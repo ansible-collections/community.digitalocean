@@ -1,0 +1,93 @@
+name: CI
+on:
+- pull_request
+
+jobs:
+  sanity:
+    name: Sanity (${{ matrix.ansible }})
+    strategy:
+      matrix:
+        ansible:
+        - stable-2.10
+        - devel
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v1
+        with:
+          # FIXME ansible_collections/NAMESPACE/COLLECTION
+          path: ansible_collections/community/FIXME
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Install ansible-base (${{ matrix.ansible }})
+        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
+
+      - name: Run sanity tests
+        run: ansible-test sanity --docker -v --color --python 3.6
+
+# If you don't have unit tests, you can delete this section
+  units:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+        with:
+          # FIXME ansible_collections/NAMESPACE/COLLECTION        
+          path: ansible_collections/community/grafana
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.6
+
+      - name: Install ansible-base (devel)
+        run: pip install https://github.com/ansible/ansible/archive/devel.tar.gz --disable-pip-version-check
+
+      - name: Run unit tests
+        run: ansible-test units --docker -v --color --python 3.6 --coverage
+
+      - name: Generate coverage report.
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false
+
+# If you don't have unit tests, you can delete this section
+# Though you should consider creating some
+
+  integration:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python_version: ["3.6"]
+    container:
+      image: python:${{ matrix.python_version }}-alpine
+    steps:
+
+      - name: Check out code
+        uses: actions/checkout@v1
+        with:
+          # FIXME ansible_collections/NAMESPACE/COLLECTION        
+          path: ansible_collections/community/FIXME
+          
+      - name: Install ansible-base (stable-2.10)
+        run: pip install https://github.com/ansible/ansible/archive/stable-2.10.tar.gz --disable-pip-version-check
+
+
+      - name: Run integration tests on Python ${{ matrix.python_version }}
+        run: ansible-test integration --docker -v --color --retry-on-error --python ${{ matrix.python_version }} --continue-on-error --diff --coverage
+        
+      - name: Generate coverage report.
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        # FIXME ansible_collections/NAMESPACE/COLLECTION        
+        working-directory: ./ansible_collections/community/FIXME
+
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false
