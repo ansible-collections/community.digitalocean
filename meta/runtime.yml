@@ -1,0 +1,63 @@
+requires_ansible: '>=2.9.10'
+plugin_routing:
+  modules:
+    digital_ocean:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_account_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_certificate_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_domain_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_firewall_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_floating_ip_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_image_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_load_balancer_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_region_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_size_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_snapshot_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_sshkey_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_tag_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    digital_ocean_volume_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
+    docker_image_facts:
+      deprecation:
+        removal_version: 2.0.0
+        warning_text: see plugin documentation for details
