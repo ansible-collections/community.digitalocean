@@ -1,0 +1,14 @@
+namespace: community
+name: digitalocean
+version: 0.1.0
+readme: README.md
+authors:
+  - Ansible (https://github.com/ansible)
+description: null
+license_file: COPYING
+tags:
+  - digitalocean
+repository: https://github.com/ansible-collections/community.digitalocean
+#documentation: https://github.com/ansible-collection-migration/community.digitalocean/tree/main/docs
+homepage: https://github.com/ansible-collections/community.digitalocean
+issues: https://github.com/ansible-collections/community.digitalocean/issues
