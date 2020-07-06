@@ -25,6 +25,7 @@ plugins/modules/digital_ocean_sshkey.py validate-modules:parameter-type-not-in-d
 plugins/modules/digital_ocean_sshkey.py validate-modules:undocumented-parameter
 plugins/modules/digital_ocean_sshkey_facts.py validate-modules:deprecation-mismatch
 plugins/modules/digital_ocean_sshkey_facts.py validate-modules:invalid-documentation
+plugins/modules/digital_ocean_sshkey_facts.py validate-modules:missing-main-call
 plugins/modules/digital_ocean_tag.py validate-modules:doc-missing-type
 plugins/modules/digital_ocean_tag.py validate-modules:parameter-type-not-in-doc
 plugins/modules/digital_ocean_tag_info.py validate-modules:parameter-type-not-in-doc
