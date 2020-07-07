@@ -8,6 +8,7 @@ jobs:
     strategy:
       matrix:
         ansible:
+        - stable-2.9
         - stable-2.10
         - devel
     runs-on: ubuntu-latest
