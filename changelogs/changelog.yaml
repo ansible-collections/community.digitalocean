@@ -1,0 +1,9 @@
+ancestor: null
+releases:
+  0.1.0:
+    changes:
+      release_summary: Initial release of the collection after extracing the modules
+        from `community.general <https://github.com/ansible-collections/community.general/>`_.
+    fragments:
+    - 0.1.0.yml
+    release_date: '2020-07-07'
