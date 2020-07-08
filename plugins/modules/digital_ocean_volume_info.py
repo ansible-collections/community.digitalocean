@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_volume_info
 short_description: Gather information about DigitalOcean volumes
@@ -22,7 +22,7 @@ options:
      - Name of region to restrict results to volumes available in a specific region.
      - Please use M(community.digitalocean.digital_ocean_region_info) for getting valid values related regions.
     required: false
-
+    type: str
 requirements:
   - "python >= 2.6"
 
@@ -32,29 +32,29 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all volume
-  digital_ocean_volume_info:
+  community.digitalocean.digital_ocean_volume_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about volume in given region
-  digital_ocean_volume_info:
+  community.digitalocean.digital_ocean_volume_info:
     region_name: nyc1
     oauth_token: "{{ oauth_token }}"
 
 - name: Get information about volume named nyc3-test-volume
-  digital_ocean_volume_info:
+  community.digitalocean.digital_ocean_volume_info:
   register: resp_out
 - set_fact:
     volume_id: "{{ item.id }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?name=='nyc3-test-volume']"
 - debug: var=volume_id
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean volume information
     returned: success

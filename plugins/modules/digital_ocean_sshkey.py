@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_sshkey
 short_description: Manage DigitalOcean SSH keys
@@ -42,9 +42,9 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: "Create ssh key"
-  digital_ocean_sshkey:
+  community.digitalocean.digital_ocean_sshkey:
     oauth_token: "{{ oauth_token }}"
     name: "My SSH Public Key"
     ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAQQDDHr/jh2Jy4yALcK4JyWbVkPRaWmhck3IgCoeOO3z1e2dBowLh64QAM+Qb72pxekALga2oi4GvT+TlWNhzPH4V example"
@@ -52,14 +52,14 @@ EXAMPLES = '''
   register: result
 
 - name: "Delete ssh key"
-  digital_ocean_sshkey:
+  community.digitalocean.digital_ocean_sshkey:
     oauth_token: "{{ oauth_token }}"
     state: "absent"
     fingerprint: "3b:16:bf:e4:8b:00:8b:b8:59:8c:a9:d3:f0:19:45:fa"
 '''
 
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
 data:
     description: This is only present when C(state=present)

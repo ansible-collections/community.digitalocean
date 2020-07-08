@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_region_info
 short_description: Gather information about DigitalOcean regions
@@ -24,26 +24,27 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all regions
-  digital_ocean_region_info:
+  community.digitalocean.digital_ocean_region_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Get Name of region where slug is known
-  digital_ocean_region_info:
+  community.digitalocean.digital_ocean_region_info:
     oauth_token: "{{ oauth_token }}"
   register: resp_out
 - debug: var=resp_out
 - set_fact:
     region_slug: "{{ item.name }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?slug==`nyc1`]"
-- debug: var=region_slug
+- debug:
+    var: region_slug
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean regions information
     returned: success

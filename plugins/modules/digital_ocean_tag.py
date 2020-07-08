@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_tag
 short_description: Create and remove tag(s) to DigitalOcean resource.
@@ -21,21 +21,25 @@ options:
      - The name of the tag. The supported characters for names include
        alphanumeric characters, dashes, and underscores.
     required: true
+    type: str
   resource_id:
     description:
     - The ID of the resource to operate on.
     - The data type of resource_id is changed from integer to string since Ansible 2.5.
     aliases: ['droplet_id']
+    type: str
   resource_type:
     description:
     - The type of resource to operate on. Currently, only tagging of
       droplets is supported.
     default: droplet
     choices: ['droplet']
+    type: str
   state:
     description:
      - Whether the tag should be present or absent on the resource.
     default: present
+    type: str
     choices: ['present', 'absent']
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
@@ -50,14 +54,14 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Create a tag
-  digital_ocean_tag:
+  community.digitalocean.digital_ocean_tag:
     name: production
     state: present
 
 - name: Tag a resource; creating the tag if it does not exist
-  digital_ocean_tag:
+  community.digitalocean.digital_ocean_tag:
     name: "{{ item }}"
     resource_id: "73333005"
     state: present
@@ -66,7 +70,7 @@ EXAMPLES = '''
     - dbserver
 
 - name: Untag a resource
-  digital_ocean_tag:
+  community.digitalocean.digital_ocean_tag:
     name: staging
     resource_id: "73333005"
     state: absent
@@ -74,13 +78,13 @@ EXAMPLES = '''
 # Deleting a tag also untags all the resources that have previously been
 # tagged with it
 - name: Remove a tag
-  digital_ocean_tag:
+  community.digitalocean.digital_ocean_tag:
     name: dbserver
     state: absent
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: a DigitalOcean Tag resource
     returned: success and no resource constraint

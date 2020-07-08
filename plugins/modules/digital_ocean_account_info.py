@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_account_info
 short_description: Gather information about DigitalOcean User account
@@ -26,14 +26,14 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about user account
-  digital_ocean_account_info:
+  community.digitalocean.digital_ocean_account_info:
     oauth_token: "{{ oauth_token }}"
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean account information
     returned: success

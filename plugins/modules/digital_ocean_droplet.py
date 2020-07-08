@@ -7,7 +7,7 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_droplet
 short_description: Create and delete a DigitalOcean droplet
@@ -110,9 +110,9 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Create a new droplet
-  digital_ocean_droplet:
+  community.digitalocean.digital_ocean_droplet:
     state: present
     name: mydroplet
     oauth_token: XXX
@@ -127,7 +127,7 @@ EXAMPLES = '''
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
 
 - name: Ensure a droplet is present
-  digital_ocean_droplet:
+  community.digitalocean.digital_ocean_droplet:
     state: present
     id: 123
     name: mydroplet
@@ -138,7 +138,7 @@ EXAMPLES = '''
     wait_timeout: 500
 
 - name: Ensure a droplet is present with SSH keys installed
-  digital_ocean_droplet:
+  community.digitalocean.digital_ocean_droplet:
     state: present
     id: 123
     name: mydroplet
@@ -150,7 +150,7 @@ EXAMPLES = '''
     wait_timeout: 500
 '''
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#droplets
 data:
     description: a DigitalOcean Droplet

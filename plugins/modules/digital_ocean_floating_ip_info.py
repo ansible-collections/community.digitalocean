@@ -7,7 +7,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_floating_ip_info
 short_description: DigitalOcean Floating IPs information
@@ -25,17 +25,18 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: "Gather information about all Floating IPs"
-  digital_ocean_floating_ip_info:
+  community.digitalocean.digital_ocean_floating_ip_info:
   register: result
 
 - name: "List of current floating ips"
-  debug: var=result.floating_ips
+  debug:
+    var: result.floating_ips
 '''
 
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#floating-ips
 floating_ips:
     description: a DigitalOcean Floating IP resource

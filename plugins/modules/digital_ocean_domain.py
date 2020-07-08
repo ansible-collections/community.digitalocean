@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_domain
 short_description: Create/delete a DNS domain in DigitalOcean
@@ -18,19 +18,23 @@ author: "Michael Gregson (@mgregson)"
 options:
   state:
     description:
-     - Indicate desired state of the target.
+    - Indicate desired state of the target.
     default: present
     choices: ['present', 'absent']
+    type: str
   id:
     description:
-     - Numeric, the droplet id you want to operate on.
+    - The droplet id you want to operate on.
     aliases: ['droplet_id']
+    type: int
   name:
     description:
-     - String, this is the name of the droplet - must be formatted by hostname rules, or the name of a SSH key, or the name of a domain.
+    - The name of the droplet - must be formatted by hostname rules, or the name of a SSH key, or the name of a domain.
+    type: str
   ip:
     description:
-     - An 'A' record for '@' ($ORIGIN) will be created with the value 'ip'.  'ip' is an IP version 4 address.
+    - An 'A' record for '@' ($ORIGIN) will be created with the value 'ip'.  'ip' is an IP version 4 address.
+    type: str
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
@@ -44,16 +48,16 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Create a domain
-  digital_ocean_domain:
+  community.digitalocean.digital_ocean_domain:
     state: present
     name: my.digitalocean.domain
     ip: 127.0.0.1
 
 # Create a droplet and corresponding domain
 - name: Create a droplet
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     name: test_droplet
     size_id: 1gb
@@ -62,7 +66,7 @@ EXAMPLES = '''
   register: test_droplet
 
 - name: Create a corresponding domain
-  digital_ocean_domain:
+  community.digitalocean.digital_ocean_domain:
     state: present
     name: "{{ test_droplet.droplet.name }}.my.domain"
     ip: "{{ test_droplet.droplet.ip_address }}"

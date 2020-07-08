@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_size_info
 short_description: Gather information about DigitalOcean Droplet sizes
@@ -24,28 +24,29 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all droplet sizes
-  digital_ocean_size_info:
+  community.digitalocean.digital_ocean_size_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Get droplet Size Slug where vcpus is 1
-  digital_ocean_size_info:
+  community.digitalocean.digital_ocean_size_info:
     oauth_token: "{{ oauth_token }}"
   register: resp_out
 - debug: var=resp_out
 - set_fact:
     size_slug: "{{ item.slug }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?vcpus==`1`]"
-- debug: var=size_slug
+- debug:
+    var: size_slug
 
 
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean droplet size information
     returned: success
