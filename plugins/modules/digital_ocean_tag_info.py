@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_tag_info
 short_description: Gather information about DigitalOcean tags
@@ -21,6 +21,7 @@ options:
     description:
      - Tag name that can be used to identify and reference a tag.
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -29,29 +30,30 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all tags
-  digital_ocean_tag_info:
+  community.digitalocean.digital_ocean_tag_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about tag with given name
-  digital_ocean_tag_info:
+  community.digitalocean.digital_ocean_tag_info:
     oauth_token: "{{ oauth_token }}"
     tag_name: "extra_awesome_tag"
 
 - name: Get resources from tag name
-  digital_ocean_tag_info:
+  community.digitalocean.digital_ocean_tag_info:
   register: resp_out
 - set_fact:
     resources: "{{ item.resources }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?name=='extra_awesome_tag']"
-- debug: var=resources
+- debug:
+    var: resources
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean tag information
     returned: success

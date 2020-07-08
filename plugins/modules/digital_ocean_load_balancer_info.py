@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_load_balancer_info
 short_description: Gather information about DigitalOcean load balancers
@@ -21,6 +21,7 @@ options:
     description:
      - Load balancer ID that can be used to identify and reference a load_balancer.
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -29,29 +30,30 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all load balancers
-  digital_ocean_load_balancer_info:
+  community.digitalocean.digital_ocean_load_balancer_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about load balancer with given id
-  digital_ocean_load_balancer_info:
+  community.digitalocean.digital_ocean_load_balancer_info:
     oauth_token: "{{ oauth_token }}"
     load_balancer_id: "4de7ac8b-495b-4884-9a69-1050c6793cd6"
 
 - name: Get name from load balancer id
-  digital_ocean_load_balancer_info:
+  community.digitalocean.digital_ocean_load_balancer_info:
   register: resp_out
 - set_fact:
     load_balancer_name: "{{ item.name }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?id=='4de7ac8b-495b-4884-9a69-1050c6793cd6']"
-- debug: var=load_balancer_name
+- debug:
+    var: load_balancer_name
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean Load balancer information
     returned: success

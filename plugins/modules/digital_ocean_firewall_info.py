@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_firewall_info
 short_description: Gather information about DigitalOcean firewalls
@@ -21,6 +21,7 @@ options:
     description:
      - Firewall rule name that can be used to identify and reference a specific firewall rule.
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -29,18 +30,18 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all firewalls
-  digital_ocean_firewall_info:
+  community.digitalocean.digital_ocean_firewall_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about a specific firewall by name
-  digital_ocean_firewall_info:
+  community.digitalocean.digital_ocean_firewall_info:
     oauth_token: "{{ oauth_token }}"
     name: "firewall_name"
 
 - name: Gather information from a firewall rule
-  digital_ocean_firewall_info:
+  community.digitalocean.digital_ocean_firewall_info:
     name: SSH
   register: resp_out
 
@@ -52,7 +53,7 @@ EXAMPLES = '''
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean firewall information
     returned: success

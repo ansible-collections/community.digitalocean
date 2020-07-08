@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_domain_info
 short_description: Gather information about DigitalOcean Domains
@@ -21,6 +21,7 @@ options:
     description:
      - Name of the domain to gather information for.
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -29,29 +30,30 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all domains
-  digital_ocean_domain_info:
+  community.digitalocean.digital_ocean_domain_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about domain with given name
-  digital_ocean_domain_info:
+  community.digitalocean.digital_ocean_domain_info:
     oauth_token: "{{ oauth_token }}"
     domain_name: "example.com"
 
 - name: Get ttl from domain
-  digital_ocean_domain_info:
+  community.digitalocean.digital_ocean_domain_info:
   register: resp_out
 - set_fact:
     domain_ttl: "{{ item.ttl }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?name=='example.com']"
-- debug: var=domain_ttl
+- debug:
+    var: domain_ttl
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean Domain information
     returned: success

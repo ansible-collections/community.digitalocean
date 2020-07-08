@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_certificate_info
 short_description: Gather information about DigitalOcean certificates
@@ -21,6 +21,7 @@ options:
     description:
      - Certificate ID that can be used to identify and reference a certificate.
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -29,29 +30,30 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all certificates
-  digital_ocean_certificate_info:
+  community.digitalocean.digital_ocean_certificate_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about certificate with given id
-  digital_ocean_certificate_info:
+  community.digitalocean.digital_ocean_certificate_info:
     oauth_token: "{{ oauth_token }}"
     certificate_id: "892071a0-bb95-49bc-8021-3afd67a210bf"
 
 - name: Get not after information about certificate
-  digital_ocean_certificate_info:
+  community.digitalocean.digital_ocean_certificate_info:
   register: resp_out
 - set_fact:
     not_after_date: "{{ item.not_after }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?name=='web-cert-01']"
-- debug: var=not_after_date
+- debug:
+    var: not_after_date
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean certificate information
     returned: success

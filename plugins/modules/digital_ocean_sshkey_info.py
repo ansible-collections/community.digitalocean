@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_sshkey_info
 short_description: Gather information about DigitalOcean SSH keys
@@ -27,16 +27,16 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about DigitalOcean SSH keys
-  digital_ocean_sshkey_info:
+  community.digitalocean.digital_ocean_sshkey_info:
     oauth_token: "{{ my_do_key }}"
   register: ssh_keys
 
 - name: Set facts based on the gathered information
   set_fact:
     pubkey: "{{ item.public_key }}"
-  loop: "{{ ssh_keys.data|json_query(ssh_pubkey) }}"
+  loop: "{{ ssh_keys.data | community.general.json_query(ssh_pubkey) }}"
   vars:
     ssh_pubkey: "[?name=='ansible_ctrl']"
 

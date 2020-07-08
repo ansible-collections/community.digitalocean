@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_snapshot_info
 short_description: Gather information about DigitalOcean Snapshot
@@ -27,12 +27,14 @@ options:
     default: 'all'
     choices: [ 'all', 'droplet', 'volume', 'by_id']
     required: false
+    type: str
   snapshot_id:
     description:
      - To retrieve information about a snapshot, please specify this as a snapshot id.
      - If set to actual snapshot id, then information are gathered related to that particular snapshot only.
      - This is required parameter, if C(snapshot_type) is set to C(by_id).
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -41,42 +43,43 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all snapshots
-  digital_ocean_snapshot_info:
+  community.digitalocean.digital_ocean_snapshot_info:
     snapshot_type: all
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about droplet snapshots
-  digital_ocean_snapshot_info:
+  community.digitalocean.digital_ocean_snapshot_info:
     snapshot_type: droplet
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about volume snapshots
-  digital_ocean_snapshot_info:
+  community.digitalocean.digital_ocean_snapshot_info:
     snapshot_type: volume
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about snapshot by snapshot id
-  digital_ocean_snapshot_info:
+  community.digitalocean.digital_ocean_snapshot_info:
     snapshot_type: by_id
     snapshot_id: 123123123
     oauth_token: "{{ oauth_token }}"
 
 - name: Get information about snapshot named big-data-snapshot1
-  digital_ocean_snapshot_info:
+  community.digitalocean.digital_ocean_snapshot_info:
   register: resp_out
 - set_fact:
     snapshot_id: "{{ item.id }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?name=='big-data-snapshot1']"
-- debug: var=snapshot_id
+- debug:
+    var: snapshot_id
 
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean snapshot information
     returned: success

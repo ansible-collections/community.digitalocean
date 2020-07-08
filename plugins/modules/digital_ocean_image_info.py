@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_image_info
 short_description: Gather information about DigitalOcean images
@@ -28,6 +28,7 @@ options:
     default: 'all'
     choices: [ 'all', 'application', 'distribution', 'private' ]
     required: false
+    type: str
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
@@ -36,36 +37,37 @@ extends_documentation_fragment:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Gather information about all images
-  digital_ocean_image_info:
+  community.digitalocean.digital_ocean_image_info:
     image_type: all
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about application images
-  digital_ocean_image_info:
+  community.digitalocean.digital_ocean_image_info:
     image_type: application
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about distribution images
-  digital_ocean_image_info:
+  community.digitalocean.digital_ocean_image_info:
     image_type: distribution
     oauth_token: "{{ oauth_token }}"
 
 - name: Get distribution about image with slug coreos-beta
-  digital_ocean_image_info:
+  community.digitalocean.digital_ocean_image_info:
   register: resp_out
 - set_fact:
     distribution_name: "{{ item.distribution }}"
-  loop: "{{ resp_out.data|json_query(name) }}"
+  loop: "{{ resp_out.data | community.general.json_query(name) }}"
   vars:
     name: "[?slug=='coreos-beta']"
-- debug: var=distribution_name
+- debug:
+    var: distribution_name
 
 '''
 
 
-RETURN = '''
+RETURN = r'''
 data:
     description: DigitalOcean image information
     returned: success

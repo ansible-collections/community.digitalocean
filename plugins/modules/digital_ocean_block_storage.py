@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_block_storage
 short_description: Create/destroy or attach/detach Block Storage volumes in DigitalOcean
@@ -20,31 +20,43 @@ options:
      - Which operation do you want to perform.
     choices: ['create', 'attach']
     required: true
+    type: str
   state:
     description:
      - Indicate desired state of the target.
     choices: ['present', 'absent']
     required: true
+    type: str
   block_size:
     description:
-    - The size of the Block Storage volume in gigabytes. Required when command=create and state=present. If snapshot_id is included, this will be ignored.
+    - The size of the Block Storage volume in gigabytes.
+    - Required when I(command=create) and I(state=present).
+    - If snapshot_id is included, this will be ignored.
+    type: int
   volume_name:
     description:
     - The name of the Block Storage volume.
+    type: str
     required: true
   description:
     description:
     - Description of the Block Storage volume.
+    type: str
   region:
     description:
-    - The slug of the region where your Block Storage volume should be located in. If snapshot_id is included, this will be ignored.
-    required: true
+    - The slug of the region where your Block Storage volume should be located in.
+    - If I(snapshot_id) is included, this will be ignored.
+    type: str
   snapshot_id:
     description:
-    - The snapshot id you would like the Block Storage volume created with. If included, region and block_size will be ignored and changed to null.
+    - The snapshot id you would like the Block Storage volume created with.
+    - If included, I(region) and I(block_size) will be ignored and changed to C(null).
+    type: str
   droplet_id:
     description:
-    - The droplet id you want to operate on. Required when command=attach.
+    - The droplet id you want to operate on.
+    - Required when I(command=attach).
+    type: int
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
@@ -57,9 +69,9 @@ author:
     - "Harnek Sidhu (@harneksidhu)"
 '''
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Create new Block Storage
-  digital_ocean_block_storage:
+  community.digitalocean.digital_ocean_block_storage:
     state: present
     command: create
     api_token: <TOKEN>
@@ -68,7 +80,7 @@ EXAMPLES = '''
     volume_name: nyc1-block-storage
 
 - name: Delete Block Storage
-  digital_ocean_block_storage:
+  community.digitalocean.digital_ocean_block_storage:
     state: absent
     command: create
     api_token: <TOKEN>
@@ -76,7 +88,7 @@ EXAMPLES = '''
     volume_name: nyc1-block-storage
 
 - name: Attach Block Storage to a Droplet
-  digital_ocean_block_storage:
+  community.digitalocean.digital_ocean_block_storage:
     state: present
     command: attach
     api_token: <TOKEN>
@@ -85,7 +97,7 @@ EXAMPLES = '''
     droplet_id: <ID>
 
 - name: Detach Block Storage from a Droplet
-  digital_ocean_block_storage:
+  community.digitalocean.digital_ocean_block_storage:
     state: absent
     command: attach
     api_token: <TOKEN>
@@ -94,7 +106,7 @@ EXAMPLES = '''
     droplet_id: <ID>
 '''
 
-RETURN = '''
+RETURN = r'''
 id:
     description: Unique identifier of a Block Storage volume returned during creation.
     returned: changed

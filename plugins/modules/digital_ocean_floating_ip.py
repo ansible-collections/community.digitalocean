@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_floating_ip
 short_description: Manage DigitalOcean Floating IPs
@@ -41,26 +41,26 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: "Create a Floating IP in region lon1"
-  digital_ocean_floating_ip:
+  community.digitalocean.digital_ocean_floating_ip:
     state: present
     region: lon1
 
 - name: "Create a Floating IP assigned to Droplet ID 123456"
-  digital_ocean_floating_ip:
+  community.digitalocean.digital_ocean_floating_ip:
     state: present
     droplet_id: 123456
 
 - name: "Delete a Floating IP with ip 1.2.3.4"
-  digital_ocean_floating_ip:
+  community.digitalocean.digital_ocean_floating_ip:
     state: absent
     ip: "1.2.3.4"
 
 '''
 
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#floating-ips
 data:
     description: a DigitalOcean Floating IP resource

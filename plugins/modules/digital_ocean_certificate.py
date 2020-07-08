@@ -7,10 +7,10 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_certificate
-short_description: Manage certificates in DigitalOcean.
+short_description: Manage certificates in DigitalOcean
 description:
     - Create, Retrieve and remove certificates DigitalOcean.
 author: "Abhijeet Kasurde (@Akasurde)"
@@ -18,21 +18,26 @@ options:
   name:
     description:
      - The name of the certificate.
-    required: true
+    required: True
+    type: str
   private_key:
     description:
     - A PEM-formatted private key content of SSL Certificate.
+    type: str
   leaf_certificate:
     description:
     - A PEM-formatted public SSL Certificate.
+    type: str
   certificate_chain:
     description:
     - The full PEM-formatted trust chain between the certificate authority's certificate and your domain's SSL certificate.
+    type: str
   state:
     description:
      - Whether the certificate should be present or absent.
     default: present
     choices: ['present', 'absent']
+    type: str
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
@@ -42,9 +47,9 @@ notes:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 - name: Create a certificate
-  digital_ocean_certificate:
+  community.digitalocean.digital_ocean_certificate:
     name: production
     state: present
     private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkM8OI7pRpgyj1I\n-----END PRIVATE KEY-----"
@@ -52,7 +57,7 @@ EXAMPLES = '''
     oauth_token: b7d03a6947b217efb6f3ec3bd365652
 
 - name: Create a certificate using file lookup plugin
-  digital_ocean_certificate:
+  community.digitalocean.digital_ocean_certificate:
     name: production
     state: present
     private_key: "{{ lookup('file', 'test.key') }}"
@@ -60,7 +65,7 @@ EXAMPLES = '''
     oauth_token: "{{ oauth_token }}"
 
 - name: Create a certificate with trust chain
-  digital_ocean_certificate:
+  community.digitalocean.digital_ocean_certificate:
     name: production
     state: present
     private_key: "{{ lookup('file', 'test.key') }}"
@@ -69,7 +74,7 @@ EXAMPLES = '''
     oauth_token: "{{ oauth_token }}"
 
 - name: Remove a certificate
-  digital_ocean_certificate:
+  community.digitalocean.digital_ocean_certificate:
     name: production
     state: absent
     oauth_token: "{{ oauth_token }}"
@@ -77,7 +82,7 @@ EXAMPLES = '''
 '''
 
 
-RETURN = ''' # '''
+RETURN = r''' # '''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
@@ -145,7 +150,7 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        name=dict(type='str'),
+        name=dict(type='str', required=True),
         leaf_certificate=dict(type='str'),
         private_key=dict(type='str', no_log=True),
         state=dict(choices=['present', 'absent'], default='present'),
@@ -154,9 +159,9 @@ def main():
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=[('state', 'present', ['name', 'leaf_certificate', 'private_key']),
-                     ('state', 'absent', ['name'])
-                     ],
+        required_if=[
+            ('state', 'present', ['leaf_certificate', 'private_key']),
+        ],
     )
 
     try:
