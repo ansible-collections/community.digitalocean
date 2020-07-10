@@ -222,6 +222,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable):
 
         counters = ["main", "secondary", "third", "fourth", "fifth"]
         for version, network in resource["networks"].items():
+            network = sorted(network, key=lambda item: item["type"], reverse=True)
             for idx, items in enumerate(network):
                 prefix = f"{version}_{counters[idx]}"
                 resource[f"{prefix}_ip"] = items["ip_address"]
