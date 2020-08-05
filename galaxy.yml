@@ -1,14 +1,24 @@
-namespace: community
-name: digitalocean
-version: 0.2.0
-readme: README.md
 authors:
   - Ansible (https://github.com/ansible)
-description: null
-license_file: COPYING
-tags:
-  - digitalocean
-repository: https://github.com/ansible-collections/community.digitalocean
-#documentation: https://github.com/ansible-collection-migration/community.digitalocean/tree/main/docs
+  - BondAnthony (https://github.com/BondAnthony)
+  - Akasurde (https://github.com/Akasurde)
+  - pmarques (https://github.com/pmarques)
+  - geerlingguy (https://www.jeffgeerling.com/)
+dependencies: {}
+description: DigitalOcean Ansible Collection.
+documentation: ''
 homepage: https://github.com/ansible-collections/community.digitalocean
 issues: https://github.com/ansible-collections/community.digitalocean/issues
+license_file: COPYING
+name: digitalocean
+namespace: community
+readme: README.md
+repository: https://github.com/ansible-collections/community.digitalocean
+tags:
+  - digitalocean
+  - cloud
+  - droplet
+version: 0.1.0
+build_ignore:
+  - .DS_Store
+  - '*.tar.gz'
