@@ -22,7 +22,7 @@ description:
 author:
     - Anthony Bond (@BondAnthony)
     - Lucas Basquerotto (@lucasbasquerotto)
-version_added: "2.10"
+version_added: "2.10.0"
 options:
   name:
     description:
@@ -204,7 +204,7 @@ data:
                         "::/0"
                     ]
                 },
-                "ports": "80"
+                "ports": "80",
                 "protocol": "tcp"
             },
             {
@@ -214,7 +214,7 @@ data:
                         "::/0"
                     ]
                 },
-                "ports": "443"
+                "ports": "443",
                 "protocol": "tcp"
             }
         ],
@@ -227,7 +227,7 @@ data:
                         "::/0"
                     ]
                 },
-                "ports": "1-65535"
+                "ports": "1-65535",
                 "protocol": "tcp"
             },
             {
@@ -237,7 +237,7 @@ data:
                         "::/0"
                     ]
                 },
-                "ports": "1-65535"
+                "ports": "1-65535",
                 "protocol": "udp"
             },
             {
@@ -247,7 +247,7 @@ data:
                         "::/0"
                     ]
                 },
-                "ports": "1-65535"
+                "ports": "1-65535",
                 "protocol": "icmp"
             }
         ],
@@ -259,7 +259,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 address_spec = dict(
@@ -280,6 +280,7 @@ outbound_spec = dict(
     ports=dict(type='str', required=True),
     destinations=dict(type='dict', required=True, options=address_spec),
 )
+
 
 class DOFirewall(object):
     def __init__(self, module):
@@ -402,19 +403,19 @@ class DOFirewall(object):
         return self.ordered(self.fill_data_defaults(obj))
 
     def update(self, obj, id):
-      if id is None:
-        status_code_success = 202
-        resp = self.rest.post(path=self.baseurl, data=obj)
-      else:
-        status_code_success = 200
-        resp = self.rest.put(path=self.baseurl + '/' + id, data=obj)
-      status_code = resp.status_code
-      if status_code != status_code_success:
-          error = resp.json
-          error.update({ 'status_code': status_code })
-          error.update({ 'status_code_success': status_code_success })
-          self.module.fail_json(msg=error)
-      self.module.exit_json(changed=True, data=resp.json['firewall'])
+        if id is None:
+            status_code_success = 202
+            resp = self.rest.post(path=self.baseurl, data=obj)
+        else:
+            status_code_success = 200
+            resp = self.rest.put(path=self.baseurl + '/' + id, data=obj)
+        status_code = resp.status_code
+        if status_code != status_code_success:
+            error = resp.json
+            error.update({'status_code': status_code})
+            error.update({'status_code_success': status_code_success})
+            self.module.fail_json(msg=error)
+        self.module.exit_json(changed=True, data=resp.json['firewall'])
 
     def create(self):
         rule = self.get_firewall_by_name()
@@ -426,7 +427,7 @@ class DOFirewall(object):
             "tags": self.module.params.get('tags')
         }
         if rule is None:
-          self.update(data, None)
+            self.update(data, None)
         else:
             rule_data = {
                 "name": rule.get('name'),
@@ -445,9 +446,9 @@ class DOFirewall(object):
             }
 
             if self.data_to_compare(user_data) == self.data_to_compare(rule_data):
-              self.module.exit_json(changed=False, data=rule)
+                self.module.exit_json(changed=False, data=rule)
             else:
-              self.update(data, rule.get('id'))
+                self.update(data, rule.get('id'))
 
     def destroy(self):
         rule = self.get_firewall_by_name()
