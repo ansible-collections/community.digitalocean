@@ -52,7 +52,8 @@ options:
       protocol:
         description:
           - Network protocol to be accepted.
-        required: true
+        required: false
+        default: tcp
         choices: ['udp', 'tcp', 'icmp']
       ports:
         description:
@@ -90,7 +91,8 @@ options:
       protocol:
         description:
           - Network protocol to be accepted.
-        required: true
+        required: false
+        default: tcp
         choices: ['udp', 'tcp', 'icmp']
       ports:
         description:
@@ -263,10 +265,10 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 from ansible.module_utils._text import to_native
 
 address_spec = dict(
-    addresses=dict(type='list', required=False),
-    droplet_ids=dict(type='list', required=False),
-    load_balancer_uids=dict(type='list', required=False),
-    tags=dict(type='list', required=False),
+    addresses=dict(type='list', elements='str', required=False),
+    droplet_ids=dict(type='list', elements='str', required=False),
+    load_balancer_uids=dict(type='list', elements='str', required=False),
+    tags=dict(type='list', elements='str', required=False),
 )
 
 inbound_spec = dict(
@@ -480,8 +482,8 @@ def main():
         state=dict(type='str', choices=['present', 'absent'], default='present'),
         droplet_ids=dict(type='list', required=False),
         tags=dict(type='list', required=False),
-        inbound_rules=dict(type='list', required=True, elements='dict', options=inbound_spec),
-        outbound_rules=dict(type='list', required=True, elements='dict', options=outbound_spec),
+        inbound_rules=dict(type='list', elements='dict', options=inbound_spec, required=True),
+        outbound_rules=dict(type='list', elements='dict', options=outbound_spec, required=True),
     )
     module = AnsibleModule(argument_spec=argument_spec)
 
