@@ -7,3 +7,12 @@ releases:
     fragments:
     - 0.1.0.yml
     release_date: '2020-07-07'
+  1.0.0:
+    changes:
+      bugfixes:
+      - Sanity test documentation fixes (https://github.com/ansible-collections/community.digitalocean/pull/3).
+      - Update docs examples to use FQCN (https://github.com/ansible-collections/community.digitalocean/issues/14).
+    fragments:
+    - 14-docs-fqcn.yaml
+    - 3-sanity-docs-fixes.yaml
+    release_date: '2020-08-17'

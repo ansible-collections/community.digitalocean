@@ -1,3 +1,0 @@
----
-bugfixes:
-  - Update docs examples to use FQCN (https://github.com/ansible-collections/community.digitalocean/issues/14).
