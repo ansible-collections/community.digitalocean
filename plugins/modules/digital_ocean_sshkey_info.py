@@ -46,7 +46,7 @@ EXAMPLES = r'''
 '''
 
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
 data:
     description: List of SSH keys on DigitalOcean

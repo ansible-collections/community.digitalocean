@@ -9,7 +9,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean_sshkey_facts
 deprecated:
@@ -30,8 +30,8 @@ requirements:
 '''
 
 
-EXAMPLES = '''
-- digital_ocean_sshkey_facts:
+EXAMPLES = r'''
+- community.digitalocean.digital_ocean_sshkey_facts:
     oauth_token: "{{ my_do_key }}"
 
 - set_fact:
@@ -45,7 +45,7 @@ EXAMPLES = '''
 '''
 
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
 data:
     description: List of SSH keys on DigitalOcean

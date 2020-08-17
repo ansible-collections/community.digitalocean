@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean
 short_description: Create/delete a droplet/SSH_key in DigitalOcean
@@ -105,13 +105,13 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # Ensure a SSH key is present
 # If a key matches this name, will return the ssh key id and changed = False
 # If no existing key matches this name, a new key is created, the ssh key id is returned and changed = False
 
 - name: Ensure a SSH key is present
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     command: ssh
     name: my_ssh_key
@@ -120,7 +120,7 @@ EXAMPLES = '''
 
 # Will return the droplet details including the droplet id (used for idempotence)
 - name: Create a new Droplet
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     command: droplet
     name: mydroplet
@@ -142,7 +142,7 @@ EXAMPLES = '''
 # If no droplet matches the id, a new droplet will be created and the droplet details (including the new id) are returned, changed = True.
 
 - name: Ensure a droplet is present
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     command: droplet
     id: 123
@@ -159,7 +159,7 @@ EXAMPLES = '''
 # The keys are used to connect as root to the droplet.
 
 - name: Create a droplet with ssh key
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     ssh_key_ids: 123,456
     name: mydroplet
