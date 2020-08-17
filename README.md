@@ -58,7 +58,7 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: community.digitalocean
-    version: 0.1.0
+    version: 1.0.0
 ```
 
 ### Using modules from the DigitalOcean Collection in your playbooks
@@ -142,6 +142,20 @@ Note: To run integration tests, you must add an [`integration_config.yml`](https
 ## Release notes
 
 See the [changelog](https://github.com/ansible-collections/community.digitalocean/blob/main/CHANGELOG.rst).
+
+### Release process
+
+Releases are automatically built and pushed to Ansible Galaxy for any new tag. Before tagging a release, make sure to do the following:
+
+  1. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection.
+  1. Update the CHANGELOG:
+    1. Make sure you have [`antsibull-changelog`](https://pypi.org/project/antsibull-changelog/) installed.
+    1. Make sure there are fragments for all known changes in `changelogs/fragments`.
+    1. Run `antsibull-changelog release`.
+  1. Commit the changes and create a PR with the changes. Wait for tests to pass, then merge it once they have.
+  1. Tag the version in Git and push to GitHub.
+
+After the version is published, verify it exists on the [DigitalOcean Collection Galaxy page](https://galaxy.ansible.com/community/digitalocean).
 
 ## More information
 
