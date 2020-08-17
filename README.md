@@ -61,7 +61,7 @@ collections:
     version: 0.1.0
 ```
 
-### Using modules from the Kubernetes Collection in your playbooks
+### Using modules from the DigitalOcean Collection in your playbooks
 
 It's preferable to use content in this collection using their Fully Qualified Collection Namespace (FQCN), for example `community.digitalocean.digital_ocean_droplet`:
 
