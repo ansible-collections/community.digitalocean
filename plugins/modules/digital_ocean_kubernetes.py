@@ -281,11 +281,11 @@ class DOKubernetes(object):
         response = self.rest.post('kubernetes/clusters', data=request_params)
         json_data = response.json
         if response.status_code >= 400:
-            self.module.fail_json(changed=False, msg=json_data['message'])
+            self.module.fail_json(changed=False, msg=json_data)
         if self.wait:
             json_data = self.ensure_running(
                 json_data['kubernetes_cluster']['id'])
-        self.module.exit_json(changed=True, data=json_data['message'])
+        self.module.exit_json(changed=True, data=json_data)
 
     def delete(self):
         json_data = self.get_kubernetes()
