@@ -40,6 +40,10 @@ class Response(object):
     def status_code(self):
         return self.info["status"]
 
+    @property
+    def text(self):
+        return to_text(self.body)
+
 
 class DigitalOceanHelper:
 
