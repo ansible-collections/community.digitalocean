@@ -15,10 +15,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_kubernetes
-short_description: Create and delete a DigitalOcean Kubernetes cluster
+module: digital_ocean_kubernetes_info
+short_description: Returns information about a DigitalOcean Kubernetes cluster
 description:
-    - Create and delete a Kubernetes cluster in DigitalOcean and optionally wait for it to be running
+    - Returns information about a DigitalOcean Kubernetes cluster
 author: "Gurchet Rai (@gurch101)"
 # options:
 #   state:
@@ -198,7 +198,7 @@ requirements:
 # '''
 
 
-class DOKubernetes(object):
+class DOKubernetesInfo(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
@@ -234,101 +234,31 @@ class DOKubernetes(object):
 
     def get_kubernetes_kubeconfig(self):
         response = self.rest.get('kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
-        json_data = response.json
-        # if response.status_code == 200:
-        #     return json_data
-        # return None
-        return json_data
+        text_data = response.text
+        return text_data
 
     def get_kubernetes(self):
         json_data = self.get_by_name(self.module.params['name'])
+        self.cluster_id = json_data['id']
         return json_data
 
-    # https://developers.digitalocean.com/documentation/v2/#list-available-regions--node-sizes--and-versions-of-kubernetes
-    def get_kubernetes_options(self):
-        response = self.rest.get('kubernetes/options')
-        json_data = response.json
-        if response.status_code == 200:
-            return json_data
-        return None
-
-    def ensure_running(self):
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
-            cluster = self.get_by_id()
-            if cluster['kubernetes_cluster']['status']['state'] == 'running':
-                return cluster
-            time.sleep(min(2, end_time - time.time()))
-        self.module.fail_json(msg='Wait for Kubernetes cluster to be running')
-
-    def create(self):
-        # Get valid Kubernetes options
-        kubernetes_options = self.get_kubernetes_options()['options']
-        # Validate region
-        valid_regions = [ str(x['slug']) for x in kubernetes_options['regions'] ]
-        if self.module.params.get('region') not in valid_regions:
-            self.module.fail_json(msg='Invalid region {} (valid regions are {})'.format(self.module.params.get('region'), ', '.join(valid_regions)))
-        # Validate version
-        valid_versions = [ str(x['slug']) for x in kubernetes_options['versions'] ]
-        if self.module.params.get('version') not in valid_versions:
-            self.module.fail_json(msg='Invalid version {} (valid versions are {})'.format(self.module.params.get('version'), ', '.join(valid_versions)))
-        # Validate size
-        valid_sizes = [ str(x['slug']) for x in kubernetes_options['sizes'] ]
-        for node_pool in self.module.params.get('node_pools'):
-            if node_pool['size'] not in valid_sizes:
-                self.module.fail_json(msg='Invalid size {} (valid sizes are {})'.format(node_pool['size'], ', '.join(valid_sizes)))
-
-        # Create the Kubernetes cluster
+    def get(self):
         json_data = self.get_kubernetes()
         if json_data:
-            self.module.exit_json(changed=False, data=json_data)
-        if self.module.check_mode:
-            self.module.exit_json(changed=True)
-        request_params = dict(self.module.params)
-        response = self.rest.post('kubernetes/clusters', data=request_params)
-        json_data = response.json
-        if response.status_code >= 400:
-            self.module.fail_json(changed=False, msg=json_data)
-        # Set the cluster_id
-        self.cluster_id = json_data['kubernetes_cluster']['id']
-        if self.wait:
-            json_data = self.ensure_running()
-        # Add the kubeconfig to the return
-        json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
-        self.module.exit_json(changed=True, data=json_data)
-
-    def delete(self):
-        json_data = self.get_kubernetes()
-        if json_data:
-            if self.module.check_mode:
-                self.module.exit_json(changed=True)
-            response = self.rest.delete(
-                'kubernetes/clusters/{0}'.format(json_data['id']))
-            json_data = response.json
-            if response.status_code == 204:
-                self.module.exit_json(
-                    changed=True, msg='Kubernetes cluster deleted')
-            self.module.fail_json(
-                changed=False, msg='Failed to delete Kubernetes cluster')
-        else:
-            self.module.exit_json(
-                changed=False, msg='Kubernetes cluster not found')
+            json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
+            self.module.exit_json(changed=True, data=json_data)
+        self.module.fail_json(changed=False, msg='Kubernetes cluster not found')
 
 
 def core(module):
-    state = module.params.pop('state')
-    cluster = DOKubernetes(module)
-    if state == 'present':
-        cluster.create()
-    elif state == 'absent':
-        cluster.delete()
+    cluster = DOKubernetesInfo(module)
+    cluster.get()
 
 
 # https://developers.digitalocean.com/documentation/v2/#kubernetes
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
@@ -336,36 +266,10 @@ def main():
                                          'DO_API_KEY', 'DO_OAUTH_TOKEN'])
             ),
             name=dict(type='str'),
-            unique_name=dict(type='bool', default=True),
-            region=dict(aliases=['region_id'], default='nyc1'),
-            version=dict(type='str', default='1.18.8-do.0'),
-            auto_upgrade=dict(type='bool', default=False),
-            surge_upgrade=dict(type='bool', default=False),
-            tags=dict(type='list'),
-            maintenance_policy=dict(
-                start_time='',
-                day=''
-            ),
-            node_pools=dict(type='list', default=[
-                {
-                    'name': 'worker-pool',
-                    'size': 's-1vcpu-2gb',
-                    'count': 1,
-                    'tags': [],
-                    'labels': {}
-                }
-            ]),
-            vpc_uuid=dict(type='str'),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(type='int', default=600)
         ),
         required_one_of=(
             ['name']
-        ),
-        required_if=([
-            ('state', 'present', ['name', 'region', 'version', 'node_pools']),
-        ]),
-        supports_check_mode=True,
+        )
     )
 
     core(module)
