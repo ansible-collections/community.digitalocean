@@ -12,7 +12,7 @@ DOCUMENTATION = r'''
 module: digital_ocean_kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
-     - Create and delete a Kubernetes cluster in DigitalOcean and optionally wait for it to be active.
+  - Create and delete a Kubernetes cluster in DigitalOcean and optionally wait for it to be running.
 author: "Gurchet Rai (@gurch101)"
 # options:
 #   state:
@@ -207,6 +207,7 @@ class DOKubernetes(object):
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
 
+
     def get_by_id(self, cluster_id):
         if not cluster_id:
             return None
@@ -216,12 +217,14 @@ class DOKubernetes(object):
             return json_data
         return None
 
+
     def get_all_clusters(self):
         response = self.rest.get('kubernetes/clusters')
         json_data = response.json
         if response.status_code == 200:
             return json_data
         return None
+
 
     def get_by_name(self, cluster_name):
         if not cluster_name:
@@ -232,23 +235,50 @@ class DOKubernetes(object):
                 return cluster
         return None
 
+
     def get_kubernetes(self):
         json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
 
+    def get_kubernetes_options(self):
+        response = self.rest.get('kubernetes/options')
+        json_data = response.json
+        if response.status_code == 200:
+            return json_data
+        return None
+
+
+    def ensure_running(self, cluster_id):
+        end_time = time.time() + self.wait_timeout
+        while time.time() < end_time:
+            cluster = self.get_by_id(cluster_id)
+            if cluster['kubernetes_cluster']['status']['state'] == 'running':
+                return cluster
+            time.sleep(min(2, end_time - time.time()))
+        self.module.fail_json(msg='Wait for Kubernetes cluster to be running')
+
+
     def create(self):
         json_data = self.get_kubernetes()
+
         if json_data:
             self.module.exit_json(changed=False, data=json_data)
+
         if self.module.check_mode:
             self.module.exit_json(changed=True)
+
         request_params = dict(self.module.params)
-        del request_params['id']
+        # del request_params['id']
         response = self.rest.post('kubernetes/clusters', data=request_params)
         json_data = response.json
+
         if response.status_code >= 400:
             self.module.fail_json(changed=False, msg=json_data['message'])
+
+        if self.wait:
+            json_data = self.ensure_running(json_data['kubernetes_cluster']['id'])
+
         self.module.exit_json(changed=True, data=json_data['message'])
 
 
@@ -287,26 +317,27 @@ def main():
             ),
             name=dict(type='str'),
             unique_name=dict(type='bool', default=True),
-            # id=dict(aliases=['kubernetes_id'], type='int'),
             region=dict(aliases=['region_id'], default='nyc1'),
             version=dict(type='str', default='1.18.8-do.0'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list'),
             maintenance_policy=dict(
-              start_time='',
-              day=''
+                start_time='',
+                day=''
             ),
             node_pools=dict(type='list', default=[
-              {
-                'name': 'worker-pool',
-                'size': 's-1vcpu-2gb',
-                'count': 1,
-                'tags': [],
-                'labels': {}
-              }
+                {
+                    'name': 'worker-pool',
+                    'size': 's-1vcpu-2gb',
+                    'count': 1,
+                    'tags': [],
+                    'labels': {}
+                }
             ]),
-            vpc_uuid=dict(type='str')
+            vpc_uuid=dict(type='str'),
+            wait=dict(type='bool', default=True),
+            wait_timeout=dict(type='int', default=600)
         ),
         required_one_of=(
             ['name']
