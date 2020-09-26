@@ -5,6 +5,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible.module_utils.basic import AnsibleModule, env_fallback
+import json
+import time
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -191,11 +195,6 @@ requirements:
 #     }
 # '''
 
-import time
-import json
-from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
-
 
 class DOKubernetes(object):
     def __init__(self, module):
@@ -207,7 +206,6 @@ class DOKubernetes(object):
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
 
-
     def get_by_id(self, cluster_id):
         if not cluster_id:
             return None
@@ -217,14 +215,12 @@ class DOKubernetes(object):
             return json_data
         return None
 
-
     def get_all_clusters(self):
         response = self.rest.get('kubernetes/clusters')
         json_data = response.json
         if response.status_code == 200:
             return json_data
         return None
-
 
     def get_by_name(self, cluster_name):
         if not cluster_name:
@@ -235,11 +231,9 @@ class DOKubernetes(object):
                 return cluster
         return None
 
-
     def get_kubernetes(self):
         json_data = self.get_by_name(self.module.params['name'])
         return json_data
-
 
     def get_kubernetes_options(self):
         response = self.rest.get('kubernetes/options')
@@ -247,7 +241,6 @@ class DOKubernetes(object):
         if response.status_code == 200:
             return json_data
         return None
-
 
     def ensure_running(self, cluster_id):
         end_time = time.time() + self.wait_timeout
@@ -257,7 +250,6 @@ class DOKubernetes(object):
                 return cluster
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for Kubernetes cluster to be running')
-
 
     def create(self):
         json_data = self.get_kubernetes()
@@ -276,23 +268,27 @@ class DOKubernetes(object):
             self.module.fail_json(changed=False, msg=json_data['message'])
 
         if self.wait:
-            json_data = self.ensure_running(json_data['kubernetes_cluster']['id'])
+            json_data = self.ensure_running(
+                json_data['kubernetes_cluster']['id'])
 
         self.module.exit_json(changed=True, data=json_data['message'])
-
 
     def delete(self):
         json_data = self.get_kubernetes()
         if json_data:
             if self.module.check_mode:
                 self.module.exit_json(changed=True)
-            response = self.rest.delete('kubernetes/clusters/{0}'.format(json_data['id']))
+            response = self.rest.delete(
+                'kubernetes/clusters/{0}'.format(json_data['id']))
             json_data = response.json
             if response.status_code == 204:
-                self.module.exit_json(changed=True, msg='Kubernetes cluster deleted')
-            self.module.fail_json(changed=False, msg='Failed to delete Kubernetes cluster')
+                self.module.exit_json(
+                    changed=True, msg='Kubernetes cluster deleted')
+            self.module.fail_json(
+                changed=False, msg='Failed to delete Kubernetes cluster')
         else:
-            self.module.exit_json(changed=False, msg='Kubernetes cluster not found')
+            self.module.exit_json(
+                changed=False, msg='Kubernetes cluster not found')
 
 
 def core(module):
@@ -312,7 +308,8 @@ def main():
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN'])
+                fallback=(env_fallback, ['DO_API_TOKEN',
+                                         'DO_API_KEY', 'DO_OAUTH_TOKEN'])
             ),
             name=dict(type='str'),
             unique_name=dict(type='bool', default=True),
