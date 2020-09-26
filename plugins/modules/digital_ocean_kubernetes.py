@@ -7,6 +7,8 @@
 from __future__ import absolute_import, division, print_function
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible.module_utils._text import to_native
+from traceback import format_exc
 import json
 import time
 __metaclass__ = type
@@ -16,7 +18,7 @@ DOCUMENTATION = r'''
 module: digital_ocean_kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
-  - Create and delete a Kubernetes cluster in DigitalOcean and optionally wait for it to be running.
+    - Create and delete a Kubernetes cluster in DigitalOcean and optionally wait for it to be running.
 author: "Gurchet Rai (@gurch101)"
 # options:
 #   state:
@@ -113,7 +115,7 @@ author: "Gurchet Rai (@gurch101)"
 #     aliases: ['API_TOKEN']
 #     required: True
 requirements:
-  - "python >= 2.6"
+    - "python >= 2.6"
 '''
 
 
@@ -235,6 +237,7 @@ class DOKubernetes(object):
         json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
+    # https://developers.digitalocean.com/documentation/v2/#list-available-regions--node-sizes--and-versions-of-kubernetes
     def get_kubernetes_options(self):
         response = self.rest.get('kubernetes/options')
         json_data = response.json
@@ -252,6 +255,13 @@ class DOKubernetes(object):
         self.module.fail_json(msg='Wait for Kubernetes cluster to be running')
 
     def create(self):
+        # Get valid Kubernetes options
+        kubernetes_options = self.get_kubernetes_options()['options']
+        valid_regions = [ str(x['slug']) for x in kubernetes_options['regions'] ]
+        # Validate region
+        if self.module.params.get('region') not in valid_regions:
+            self.module.fail_json(msg='Invalid region {} (valid regions are {})'.format(self.module.params.get('region'), ', '.join(valid_regions)))
+
         json_data = self.get_kubernetes()
 
         if json_data:
@@ -293,11 +303,11 @@ class DOKubernetes(object):
 
 def core(module):
     state = module.params.pop('state')
-    kube = DOKubernetes(module)
+    cluster = DOKubernetes(module)
     if state == 'present':
-        kube.create()
+        cluster.create()
     elif state == 'absent':
-        kube.delete()
+        cluster.delete()
 
 
 # https://developers.digitalocean.com/documentation/v2/#kubernetes
@@ -313,7 +323,7 @@ def main():
             ),
             name=dict(type='str'),
             unique_name=dict(type='bool', default=True),
-            region=dict(aliases=['region_id'], default='nyc1'),
+            region=dict(aliases=['region_id'], default='nyc4'),
             version=dict(type='str', default='1.18.8-do.0'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
