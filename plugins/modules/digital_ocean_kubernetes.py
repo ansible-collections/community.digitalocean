@@ -269,7 +269,6 @@ class DOKubernetes(object):
             self.module.exit_json(changed=True)
 
         request_params = dict(self.module.params)
-        # del request_params['id']
         response = self.rest.post('kubernetes/clusters', data=request_params)
         json_data = response.json
 
