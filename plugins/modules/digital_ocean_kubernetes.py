@@ -257,30 +257,34 @@ class DOKubernetes(object):
     def create(self):
         # Get valid Kubernetes options
         kubernetes_options = self.get_kubernetes_options()['options']
-        valid_regions = [ str(x['slug']) for x in kubernetes_options['regions'] ]
         # Validate region
+        valid_regions = [ str(x['slug']) for x in kubernetes_options['regions'] ]
         if self.module.params.get('region') not in valid_regions:
             self.module.fail_json(msg='Invalid region {} (valid regions are {})'.format(self.module.params.get('region'), ', '.join(valid_regions)))
+        # Validate version
+        valid_versions = [ str(x['slug']) for x in kubernetes_options['versions'] ]
+        if self.module.params.get('version') not in valid_versions:
+            self.module.fail_json(msg='Invalid version {} (valid versions are {})'.format(self.module.params.get('version'), ', '.join(valid_versions)))
+        # Validate size
+        valid_sizes = [ str(x['slug']) for x in kubernetes_options['sizes'] ]
+        for node_pool in self.module.params.get('node_pools'):
+            if node_pool['size'] not in valid_sizes:
+                self.module.fail_json(msg='Invalid size {} (valid sizes are {})'.format(node_pool['size'], ', '.join(valid_sizes)))
 
+        # Create the Kubernetes cluster
         json_data = self.get_kubernetes()
-
         if json_data:
             self.module.exit_json(changed=False, data=json_data)
-
         if self.module.check_mode:
             self.module.exit_json(changed=True)
-
         request_params = dict(self.module.params)
         response = self.rest.post('kubernetes/clusters', data=request_params)
         json_data = response.json
-
         if response.status_code >= 400:
             self.module.fail_json(changed=False, msg=json_data['message'])
-
         if self.wait:
             json_data = self.ensure_running(
                 json_data['kubernetes_cluster']['id'])
-
         self.module.exit_json(changed=True, data=json_data['message'])
 
     def delete(self):
