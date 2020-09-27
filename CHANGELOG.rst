@@ -4,6 +4,13 @@ Community DigitalOcean Release Notes
 
 .. contents:: Topics
 
+v1.1.0
+======
+
+New
+---
+
+- Added support for Kubernetes.
 
 v1.0.0
 ======
