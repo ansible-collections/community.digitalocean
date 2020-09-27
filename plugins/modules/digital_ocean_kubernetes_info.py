@@ -16,198 +16,117 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 ---
 module: digital_ocean_kubernetes_info
-short_description: Returns information about a DigitalOcean Kubernetes cluster
+short_description: Returns information about an existing DigitalOcean Kubernetes cluster
 description:
-    - Returns information about a DigitalOcean Kubernetes cluster
-author: "Gurchet Rai (@gurch101)"
-# options:
-#   state:
-#     description:
-#      - Indicate desired state of the target.
-#     default: present
-#     choices: ['present', 'absent']
-#   id:
-#     description:
-#      - Numeric, the droplet id you want to operate on.
-#     aliases: ['droplet_id']
-#   name:
-#     description:
-#      - String, this is the name of the droplet - must be formatted by hostname rules.
-#   unique_name:
-#     description:
-#      - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
-#        per name.  Useful for idempotence.
-#     default: False
-#     type: bool
-#   size:
-#     description:
-#      - This is the slug of the size you would like the droplet created with.
-#     aliases: ['size_id']
-#   image:
-#     description:
-#      - This is the slug of the image you would like the droplet created with.
-#     aliases: ['image_id']
-#   region:
-#     description:
-#      - This is the slug of the region you would like your server to be created in.
-#     aliases: ['region_id']
-#   ssh_keys:
-#     description:
-#      - array of SSH key Fingerprint that you would like to be added to the server.
-#     required: False
-#   private_networking:
-#     description:
-#      - add an additional, private network interface to droplet for inter-droplet communication.
-#     default: False
-#     type: bool
-#   vpc_uuid:
-#     description:
-#      - A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, Droplet will be
-#        assigned to the account's default VPC for the region.
-#     type: str
-#     version_added: 0.1.0
-#   user_data:
-#     description:
-#       - opaque blob of data which is made available to the droplet
-#     required: False
-#   ipv6:
-#     description:
-#       - enable IPv6 for your droplet.
-#     required: False
-#     default: False
-#     type: bool
-#   wait:
-#     description:
-#      - Wait for the droplet to be active before returning.  If wait is "no" an ip_address may not be returned.
-#     required: False
-#     default: True
-#     type: bool
-#   wait_timeout:
-#     description:
-#      - How long before wait gives up, in seconds, when creating a droplet.
-#     default: 120
-#   backups:
-#     description:
-#      - indicates whether automated backups should be enabled.
-#     required: False
-#     default: False
-#     type: bool
-#   monitoring:
-#     description:
-#      - indicates whether to install the DigitalOcean agent for monitoring.
-#     required: False
-#     default: False
-#     type: bool
-#   tags:
-#     description:
-#      - List, A list of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.
-#     required: False
-#   maintenance_policy:
-#     description:
-#      - Dict, An object specifying the maintenance window policy for the Kubernetes cluster (see table below).
-#   volumes:
-#     description:
-#      - List, A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
-#     required: False
-#   oauth_token:
-#     description:
-#      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-#     aliases: ['API_TOKEN']
-#     required: True
+  - Returns information about an existing DigitalOcean Kubernetes cluster
+author: "Mark Mercado (@mamercad)"
+options:
+  name:
+    description:
+      - String, the name of the Kubernetes cluster to display
+  return_kubeconfig:
+    description:
+      - Boolean (default False), whether or not to return the kubeconfig
 requirements:
-    - "python >= 2.6"
+  - "python >= 2.6"
 '''
 
+EXAMPLES = r'''
+- name: Get information about an existing DigitalOcean Kubernetes cluster
+  community.digitalocean.digital_ocean_droplet_info:
+    oauth_token: REDACTED
+    name: hacktoberfest
+    return_kubeconfig: yes
+  register: my_cluster
 
-# EXAMPLES = r'''
-# - name: Create a new droplet
-#   community.digitalocean.digital_ocean_droplet:
-#     state: present
-#     name: mydroplet
-#     oauth_token: XXX
-#     size: 2gb
-#     region: sfo1
-#     image: ubuntu-16-04-x64
-#     wait_timeout: 500
-#     ssh_keys: [ .... ]
-#   register: my_droplet
+- debug:
+    msg: "Cluster name is {{ my_cluster.data.name}}, ID is {{ my_cluster.data.id }}"
 
-# - debug:
-#     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+- debug:
+    msg: "Cluster kubeconfig is {{ my_cluster.data.kubeconfig }}"
+'''
 
-# - name: Ensure a droplet is present
-#   community.digitalocean.digital_ocean_droplet:
-#     state: present
-#     id: 123
-#     name: mydroplet
-#     oauth_token: XXX
-#     size: 2gb
-#     region: sfo1
-#     image: ubuntu-16-04-x64
-#     wait_timeout: 500
-
-# - name: Ensure a droplet is present with SSH keys installed
-#   community.digitalocean.digital_ocean_droplet:
-#     state: present
-#     id: 123
-#     name: mydroplet
-#     oauth_token: XXX
-#     size: 2gb
-#     region: sfo1
-#     ssh_keys: ['1534404', '1784768']
-#     image: ubuntu-16-04-x64
-#     wait_timeout: 500
-# '''
-
-# RETURN = r'''
-# # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#droplets
-# data:
-#     description: a DigitalOcean Droplet
-#     returned: changed
-#     type: dict
-#     sample: {
-#         "ip_address": "104.248.118.172",
-#         "ipv6_address": "2604:a880:400:d1::90a:6001",
-#         "private_ipv4_address": "10.136.122.141",
-#         "droplet": {
-#             "id": 3164494,
-#             "name": "example.com",
-#             "memory": 512,
-#             "vcpus": 1,
-#             "disk": 20,
-#             "locked": true,
-#             "status": "new",
-#             "kernel": {
-#                 "id": 2233,
-#                 "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic",
-#                 "version": "3.13.0-37-generic"
-#             },
-#             "created_at": "2014-11-14T16:36:31Z",
-#             "features": ["virtio"],
-#             "backup_ids": [],
-#             "snapshot_ids": [],
-#             "image": {},
-#             "volume_ids": [],
-#             "size": {},
-#             "size_slug": "512mb",
-#             "networks": {},
-#             "region": {},
-#             "tags": ["web"]
-#         }
-#     }
-# '''
+# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#retrieve-the-kubeconfig-for-a-kubernetes-cluster
+# The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
+RETURN = r'''
+  data:
+    auto_upgrade: false
+    cluster_subnet: 10.244.0.0/16
+    created_at: '2020-09-26T21:36:18Z'
+    endpoint: https://REDACTED.k8s.ondigitalocean.com
+    id: REDACTED
+    ipv4: REDACTED
+    kubeconfig: |-
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority-data: REDACTED
+          server: https://REDACTED.k8s.ondigitalocean.com
+        name: do-nyc1-hacktoberfest
+      contexts:
+      - context:
+          cluster: do-nyc1-hacktoberfest
+          user: do-nyc1-hacktoberfest-admin
+        name: do-nyc1-hacktoberfest
+      current-context: do-nyc1-hacktoberfest
+      kind: Config
+      preferences: {}
+      users:
+      - name: do-nyc1-hacktoberfest-admin
+        user:
+          token: REDACTED
+    maintenance_policy:
+      day: any
+      duration: 4h0m0s
+      start_time: '13:00'
+    name: hacktoberfest
+    node_pools:
+    - auto_scale: false
+      count: 1
+      id: REDACTED
+      labels: null
+      max_nodes: 0
+      min_nodes: 0
+      name: hacktoberfest-workers
+      nodes:
+      - created_at: '2020-09-26T21:36:18Z'
+        droplet_id: 'REDACTED'
+        id: REDACTED
+        name: hacktoberfest-workers-3tv46
+        status:
+          state: running
+        updated_at: '2020-09-26T21:40:28Z'
+      size: s-1vcpu-2gb
+      tags:
+      - k8s
+      - k8s:REDACTED
+      - k8s:worker
+      taints: []
+    region: nyc1
+    service_subnet: 10.245.0.0/16
+    status:
+      state: running
+    surge_upgrade: false
+    tags:
+    - k8s
+    - k8s:REDACTED
+    updated_at: '2020-09-26T21:42:29Z'
+    version: 1.18.8-do.0
+    vpc_uuid: REDACTED
+  invocation:
+    module_args:
+      name: hacktoberfest
+data:
+'''
 
 
 class DOKubernetesInfo(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
-        self.wait = self.module.params.pop('wait', True)
-        self.wait_timeout = self.module.params.pop('wait_timeout', 120)
-        self.unique_name = self.module.params.pop('unique_name', False)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
-        self.cluster_id = 0
+        self.cluster_id = None
 
     def get_by_id(self):
         response = self.rest.get('kubernetes/clusters/{0}'.format(self.cluster_id))
@@ -245,7 +164,8 @@ class DOKubernetesInfo(object):
     def get(self):
         json_data = self.get_kubernetes()
         if json_data:
-            json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
+            if self.module.params['return_kubeconfig']:
+                json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
             self.module.exit_json(changed=True, data=json_data)
         self.module.fail_json(changed=False, msg='Kubernetes cluster not found')
 
@@ -266,6 +186,7 @@ def main():
                                          'DO_API_KEY', 'DO_OAUTH_TOKEN'])
             ),
             name=dict(type='str'),
+            return_kubeconfig=dict(type='bool', default=False)
         ),
         required_one_of=(
             ['name']
