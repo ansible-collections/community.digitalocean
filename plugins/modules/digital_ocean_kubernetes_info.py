@@ -134,8 +134,9 @@ class DOKubernetesInfo(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
-        # pop the oauth token so we don't include it in the POST data
+        # pop these values so we don't include them in the POST data
         self.module.params.pop('oauth_token')
+        self.return_kubeconfig = self.module.params.pop('return_kubeconfig')
         self.cluster_id = None
 
     def get_by_id(self):
@@ -171,10 +172,11 @@ class DOKubernetesInfo(object):
         self.cluster_id = json_data['id']
         return json_data
 
+    # https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-kubernetes-cluster
     def get(self):
         json_data = self.get_kubernetes()
         if json_data:
-            if self.module.params['return_kubeconfig']:
+            if self.return_kubeconfig:
                 json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
             self.module.exit_json(changed=True, data=json_data)
         self.module.fail_json(changed=False, msg='Kubernetes cluster not found')

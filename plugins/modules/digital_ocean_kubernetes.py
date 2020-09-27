@@ -218,11 +218,12 @@ class DOKubernetes(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
+        # pop these values so we don't include them in the POST data
+        self.return_kubeconfig = self.module.params.pop('return_kubeconfig', False)
         self.wait = self.module.params.pop('wait', True)
-        self.wait_timeout = self.module.params.pop('wait_timeout', 120)
-        # pop the oauth token so we don't include it in the POST data
+        self.wait_timeout = self.module.params.pop('wait_timeout', 600)
         self.module.params.pop('oauth_token')
-        self.cluster_id = 0
+        self.cluster_id = None
 
     def get_by_id(self):
         response = self.rest.get('kubernetes/clusters/{0}'.format(self.cluster_id))
@@ -273,6 +274,7 @@ class DOKubernetes(object):
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for Kubernetes cluster to be running')
 
+    # https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
     def create(self):
         # Get valid Kubernetes options
         kubernetes_options = self.get_kubernetes_options()['options']
@@ -310,6 +312,7 @@ class DOKubernetes(object):
             json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
         self.module.exit_json(changed=True, data=json_data)
 
+    # https://developers.digitalocean.com/documentation/v2/#delete-a-kubernetes-cluster
     def delete(self):
         json_data = self.get_kubernetes()
         if json_data:
