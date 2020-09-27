@@ -172,8 +172,11 @@ class DOKubernetesInfo(object):
         self.cluster_id = json_data['id']
         return json_data
 
-    # https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-kubernetes-cluster
     def get(self):
+        """Fetches an existing DigitalOcean Kubernetes cluster
+
+        API reference: https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-kubernetes-cluster
+        """
         json_data = self.get_kubernetes()
         if json_data:
             if self.return_kubeconfig:

@@ -257,8 +257,11 @@ class DOKubernetes(object):
         json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
-    # https://developers.digitalocean.com/documentation/v2/#list-available-regions--node-sizes--and-versions-of-kubernetes
     def get_kubernetes_options(self):
+        """Fetches DigitalOcean Kubernetes options: regions, sizes, versions.
+
+        API reference: https://developers.digitalocean.com/documentation/v2/#list-available-regions--node-sizes--and-versions-of-kubernetes
+        """
         response = self.rest.get('kubernetes/options')
         json_data = response.json
         if response.status_code == 200:
@@ -274,9 +277,12 @@ class DOKubernetes(object):
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for Kubernetes cluster to be running')
 
-    # https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
     def create(self):
-        # Get valid Kubernetes options
+        """Creates a DigitalOcean Kubernetes cluster
+
+        API reference: https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
+        """
+        # Get valid Kubernetes options (regions, sizes, versions)
         kubernetes_options = self.get_kubernetes_options()['options']
         # Validate region
         valid_regions = [ str(x['slug']) for x in kubernetes_options['regions'] ]
@@ -312,8 +318,11 @@ class DOKubernetes(object):
             json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
         self.module.exit_json(changed=True, data=json_data)
 
-    # https://developers.digitalocean.com/documentation/v2/#delete-a-kubernetes-cluster
     def delete(self):
+        """Deletes a DigitalOcean Kubernetes cluster
+
+        API reference: https://developers.digitalocean.com/documentation/v2/#delete-a-kubernetes-cluster
+        """
         json_data = self.get_kubernetes()
         if json_data:
             if self.module.check_mode:
@@ -340,7 +349,6 @@ def core(module):
         cluster.delete()
 
 
-# https://developers.digitalocean.com/documentation/v2/#kubernetes
 def main():
     module = AnsibleModule(
         argument_spec=dict(
