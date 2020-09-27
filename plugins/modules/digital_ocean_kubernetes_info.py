@@ -11,6 +11,7 @@ from ansible.module_utils._text import to_native
 from traceback import format_exc
 import json
 import time
+import traceback
 __metaclass__ = type
 
 DOCUMENTATION = r'''
@@ -210,8 +211,10 @@ def main():
         )
     )
 
-    core(module)
-
+    try:
+        core(module)
+    except Exception as e:
+        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
 
 if __name__ == '__main__':
     main()
