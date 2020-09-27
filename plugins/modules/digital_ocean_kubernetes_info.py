@@ -21,14 +21,24 @@ description:
   - Returns information about an existing DigitalOcean Kubernetes cluster
 author: "Mark Mercado (@mamercad)"
 options:
+  oauth_token:
+    description:
+      - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
+    aliases: ['API_TOKEN']
+    required: yes
   name:
     description:
-      - String, the name of the Kubernetes cluster to display
+      - A human-readable name for a Kubernetes cluster.
+    type: str
+    required: yes
   return_kubeconfig:
     description:
-      - Boolean (default False), whether or not to return the kubeconfig
+      - Controls whether or not to return the C(kubeconfig).
+    type: bool
+    required: no
+    default: C(False)
 requirements:
-  - "python >= 2.6"
+  - python >= 2.6
 '''
 
 EXAMPLES = r'''

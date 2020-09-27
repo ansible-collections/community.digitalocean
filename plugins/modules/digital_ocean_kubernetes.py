@@ -18,104 +18,82 @@ DOCUMENTATION = r'''
 module: digital_ocean_kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
-    - Create and delete a Kubernetes cluster in DigitalOcean and optionally wait for it to be running
-author: "Gurchet Rai (@gurch101)"
-# options:
-#   state:
-#     description:
-#      - Indicate desired state of the target.
-#     default: present
-#     choices: ['present', 'absent']
-#   id:
-#     description:
-#      - Numeric, the droplet id you want to operate on.
-#     aliases: ['droplet_id']
-#   name:
-#     description:
-#      - String, this is the name of the droplet - must be formatted by hostname rules.
-#   unique_name:
-#     description:
-#      - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
-#        per name.  Useful for idempotence.
-#     default: False
-#     type: bool
-#   size:
-#     description:
-#      - This is the slug of the size you would like the droplet created with.
-#     aliases: ['size_id']
-#   image:
-#     description:
-#      - This is the slug of the image you would like the droplet created with.
-#     aliases: ['image_id']
-#   region:
-#     description:
-#      - This is the slug of the region you would like your server to be created in.
-#     aliases: ['region_id']
-#   ssh_keys:
-#     description:
-#      - array of SSH key Fingerprint that you would like to be added to the server.
-#     required: False
-#   private_networking:
-#     description:
-#      - add an additional, private network interface to droplet for inter-droplet communication.
-#     default: False
-#     type: bool
-#   vpc_uuid:
-#     description:
-#      - A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, Droplet will be
-#        assigned to the account's default VPC for the region.
-#     type: str
-#     version_added: 0.1.0
-#   user_data:
-#     description:
-#       - opaque blob of data which is made available to the droplet
-#     required: False
-#   ipv6:
-#     description:
-#       - enable IPv6 for your droplet.
-#     required: False
-#     default: False
-#     type: bool
-#   wait:
-#     description:
-#      - Wait for the droplet to be active before returning.  If wait is "no" an ip_address may not be returned.
-#     required: False
-#     default: True
-#     type: bool
-#   wait_timeout:
-#     description:
-#      - How long before wait gives up, in seconds, when creating a droplet.
-#     default: 120
-#   backups:
-#     description:
-#      - indicates whether automated backups should be enabled.
-#     required: False
-#     default: False
-#     type: bool
-#   monitoring:
-#     description:
-#      - indicates whether to install the DigitalOcean agent for monitoring.
-#     required: False
-#     default: False
-#     type: bool
-#   tags:
-#     description:
-#      - List, A list of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.
-#     required: False
-#   maintenance_policy:
-#     description:
-#      - Dict, An object specifying the maintenance window policy for the Kubernetes cluster (see table below).
-#   volumes:
-#     description:
-#      - List, A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
-#     required: False
-#   oauth_token:
-#     description:
-#      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-#     aliases: ['API_TOKEN']
-#     required: True
+    - Create and delete a Kubernetes cluster in DigitalOcean (and optionally wait for it to be running)
+author: "Mark Mercado (@mamercad)"
+options:
+  oauth_token:
+    description:
+      - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
+    aliases: ['API_TOKEN']
+    required: yes
+  state:
+    description:
+      - The usual, C(present) to create, C(absent) to destroy
+    choices: ['present', 'absent']
+    default: C(present)
+    required: yes
+  name:
+    description:
+      - A human-readable name for a Kubernetes cluster.
+    type: str
+    required: yes
+  region:
+    description:
+      - The slug identifier for the region where the Kubernetes cluster will be created.
+    type: str
+    required: yes
+    default: nyc1
+  version:
+    description:
+      - The slug identifier for the version of Kubernetes used for the cluster. See the /v2/kubernetes/options endpoint for available versions.
+    type: str
+    required: no
+    default: 1.18.8-do.0
+  auto_upgrade:
+    description:
+      - A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
+    type: bool
+    required: no
+    default: C(False)
+  surge_upgrade:
+    description:
+      - A boolean value indicating whether surge upgrade is enabled/disabled for the cluster. Surge upgrade makes cluster upgrades fast and reliable by bringing up new nodes before destroying the outdated nodes.
+    type: bool
+    required: no
+    default: C(False)
+  tags:
+    description:
+      - A flat array of tag names as strings to be applied to the Kubernetes cluster. All clusters will be automatically tagged "k8s" and "k8s:$K8S_CLUSTER_ID" in addition to any tags provided by the user.
+    type: list(str)
+    required: no
+  maintenance_policy:
+    description:
+      - An object specifying the maintenance window policy for the Kubernetes cluster (see table below).
+    type: dict
+    required: no
+  node_pools:
+    description:
+      - An object specifying the details of the worker nodes available to the Kubernetes cluster (see table below).
+    type: dict
+    required: no
+  vpc_uuid:
+    description:
+      - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned. If excluded, the cluster will be assigned to your account's default VPC for the region.
+    type: str
+    required: no
+  wait:
+    description:
+     - Wait for the cluster to be running before returning.
+    type: bool
+    required: no
+    default: C(True)
+  wait_timeout:
+    description:
+      - How long before wait gives up, in seconds, when creating a cluster.
+    type: int
+    default: 600
 requirements:
-    - "python >= 2.6"
+    - python >= 2.6
 '''
 
 
@@ -204,7 +182,6 @@ class DOKubernetes(object):
         self.module = module
         self.wait = self.module.params.pop('wait', True)
         self.wait_timeout = self.module.params.pop('wait_timeout', 120)
-        self.unique_name = self.module.params.pop('unique_name', False)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
         self.cluster_id = 0
@@ -336,7 +313,6 @@ def main():
                                          'DO_API_KEY', 'DO_OAUTH_TOKEN'])
             ),
             name=dict(type='str'),
-            unique_name=dict(type='bool', default=True),
             region=dict(aliases=['region_id'], default='nyc1'),
             version=dict(type='str', default='1.18.8-do.0'),
             auto_upgrade=dict(type='bool', default=False),
