@@ -56,7 +56,7 @@ EXAMPLES = r'''
     msg: "Cluster kubeconfig is {{ my_cluster.data.kubeconfig }}"
 '''
 
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#retrieve-the-kubeconfig-for-a-kubernetes-cluster
+# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
 RETURN = r'''
   data:
@@ -134,13 +134,14 @@ class DOKubernetesInfo(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
-        # pop these values so we don't include them in the POST data
+        # Pop these values so we don't include them in the POST data
         self.module.params.pop('oauth_token')
         self.return_kubeconfig = self.module.params.pop('return_kubeconfig')
         self.cluster_id = None
 
     def get_by_id(self):
-        response = self.rest.get('kubernetes/clusters/{0}'.format(self.cluster_id))
+        response = self.rest.get(
+            'kubernetes/clusters/{0}'.format(self.cluster_id))
         json_data = response.json
         if response.status_code == 200:
             return json_data
@@ -163,7 +164,8 @@ class DOKubernetesInfo(object):
         return None
 
     def get_kubernetes_kubeconfig(self):
-        response = self.rest.get('kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
+        response = self.rest.get(
+            'kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
         text_data = response.text
         return text_data
 
@@ -182,7 +184,8 @@ class DOKubernetesInfo(object):
             if self.return_kubeconfig:
                 json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
             self.module.exit_json(changed=True, data=json_data)
-        self.module.fail_json(changed=False, msg='Kubernetes cluster not found')
+        self.module.fail_json(
+            changed=False, msg='Kubernetes cluster not found')
 
 
 def core(module):
@@ -190,7 +193,6 @@ def core(module):
     cluster.get()
 
 
-# https://developers.digitalocean.com/documentation/v2/#kubernetes
 def main():
     module = AnsibleModule(
         argument_spec=dict(

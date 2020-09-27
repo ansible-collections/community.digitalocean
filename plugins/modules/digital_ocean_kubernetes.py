@@ -129,7 +129,8 @@ EXAMPLES = r'''
     name: hacktoberfest
 '''
 
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
+# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
+# The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
 RETURN = r'''
   data:
     kubeconfig: |-
@@ -218,15 +219,17 @@ class DOKubernetes(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
-        # pop these values so we don't include them in the POST data
-        self.return_kubeconfig = self.module.params.pop('return_kubeconfig', False)
+        # Pop these values so we don't include them in the POST data
+        self.return_kubeconfig = self.module.params.pop(
+            'return_kubeconfig', False)
         self.wait = self.module.params.pop('wait', True)
         self.wait_timeout = self.module.params.pop('wait_timeout', 600)
         self.module.params.pop('oauth_token')
         self.cluster_id = None
 
     def get_by_id(self):
-        response = self.rest.get('kubernetes/clusters/{0}'.format(self.cluster_id))
+        response = self.rest.get(
+            'kubernetes/clusters/{0}'.format(self.cluster_id))
         json_data = response.json
         if response.status_code == 200:
             return json_data
@@ -249,7 +252,8 @@ class DOKubernetes(object):
         return None
 
     def get_kubernetes_kubeconfig(self):
-        response = self.rest.get('kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
+        response = self.rest.get(
+            'kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
         text_data = response.text
         return text_data
 
@@ -285,18 +289,22 @@ class DOKubernetes(object):
         # Get valid Kubernetes options (regions, sizes, versions)
         kubernetes_options = self.get_kubernetes_options()['options']
         # Validate region
-        valid_regions = [ str(x['slug']) for x in kubernetes_options['regions'] ]
+        valid_regions = [str(x['slug']) for x in kubernetes_options['regions']]
         if self.module.params.get('region') not in valid_regions:
-            self.module.fail_json(msg='Invalid region {} (valid regions are {})'.format(self.module.params.get('region'), ', '.join(valid_regions)))
+            self.module.fail_json(msg='Invalid region {} (valid regions are {})'.format(
+                self.module.params.get('region'), ', '.join(valid_regions)))
         # Validate version
-        valid_versions = [ str(x['slug']) for x in kubernetes_options['versions'] ]
+        valid_versions = [str(x['slug'])
+                          for x in kubernetes_options['versions']]
         if self.module.params.get('version') not in valid_versions:
-            self.module.fail_json(msg='Invalid version {} (valid versions are {})'.format(self.module.params.get('version'), ', '.join(valid_versions)))
+            self.module.fail_json(msg='Invalid version {} (valid versions are {})'.format(
+                self.module.params.get('version'), ', '.join(valid_versions)))
         # Validate size
-        valid_sizes = [ str(x['slug']) for x in kubernetes_options['sizes'] ]
+        valid_sizes = [str(x['slug']) for x in kubernetes_options['sizes']]
         for node_pool in self.module.params.get('node_pools'):
             if node_pool['size'] not in valid_sizes:
-                self.module.fail_json(msg='Invalid size {} (valid sizes are {})'.format(node_pool['size'], ', '.join(valid_sizes)))
+                self.module.fail_json(msg='Invalid size {} (valid sizes are {})'.format(
+                    node_pool['size'], ', '.join(valid_sizes)))
 
         # Create the Kubernetes cluster
         json_data = self.get_kubernetes()
