@@ -81,6 +81,12 @@ options:
       - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned. If excluded, the cluster will be assigned to your account's default VPC for the region.
     type: str
     required: no
+  return_kubeconfig:
+    description:
+      - Controls whether or not to return the C(kubeconfig).
+    type: bool
+    required: no
+    default: C(False)
   wait:
     description:
      - Wait for the cluster to be running before returning.
@@ -97,83 +103,115 @@ requirements:
 '''
 
 
-# EXAMPLES = r'''
-# - name: Create a new droplet
-#   community.digitalocean.digital_ocean_droplet:
-#     state: present
-#     name: mydroplet
-#     oauth_token: XXX
-#     size: 2gb
-#     region: sfo1
-#     image: ubuntu-16-04-x64
-#     wait_timeout: 500
-#     ssh_keys: [ .... ]
-#   register: my_droplet
+EXAMPLES = r'''
+- name: Create a new DigitalOcean Kubernetes cluster in New York 1
+  community.digitalocean.digital_ocean_kubernetes:
+    state: present
+    oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
+    name: hacktoberfest
+    region: nyc1
+    node_pools:
+        - name: hacktoberfest-workers
+        size: s-1vcpu-2gb
+        count: 3
+    return_kubeconfig: yes
+    wait_timeout: 600
+    register: my_cluster
 
-# - debug:
-#     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+- name: Show the kubeconfig for the cluster we just created
+  debug:
+    msg: "{{ my_cluster.data.kubeconfig }}"
 
-# - name: Ensure a droplet is present
-#   community.digitalocean.digital_ocean_droplet:
-#     state: present
-#     id: 123
-#     name: mydroplet
-#     oauth_token: XXX
-#     size: 2gb
-#     region: sfo1
-#     image: ubuntu-16-04-x64
-#     wait_timeout: 500
+- name: Destroy (delete) an existing DigitalOcean Kubernetes cluster
+  community.digitalocean.digital_ocean_kubernetes:
+    state: absent
+    oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
+    name: hacktoberfest
+'''
 
-# - name: Ensure a droplet is present with SSH keys installed
-#   community.digitalocean.digital_ocean_droplet:
-#     state: present
-#     id: 123
-#     name: mydroplet
-#     oauth_token: XXX
-#     size: 2gb
-#     region: sfo1
-#     ssh_keys: ['1534404', '1784768']
-#     image: ubuntu-16-04-x64
-#     wait_timeout: 500
-# '''
-
-# RETURN = r'''
-# # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#droplets
-# data:
-#     description: a DigitalOcean Droplet
-#     returned: changed
-#     type: dict
-#     sample: {
-#         "ip_address": "104.248.118.172",
-#         "ipv6_address": "2604:a880:400:d1::90a:6001",
-#         "private_ipv4_address": "10.136.122.141",
-#         "droplet": {
-#             "id": 3164494,
-#             "name": "example.com",
-#             "memory": 512,
-#             "vcpus": 1,
-#             "disk": 20,
-#             "locked": true,
-#             "status": "new",
-#             "kernel": {
-#                 "id": 2233,
-#                 "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic",
-#                 "version": "3.13.0-37-generic"
-#             },
-#             "created_at": "2014-11-14T16:36:31Z",
-#             "features": ["virtio"],
-#             "backup_ids": [],
-#             "snapshot_ids": [],
-#             "image": {},
-#             "volume_ids": [],
-#             "size": {},
-#             "size_slug": "512mb",
-#             "networks": {},
-#             "region": {},
-#             "tags": ["web"]
-#         }
-#     }
-# '''
+# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
+RETURN = r'''
+  data:
+    kubeconfig: |-
+      apiVersion: v1
+      clusters:
+      - cluster:
+          certificate-authority-data: REDACTED
+          server: https://REDACTED.k8s.ondigitalocean.com
+        name: do-nyc1-hacktoberfest
+      contexts:
+      - context:
+          cluster: do-nyc1-hacktoberfest
+          user: do-nyc1-hacktoberfest-admin
+        name: do-nyc1-hacktoberfest
+      current-context: do-nyc1-hacktoberfest
+      kind: Config
+      preferences: {}
+      users:
+      - name: do-nyc1-hacktoberfest-admin
+        user:
+          token: REDACTED
+    kubernetes_cluster:
+      auto_upgrade: false
+      cluster_subnet: 10.244.0.0/16
+      created_at: '2020-09-27T00:55:37Z'
+      endpoint: https://REDACTED.k8s.ondigitalocean.com
+      id: REDACTED
+      ipv4: REDACTED
+      maintenance_policy:
+        day: any
+        duration: 4h0m0s
+        start_time: '15:00'
+      name: hacktoberfest
+      node_pools:
+      - auto_scale: false
+        count: 1
+        id: REDACTED
+        labels: null
+        max_nodes: 0
+        min_nodes: 0
+        name: hacktoberfest-workers
+        nodes:
+        - created_at: '2020-09-27T00:55:37Z'
+          droplet_id: '209555245'
+          id: REDACTED
+          name: hacktoberfest-workers-3tdq1
+          status:
+            state: running
+          updated_at: '2020-09-27T00:58:36Z'
+        size: s-1vcpu-2gb
+        tags:
+        - k8s
+        - k8s:REDACTED
+        - k8s:worker
+        taints: []
+      region: nyc1
+      service_subnet: 10.245.0.0/16
+      status:
+        state: running
+      surge_upgrade: false
+      tags:
+      - k8s
+      - k8s:REDACTED
+      updated_at: '2020-09-27T01:00:37Z'
+      version: 1.18.8-do.0
+      vpc_uuid: REDACTED
+  invocation:
+    module_args:
+      auto_upgrade: false
+      maintenance_policy: null
+      name: hacktoberfest
+      node_pools:
+      - count: 1
+        name: hacktoberfest-workers
+        size: s-1vcpu-2gb
+      region: nyc1
+      return_kubeconfig: true
+      surge_upgrade: false
+      tags: null
+      version: 1.18.8-do.0
+      vpc_uuid: null
+'''
 
 
 class DOKubernetes(object):
@@ -271,7 +309,8 @@ class DOKubernetes(object):
         if self.wait:
             json_data = self.ensure_running()
         # Add the kubeconfig to the return
-        json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
+        if self.module.params['return_kubeconfig']:
+            json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
         self.module.exit_json(changed=True, data=json_data)
 
     def delete(self):
@@ -332,6 +371,7 @@ def main():
                 }
             ]),
             vpc_uuid=dict(type='str'),
+            return_kubeconfig=dict(type='bool', default=False),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(type='int', default=600)
         ),
