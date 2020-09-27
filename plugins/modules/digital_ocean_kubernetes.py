@@ -249,11 +249,8 @@ class DOKubernetes(object):
 
     def get_kubernetes_kubeconfig(self):
         response = self.rest.get('kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
-        json_data = response.json
-        # if response.status_code == 200:
-        #     return json_data
-        # return None
-        return json_data
+        text_data = response.text
+        return text_data
 
     def get_kubernetes(self):
         json_data = self.get_by_name(self.module.params['name'])
