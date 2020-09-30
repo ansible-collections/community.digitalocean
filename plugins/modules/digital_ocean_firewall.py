@@ -37,7 +37,7 @@ options:
       - Assert the state of the firewall rule. Set to 'present' to create or update and 'absent' to remove.
   droplet_ids:
     type: list
-    type: str
+    elements: str
     description:
      - List of droplet ids to be assigned to the firewall
     required: false
@@ -49,6 +49,7 @@ options:
     required: false
   inbound_rules:
     type: list
+    elements: dict
     description:
       - Firewall rules specifically targeting inbound network traffic into Digital Ocean
     required: true
@@ -99,6 +100,7 @@ options:
             required: false
   outbound_rules:
     type: list
+    elements: dict
     description:
       - Firewall rules specifically targeting outbound network traffic from Digital Ocean
     required: true
@@ -506,8 +508,8 @@ def main():
     argument_spec.update(
         name=dict(type='str', required=True),
         state=dict(type='str', choices=['present', 'absent'], default='present'),
-        droplet_ids=dict(type='list', required=False),
-        tags=dict(type='list', required=False),
+        droplet_ids=dict(type='list', elements='str', required=False),
+        tags=dict(type='list', elements='str', required=False),
         inbound_rules=dict(type='list', elements='dict', options=inbound_spec, required=True),
         outbound_rules=dict(type='list', elements='dict', options=outbound_spec, required=True),
     )
