@@ -25,98 +25,124 @@ author:
 version_added: "2.10.0"
 options:
   name:
+    type: str
     description:
      - Name of the firewall rule to create or manage
     required: true
   state:
+    type: str
+    choices: ['present', 'absent']
+    default: present
     description:
       - Assert the state of the firewall rule. Set to 'present' to create or update and 'absent' to remove.
-    default: present
-    choices: ['present', 'absent']
   droplet_ids:
+    type: list
+    type: str
     description:
      - List of droplet ids to be assigned to the firewall
     required: false
-    type: list
   tags:
+    type: list
+    elements: str
     description:
       - List of tags to be assigned to the firewall
     required: false
-    type: list
   inbound_rules:
+    type: list
     description:
       - Firewall rules specifically targeting inbound network traffic into Digital Ocean
     required: true
-    type: list
     suboptions:
       protocol:
+        type: str
+        choices: ['udp', 'tcp', 'icmp']
+        default: tcp
         description:
           - Network protocol to be accepted.
         required: false
-        default: tcp
-        choices: ['udp', 'tcp', 'icmp']
       ports:
+        type: str
         description:
           - The ports on which traffic will be allowed, single, range, or all
         required: true
       sources:
+        type: dict
         description:
           - Dictionary of locations from which inbound traffic will be accepted
         required: true
         suboptions:
           addresses:
+            type: list
+            elements: str
             description:
               - List of strings containing the IPv4 addresses, IPv6 addresses, IPv4 CIDRs,
                 and/or IPv6 CIDRs to which the firewall will allow traffic
             required: false
           droplet_ids:
+            type: list
+            elements: str
             description:
               - List of integers containing the IDs of the Droplets to which the firewall will allow traffic
             required: false
           load_balancer_uids:
+            type: list
+            elements: str
             description:
               - List of strings containing the IDs of the Load Balancers to which the firewall will allow traffic
             required: false
           tags:
+            type: list
+            elements: str
             description:
               - List of strings containing the names of Tags corresponding to groups of Droplets to
                 which the Firewall will allow traffic
             required: false
   outbound_rules:
+    type: list
     description:
       - Firewall rules specifically targeting outbound network traffic from Digital Ocean
     required: true
-    type: list
     suboptions:
       protocol:
+        type: str
+        choices: ['udp', 'tcp', 'icmp']
+        default: tcp
         description:
           - Network protocol to be accepted.
         required: false
-        default: tcp
-        choices: ['udp', 'tcp', 'icmp']
       ports:
+        type: str
         description:
           - The ports on which traffic will be allowed, single, range, or all
         required: true
       destinations:
+        type: dict
         description:
           - Dictionary of locations from which outbound traffic will be allowed
         required: true
         suboptions:
           addresses:
+            type: list
+            elements: str
             description:
               - List of strings containing the IPv4 addresses, IPv6 addresses, IPv4 CIDRs,
                 and/or IPv6 CIDRs to which the firewall will allow traffic
             required: false
           droplet_ids:
+            type: list
+            elements: str
             description:
               - List of integers containing the IDs of the Droplets to which the firewall will allow traffic
             required: false
           load_balancer_uids:
+            type: list
+            elements: str
             description:
               - List of strings containing the IDs of the Load Balancers to which the firewall will allow traffic
             required: false
           tags:
+            type: list
+            elements: str
             description:
               - List of strings containing the names of Tags corresponding to groups of Droplets to
                 which the Firewall will allow traffic
