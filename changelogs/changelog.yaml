@@ -16,3 +16,9 @@ releases:
     - 14-docs-fqcn.yaml
     - 3-sanity-docs-fixes.yaml
     release_date: '2020-08-17'
+  1.0.1:
+    changes:
+      release_summary: Added support for Kubernetes (https://github.com/ansible-collections/community.digitalocean/issues/20).
+    fragments:
+    - 1.0.1.yml
+    release_date: '2020-10-03'
