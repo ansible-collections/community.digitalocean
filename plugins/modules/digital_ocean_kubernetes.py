@@ -259,12 +259,16 @@ class DOKubernetes(object):
         return text_data
 
     def get_kubernetes(self):
+        """Returns an existing DigitalOcean Kubernetes cluster by name"""
         json_data = self.get_by_name(self.module.params['name'])
-        return json_data
+        if json_data:
+            self.cluster_id = json_data['id']
+            return json_data
+        else:
+            return None
 
     def get_kubernetes_options(self):
         """Fetches DigitalOcean Kubernetes options: regions, sizes, versions.
-
         API reference: https://developers.digitalocean.com/documentation/v2/#list-available-regions--node-sizes--and-versions-of-kubernetes
         """
         response = self.rest.get('kubernetes/options')
@@ -284,7 +288,6 @@ class DOKubernetes(object):
 
     def create(self):
         """Creates a DigitalOcean Kubernetes cluster
-
         API reference: https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
         """
         # Get valid Kubernetes options (regions, sizes, versions)
@@ -329,7 +332,6 @@ class DOKubernetes(object):
 
     def delete(self):
         """Deletes a DigitalOcean Kubernetes cluster
-
         API reference: https://developers.digitalocean.com/documentation/v2/#delete-a-kubernetes-cluster
         """
         json_data = self.get_kubernetes()
