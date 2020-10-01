@@ -43,8 +43,8 @@ requirements:
 
 EXAMPLES = r'''
 - name: Get information about an existing DigitalOcean Kubernetes cluster
-  community.digitalocean.digital_ocean_droplet_info:
-    oauth_token: REDACTED
+  community.digitalocean.digital_ocean_kubernetes_info:
+    oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
     return_kubeconfig: yes
   register: my_cluster
