@@ -318,6 +318,9 @@ class DOKubernetes(object):
         # Create the Kubernetes cluster
         json_data = self.get_kubernetes()
         if json_data:
+            # Add the kubeconfig to the return
+            if self.return_kubeconfig:
+                json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
             self.module.exit_json(changed=False, data=json_data)
         if self.module.check_mode:
             self.module.exit_json(changed=True)
@@ -331,7 +334,7 @@ class DOKubernetes(object):
         if self.wait:
             json_data = self.ensure_running()
         # Add the kubeconfig to the return
-        if self.module.params['return_kubeconfig']:
+        if self.return_kubeconfig:
             json_data['kubeconfig'] = self.get_kubernetes_kubeconfig()
         self.module.exit_json(changed=True, data=json_data)
 
@@ -377,7 +380,7 @@ def main():
             ),
             name=dict(type='str'),
             region=dict(aliases=['region_id'], default='nyc1'),
-            version=dict(type='str', default='1.18.8-do.0'),
+            version=dict(type='str', default='1.18.8-do.1'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list'),
