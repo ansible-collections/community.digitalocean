@@ -51,7 +51,7 @@ EXAMPLES = r'''
   register: my_cluster
 
 - debug:
-    msg: "Cluster name is {{ my_cluster.data.name}}, ID is {{ my_cluster.data.id }}"
+    msg: "Cluster name is {{ my_cluster.data.name }}, ID is {{ my_cluster.data.id }}"
 
 - debug:
     msg: "Cluster kubeconfig is {{ my_cluster.data.kubeconfig }}"
@@ -141,6 +141,7 @@ class DOKubernetesInfo(object):
         self.cluster_id = None
 
     def get_by_id(self):
+        """Returns an existing DigitalOcean Kubernetes cluster matching on id"""
         response = self.rest.get(
             'kubernetes/clusters/{0}'.format(self.cluster_id))
         json_data = response.json
@@ -149,6 +150,7 @@ class DOKubernetesInfo(object):
         return None
 
     def get_all_clusters(self):
+        """Returns all DigitalOcean Kubernetes clusters"""
         response = self.rest.get('kubernetes/clusters')
         json_data = response.json
         if response.status_code == 200:
@@ -156,6 +158,7 @@ class DOKubernetesInfo(object):
         return None
 
     def get_by_name(self, cluster_name):
+        """Returns an existing DigitalOcean Kubernetes cluster matching on name"""
         if not cluster_name:
             return None
         clusters = self.get_all_clusters()
@@ -165,19 +168,23 @@ class DOKubernetesInfo(object):
         return None
 
     def get_kubernetes_kubeconfig(self):
+        """Returns the kubeconfig for an existing DigitalOcean Kubernetes cluster"""
         response = self.rest.get(
             'kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
         text_data = response.text
         return text_data
 
     def get_kubernetes(self):
+        """Returns an existing DigitalOcean Kubernetes cluster by name"""
         json_data = self.get_by_name(self.module.params['name'])
-        self.cluster_id = json_data['id']
-        return json_data
+        if json_data:
+            self.cluster_id = json_data['id']
+            return json_data
+        else:
+            return None
 
     def get(self):
         """Fetches an existing DigitalOcean Kubernetes cluster
-
         API reference: https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-kubernetes-cluster
         """
         json_data = self.get_kubernetes()
@@ -215,6 +222,7 @@ def main():
         core(module)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+
 
 if __name__ == '__main__':
     main()
