@@ -229,6 +229,7 @@ class DOKubernetes(object):
         self.cluster_id = None
 
     def get_by_id(self):
+        """Returns an existing DigitalOcean Kubernetes cluster matching on id"""
         response = self.rest.get(
             'kubernetes/clusters/{0}'.format(self.cluster_id))
         json_data = response.json
@@ -237,6 +238,7 @@ class DOKubernetes(object):
         return None
 
     def get_all_clusters(self):
+        """Returns all DigitalOcean Kubernetes clusters"""
         response = self.rest.get('kubernetes/clusters')
         json_data = response.json
         if response.status_code == 200:
@@ -244,6 +246,7 @@ class DOKubernetes(object):
         return None
 
     def get_by_name(self, cluster_name):
+        """Returns an existing DigitalOcean Kubernetes cluster matching on name"""
         if not cluster_name:
             return None
         clusters = self.get_all_clusters()
@@ -253,6 +256,7 @@ class DOKubernetes(object):
         return None
 
     def get_kubernetes_kubeconfig(self):
+        """Returns the kubeconfig for an existing DigitalOcean Kubernetes cluster"""
         response = self.rest.get(
             'kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
         text_data = response.text
@@ -278,6 +282,7 @@ class DOKubernetes(object):
         return None
 
     def ensure_running(self):
+        """Waits for the newly created DigitalOcean Kubernetes cluster to be running"""
         end_time = time.time() + self.wait_timeout
         while time.time() < end_time:
             cluster = self.get_by_id()
