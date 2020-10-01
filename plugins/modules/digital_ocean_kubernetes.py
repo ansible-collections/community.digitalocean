@@ -4,14 +4,15 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
-from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils._text import to_native
-from traceback import format_exc
-import json
-import time
 import traceback
+import time
+import json
+from traceback import format_exc
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 __metaclass__ = type
+
 
 DOCUMENTATION = r'''
 ---
@@ -30,7 +31,7 @@ options:
     description:
       - The usual, C(present) to create, C(absent) to destroy
     choices: ['present', 'absent']
-    default: C(present)
+    default: present
     required: yes
   name:
     description:
@@ -54,14 +55,14 @@ options:
       - A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
     type: bool
     required: no
-    default: C(False)
+    default: False
   surge_upgrade:
     description:
       - A boolean value indicating whether surge upgrade is enabled/disabled for the cluster.
       - Surge upgrade makes cluster upgrades fast and reliable by bringing up new nodes before destroying the outdated nodes.
     type: bool
     required: no
-    default: C(False)
+    default: False
   tags:
     description:
       - A flat array of tag names as strings to be applied to the Kubernetes cluster.
@@ -89,13 +90,13 @@ options:
       - Controls whether or not to return the C(kubeconfig).
     type: bool
     required: no
-    default: C(False)
+    default: False
   wait:
     description:
       - Wait for the cluster to be running before returning.
     type: bool
     required: no
-    default: C(True)
+    default: True
   wait_timeout:
     description:
       - How long before wait gives up, in seconds, when creating a cluster.
@@ -131,6 +132,7 @@ EXAMPLES = r'''
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
 '''
+
 
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']

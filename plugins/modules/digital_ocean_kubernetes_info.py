@@ -4,14 +4,15 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
-from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible.module_utils._text import to_native
-from traceback import format_exc
-import json
-import time
 import traceback
+import time
+import json
+from traceback import format_exc
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 __metaclass__ = type
+
 
 DOCUMENTATION = r'''
 ---
@@ -36,10 +37,11 @@ options:
       - Controls whether or not to return the C(kubeconfig).
     type: bool
     required: no
-    default: C(False)
+    default: False
 requirements:
   - python >= 2.6
 '''
+
 
 EXAMPLES = r'''
 - name: Get information about an existing DigitalOcean Kubernetes cluster
@@ -55,6 +57,7 @@ EXAMPLES = r'''
 - debug:
     msg: "Cluster kubeconfig is {{ my_cluster.data.kubeconfig }}"
 '''
+
 
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
