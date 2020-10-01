@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#
-# Copyright: Ansible Project
+# Copyright: (c) 2020, Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -19,8 +18,8 @@ DOCUMENTATION = r'''
 module: digital_ocean_kubernetes_info
 short_description: Returns information about an existing DigitalOcean Kubernetes cluster
 description:
-  - Returns information about an existing DigitalOcean Kubernetes cluster
-author: "Mark Mercado (@mamercad)"
+  - Returns information about an existing DigitalOcean Kubernetes cluster.
+author: Mark Mercado (@mamercad)
 options:
   oauth_token:
     description:
@@ -60,7 +59,11 @@ EXAMPLES = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
 RETURN = r'''
-  data:
+data:
+  description: A DigitalOcean Kubernetes cluster (and optional C(kubeconfig))
+  return: changed
+  type: dict
+  sample:
     auto_upgrade: false
     cluster_subnet: 10.244.0.0/16
     created_at: '2020-09-26T21:36:18Z'
@@ -127,7 +130,6 @@ RETURN = r'''
   invocation:
     module_args:
       name: hacktoberfest
-data:
 '''
 
 

@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#
-# Copyright: Ansible Project
+# Copyright: (c) 2020, Ansible Project
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
@@ -19,8 +18,8 @@ DOCUMENTATION = r'''
 module: digital_ocean_kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
-    - Create and delete a Kubernetes cluster in DigitalOcean (and optionally wait for it to be running)
-author: "Mark Mercado (@mamercad)"
+  - Create and delete a Kubernetes cluster in DigitalOcean (and optionally wait for it to be running).
+author: Mark Mercado (@mamercad)
 options:
   oauth_token:
     description:
@@ -58,13 +57,15 @@ options:
     default: C(False)
   surge_upgrade:
     description:
-      - A boolean value indicating whether surge upgrade is enabled/disabled for the cluster. Surge upgrade makes cluster upgrades fast and reliable by bringing up new nodes before destroying the outdated nodes.
+      - A boolean value indicating whether surge upgrade is enabled/disabled for the cluster.
+      - Surge upgrade makes cluster upgrades fast and reliable by bringing up new nodes before destroying the outdated nodes.
     type: bool
     required: no
     default: C(False)
   tags:
     description:
-      - A flat array of tag names as strings to be applied to the Kubernetes cluster. All clusters will be automatically tagged "k8s" and "k8s:$K8S_CLUSTER_ID" in addition to any tags provided by the user.
+      - A flat array of tag names as strings to be applied to the Kubernetes cluster.
+      - All clusters will be automatically tagged "k8s" and "k8s:$K8S_CLUSTER_ID" in addition to any tags provided by the user.
     type: list(str)
     required: no
   maintenance_policy:
@@ -79,7 +80,8 @@ options:
     required: no
   vpc_uuid:
     description:
-      - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned. If excluded, the cluster will be assigned to your account's default VPC for the region.
+      - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned.
+      - If excluded, the cluster will be assigned to your account's default VPC for the region.
     type: str
     required: no
   return_kubeconfig:
@@ -90,7 +92,7 @@ options:
     default: C(False)
   wait:
     description:
-     - Wait for the cluster to be running before returning.
+      - Wait for the cluster to be running before returning.
     type: bool
     required: no
     default: C(True)
@@ -112,7 +114,7 @@ EXAMPLES = r'''
     name: hacktoberfest
     region: nyc1
     node_pools:
-        - name: hacktoberfest-workers
+      - name: hacktoberfest-workers
         size: s-1vcpu-2gb
         count: 3
     return_kubeconfig: yes
@@ -133,7 +135,11 @@ EXAMPLES = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
 RETURN = r'''
-  data:
+data:
+  description: A DigitalOcean Kubernetes cluster (and optional C(kubeconfig))
+  return: changed
+  type: dict
+  sample:
     kubeconfig: |-
       apiVersion: v1
       clusters:
@@ -259,8 +265,9 @@ class DOKubernetes(object):
         """Returns the kubeconfig for an existing DigitalOcean Kubernetes cluster"""
         response = self.rest.get(
             'kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
-        text_data = response.text
-        return text_data
+        # text_data = response.text
+        # return text_data
+        return response.json['message']
 
     def get_kubernetes(self):
         """Returns an existing DigitalOcean Kubernetes cluster by name"""
@@ -415,6 +422,7 @@ def main():
         core(module)
     except Exception as e:
         module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+
 
 if __name__ == '__main__':
     main()
