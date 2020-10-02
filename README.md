@@ -27,8 +27,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_floating_ip_info](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_floating_ip_info_module.html) – DigitalOcean Floating IPs information
 - [digital_ocean_image_facts](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_image_facts_module.html) – Gather information about DigitalOcean images
 - [digital_ocean_image_info](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_image_info_module.html) – Gather information about DigitalOcean images
-- [digital_ocean_kubernetes_info](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_kubernetes_info_module.html) – Gather information about DigitalOcean Kubernetes
-- [digital_ocean_kubernetes](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_kubernetes_info_module.html) – Create/delete a Kubernetes cluster in DigitalOcean
+- [kubernetes_info](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/kubernetes_info_module.html) – Gather information about DigitalOcean Kubernetes
+- [kubernetes](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/kubernetes_info_module.html) – Create/delete a Kubernetes cluster in DigitalOcean
 - [digital_ocean_load_balancer_facts](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_load_balancer_facts_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_load_balancer_info](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_load_balancer_info_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_region_facts](https://docs.ansible.com/ansible/2.10/collections/community/digitalocean/digital_ocean_region_facts_module.html) – Gather information about DigitalOcean regions

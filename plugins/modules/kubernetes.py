@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_kubernetes
+module: kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
   - Create and delete a Kubernetes cluster in DigitalOcean (and optionally wait for it to be running).
@@ -131,7 +131,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a new DigitalOcean Kubernetes cluster in New York 1
-  community.digitalocean.digital_ocean_kubernetes:
+  community.digitalocean.kubernetes:
     state: present
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
@@ -149,7 +149,7 @@ EXAMPLES = r'''
     msg: "{{ my_cluster.data.kubeconfig }}"
 
 - name: Destroy (delete) an existing DigitalOcean Kubernetes cluster
-  community.digitalocean.digital_ocean_kubernetes:
+  community.digitalocean.kubernetes:
     state: absent
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
@@ -396,7 +396,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent'], default='present', required=True),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
