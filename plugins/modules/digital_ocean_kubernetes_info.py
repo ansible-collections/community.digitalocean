@@ -4,13 +4,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-import traceback
-import time
-import json
-from traceback import format_exc
-from ansible.module_utils._text import to_native
-from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 __metaclass__ = type
 
 
@@ -134,6 +127,15 @@ data:
     module_args:
       name: hacktoberfest
 '''
+
+
+import traceback
+import time
+import json
+from traceback import format_exc
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 
 
 class DOKubernetesInfo(object):

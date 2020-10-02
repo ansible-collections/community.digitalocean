@@ -4,13 +4,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
-import traceback
-import time
-import json
-from traceback import format_exc
-from ansible.module_utils._text import to_native
-from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 __metaclass__ = type
 
 
@@ -78,7 +71,13 @@ options:
     description:
       - An object specifying the details of the worker nodes available to the Kubernetes cluster (see table below).
     type: dict
-    required: no
+    required: yes
+    default:
+      - name: worker-pool
+        size: s-1vcpu-2gb
+        count: 1
+        tags: []
+        labels: {}
   vpc_uuid:
     description:
       - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned.
@@ -222,6 +221,15 @@ data:
       version: 1.18.8-do.0
       vpc_uuid: null
 '''
+
+
+import traceback
+import time
+import json
+from traceback import format_exc
+from ansible.module_utils._text import to_native
+from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 
 
 class DOKubernetes(object):
