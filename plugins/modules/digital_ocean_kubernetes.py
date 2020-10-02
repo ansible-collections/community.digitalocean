@@ -376,7 +376,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present', required=True),
+            state=dict(choices=['present', 'absent'], default='present'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
@@ -385,7 +385,7 @@ def main():
                 required=True,
             ),
             name=dict(type='str', required=True),
-            region=dict(aliases=['region_id'], default='nyc1', required=True),
+            region=dict(aliases=['region_id'], default='nyc1'),
             version=dict(type='str', default='1.18.8-do.1'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
@@ -399,7 +399,7 @@ def main():
                     'tags': [],
                     'labels': {}
                 }
-            ]),
+            ], required=True),
             vpc_uuid=dict(type='str'),
             return_kubeconfig=dict(type='bool', default=False),
             wait=dict(type='bool', default=True),
