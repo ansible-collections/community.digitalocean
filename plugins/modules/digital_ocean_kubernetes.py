@@ -37,6 +37,7 @@ options:
     description:
       - The slug identifier for the region where the Kubernetes cluster will be created.
     type: str
+    aliases: ['region_id']
     required: yes
     default: nyc1
   version:
@@ -140,6 +141,7 @@ EXAMPLES = r'''
 RETURN = r'''
 data:
   description: A DigitalOcean Kubernetes cluster (and optional C(kubeconfig))
+  returned: changed
   type: dict
   sample:
     kubeconfig: |-
@@ -374,7 +376,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent'], default='present', required=True),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
@@ -388,10 +390,7 @@ def main():
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list'),
-            maintenance_policy=dict(type='dict', default={
-                'start_time': '',
-                'day': '',
-            }),
+            maintenance_policy=dict(type='dict'),
             node_pools=dict(type='list', default=[
                 {
                     'name': 'worker-pool',

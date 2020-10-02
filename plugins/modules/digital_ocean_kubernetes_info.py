@@ -58,6 +58,7 @@ EXAMPLES = r'''
 RETURN = r'''
 data:
   description: A DigitalOcean Kubernetes cluster (and optional C(kubeconfig))
+  returned: changed
   type: dict
   sample:
     auto_upgrade: false
@@ -215,7 +216,7 @@ def main():
                                          'DO_API_KEY', 'DO_OAUTH_TOKEN']),
                 required=True,
             ),
-            name=dict(type='str'),
+            name=dict(type='str', required=True),
             return_kubeconfig=dict(type='bool', default=False)
         ),
     )
