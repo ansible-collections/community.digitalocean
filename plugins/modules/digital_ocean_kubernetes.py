@@ -409,9 +409,9 @@ def main():
             version=dict(type='str', default='1.18.8-do.1'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
-            tags=dict(type='list'),
+            tags=dict(type='list', elements='str'),
             maintenance_policy=dict(type='dict'),
-            node_pools=dict(type='list', default=[
+            node_pools=dict(type='list', elements='dict', default=[
                 {
                     'name': 'worker-pool',
                     'size': 's-1vcpu-2gb',
