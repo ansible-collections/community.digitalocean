@@ -18,6 +18,7 @@ options:
   oauth_token:
     description:
       - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
+    type: str
     aliases: ['API_TOKEN']
     required: yes
   name:
@@ -57,7 +58,6 @@ EXAMPLES = r'''
 RETURN = r'''
 data:
   description: A DigitalOcean Kubernetes cluster (and optional C(kubeconfig))
-  return: changed
   type: dict
   sample:
     auto_upgrade: false
@@ -123,9 +123,6 @@ data:
     updated_at: '2020-09-26T21:42:29Z'
     version: 1.18.8-do.0
     vpc_uuid: REDACTED
-  invocation:
-    module_args:
-      name: hacktoberfest
 '''
 
 
@@ -215,14 +212,12 @@ def main():
                 aliases=['API_TOKEN'],
                 no_log=True,
                 fallback=(env_fallback, ['DO_API_TOKEN',
-                                         'DO_API_KEY', 'DO_OAUTH_TOKEN'])
+                                         'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                required=True,
             ),
             name=dict(type='str'),
             return_kubeconfig=dict(type='bool', default=False)
         ),
-        required_one_of=(
-            ['name']
-        )
     )
 
     try:

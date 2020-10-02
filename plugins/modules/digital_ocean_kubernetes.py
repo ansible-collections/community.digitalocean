@@ -18,11 +18,13 @@ options:
   oauth_token:
     description:
       - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
+    type: str
     aliases: ['API_TOKEN']
     required: yes
   state:
     description:
       - The usual, C(present) to create, C(absent) to destroy
+    type: str
     choices: ['present', 'absent']
     default: present
     required: yes
@@ -42,7 +44,7 @@ options:
       - The slug identifier for the version of Kubernetes used for the cluster. See the /v2/kubernetes/options endpoint for available versions.
     type: str
     required: no
-    default: 1.18.8-do.0
+    default: 1.18.8-do.1
   auto_upgrade:
     description:
       - A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
@@ -60,7 +62,7 @@ options:
     description:
       - A flat array of tag names as strings to be applied to the Kubernetes cluster.
       - All clusters will be automatically tagged "k8s" and "k8s:$K8S_CLUSTER_ID" in addition to any tags provided by the user.
-    type: list(str)
+    type: list
     required: no
   maintenance_policy:
     description:
@@ -70,7 +72,7 @@ options:
   node_pools:
     description:
       - An object specifying the details of the worker nodes available to the Kubernetes cluster (see table below).
-    type: dict
+    type: list
     required: yes
     default:
       - name: worker-pool
@@ -138,7 +140,6 @@ EXAMPLES = r'''
 RETURN = r'''
 data:
   description: A DigitalOcean Kubernetes cluster (and optional C(kubeconfig))
-  return: changed
   type: dict
   sample:
     kubeconfig: |-
@@ -203,23 +204,8 @@ data:
       - k8s
       - k8s:REDACTED
       updated_at: '2020-09-27T01:00:37Z'
-      version: 1.18.8-do.0
+      version: 1.18.8-do.1
       vpc_uuid: REDACTED
-  invocation:
-    module_args:
-      auto_upgrade: false
-      maintenance_policy: null
-      name: hacktoberfest
-      node_pools:
-      - count: 1
-        name: hacktoberfest-workers
-        size: s-1vcpu-2gb
-      region: nyc1
-      return_kubeconfig: true
-      surge_upgrade: false
-      tags: null
-      version: 1.18.8-do.0
-      vpc_uuid: null
 '''
 
 
@@ -393,18 +379,19 @@ def main():
                 aliases=['API_TOKEN'],
                 no_log=True,
                 fallback=(env_fallback, ['DO_API_TOKEN',
-                                         'DO_API_KEY', 'DO_OAUTH_TOKEN'])
+                                         'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                required=True,
             ),
-            name=dict(type='str'),
-            region=dict(aliases=['region_id'], default='nyc1'),
+            name=dict(type='str', required=True),
+            region=dict(aliases=['region_id'], default='nyc1', required=True),
             version=dict(type='str', default='1.18.8-do.1'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list'),
-            maintenance_policy=dict(
-                start_time='',
-                day=''
-            ),
+            maintenance_policy=dict(type='dict', default={
+                'start_time': '',
+                'day': '',
+            }),
             node_pools=dict(type='list', default=[
                 {
                     'name': 'worker-pool',
@@ -418,9 +405,6 @@ def main():
             return_kubeconfig=dict(type='bool', default=False),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(type='int', default=600)
-        ),
-        required_one_of=(
-            ['name']
         ),
         required_if=([
             ('state', 'present', ['name', 'region', 'version', 'node_pools']),
