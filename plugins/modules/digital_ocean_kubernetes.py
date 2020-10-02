@@ -63,8 +63,9 @@ options:
     description:
       - A flat array of tag names as strings to be applied to the Kubernetes cluster.
       - All clusters will be automatically tagged "k8s" and "k8s:$K8S_CLUSTER_ID" in addition to any tags provided by the user.
-    type: list
     required: no
+    type: list
+    elements: str
   maintenance_policy:
     description:
       - An object specifying the maintenance window policy for the Kubernetes cluster (see table below).
@@ -73,8 +74,27 @@ options:
   node_pools:
     description:
       - An object specifying the details of the worker nodes available to the Kubernetes cluster (see table below).
-    type: list
     required: yes
+    type: list
+    elements: dict
+      suboptions:
+        name:
+          type: str
+          description: A human-readable name for the node pool.
+        size:
+          type: str
+          description: The slug identifier for the type of Droplet used as workers in the node pool.
+        count:
+          type: int
+          description: The number of Droplet instances in the node pool.
+        tags:
+          type: list
+          description:
+            - An array containing the tags applied to the node pool.
+            - All node pools are automatically tagged C("k8s"), C("k8s-worker"), and C("k8s:$K8S_CLUSTER_ID").
+        labels:
+          type: dict
+          description: An object containing a set of Kubernetes labels. The keys are user-defined.
     default:
       - name: worker-pool
         size: s-1vcpu-2gb
@@ -399,7 +419,7 @@ def main():
                     'tags': [],
                     'labels': {}
                 }
-            ], required=True),
+            ]),
             vpc_uuid=dict(type='str'),
             return_kubeconfig=dict(type='bool', default=False),
             wait=dict(type='bool', default=True),
