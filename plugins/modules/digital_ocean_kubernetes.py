@@ -325,19 +325,19 @@ class DOKubernetes(object):
         # Validate region
         valid_regions = [str(x['slug']) for x in kubernetes_options['regions']]
         if self.module.params.get('region') not in valid_regions:
-            self.module.fail_json(msg='Invalid region {} (valid regions are {})'.format(
+            self.module.fail_json(msg='Invalid region {0} (valid regions are {1})'.format(
                 self.module.params.get('region'), ', '.join(valid_regions)))
         # Validate version
         valid_versions = [str(x['slug'])
                           for x in kubernetes_options['versions']]
         if self.module.params.get('version') not in valid_versions:
-            self.module.fail_json(msg='Invalid version {} (valid versions are {})'.format(
+            self.module.fail_json(msg='Invalid version {0} (valid versions are {1})'.format(
                 self.module.params.get('version'), ', '.join(valid_versions)))
         # Validate size
         valid_sizes = [str(x['slug']) for x in kubernetes_options['sizes']]
         for node_pool in self.module.params.get('node_pools'):
             if node_pool['size'] not in valid_sizes:
-                self.module.fail_json(msg='Invalid size {} (valid sizes are {})'.format(
+                self.module.fail_json(msg='Invalid size {0} (valid sizes are {1})'.format(
                     node_pool['size'], ', '.join(valid_sizes)))
 
         # Create the Kubernetes cluster
