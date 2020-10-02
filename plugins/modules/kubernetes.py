@@ -27,7 +27,6 @@ options:
     type: str
     choices: ['present', 'absent']
     default: present
-    required: yes
   name:
     description:
       - A human-readable name for a Kubernetes cluster.
@@ -38,7 +37,6 @@ options:
       - The slug identifier for the region where the Kubernetes cluster will be created.
     type: str
     aliases: ['region_id']
-    required: yes
     default: nyc1
   version:
     description:
@@ -74,7 +72,6 @@ options:
   node_pools:
     description:
       - An object specifying the details of the worker nodes available to the Kubernetes cluster (see table below).
-    required: yes
     type: list
     elements: dict
     suboptions:
@@ -396,7 +393,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present', required=True),
+            state=dict(choices=['present', 'absent'], default='present'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
