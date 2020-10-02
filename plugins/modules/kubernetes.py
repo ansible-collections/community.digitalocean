@@ -280,9 +280,8 @@ class DOKubernetes(object):
         """Returns the kubeconfig for an existing DigitalOcean Kubernetes cluster"""
         response = self.rest.get(
             'kubernetes/clusters/{0}/kubeconfig'.format(self.cluster_id))
-        # text_data = response.text
-        # return text_data
-        return response.json['message']
+        text_data = response.text
+        return text_data
 
     def get_kubernetes(self):
         """Returns an existing DigitalOcean Kubernetes cluster by name"""
