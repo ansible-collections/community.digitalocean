@@ -271,36 +271,23 @@ class DODroplet(object):
 
 
     def resize_droplet(self):
-        """
-        *NOTE: API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet
-        *NOTE: Must be powered off
-        *NOTE: Endpoint: /v2/droplets/$DROPLET_ID/actions
-        *NOTE: Payload:
-          {
-            "type": "resize",
-            "disk": true,
-            "size": "1gb"
-          }
-        """
-        # if self.status == 'off':
-        response = self.rest.post('droplets/{}/actions'.format(self.id), data={'type': 'resize', 'disk': False, 'size': self.module.params['size']})
-        json_data = response.json
-        if response.status_code == 201:
-            self.module.exit_json(changed=True, msg='Resized Droplet {} ({}) from {} to {}'.format(self.name, self.id, self.size, self.module.params['size']))
+        """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
+        if self.status == 'off':
+          response = self.rest.post('droplets/{}/actions'.format(self.id), data={'type': 'resize', 'disk': False, 'size': self.module.params['size']})
+          json_data = response.json
+          if response.status_code == 201:
+              self.module.exit_json(changed=True, msg='Resized Droplet {} ({}) from {} to {}'.format(self.name, self.id, self.size, self.module.params['size']))
+          else:
+              self.module.fail_json(msg="Resizing Droplet {} ({}) failed [HTTP {}: {}]".format(self.name, self.id, response.status_code, response.json['message']))
         else:
-            self.module.fail_json(msg="Resizing Droplet {} ({}) failed [HTTP {}: {}]".format(self.name, self.id, response.status_code, response.json['message']))
-        # else:
-        #     self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
+            self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
 
     def create(self):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
-
-            # Resize?
-            if self.size != self.module.params['size']:
+            if json_data['droplet']['size']['slug'] != self.module.params['size']:
                 self.resize_droplet()
-
             droplet_data = self.get_addresses(json_data)
             self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
