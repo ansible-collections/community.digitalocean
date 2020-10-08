@@ -275,14 +275,14 @@ class DODroplet(object):
     def resize_droplet(self):
         """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
         if self.status == 'off':
-            response = self.rest.post('droplets/{}/actions'.format(self.id),
+            response = self.rest.post('droplets/{0}/actions'.format(self.id),
                                       data={'type': 'resize', 'disk': self.module.params['resize_disk'], 'size': self.module.params['size']})
             json_data = response.json
             if response.status_code == 201:
-                self.module.exit_json(changed=True, msg='Resized Droplet {} ({}) from {} to {}'.format(
+                self.module.exit_json(changed=True, msg='Resized Droplet {0} ({1}) from {2} to {3}'.format(
                     self.name, self.id, self.size, self.module.params['size']))
             else:
-                self.module.fail_json(msg="Resizing Droplet {} ({}) failed [HTTP {}: {}]".format(
+                self.module.fail_json(msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
                     self.name, self.id, response.status_code, response.json['message']))
         else:
             self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
