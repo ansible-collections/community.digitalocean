@@ -249,9 +249,7 @@ class DODroplet(object):
         return None
 
     def get_addresses(self, data):
-        """
-         Expose IP addresses as their own property allowing users extend to additional tasks
-        """
+        """Expose IP addresses as their own property allowing users extend to additional tasks"""
         _data = data
         for k, v in data.items():
             setattr(self, k, v)
@@ -268,23 +266,24 @@ class DODroplet(object):
                 _data['private_ipv6_address'] = network['ip_address']
         return _data
 
-
     def get_droplet(self):
         json_data = self.get_by_id(self.module.params['id'])
         if not json_data and self.unique_name:
             json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
-
     def resize_droplet(self):
         """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
         if self.status == 'off':
-          response = self.rest.post('droplets/{}/actions'.format(self.id), data={'type': 'resize', 'disk': self.module.params['resize_disk'], 'size': self.module.params['size']})
-          json_data = response.json
-          if response.status_code == 201:
-              self.module.exit_json(changed=True, msg='Resized Droplet {} ({}) from {} to {}'.format(self.name, self.id, self.size, self.module.params['size']))
-          else:
-              self.module.fail_json(msg="Resizing Droplet {} ({}) failed [HTTP {}: {}]".format(self.name, self.id, response.status_code, response.json['message']))
+            response = self.rest.post('droplets/{}/actions'.format(self.id),
+                                      data={'type': 'resize', 'disk': self.module.params['resize_disk'], 'size': self.module.params['size']})
+            json_data = response.json
+            if response.status_code == 201:
+                self.module.exit_json(changed=True, msg='Resized Droplet {} ({}) from {} to {}'.format(
+                    self.name, self.id, self.size, self.module.params['size']))
+            else:
+                self.module.fail_json(msg="Resizing Droplet {} ({}) failed [HTTP {}: {}]".format(
+                    self.name, self.id, response.status_code, response.json['message']))
         else:
             self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
 
