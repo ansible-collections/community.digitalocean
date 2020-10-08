@@ -105,6 +105,12 @@ options:
      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
     aliases: ['API_TOKEN']
     required: True
+  resize_disk:
+    description:
+    - Whether to increase disk size (only consulted if the C(unique_name) is C(True) and C(size) dictates an increase)
+    required: False
+    default: False
+    type: bool
 requirements:
   - "python >= 2.6"
 '''
@@ -273,7 +279,7 @@ class DODroplet(object):
     def resize_droplet(self):
         """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
         if self.status == 'off':
-          response = self.rest.post('droplets/{}/actions'.format(self.id), data={'type': 'resize', 'disk': False, 'size': self.module.params['size']})
+          response = self.rest.post('droplets/{}/actions'.format(self.id), data={'type': 'resize', 'disk': self.module.params['resize_disk'], 'size': self.module.params['size']})
           json_data = response.json
           if response.status_code == 201:
               self.module.exit_json(changed=True, msg='Resized Droplet {} ({}) from {} to {}'.format(self.name, self.id, self.size, self.module.params['size']))
@@ -362,6 +368,7 @@ def main():
             wait=dict(type='bool', default=True),
             wait_timeout=dict(default=120, type='int'),
             unique_name=dict(type='bool', default=False),
+            resize_disk=dict(type='bool', default=False),
         ),
         required_one_of=(
             ['id', 'name'],
