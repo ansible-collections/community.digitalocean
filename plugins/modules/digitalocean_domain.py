@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_domain
+module: digitalocean_domain
 short_description: Create/delete a DNS domain in DigitalOcean
 description:
      - Create/delete a DNS domain in DigitalOcean.
@@ -36,7 +36,7 @@ options:
     - An 'A' record for '@' ($ORIGIN) will be created with the value 'ip'.  'ip' is an IP version 4 address.
     type: str
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 notes:
   - Environment variables DO_OAUTH_TOKEN can be used for the oauth_token.
@@ -50,14 +50,14 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a domain
-  community.digitalocean.digital_ocean_domain:
+  community.digitalocean.digitalocean_domain:
     state: present
     name: my.digitalocean.domain
     ip: 127.0.0.1
 
 # Create a droplet and corresponding domain
 - name: Create a droplet
-  community.digitalocean.digital_ocean:
+  community.digitalocean.digitalocean:
     state: present
     name: test_droplet
     size_id: 1gb
@@ -66,7 +66,7 @@ EXAMPLES = r'''
   register: test_droplet
 
 - name: Create a corresponding domain
-  community.digitalocean.digital_ocean_domain:
+  community.digitalocean.digitalocean_domain:
     state: present
     name: "{{ test_droplet.droplet.name }}.my.domain"
     ip: "{{ test_droplet.droplet.ip_address }}"
@@ -75,7 +75,7 @@ EXAMPLES = r'''
 
 import traceback
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -193,7 +193,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         state=dict(choices=['present', 'absent'], default='present'),
         name=dict(type='str'),

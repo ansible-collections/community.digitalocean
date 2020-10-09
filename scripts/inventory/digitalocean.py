@@ -10,7 +10,7 @@ In addition to the --list and --host options used by Ansible, there are options
 for generating JSON of other DigitalOcean data.  This is useful when creating
 droplets.  For example, --regions will return all the DigitalOcean Regions.
 This information can also be easily found in the cache file, whose default
-location is /tmp/ansible-digital_ocean.cache).
+location is /tmp/ansible-digitalocean.cache).
 
 The --pretty (-p) option pretty-prints the output for better human readability.
 
@@ -21,7 +21,7 @@ the cache is not used for current droplet information (in --list, --host,
 found.  You can force this script to use the cache with --force-cache.
 
 ----
-Configuration is read from `digital_ocean.ini`, then from environment variables,
+Configuration is read from `digitalocean.ini`, then from environment variables,
 and then from command-line arguments.
 
 Most notably, the DigitalOcean API Token must be specified. It can be specified
@@ -32,15 +32,15 @@ in the INI file or with the following environment variables:
 Alternatively, it can be passed on the command-line with --api-token.
 
 If you specify DigitalOcean credentials in the INI file, a handy way to
-get them into your environment (e.g., to use the digital_ocean module)
+get them into your environment (e.g., to use the digitalocean module)
 is to use the output of the --env option with export:
-    export $(digital_ocean.py --env)
+    export $(digitalocean.py --env)
 
 ----
 The following groups are generated from --list:
  - ID    (droplet ID)
  - NAME  (droplet NAME)
- - digital_ocean
+ - digitalocean
  - image_ID
  - image_NAME
  - distro_NAME  (distribution NAME from image)
@@ -74,7 +74,7 @@ For each host, the following variables are registered:
 
 -----
 ```
-usage: digital_ocean.py [-h] [--list] [--host HOST] [--all] [--droplets]
+usage: digitalocean.py [-h] [--list] [--host HOST] [--all] [--droplets]
                         [--regions] [--images] [--sizes] [--ssh-keys]
                         [--domains] [--tags] [--pretty]
                         [--cache-path CACHE_PATH]
@@ -252,7 +252,7 @@ class DigitalOceanInventory(object):
             sys.exit(0)
 
         # Manage cache
-        self.cache_filename = self.cache_path + "/ansible-digital_ocean.cache"
+        self.cache_filename = self.cache_path + "/ansible-digitalocean.cache"
         self.cache_refreshed = False
 
         if self.is_cache_valid():
@@ -266,33 +266,33 @@ class DigitalOceanInventory(object):
 
         # Pick the json_data to print based on the CLI command
         if self.args.droplets:
-            self.load_from_digital_ocean('droplets')
+            self.load_from_digitalocean('droplets')
             json_data = {'droplets': self.data['droplets']}
         elif self.args.regions:
-            self.load_from_digital_ocean('regions')
+            self.load_from_digitalocean('regions')
             json_data = {'regions': self.data['regions']}
         elif self.args.images:
-            self.load_from_digital_ocean('images')
+            self.load_from_digitalocean('images')
             json_data = {'images': self.data['images']}
         elif self.args.sizes:
-            self.load_from_digital_ocean('sizes')
+            self.load_from_digitalocean('sizes')
             json_data = {'sizes': self.data['sizes']}
         elif self.args.ssh_keys:
-            self.load_from_digital_ocean('ssh_keys')
+            self.load_from_digitalocean('ssh_keys')
             json_data = {'ssh_keys': self.data['ssh_keys']}
         elif self.args.domains:
-            self.load_from_digital_ocean('domains')
+            self.load_from_digitalocean('domains')
             json_data = {'domains': self.data['domains']}
         elif self.args.tags:
-            self.load_from_digital_ocean('tags')
+            self.load_from_digitalocean('tags')
             json_data = {'tags': self.data['tags']}
         elif self.args.all:
-            self.load_from_digital_ocean()
+            self.load_from_digitalocean()
             json_data = self.data
         elif self.args.host:
             json_data = self.load_droplet_variables_for_host()
         else:    # '--list' this is last to make it default
-            self.load_from_digital_ocean('droplets')
+            self.load_from_digitalocean('droplets')
             self.build_inventory()
             json_data = self.inventory
 
@@ -309,28 +309,28 @@ class DigitalOceanInventory(object):
     ###########################################################################
 
     def read_settings(self):
-        """ Reads the settings from the digital_ocean.ini file """
+        """ Reads the settings from the digitalocean.ini file """
         config = ConfigParser.ConfigParser()
-        config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'digital_ocean.ini')
+        config_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'digitalocean.ini')
         config.read(config_path)
 
         # Credentials
-        if config.has_option('digital_ocean', 'api_token'):
-            self.api_token = config.get('digital_ocean', 'api_token')
+        if config.has_option('digitalocean', 'api_token'):
+            self.api_token = config.get('digitalocean', 'api_token')
 
         # Cache related
-        if config.has_option('digital_ocean', 'cache_path'):
-            self.cache_path = config.get('digital_ocean', 'cache_path')
-        if config.has_option('digital_ocean', 'cache_max_age'):
-            self.cache_max_age = config.getint('digital_ocean', 'cache_max_age')
+        if config.has_option('digitalocean', 'cache_path'):
+            self.cache_path = config.get('digitalocean', 'cache_path')
+        if config.has_option('digitalocean', 'cache_max_age'):
+            self.cache_max_age = config.getint('digitalocean', 'cache_max_age')
 
         # Private IP Address
-        if config.has_option('digital_ocean', 'use_private_network'):
-            self.use_private_network = config.getboolean('digital_ocean', 'use_private_network')
+        if config.has_option('digitalocean', 'use_private_network'):
+            self.use_private_network = config.getboolean('digitalocean', 'use_private_network')
 
         # Group variables
-        if config.has_option('digital_ocean', 'group_variables'):
-            self.group_variables = ast.literal_eval(config.get('digital_ocean', 'group_variables'))
+        if config.has_option('digitalocean', 'group_variables'):
+            self.group_variables = ast.literal_eval(config.get('digitalocean', 'group_variables'))
 
     def read_environment(self):
         """ Reads the settings from environment variables """
@@ -384,7 +384,7 @@ class DigitalOceanInventory(object):
     # Data Management
     ###########################################################################
 
-    def load_from_digital_ocean(self, resource=None):
+    def load_from_digitalocean(self, resource=None):
         """Get JSON from DigitalOcean API """
         if self.args.force_cache and os.path.isfile(self.cache_filename):
             return
@@ -456,7 +456,7 @@ class DigitalOceanInventory(object):
             self.add_host(droplet['name'], dest)
 
             # groups that are always present
-            for group in ('digital_ocean',
+            for group in ('digitalocean',
                           'region_' + droplet['region']['slug'],
                           'image_' + str(droplet['image']['id']),
                           'size_' + droplet['size']['slug'],

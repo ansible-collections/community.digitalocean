@@ -10,25 +10,25 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_account_info
+module: digitalocean_account_info
 short_description: Gather information about DigitalOcean User account
 description:
     - This module can be used to gather information about User account.
-    - This module was called C(digital_ocean_account_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_account_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 
 requirements:
   - "python >= 2.6"
 
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about user account
-  community.digitalocean.digital_ocean_account_info:
+  community.digitalocean.digitalocean_account_info:
     oauth_token: "{{ oauth_token }}"
 '''
 
@@ -51,7 +51,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -66,10 +66,10 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_account_facts', 'community.digitalocean.digital_ocean_account_facts'):
-        module.deprecate("The 'digital_ocean_account_facts' module has been renamed to 'digital_ocean_account_info'",
+    if module._name in ('digitalocean_account_facts', 'community.digitalocean.digitalocean_account_facts'):
+        module.deprecate("The 'digitalocean_account_facts' module has been renamed to 'digitalocean_account_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
     try:
         core(module)

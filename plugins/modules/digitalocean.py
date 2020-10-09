@@ -10,12 +10,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean
+module: digitalocean
 short_description: Create/delete a droplet/SSH_key in DigitalOcean
 deprecated:
   removed_in: 2.0.0  # was Ansible 2.12
   why: Updated module to remove external dependency with increased functionality.
-  alternative: Use M(community.digitalocean.digital_ocean_droplet) instead.
+  alternative: Use M(community.digitalocean.digitalocean_droplet) instead.
 description:
      - Create/delete a droplet in DigitalOcean and optionally wait for it to be 'running', or deploy an SSH key.
 author: "Vincent Viallet (@zbal)"
@@ -111,7 +111,7 @@ EXAMPLES = r'''
 # If no existing key matches this name, a new key is created, the ssh key id is returned and changed = False
 
 - name: Ensure a SSH key is present
-  community.digitalocean.digital_ocean:
+  community.digitalocean.digitalocean:
     state: present
     command: ssh
     name: my_ssh_key
@@ -120,7 +120,7 @@ EXAMPLES = r'''
 
 # Will return the droplet details including the droplet id (used for idempotence)
 - name: Create a new Droplet
-  community.digitalocean.digital_ocean:
+  community.digitalocean.digitalocean:
     state: present
     command: droplet
     name: mydroplet
@@ -142,7 +142,7 @@ EXAMPLES = r'''
 # If no droplet matches the id, a new droplet will be created and the droplet details (including the new id) are returned, changed = True.
 
 - name: Ensure a droplet is present
-  community.digitalocean.digital_ocean:
+  community.digitalocean.digitalocean:
     state: present
     command: droplet
     id: 123
@@ -159,7 +159,7 @@ EXAMPLES = r'''
 # The keys are used to connect as root to the droplet.
 
 - name: Create a droplet with ssh key
-  community.digitalocean.digital_ocean:
+  community.digitalocean.digitalocean:
     state: present
     ssh_key_ids: 123,456
     name: mydroplet

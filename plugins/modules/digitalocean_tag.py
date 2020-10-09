@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_tag
+module: digitalocean_tag
 short_description: Create and remove tag(s) to DigitalOcean resource.
 description:
     - Create and remove tag(s) to DigitalOcean resource.
@@ -42,7 +42,7 @@ options:
     type: str
     choices: ['present', 'absent']
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 notes:
   - Two environment variables can be used, DO_API_KEY and DO_API_TOKEN.
@@ -56,12 +56,12 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a tag
-  community.digitalocean.digital_ocean_tag:
+  community.digitalocean.digitalocean_tag:
     name: production
     state: present
 
 - name: Tag a resource; creating the tag if it does not exist
-  community.digitalocean.digital_ocean_tag:
+  community.digitalocean.digitalocean_tag:
     name: "{{ item }}"
     resource_id: "73333005"
     state: present
@@ -70,7 +70,7 @@ EXAMPLES = r'''
     - dbserver
 
 - name: Untag a resource
-  community.digitalocean.digital_ocean_tag:
+  community.digitalocean.digitalocean_tag:
     name: staging
     resource_id: "73333005"
     state: absent
@@ -78,7 +78,7 @@ EXAMPLES = r'''
 # Deleting a tag also untags all the resources that have previously been
 # tagged with it
 - name: Remove a tag
-  community.digitalocean.digital_ocean_tag:
+  community.digitalocean.digitalocean_tag:
     name: dbserver
     state: absent
 '''
@@ -104,7 +104,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -189,7 +189,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         name=dict(type='str', required=True),
         resource_id=dict(aliases=['droplet_id'], type='str'),

@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_firewall_info
+module: digitalocean_firewall_info
 short_description: Gather information about DigitalOcean firewalls
 description:
     - This module can be used to gather information about DigitalOcean firewalls.
-    - This module was called C(digital_ocean_firewall_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_firewall_facts) before Ansible 2.9. The usage did not change.
 author: "Anthony Bond (@BondAnthony)"
 options:
   name:
@@ -25,23 +25,23 @@ options:
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about all firewalls
-  community.digitalocean.digital_ocean_firewall_info:
+  community.digitalocean.digitalocean_firewall_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about a specific firewall by name
-  community.digitalocean.digital_ocean_firewall_info:
+  community.digitalocean.digitalocean_firewall_info:
     oauth_token: "{{ oauth_token }}"
     name: "firewall_name"
 
 - name: Gather information from a firewall rule
-  community.digitalocean.digital_ocean_firewall_info:
+  community.digitalocean.digitalocean_firewall_info:
     name: SSH
   register: resp_out
 
@@ -87,7 +87,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -113,13 +113,13 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         name=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_firewall_facts', 'community.digitalocean.digital_ocean_firewall_facts'):
-        module.deprecate("The 'digital_ocean_firewall_facts' module has been renamed to 'digital_ocean_firewall_info'",
+    if module._name in ('digitalocean_firewall_facts', 'community.digitalocean.digitalocean_firewall_facts'):
+        module.deprecate("The 'digitalocean_firewall_facts' module has been renamed to 'digitalocean_firewall_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

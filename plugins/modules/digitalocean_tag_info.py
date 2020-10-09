@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_tag_info
+module: digitalocean_tag_info
 short_description: Gather information about DigitalOcean tags
 description:
     - This module can be used to gather information about DigitalOcean provided tags.
-    - This module was called C(digital_ocean_tag_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_tag_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   tag_name:
@@ -25,23 +25,23 @@ options:
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about all tags
-  community.digitalocean.digital_ocean_tag_info:
+  community.digitalocean.digitalocean_tag_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about tag with given name
-  community.digitalocean.digital_ocean_tag_info:
+  community.digitalocean.digitalocean_tag_info:
     oauth_token: "{{ oauth_token }}"
     tag_name: "extra_awesome_tag"
 
 - name: Get resources from tag name
-  community.digitalocean.digital_ocean_tag_info:
+  community.digitalocean.digitalocean_tag_info:
   register: resp_out
 - set_fact:
     resources: "{{ item.resources }}"
@@ -73,7 +73,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -98,13 +98,13 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         tag_name=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_tag_facts', 'community.digitalocean.digital_ocean_tag_facts'):
-        module.deprecate("The 'digital_ocean_tag_facts' module has been renamed to 'digital_ocean_tag_info'",
+    if module._name in ('digitalocean_tag_facts', 'community.digitalocean.digitalocean_tag_facts'):
+        module.deprecate("The 'digitalocean_tag_facts' module has been renamed to 'digitalocean_tag_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

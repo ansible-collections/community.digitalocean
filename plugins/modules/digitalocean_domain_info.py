@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_domain_info
+module: digitalocean_domain_info
 short_description: Gather information about DigitalOcean Domains
 description:
     - This module can be used to gather information about DigitalOcean provided Domains.
-    - This module was called C(digital_ocean_domain_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_domain_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   domain_name:
@@ -25,23 +25,23 @@ options:
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about all domains
-  community.digitalocean.digital_ocean_domain_info:
+  community.digitalocean.digitalocean_domain_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about domain with given name
-  community.digitalocean.digital_ocean_domain_info:
+  community.digitalocean.digitalocean_domain_info:
     oauth_token: "{{ oauth_token }}"
     domain_name: "example.com"
 
 - name: Get ttl from domain
-  community.digitalocean.digital_ocean_domain_info:
+  community.digitalocean.digitalocean_domain_info:
   register: resp_out
 - set_fact:
     domain_ttl: "{{ item.ttl }}"
@@ -83,7 +83,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -121,13 +121,13 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         domain_name=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_domain_facts', 'community.digitalocean.digital_ocean_domain_facts'):
-        module.deprecate("The 'digital_ocean_domain_facts' module has been renamed to 'digital_ocean_domain_info'",
+    if module._name in ('digitalocean_domain_facts', 'community.digitalocean.digitalocean_domain_facts'):
+        module.deprecate("The 'digitalocean_domain_facts' module has been renamed to 'digitalocean_domain_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

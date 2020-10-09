@@ -10,12 +10,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_image_info
+module: digitalocean_image_info
 short_description: Gather information about DigitalOcean images
 description:
     - This module can be used to gather information about DigitalOcean provided images.
     - These images can be either of type C(distribution), C(application) and C(private).
-    - This module was called C(digital_ocean_image_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_image_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   image_type:
@@ -32,29 +32,29 @@ options:
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about all images
-  community.digitalocean.digital_ocean_image_info:
+  community.digitalocean.digitalocean_image_info:
     image_type: all
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about application images
-  community.digitalocean.digital_ocean_image_info:
+  community.digitalocean.digitalocean_image_info:
     image_type: application
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about distribution images
-  community.digitalocean.digital_ocean_image_info:
+  community.digitalocean.digitalocean_image_info:
     image_type: distribution
     oauth_token: "{{ oauth_token }}"
 
 - name: Get distribution about image with slug coreos-beta
-  community.digitalocean.digital_ocean_image_info:
+  community.digitalocean.digitalocean_image_info:
   register: resp_out
 - set_fact:
     distribution_name: "{{ item.distribution }}"
@@ -103,7 +103,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -126,7 +126,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         image_type=dict(type='str',
                         required=False,
@@ -136,8 +136,8 @@ def main():
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_image_facts', 'community.digitalocean.digital_ocean_image_facts'):
-        module.deprecate("The 'digital_ocean_image_facts' module has been renamed to 'digital_ocean_image_info'",
+    if module._name in ('digitalocean_image_facts', 'community.digitalocean.digitalocean_image_facts'):
+        module.deprecate("The 'digitalocean_image_facts' module has been renamed to 'digitalocean_image_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

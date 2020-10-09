@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_sshkey
+module: digitalocean_sshkey
 short_description: Manage DigitalOcean SSH keys
 description:
      - Create/delete DigitalOcean SSH keys.
@@ -44,7 +44,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: "Create ssh key"
-  community.digitalocean.digital_ocean_sshkey:
+  community.digitalocean.digitalocean_sshkey:
     oauth_token: "{{ oauth_token }}"
     name: "My SSH Public Key"
     ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAQQDDHr/jh2Jy4yALcK4JyWbVkPRaWmhck3IgCoeOO3z1e2dBowLh64QAM+Qb72pxekALga2oi4GvT+TlWNhzPH4V example"
@@ -52,7 +52,7 @@ EXAMPLES = r'''
   register: result
 
 - name: "Delete ssh key"
-  community.digitalocean.digital_ocean_sshkey:
+  community.digitalocean.digitalocean_sshkey:
     oauth_token: "{{ oauth_token }}"
     state: "absent"
     fingerprint: "3b:16:bf:e4:8b:00:8b:b8:59:8c:a9:d3:f0:19:45:fa"

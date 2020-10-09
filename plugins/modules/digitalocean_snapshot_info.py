@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_snapshot_info
+module: digitalocean_snapshot_info
 short_description: Gather information about DigitalOcean Snapshot
 description:
     - This module can be used to gather information about snapshot information based upon provided values such as droplet, volume and snapshot id.
-    - This module was called C(digital_ocean_snapshot_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_snapshot_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   snapshot_type:
@@ -38,35 +38,35 @@ options:
 requirements:
   - "python >= 2.6"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about all snapshots
-  community.digitalocean.digital_ocean_snapshot_info:
+  community.digitalocean.digitalocean_snapshot_info:
     snapshot_type: all
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about droplet snapshots
-  community.digitalocean.digital_ocean_snapshot_info:
+  community.digitalocean.digitalocean_snapshot_info:
     snapshot_type: droplet
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about volume snapshots
-  community.digitalocean.digital_ocean_snapshot_info:
+  community.digitalocean.digitalocean_snapshot_info:
     snapshot_type: volume
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about snapshot by snapshot id
-  community.digitalocean.digital_ocean_snapshot_info:
+  community.digitalocean.digitalocean_snapshot_info:
     snapshot_type: by_id
     snapshot_id: 123123123
     oauth_token: "{{ oauth_token }}"
 
 - name: Get information about snapshot named big-data-snapshot1
-  community.digitalocean.digital_ocean_snapshot_info:
+  community.digitalocean.digitalocean_snapshot_info:
   register: resp_out
 - set_fact:
     snapshot_id: "{{ item.id }}"
@@ -102,7 +102,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -134,7 +134,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         snapshot_type=dict(type='str',
                            required=False,
@@ -149,8 +149,8 @@ def main():
             ['snapshot_type', 'by_id', ['snapshot_id']],
         ],
     )
-    if module._name in ('digital_ocean_snapshot_facts', 'community.digitalocean.digital_ocean_snapshot_facts'):
-        module.deprecate("The 'digital_ocean_snapshot_facts' module has been renamed to 'digital_ocean_snapshot_info'",
+    if module._name in ('digitalocean_snapshot_facts', 'community.digitalocean.digitalocean_snapshot_facts'):
+        module.deprecate("The 'digitalocean_snapshot_facts' module has been renamed to 'digitalocean_snapshot_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

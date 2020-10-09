@@ -1,59 +1,59 @@
 requires_ansible: '>=2.9.10'
 plugin_routing:
   modules:
-    digital_ocean:
+    digitalocean:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_account_facts:
+    digitalocean_account_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_certificate_facts:
+    digitalocean_certificate_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_domain_facts:
+    digitalocean_domain_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_firewall_facts:
+    digitalocean_firewall_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_floating_ip_facts:
+    digitalocean_floating_ip_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_image_facts:
+    digitalocean_image_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_load_balancer_facts:
+    digitalocean_load_balancer_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_region_facts:
+    digitalocean_region_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_size_facts:
+    digitalocean_size_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_snapshot_facts:
+    digitalocean_snapshot_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_sshkey_facts:
+    digitalocean_sshkey_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_tag_facts:
+    digitalocean_tag_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digital_ocean_volume_facts:
+    digitalocean_volume_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details

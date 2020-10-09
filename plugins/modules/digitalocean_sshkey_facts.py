@@ -11,17 +11,17 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_sshkey_facts
+module: digitalocean_sshkey_facts
 deprecated:
   removed_in: 2.0.0  # was Ansible 2.13
   why: Deprecated in favour of C(_info) module.
-  alternative: Use M(community.digitalocean.digital_ocean_sshkey_info) instead.
+  alternative: Use M(community.digitalocean.digitalocean_sshkey_info) instead.
 short_description: DigitalOcean SSH keys facts
 description:
      - Fetch DigitalOcean SSH keys facts.
 author: "Patrick Marques (@pmarques)"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 notes:
   - Version 2 of DigitalOcean API is used.
@@ -31,7 +31,7 @@ requirements:
 
 
 EXAMPLES = r'''
-- community.digitalocean.digital_ocean_sshkey_facts:
+- community.digitalocean.digitalocean_sshkey_facts:
     oauth_token: "{{ my_do_key }}"
 
 - set_fact:
@@ -69,7 +69,7 @@ data:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 
 
 def core(module):
@@ -87,11 +87,11 @@ def core(module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(),
+        argument_spec=DigitalOceanHelper.digitalocean_argument_spec(),
         supports_check_mode=False,
     )
 
-    module.deprecate("The 'digital_ocean_sshkey_facts' module has been deprecated, use the new 'digital_ocean_sshkey_info' module",
+    module.deprecate("The 'digitalocean_sshkey_facts' module has been deprecated, use the new 'digitalocean_sshkey_info' module",
                      version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     core(module)

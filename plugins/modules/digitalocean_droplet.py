@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_droplet
+module: digitalocean_droplet
 short_description: Create and delete a DigitalOcean droplet
 description:
      - Create and delete a droplet in DigitalOcean and optionally wait for it to be active.
@@ -112,7 +112,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a new droplet
-  community.digitalocean.digital_ocean_droplet:
+  community.digitalocean.digitalocean_droplet:
     state: present
     name: mydroplet
     oauth_token: XXX
@@ -127,7 +127,7 @@ EXAMPLES = r'''
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
 
 - name: Ensure a droplet is present
-  community.digitalocean.digital_ocean_droplet:
+  community.digitalocean.digitalocean_droplet:
     state: present
     id: 123
     name: mydroplet
@@ -138,7 +138,7 @@ EXAMPLES = r'''
     wait_timeout: 500
 
 - name: Ensure a droplet is present with SSH keys installed
-  community.digitalocean.digital_ocean_droplet:
+  community.digitalocean.digitalocean_droplet:
     state: present
     id: 123
     name: mydroplet
@@ -191,7 +191,7 @@ data:
 import time
 import json
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 
 
 class DODroplet(object):

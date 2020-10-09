@@ -9,14 +9,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_floating_ip_info
+module: digitalocean_floating_ip_info
 short_description: DigitalOcean Floating IPs information
 description:
      - This module can be used to fetch DigitalOcean Floating IPs information.
-     - This module was called C(digital_ocean_floating_ip_facts) before Ansible 2.9. The usage did not change.
+     - This module was called C(digitalocean_floating_ip_facts) before Ansible 2.9. The usage did not change.
 author: "Patrick Marques (@pmarques)"
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 notes:
   - Version 2 of DigitalOcean API is used.
@@ -27,7 +27,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: "Gather information about all Floating IPs"
-  community.digitalocean.digital_ocean_floating_ip_info:
+  community.digitalocean.digitalocean_floating_ip_info:
   register: result
 
 - name: "List of current floating ips"
@@ -74,7 +74,7 @@ floating_ips:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -104,10 +104,10 @@ def core(module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec()
+        argument_spec=DigitalOceanHelper.digitalocean_argument_spec()
     )
-    if module._name in ('digital_ocean_floating_ip_facts', 'community.digitalocean.digital_ocean_floating_ip_facts'):
-        module.deprecate("The 'digital_ocean_floating_ip_facts' module has been renamed to 'digital_ocean_floating_ip_info'",
+    if module._name in ('digitalocean_floating_ip_facts', 'community.digitalocean.digitalocean_floating_ip_facts'):
+        module.deprecate("The 'digitalocean_floating_ip_facts' module has been renamed to 'digitalocean_floating_ip_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

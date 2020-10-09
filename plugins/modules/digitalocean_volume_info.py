@@ -10,40 +10,40 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_volume_info
+module: digitalocean_volume_info
 short_description: Gather information about DigitalOcean volumes
 description:
     - This module can be used to gather information about DigitalOcean provided volumes.
-    - This module was called C(digital_ocean_volume_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(digitalocean_volume_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   region_name:
     description:
      - Name of region to restrict results to volumes available in a specific region.
-     - Please use M(community.digitalocean.digital_ocean_region_info) for getting valid values related regions.
+     - Please use M(community.digitalocean.digitalocean_region_info) for getting valid values related regions.
     required: false
     type: str
 requirements:
   - "python >= 2.6"
 
 extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
+- community.digitalocean.digitalocean.documentation
 
 '''
 
 
 EXAMPLES = r'''
 - name: Gather information about all volume
-  community.digitalocean.digital_ocean_volume_info:
+  community.digitalocean.digitalocean_volume_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about volume in given region
-  community.digitalocean.digital_ocean_volume_info:
+  community.digitalocean.digitalocean_volume_info:
     region_name: nyc1
     oauth_token: "{{ oauth_token }}"
 
 - name: Get information about volume named nyc3-test-volume
-  community.digitalocean.digital_ocean_volume_info:
+  community.digitalocean.digitalocean_volume_info:
   register: resp_out
 - set_fact:
     volume_id: "{{ item.id }}"
@@ -102,7 +102,7 @@ data:
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digitalocean import DigitalOceanHelper
 from ansible.module_utils._text import to_native
 
 
@@ -121,13 +121,13 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
     argument_spec.update(
         region_name=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_volume_facts', 'community.digitalocean.digital_ocean_volume_facts'):
-        module.deprecate("The 'digital_ocean_volume_facts' module has been renamed to 'digital_ocean_volume_info'",
+    if module._name in ('digitalocean_volume_facts', 'community.digitalocean.digitalocean_volume_facts'):
+        module.deprecate("The 'digitalocean_volume_facts' module has been renamed to 'digitalocean_volume_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:
