@@ -58,7 +58,7 @@ EXAMPLES = r'''
   community.digitalocean.digital_ocean_domain:
     state: present
     name: my.digitalocean.domain
-    ip: 1.2.3.4
+    ip: 127.0.0.1
 
 # Create a droplet and corresponding domain
 - name: Create a droplet
