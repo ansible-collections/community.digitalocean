@@ -270,6 +270,17 @@ def create_floating_ips(module, rest):
     if module.params['droplet_id'] is not None:
         payload["droplet_id"] = module.params['droplet_id']
 
+    # Get existing floating IPs
+    response = rest.get('floating_ips/')
+    status_code = response.status_code
+    json_data = response.json
+
+    # Exit unchanged if any of them are assigned to this Droplet already
+    if status_code == 200:
+        for floating_ip in json_data['floating_ips']:
+            if floating_ip['droplet']['id'] == module.params['droplet_id']:
+                module.exit_json(changed=False, data={'floating_ip': floating_ip['ip']})
+
     response = rest.post("floating_ips", data=payload)
     status_code = response.status_code
     json_data = response.json
@@ -286,7 +297,7 @@ def main():
             state=dict(choices=['present', 'absent'], default='present'),
             ip=dict(aliases=['id'], required=False),
             region=dict(required=False),
-            droplet_id=dict(required=False),
+            droplet_id=dict(type='int', required=False),
             oauth_token=dict(
                 no_log=True,
                 # Support environment variable for DigitalOcean OAuth Token
