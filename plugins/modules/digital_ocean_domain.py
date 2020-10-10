@@ -53,7 +53,12 @@ EXAMPLES = r'''
   community.digitalocean.digital_ocean_domain:
     state: present
     name: my.digitalocean.domain
-    ip: 127.0.0.1
+
+- name: Create a domain with an apex A record
+  community.digitalocean.digital_ocean_domain:
+    state: present
+    name: my.digitalocean.domain
+    ip: 1.2.3.4
 
 # Create a droplet and corresponding domain
 - name: Create a droplet
@@ -165,6 +170,16 @@ def core(module):
                 module.exit_json(changed=True, domain=domain)
         else:
             records = do_manager.all_domain_records()
+
+            if module.params['ip'] is None: # If we can find the SOA and we're not given an IP, then bail unchanged (IP is optional)
+                for record in records['domain_records']:
+                    if record['name'] == '@' and record['type'] == 'SOA':
+                        module.exit_json(changed=False, domain=module.params['name'])
+            else: # If we can find an apex A with the given IP, then bail unchanged, we're done
+                for record in records['domain_records']:
+                    if record['name'] == '@' and record['type'] == 'A' and record['data'] == module.params['ip']:
+                        module.exit_json(changed=False, domain=module.params['name']+' '+module.params['ip'])
+
             at_record = None
             for record in records['domain_records']:
                 if record['name'] == "@" and record['type'] == 'A':
