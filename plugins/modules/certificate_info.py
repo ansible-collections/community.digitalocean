@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_certificate_info
+module: certificate_info
 short_description: Gather information about DigitalOcean certificates
 description:
     - This module can be used to gather information about DigitalOcean provided certificates.
-    - This module was called C(digitalocean_certificate_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(certificate_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   certificate_id:
@@ -32,16 +32,16 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather information about all certificates
-  community.digitalocean.digitalocean_certificate_info:
+  community.digitalocean.certificate_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about certificate with given id
-  community.digitalocean.digitalocean_certificate_info:
+  community.digitalocean.certificate_info:
     oauth_token: "{{ oauth_token }}"
     certificate_id: "892071a0-bb95-49bc-8021-3afd67a210bf"
 
 - name: Get not after information about certificate
-  community.digitalocean.digitalocean_certificate_info:
+  community.digitalocean.certificate_info:
   register: resp_out
 - set_fact:
     not_after_date: "{{ item.not_after }}"
@@ -96,13 +96,13 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         certificate_id=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digitalocean_certificate_facts', 'community.digitalocean.digitalocean_certificate_facts'):
-        module.deprecate("The 'digitalocean_certificate_facts' module has been renamed to 'digitalocean_certificate_info'",
+    if module._name in ('certificate_facts', 'community.digitalocean.certificate_facts'):
+        module.deprecate("The 'certificate_facts' module has been renamed to 'certificate_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_block_storage
+module: block_storage
 short_description: Create/destroy or attach/detach Block Storage volumes in DigitalOcean
 description:
      - Create/destroy Block Storage volume in DigitalOcean, or attach/detach Block Storage volume to a droplet.
@@ -71,7 +71,7 @@ author:
 
 EXAMPLES = r'''
 - name: Create new Block Storage
-  community.digitalocean.digitalocean_block_storage:
+  community.digitalocean.block_storage:
     state: present
     command: create
     api_token: <TOKEN>
@@ -80,7 +80,7 @@ EXAMPLES = r'''
     volume_name: nyc1-block-storage
 
 - name: Delete Block Storage
-  community.digitalocean.digitalocean_block_storage:
+  community.digitalocean.block_storage:
     state: absent
     command: create
     api_token: <TOKEN>
@@ -88,7 +88,7 @@ EXAMPLES = r'''
     volume_name: nyc1-block-storage
 
 - name: Attach Block Storage to a Droplet
-  community.digitalocean.digitalocean_block_storage:
+  community.digitalocean.block_storage:
     state: present
     command: attach
     api_token: <TOKEN>
@@ -97,7 +97,7 @@ EXAMPLES = r'''
     droplet_id: <ID>
 
 - name: Detach Block Storage from a Droplet
-  community.digitalocean.digitalocean_block_storage:
+  community.digitalocean.block_storage:
     state: absent
     command: attach
     api_token: <TOKEN>
@@ -269,7 +269,7 @@ def handle_request(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         state=dict(choices=['present', 'absent'], required=True),
         command=dict(choices=['create', 'attach'], required=True),

@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_load_balancer_info
+module: load_balancer_info
 short_description: Gather information about DigitalOcean load balancers
 description:
     - This module can be used to gather information about DigitalOcean provided load balancers.
-    - This module was called C(digitalocean_load_balancer_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(load_balancer_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   load_balancer_id:
@@ -32,16 +32,16 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather information about all load balancers
-  community.digitalocean.digitalocean_load_balancer_info:
+  community.digitalocean.load_balancer_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about load balancer with given id
-  community.digitalocean.digitalocean_load_balancer_info:
+  community.digitalocean.load_balancer_info:
     oauth_token: "{{ oauth_token }}"
     load_balancer_id: "4de7ac8b-495b-4884-9a69-1050c6793cd6"
 
 - name: Get name from load balancer id
-  community.digitalocean.digitalocean_load_balancer_info:
+  community.digitalocean.load_balancer_info:
   register: resp_out
 - set_fact:
     load_balancer_name: "{{ item.name }}"
@@ -98,13 +98,13 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         load_balancer_id=dict(type='str', required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digitalocean_load_balancer_facts', 'community.digitalocean.digitalocean_load_balancer_facts'):
-        module.deprecate("The 'digitalocean_load_balancer_facts' module has been renamed to 'digitalocean_load_balancer_info'",
+    if module._name in ('load_balancer_facts', 'community.digitalocean.load_balancer_facts'):
+        module.deprecate("The 'load_balancer_facts' module has been renamed to 'load_balancer_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

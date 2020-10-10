@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_domain
+module: domain
 short_description: Create/delete a DNS domain in DigitalOcean
 description:
      - Create/delete a DNS domain in DigitalOcean.
@@ -50,7 +50,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a domain
-  community.digitalocean.digitalocean_domain:
+  community.digitalocean.domain:
     state: present
     name: my.digitalocean.domain
     ip: 127.0.0.1
@@ -66,7 +66,7 @@ EXAMPLES = r'''
   register: test_droplet
 
 - name: Create a corresponding domain
-  community.digitalocean.digitalocean_domain:
+  community.digitalocean.domain:
     state: present
     name: "{{ test_droplet.droplet.name }}.my.domain"
     ip: "{{ test_droplet.droplet.ip_address }}"
@@ -193,7 +193,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         state=dict(choices=['present', 'absent'], default='present'),
         name=dict(type='str'),

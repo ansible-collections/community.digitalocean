@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_region_info
+module: region_info
 short_description: Gather information about DigitalOcean regions
 description:
     - This module can be used to gather information about regions.
-    - This module was called C(digitalocean_region_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(region_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 extends_documentation_fragment:
 - community.digitalocean.digitalocean.documentation
@@ -26,11 +26,11 @@ requirements:
 
 EXAMPLES = r'''
 - name: Gather information about all regions
-  community.digitalocean.digitalocean_region_info:
+  community.digitalocean.region_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Get Name of region where slug is known
-  community.digitalocean.digitalocean_region_info:
+  community.digitalocean.region_info:
     oauth_token: "{{ oauth_token }}"
   register: resp_out
 - debug: var=resp_out
@@ -100,10 +100,10 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digitalocean_region_facts', 'community.digitalocean.digitalocean_region_facts'):
-        module.deprecate("The 'digitalocean_region_facts' module has been renamed to 'digitalocean_region_info'",
+    if module._name in ('region_facts', 'community.digitalocean.region_facts'):
+        module.deprecate("The 'region_facts' module has been renamed to 'region_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

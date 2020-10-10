@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_droplet
+module: droplet
 short_description: Create and delete a DigitalOcean droplet
 description:
      - Create and delete a droplet in DigitalOcean and optionally wait for it to be active.
@@ -112,7 +112,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a new droplet
-  community.digitalocean.digitalocean_droplet:
+  community.digitalocean.droplet:
     state: present
     name: mydroplet
     oauth_token: XXX
@@ -127,7 +127,7 @@ EXAMPLES = r'''
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
 
 - name: Ensure a droplet is present
-  community.digitalocean.digitalocean_droplet:
+  community.digitalocean.droplet:
     state: present
     id: 123
     name: mydroplet
@@ -138,7 +138,7 @@ EXAMPLES = r'''
     wait_timeout: 500
 
 - name: Ensure a droplet is present with SSH keys installed
-  community.digitalocean.digitalocean_droplet:
+  community.digitalocean.droplet:
     state: present
     id: 123
     name: mydroplet

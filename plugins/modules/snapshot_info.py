@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_snapshot_info
+module: snapshot_info
 short_description: Gather information about DigitalOcean Snapshot
 description:
     - This module can be used to gather information about snapshot information based upon provided values such as droplet, volume and snapshot id.
-    - This module was called C(digitalocean_snapshot_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(snapshot_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   snapshot_type:
@@ -45,28 +45,28 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather information about all snapshots
-  community.digitalocean.digitalocean_snapshot_info:
+  community.digitalocean.snapshot_info:
     snapshot_type: all
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about droplet snapshots
-  community.digitalocean.digitalocean_snapshot_info:
+  community.digitalocean.snapshot_info:
     snapshot_type: droplet
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about volume snapshots
-  community.digitalocean.digitalocean_snapshot_info:
+  community.digitalocean.snapshot_info:
     snapshot_type: volume
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about snapshot by snapshot id
-  community.digitalocean.digitalocean_snapshot_info:
+  community.digitalocean.snapshot_info:
     snapshot_type: by_id
     snapshot_id: 123123123
     oauth_token: "{{ oauth_token }}"
 
 - name: Get information about snapshot named big-data-snapshot1
-  community.digitalocean.digitalocean_snapshot_info:
+  community.digitalocean.snapshot_info:
   register: resp_out
 - set_fact:
     snapshot_id: "{{ item.id }}"
@@ -134,7 +134,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         snapshot_type=dict(type='str',
                            required=False,
@@ -149,8 +149,8 @@ def main():
             ['snapshot_type', 'by_id', ['snapshot_id']],
         ],
     )
-    if module._name in ('digitalocean_snapshot_facts', 'community.digitalocean.digitalocean_snapshot_facts'):
-        module.deprecate("The 'digitalocean_snapshot_facts' module has been renamed to 'digitalocean_snapshot_info'",
+    if module._name in ('snapshot_facts', 'community.digitalocean.snapshot_facts'):
+        module.deprecate("The 'snapshot_facts' module has been renamed to 'snapshot_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

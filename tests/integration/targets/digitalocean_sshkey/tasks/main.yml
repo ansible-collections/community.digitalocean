@@ -5,7 +5,7 @@
   when: do_api_key is not defined
 
 - name: Create ssh key
-  digitalocean_sshkey:
+  sshkey:
     name: test-key1
     ssh_pub_key: "{{ dummy_ssh_pub_key }}"
     oauth_token: "{{ do_api_key }}"
@@ -17,7 +17,7 @@
       - "result.changed"
 
 - name: "Delete ssh key"
-  digitalocean_sshkey:
+  sshkey:
     state: "absent"
     fingerprint: "{{ result.data.ssh_key.fingerprint }}"
     oauth_token: "{{ do_api_key }}"

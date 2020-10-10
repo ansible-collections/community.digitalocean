@@ -11,11 +11,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_sshkey_info
+module: sshkey_info
 short_description: Gather information about DigitalOcean SSH keys
 description:
   - This module can be used to gather information about DigitalOcean SSH keys.
-  - This module replaces the C(digitalocean_sshkey_facts) module.
+  - This module replaces the C(sshkey_facts) module.
 author: "Patrick Marques (@pmarques)"
 extends_documentation_fragment:
 - community.digitalocean.digitalocean.documentation
@@ -29,7 +29,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Gather information about DigitalOcean SSH keys
-  community.digitalocean.digitalocean_sshkey_info:
+  community.digitalocean.sshkey_info:
     oauth_token: "{{ my_do_key }}"
   register: ssh_keys
 
@@ -81,7 +81,7 @@ def core(module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digitalocean_argument_spec(),
+        argument_spec=DigitalOceanHelper.argument_spec(),
         supports_check_mode=True,
     )
 

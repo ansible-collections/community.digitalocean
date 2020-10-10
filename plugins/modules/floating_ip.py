@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_floating_ip
+module: floating_ip
 short_description: Manage DigitalOcean Floating IPs
 description:
      - Create/delete/assign a floating IP.
@@ -43,17 +43,17 @@ requirements:
 
 EXAMPLES = r'''
 - name: "Create a Floating IP in region lon1"
-  community.digitalocean.digitalocean_floating_ip:
+  community.digitalocean.floating_ip:
     state: present
     region: lon1
 
 - name: "Create a Floating IP assigned to Droplet ID 123456"
-  community.digitalocean.digitalocean_floating_ip:
+  community.digitalocean.floating_ip:
     state: present
     droplet_id: 123456
 
 - name: "Delete a Floating IP with ip 1.2.3.4"
-  community.digitalocean.digitalocean_floating_ip:
+  community.digitalocean.floating_ip:
     state: absent
     ip: "1.2.3.4"
 

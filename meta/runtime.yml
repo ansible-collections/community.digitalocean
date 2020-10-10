@@ -5,55 +5,55 @@ plugin_routing:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_account_facts:
+    account_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_certificate_facts:
+    certificate_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_domain_facts:
+    domain_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_firewall_facts:
+    firewall_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_floating_ip_facts:
+    floating_ip_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_image_facts:
+    image_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_load_balancer_facts:
+    load_balancer_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_region_facts:
+    region_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_size_facts:
+    size_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_snapshot_facts:
+    snapshot_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_sshkey_facts:
+    sshkey_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_tag_facts:
+    tag_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    digitalocean_volume_facts:
+    volume_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details

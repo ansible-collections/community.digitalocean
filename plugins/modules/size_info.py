@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_size_info
+module: size_info
 short_description: Gather information about DigitalOcean Droplet sizes
 description:
     - This module can be used to gather information about droplet sizes.
-    - This module was called C(digitalocean_size_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(size_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 requirements:
   - "python >= 2.6"
@@ -26,11 +26,11 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather information about all droplet sizes
-  community.digitalocean.digitalocean_size_info:
+  community.digitalocean.size_info:
     oauth_token: "{{ oauth_token }}"
 
 - name: Get droplet Size Slug where vcpus is 1
-  community.digitalocean.digitalocean_size_info:
+  community.digitalocean.size_info:
     oauth_token: "{{ oauth_token }}"
   register: resp_out
 - debug: var=resp_out
@@ -96,12 +96,12 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     module = AnsibleModule(
         argument_spec=argument_spec,
     )
-    if module._name in ('digitalocean_size_facts', 'community.digitalocean.digitalocean_size_facts'):
-        module.deprecate("The 'digitalocean_size_facts' module has been renamed to 'digitalocean_size_info'",
+    if module._name in ('size_facts', 'community.digitalocean.size_facts'):
+        module.deprecate("The 'size_facts' module has been renamed to 'size_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

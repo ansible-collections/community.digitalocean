@@ -6,14 +6,14 @@
     when: do_api_key is not defined
 
   - name: Create a new tag
-    digitalocean_tag:
+    tag:
       oauth_token: '{{do_api_key}}'
       name: integration-test
       state: present
     register: create_tag
 
   - name: Create a new tag for idempotency
-    digitalocean_tag:
+    tag:
       oauth_token: '{{do_api_key}}'
       name: integration-test
       state: present
@@ -30,7 +30,7 @@
 
   always:
   - name: Delete tag
-    digitalocean_tag:
+    tag:
       oauth_token: '{{do_api_key}}'
       name: integration-test
       state: absent
@@ -38,7 +38,7 @@
 
 # FIXME: Deleting a tag isn't idempotent
 #  - name: Delete tag with idempotency
-#    digitalocean_tag:
+#    tag:
 #      oauth_token: '{{do_api_key}}'
 #      name: integration-test
 #      state: absent

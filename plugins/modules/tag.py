@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_tag
+module: tag
 short_description: Create and remove tag(s) to DigitalOcean resource.
 description:
     - Create and remove tag(s) to DigitalOcean resource.
@@ -56,12 +56,12 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a tag
-  community.digitalocean.digitalocean_tag:
+  community.digitalocean.tag:
     name: production
     state: present
 
 - name: Tag a resource; creating the tag if it does not exist
-  community.digitalocean.digitalocean_tag:
+  community.digitalocean.tag:
     name: "{{ item }}"
     resource_id: "73333005"
     state: present
@@ -70,7 +70,7 @@ EXAMPLES = r'''
     - dbserver
 
 - name: Untag a resource
-  community.digitalocean.digitalocean_tag:
+  community.digitalocean.tag:
     name: staging
     resource_id: "73333005"
     state: absent
@@ -78,7 +78,7 @@ EXAMPLES = r'''
 # Deleting a tag also untags all the resources that have previously been
 # tagged with it
 - name: Remove a tag
-  community.digitalocean.digitalocean_tag:
+  community.digitalocean.tag:
     name: dbserver
     state: absent
 '''
@@ -189,7 +189,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         name=dict(type='str', required=True),
         resource_id=dict(aliases=['droplet_id'], type='str'),

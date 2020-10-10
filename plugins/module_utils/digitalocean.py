@@ -82,7 +82,7 @@ class DigitalOceanHelper:
         return self.send('DELETE', path, data)
 
     @staticmethod
-    def digitalocean_argument_spec():
+    def argument_spec():
         return dict(
             validate_certs=dict(type='bool', required=False, default=True),
             oauth_token=dict(

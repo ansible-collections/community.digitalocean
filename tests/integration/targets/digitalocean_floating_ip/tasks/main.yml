@@ -5,7 +5,7 @@
   when: do_api_key is not defined
 
 - name: "Make sure that the Floating IP is absent"
-  digitalocean_floating_ip:
+  floating_ip:
     state: absent
     ip: "8.8.8.8"
     oauth_token: "{{ do_api_key }}"
@@ -17,7 +17,7 @@
       - "not result.changed"
 
 - name: "Create a Floating IP"
-  digitalocean_floating_ip:
+  floating_ip:
     state: present
     region: "lon1"
     oauth_token: "{{ do_api_key }}"
@@ -29,7 +29,7 @@
       - "result.changed"
 
 - name: "Destroy Floating IP"
-  digitalocean_floating_ip:
+  floating_ip:
     state: absent
     ip: "{{ result.data.floating_ip.ip }}"
     region: "lon1"

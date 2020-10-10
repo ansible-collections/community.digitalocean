@@ -10,11 +10,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_account_info
+module: account_info
 short_description: Gather information about DigitalOcean User account
 description:
     - This module can be used to gather information about User account.
-    - This module was called C(digitalocean_account_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(account_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 
 requirements:
@@ -28,7 +28,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather information about user account
-  community.digitalocean.digitalocean_account_info:
+  community.digitalocean.account_info:
     oauth_token: "{{ oauth_token }}"
 '''
 
@@ -66,10 +66,10 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digitalocean_account_facts', 'community.digitalocean.digitalocean_account_facts'):
-        module.deprecate("The 'digitalocean_account_facts' module has been renamed to 'digitalocean_account_info'",
+    if module._name in ('account_facts', 'community.digitalocean.account_facts'):
+        module.deprecate("The 'account_facts' module has been renamed to 'account_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
     try:
         core(module)

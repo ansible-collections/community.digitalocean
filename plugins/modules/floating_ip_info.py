@@ -9,11 +9,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_floating_ip_info
+module: floating_ip_info
 short_description: DigitalOcean Floating IPs information
 description:
      - This module can be used to fetch DigitalOcean Floating IPs information.
-     - This module was called C(digitalocean_floating_ip_facts) before Ansible 2.9. The usage did not change.
+     - This module was called C(floating_ip_facts) before Ansible 2.9. The usage did not change.
 author: "Patrick Marques (@pmarques)"
 extends_documentation_fragment:
 - community.digitalocean.digitalocean.documentation
@@ -27,7 +27,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: "Gather information about all Floating IPs"
-  community.digitalocean.digitalocean_floating_ip_info:
+  community.digitalocean.floating_ip_info:
   register: result
 
 - name: "List of current floating ips"
@@ -104,10 +104,10 @@ def core(module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digitalocean_argument_spec()
+        argument_spec=DigitalOceanHelper.argument_spec()
     )
-    if module._name in ('digitalocean_floating_ip_facts', 'community.digitalocean.digitalocean_floating_ip_facts'):
-        module.deprecate("The 'digitalocean_floating_ip_facts' module has been renamed to 'digitalocean_floating_ip_info'",
+    if module._name in ('floating_ip_facts', 'community.digitalocean.floating_ip_facts'):
+        module.deprecate("The 'floating_ip_facts' module has been renamed to 'floating_ip_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

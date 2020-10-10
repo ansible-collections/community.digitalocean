@@ -10,12 +10,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_image_info
+module: image_info
 short_description: Gather information about DigitalOcean images
 description:
     - This module can be used to gather information about DigitalOcean provided images.
     - These images can be either of type C(distribution), C(application) and C(private).
-    - This module was called C(digitalocean_image_facts) before Ansible 2.9. The usage did not change.
+    - This module was called C(image_facts) before Ansible 2.9. The usage did not change.
 author: "Abhijeet Kasurde (@Akasurde)"
 options:
   image_type:
@@ -39,22 +39,22 @@ extends_documentation_fragment:
 
 EXAMPLES = r'''
 - name: Gather information about all images
-  community.digitalocean.digitalocean_image_info:
+  community.digitalocean.image_info:
     image_type: all
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about application images
-  community.digitalocean.digitalocean_image_info:
+  community.digitalocean.image_info:
     image_type: application
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about distribution images
-  community.digitalocean.digitalocean_image_info:
+  community.digitalocean.image_info:
     image_type: distribution
     oauth_token: "{{ oauth_token }}"
 
 - name: Get distribution about image with slug coreos-beta
-  community.digitalocean.digitalocean_image_info:
+  community.digitalocean.image_info:
   register: resp_out
 - set_fact:
     distribution_name: "{{ item.distribution }}"
@@ -126,7 +126,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         image_type=dict(type='str',
                         required=False,
@@ -136,8 +136,8 @@ def main():
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digitalocean_image_facts', 'community.digitalocean.digitalocean_image_facts'):
-        module.deprecate("The 'digitalocean_image_facts' module has been renamed to 'digitalocean_image_info'",
+    if module._name in ('image_facts', 'community.digitalocean.image_facts'):
+        module.deprecate("The 'image_facts' module has been renamed to 'image_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
     try:

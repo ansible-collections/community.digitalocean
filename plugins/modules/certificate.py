@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digitalocean_certificate
+module: certificate
 short_description: Manage certificates in DigitalOcean
 description:
     - Create, Retrieve and remove certificates DigitalOcean.
@@ -49,7 +49,7 @@ notes:
 
 EXAMPLES = r'''
 - name: Create a certificate
-  community.digitalocean.digitalocean_certificate:
+  community.digitalocean.certificate:
     name: production
     state: present
     private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkM8OI7pRpgyj1I\n-----END PRIVATE KEY-----"
@@ -57,7 +57,7 @@ EXAMPLES = r'''
     oauth_token: "{{ oauth_token }}"
 
 - name: Create a certificate using file lookup plugin
-  community.digitalocean.digitalocean_certificate:
+  community.digitalocean.certificate:
     name: production
     state: present
     private_key: "{{ lookup('file', 'test.key') }}"
@@ -65,7 +65,7 @@ EXAMPLES = r'''
     oauth_token: "{{ oauth_token }}"
 
 - name: Create a certificate with trust chain
-  community.digitalocean.digitalocean_certificate:
+  community.digitalocean.certificate:
     name: production
     state: present
     private_key: "{{ lookup('file', 'test.key') }}"
@@ -74,7 +74,7 @@ EXAMPLES = r'''
     oauth_token: "{{ oauth_token }}"
 
 - name: Remove a certificate
-  community.digitalocean.digitalocean_certificate:
+  community.digitalocean.certificate:
     name: production
     state: absent
     oauth_token: "{{ oauth_token }}"
@@ -148,7 +148,7 @@ def core(module):
 
 
 def main():
-    argument_spec = DigitalOceanHelper.digitalocean_argument_spec()
+    argument_spec = DigitalOceanHelper.argument_spec()
     argument_spec.update(
         name=dict(type='str', required=True),
         leaf_certificate=dict(type='str'),
