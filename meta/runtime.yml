@@ -1,62 +1,112 @@
 requires_ansible: '>=2.9.10'
 plugin_routing:
   modules:
-    digitalocean:
+    digital_ocean:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    account_facts:
+      redirect: community.digitalocean.digitalocean
+    digital_ocean_account_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    certificate_facts:
+      redirect: community.digitalocean.account_facts
+    digital_ocean_account_info:
+      redirect: community.digitalocean.account_info
+    digital_ocean_block_storage:
+      redirect: community.digitalocean.block_storage
+    digital_ocean_certificate_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    domain_facts:
+      redirect: community.digitalocean.certificate_facts
+    digital_ocean_domain_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    firewall_facts:
+      redirect: community.digitalocean.domain_facts
+    digital_ocean_domain_info:
+      redirect: community.digitalocean.domain_info
+    digital_ocean_domain:
+      redirect: community.digitalocean.domain
+    digital_ocean_droplet:
+      redirect: community.digitalocean.droplet
+    digital_ocean_firewall_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    floating_ip_facts:
+      redirect: community.digitalocean.firewall_facts
+    digital_ocean_firewall_info:
+      redirect: community.digitalocean.firewall_info
+    digital_ocean_floating_ip_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    image_facts:
+      redirect: community.digitalocean.floating_ip_facts
+    digital_ocean_floating_ip_info:
+      redirect: community.digitalocean.floating_ip_info
+    digital_ocean_floating_ip:
+      redirect: community.digitalocean.floating_ip
+    digital_ocean_image_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    load_balancer_facts:
+      redirect: community.digitalocean.floating_image_facts
+    digital_ocean_image_info:
+      redirect: community.digitalocean.image_info
+    digital_ocean_load_balancer_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    region_facts:
+      redirect: community.digitalocean.load_balancer_facts
+    digital_ocean_load_balancer_info:
+      redirect: community.digitalocean.load_balancer_info
+    digital_ocean_region_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    size_facts:
+      redirect: community.digitalocean.load_region_facts
+    digital_ocean_region_info:
+      redirect: community.digitalocean.region_info
+    digital_ocean_size_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    snapshot_facts:
+      redirect: community.digitalocean.load_size_facts
+    digital_ocean_size_info:
+      redirect: community.digitalocean.size_info
+    digital_ocean_snapshot_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    sshkey_facts:
+      redirect: community.digitalocean.load_snapshot_facts
+    digital_ocean_snapshot_info:
+      redirect: community.digitalocean.snapshot_info
+    digital_ocean_sshkey_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    tag_facts:
+      redirect: community.digitalocean.sshkey_facts
+    digital_ocean_sshkey_info:
+      redirect: community.digitalocean.sshkey_info
+    digital_ocean_sshkey:
+      redirect: community.digitalocean.sshkey
+    digital_ocean_tag_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-    volume_facts:
+      redirect: community.digitalocean.load_tag_facts
+    digital_ocean_tag_info:
+      redirect: community.digitalocean.load_tag_info
+    digital_ocean_tag:
+      redirect: community.digitalocean.load_tag
+    digital_ocean_volume_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
+      redirect: community.digitalocean.load_volume_facts
+    digital_ocean_volume_info:
+      redirect: community.digitalocean.load_volume_info
     docker_image_facts:
       deprecation:
         removal_version: 2.0.0
