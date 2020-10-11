@@ -2,10 +2,11 @@ requires_ansible: '>=2.9.10'
 plugin_routing:
   modules:
     digital_ocean:
+      redirect: community.digitalocean.digitalocean
+    digitalocean:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-      redirect: community.digitalocean.digitalocean
     digital_ocean_account_facts:
       deprecation:
         removal_version: 2.0.0
@@ -83,10 +84,11 @@ plugin_routing:
     digital_ocean_snapshot_info:
       redirect: community.digitalocean.snapshot_info
     digital_ocean_sshkey_facts:
+      redirect: community.digitalocean.sshkey_facts
+    sshkey_facts:
       deprecation:
         removal_version: 2.0.0
         warning_text: see plugin documentation for details
-      redirect: community.digitalocean.sshkey_facts
     digital_ocean_sshkey_info:
       redirect: community.digitalocean.sshkey_info
     digital_ocean_sshkey:
