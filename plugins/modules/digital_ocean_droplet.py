@@ -263,7 +263,7 @@ class DODroplet(object):
     def create(self, state):
         json_data = self.get_droplet()
         droplet_data = None
-        if json_data: # The droplet exists already
+        if json_data:  # The droplet exists already
             droplet_data = self.get_addresses(json_data)
             # If state is active or inactive, ensure requested and desired power states match
             if state == 'active' and json_data['droplet']['status'] != 'active':
@@ -322,10 +322,11 @@ class DODroplet(object):
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for droplet powering off timeout')
 
+
 def core(module):
     state = module.params.pop('state')
     droplet = DODroplet(module)
-    if state == 'present' or state == 'active' or state == 'inactive': # These states imply that we have, or create, the droplet
+    if state == 'present' or state == 'active' or state == 'inactive':  # These states imply that we have, or create, the droplet
         droplet.create(state)
     elif state == 'absent':
         droplet.delete()
