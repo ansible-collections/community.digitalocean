@@ -18,8 +18,12 @@ options:
   state:
     description:
      - Indicate desired state of the target.
+     - C(present) will create named droplet, be mindful of the C(unique_name) parameter
+     - C(absent) will delete named droplet if it exists
+     - C(active) will create the droplet, if it doesn't already exist, and ensure that it is powered on
+     - C(inactive) will create the droplet, if it does not already exist, and ensure that it is powered off
     default: present
-    choices: ['present', 'absent']
+    choices: ['present', 'absent', 'active', 'inactive']
   id:
     description:
      - Numeric, the droplet id you want to operate on.
@@ -27,6 +31,8 @@ options:
   name:
     description:
      - String, this is the name of the droplet - must be formatted by hostname rules.
+    required: true
+    type: str
   unique_name:
     description:
      - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
@@ -231,9 +237,7 @@ class DODroplet(object):
         return None
 
     def get_addresses(self, data):
-        """
-         Expose IP addresses as their own property allowing users extend to additional tasks
-        """
+        """Expose IP addresses as their own property allowing users extend to additional tasks"""
         _data = data
         for k, v in data.items():
             setattr(self, k, v)
@@ -256,12 +260,20 @@ class DODroplet(object):
             json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
-    def create(self):
+    def create(self, state):
         json_data = self.get_droplet()
         droplet_data = None
-        if json_data:
+        if json_data: # The droplet exists already
             droplet_data = self.get_addresses(json_data)
-            self.module.exit_json(changed=False, data=droplet_data)
+            # If state is active or inactive, ensure requested and desired power states match
+            if state == 'active' and json_data['droplet']['status'] != 'active':
+                json_data = self.ensure_power_on(json_data['droplet']['id'])
+                self.module.exit_json(changed=True, data=droplet_data)
+            elif state == 'inactive' and json_data['droplet']['status'] != 'off':
+                json_data = self.ensure_power_off(json_data['droplet']['id'])
+                self.module.exit_json(changed=True, data=droplet_data)
+            else:
+                self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
             self.module.exit_json(changed=True)
         request_params = dict(self.module.params)
@@ -289,6 +301,7 @@ class DODroplet(object):
             self.module.exit_json(changed=False, msg='Droplet not found')
 
     def ensure_power_on(self, droplet_id):
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_on'})
         end_time = time.time() + self.wait_timeout
         while time.time() < end_time:
             response = self.rest.get('droplets/{0}'.format(droplet_id))
@@ -298,12 +311,22 @@ class DODroplet(object):
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for droplet powering on timeout')
 
+    def ensure_power_off(self, droplet_id):
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
+        end_time = time.time() + self.wait_timeout
+        while time.time() < end_time:
+            response = self.rest.get('droplets/{0}'.format(droplet_id))
+            json_data = response.json
+            if json_data['droplet']['status'] == 'off':
+                return json_data
+            time.sleep(min(2, end_time - time.time()))
+        self.module.fail_json(msg='Wait for droplet powering off timeout')
 
 def core(module):
     state = module.params.pop('state')
     droplet = DODroplet(module)
-    if state == 'present':
-        droplet.create()
+    if state == 'present' or state == 'active' or state == 'inactive': # These states imply that we have, or create, the droplet
+        droplet.create(state)
     elif state == 'absent':
         droplet.delete()
 
@@ -311,7 +334,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent', 'active', 'inactive'], default='present'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
@@ -340,6 +363,7 @@ def main():
         ),
         required_if=([
             ('state', 'present', ['name', 'size', 'image', 'region']),
+            ('state', 'active', ['name', 'size', 'image', 'region']),
         ]),
         supports_check_mode=True,
     )
