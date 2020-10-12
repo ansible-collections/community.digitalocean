@@ -16,9 +16,9 @@ ANSIBLE_METADATA = {
 DOCUMENTATION = '''
 ---
 module: digital_ocean_firewall
-short_description: Manage cloud firewalls within Digital Ocean
+short_description: Manage cloud firewalls within DigitalOcean
 description:
-    - This module can be used to add or remove firewalls on the Digital Ocean cloud platform.
+    - This module can be used to add or remove firewalls on the DigitalOcean cloud platform.
 author:
     - Anthony Bond (@BondAnthony)
     - Lucas Basquerotto (@lucasbasquerotto)
@@ -51,7 +51,7 @@ options:
     type: list
     elements: dict
     description:
-      - Firewall rules specifically targeting inbound network traffic into Digital Ocean
+      - Firewall rules specifically targeting inbound network traffic into DigitalOcean
     required: true
     suboptions:
       protocol:
@@ -102,7 +102,7 @@ options:
     type: list
     elements: dict
     description:
-      - Firewall rules specifically targeting outbound network traffic from Digital Ocean
+      - Firewall rules specifically targeting outbound network traffic from DigitalOcean
     required: true
     suboptions:
       protocol:
@@ -325,7 +325,7 @@ class DOFirewall(object):
         response = self.rest.get("%s" % base_url)
         status_code = response.status_code
         if status_code != 200:
-            self.module.fail_json(msg="Failed to retrieve firewalls from Digital Ocean")
+            self.module.fail_json(msg="Failed to retrieve firewalls from DigitalOcean")
         return self.rest.get_paginated_data(base_url=base_url, data_key_name='firewalls')
 
     def get_firewall_by_name(self):
