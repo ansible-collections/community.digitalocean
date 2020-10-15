@@ -212,7 +212,7 @@ tag:
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 
 
 class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
