@@ -157,58 +157,25 @@ EXAMPLES = '''
     priority: 10
 '''
 
-RETURN = '''
-id:
-    description: A unique identifier for each domain record
-    returned: when record is created
-    type: int
-    sample: 3352896
-type:
-    description: The type of the DNS record.
-    returned: when record is created
-    type: string
-    sample: "CNAME"
-name:
-    description: The host name, alias, or service being defined by the record.
-    returned: when record is created
-    type: string
-    sample: "www"
+RETURN = r'''
 data:
-    description: Variable data depending on record type.
-    returned: when record is created
-    type: string
-    sample: "192.168.0.1"
-priority:
-    description: The priority for SRV and MX records.
-    returned: when record is created
-    type: int
-    sample: 10
-port:
-    description: The port for SRV records.
-    returned: when record is created
-    type: int
-    sample: 5556
-ttl:
-    description: This value is the time to live for the record, in seconds.
-    returned: when record is created
-    type: int
-    sample: 3600
-weight:
-    description: The weight for SRV records.
-    returned: when record is created
-    type: int
-    sample: 50
-flags:
-    description: An unsigned integer between 0-255 used for CAA records.
-    returned: when record is created
-    type: int
-    sample: 16
-tag:
-    description: The parameter tag for CAA records.
-    returned: when record is created
-    type: string
-    sample: "issue"
+    description: a DigitalOcean Domain Record
+    returned: success
+    type: dict
+    sample: {
+        "id": 3352896,
+        "type": "CNAME",
+        "name": "www",
+        "data": "192.168.0.1",
+        "priority": 10,
+        "port": 5556,
+        "ttl": 3600,
+        "weight": 10,
+        "flags" 16,
+        "tag": "issue"
+    }
 '''
+
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.basic import AnsibleModule
