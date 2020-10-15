@@ -171,7 +171,7 @@ data:
         "port": 5556,
         "ttl": 3600,
         "weight": 10,
-        "flags" 16,
+        "flags": 16,
         "tag": "issue"
     }
 '''
