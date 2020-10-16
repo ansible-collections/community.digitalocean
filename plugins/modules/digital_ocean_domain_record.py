@@ -19,70 +19,74 @@ module: digital_ocean_domain_record
 author: "Adam Papai (@woohgit)"
 short_description: Manage DigitalOcean domain records
 description:
-     - Create/delete a domain record in DigitalOcean.
-version_added: "2.9"
+    - Create/delete a domain record in DigitalOcean.
 options:
   state:
     description:
      - Indicate desired state of the target.
     default: present
     choices: [ present, absent ]
-  oauth_token:
-    description:
-     - DigitalOcean OAuth token.
-    required: true
-    default: None
+    type: str
   record_id:
     description:
       - Used with C(force_update=yes) and C(state='absent') to update or delete a specific record.
-    default: None
+    type: int
   force_update:
     description:
         - If there is already a record with the same C(name) and C(type) force update it.
     default: false
+    type: bool
   domain:
     description:
      - Name of the domain.
     required: true
-    default: None
+    type: str
   type:
     description:
      - The type of record you would like to create.
-    choices: [ A, AAAA, CNAME, NS, TXT, MX, SRV ]
-    default: A
+    choices: [ A, AAAA, CNAME, MX, TXT, SRV, NS, CAA ]
+    type: str
   data:
     description:
-     - this is the value of the record, depending on the record type.
-    default: None
+     - This is the value of the record, depending on the record type.
+    default: ""
+    type: str
   name:
     description:
      - Required for C(A, AAAA, CNAME, TXT, SRV) records. The host name, alias, or service being defined by the record.
     default: "@"
+    type: str
   priority:
     description:
      - The priority of the host for C(SRV, MX) records).
-    default: None
+    type: int
   port:
     description:
      - The port that the service is accessible on for SRV records only.
-    default: None
+    type: int
   weight:
     description:
      - The weight of records with the same priority for SRV records only.
-    default: None
+    type: int
   ttl:
     description:
      - Time to live for the record, in seconds.
     default: 1800
+    type: int
   flags:
     description:
      - An unsignedinteger between 0-255 used for CAA records.
-    default: None
+    type: int
   tag:
     description:
      - The parameter tag for CAA records.
     choices: [ issue, wildissue, iodef ]
-    default: None
+    type: str
+  oauth_token:
+    description:
+     - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
+    aliases: ['API_TOKEN']
+    type: str
 
 notes:
   - Version 2 of DigitalOcean API is used.
@@ -389,7 +393,7 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
             record_id = self.record_id
         # if no record_id is given, try to find an exact match
         else:
-            record, record_id, _ = self.__get_matching_records()
+            record, record_id, _tmp = self.__get_matching_records()
 
         # record was not found, we're done
         if not record:
@@ -414,9 +418,9 @@ def main():
         argument_spec=dict(
             state=dict(choices=['present', 'absent'], default='present'),
             oauth_token=dict(
+                aliases=['API_TOKEN'],
                 no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
-                required=True,
+                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN'])
             ),
             force_update=dict(type='bool', default=False),
             record_id=dict(type='int'),
