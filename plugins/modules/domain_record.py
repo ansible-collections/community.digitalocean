@@ -7,15 +7,9 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-
-ANSIBLE_METADATA = {'metadata_version': '1.1',
-                    'status': ['preview'],
-                    'supported_by': 'community'}
-
-
 DOCUMENTATION = '''
 ---
-module: digital_ocean_domain_record
+module: domain_record
 author: "Adam Papai (@woohgit)"
 short_description: Manage DigitalOcean domain records
 description:
@@ -97,7 +91,7 @@ requirements:
 
 EXAMPLES = '''
 - name: Create default A record for example.com
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: present
     domain: example.com
@@ -106,7 +100,7 @@ EXAMPLES = '''
     data: 127.0.0.1
 
 - name: Create A record for www
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: present
     domain: example.com
@@ -115,7 +109,7 @@ EXAMPLES = '''
     data: 127.0.0.1
 
 - name: Update A record for www based on name/type/data
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: present
     domain: example.com
@@ -125,7 +119,7 @@ EXAMPLES = '''
     force_update: yes
 
 - name: Update A record for www based on record_id
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: present
     domain: example.com
@@ -136,7 +130,7 @@ EXAMPLES = '''
     force_update: yes
 
 - name: Remove www record based on name/type/data
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: absent
     domain: example.com
@@ -145,14 +139,14 @@ EXAMPLES = '''
     data: 127.0.0.1
 
 - name: Remove www record based on record_id
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: absent
     domain: example.com
     record_id: 1234567
 
 - name: Create MX record with priority 10 for example.com
-  digital_ocean_domain_record:
+  community.digitalocean.domain_record:
     oauth_token: xxxx
     state: present
     domain: example.com
