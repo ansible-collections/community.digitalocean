@@ -149,9 +149,9 @@ Releases are automatically built and pushed to Ansible Galaxy for any new tag. B
 
   1. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection.
   1. Update the CHANGELOG:
-    1. Make sure you have [`antsibull-changelog`](https://pypi.org/project/antsibull-changelog/) installed.
-    1. Make sure there are fragments for all known changes in `changelogs/fragments`.
-    1. Run `antsibull-changelog release`.
+      1. Make sure you have [`antsibull-changelog`](https://pypi.org/project/antsibull-changelog/) installed.
+      1. Make sure there are fragments for all known changes in `changelogs/fragments`.
+      1. Run `antsibull-changelog release`.
   1. Commit the changes and create a PR with the changes. Wait for tests to pass, then merge it once they have.
   1. Tag the version in Git and push to GitHub.
 
