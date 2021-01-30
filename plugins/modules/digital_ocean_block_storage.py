@@ -166,18 +166,18 @@ class DOBlockStorage(object):
         resp = self.rest.get(url)
         if resp.status_code != 200:
             raise DOBlockStorageException(resp.json['message'])
-        
+
         volumes = resp.json['volumes']
         if not volumes:
             return None
-        
+
         return volumes[0]
 
     def get_attached_droplet_ID(self, volume_name, region):
         volume = self.get_block_storage_by_name(volume_name, region)
         if not volume or not volume['droplet_ids']:
             return None
-        
+
         return volume['droplet_ids'][0]
 
     def attach_detach_block_storage(self, method, volume_name, region, droplet_id):
@@ -202,17 +202,17 @@ class DOBlockStorage(object):
     def resize_block_storage(self, volume_name, region, desired_size):
         if not desired_size:
             return False
-        
+
         volume = self.get_block_storage_by_name(volume_name, region)
         if volume['size_gigabytes'] == desired_size:
             return False
-        
+
         data = {
             'type': 'resize',
             'size_gigabytes': desired_size,
         }
         resp = self.rest.post(
-            'volumes/{}/actions'.format(volume['id']),
+            'volumes/{0}/actions'.format(volume['id']),
             data=data,
         )
         if resp.status_code == 202:
