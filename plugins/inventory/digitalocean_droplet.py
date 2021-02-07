@@ -71,7 +71,7 @@ class InventoryModule(BaseFileInventoryPlugin):
 
             headers = {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer {}'.format(os.getenv('DO_TOKEN')),
+                'Authorization': 'Bearer {0}'.format(os.getenv('DO_TOKEN')),
             }
 
             r = requests.get(u, headers=headers)
