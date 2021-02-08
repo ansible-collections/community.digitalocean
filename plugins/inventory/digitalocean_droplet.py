@@ -60,12 +60,7 @@ class InventoryModule(BaseFileInventoryPlugin):
         self.display.debug("digitalocean_droplet inventory filename must end with 'digitalocean_droplet.yml' or 'digitalocean_droplet.yaml'")
         return False
 
-    def _get_droplets(self, *args, **kwargs):
-
-        if 'start' in kwargs:
-            u = kwargs['start']
-        else:
-            u = 'https://api.digitalocean.com/v2/droplets?page=1&per_page=1'
+    def _get_droplets(self, entrypoint='https://api.digitalocean.com/v2/droplets?page=1&per_page=1'):
 
         try:
 
@@ -74,7 +69,7 @@ class InventoryModule(BaseFileInventoryPlugin):
                 'Authorization': 'Bearer {0}'.format(os.getenv('DO_TOKEN')),
             }
 
-            r = requests.get(u, headers=headers)
+            r = requests.get(entrypoint, headers=headers)
             j = r.json()
 
             # Get all Droplets (add if network type is public)
@@ -92,7 +87,7 @@ class InventoryModule(BaseFileInventoryPlugin):
             # Recurse through links['pages']['next']
             if 'pages' in j['links'].keys():
                 if 'next' in j['links']['pages'].keys():
-                    self._get_droplets(start=j['links']['pages']['next'])
+                    self._get_droplets(entrypoint=j['links']['pages']['next'])
 
         except Exception as e:
             raise AnsibleError(e)
