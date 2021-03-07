@@ -43,7 +43,7 @@ options:
       Check out the DO api docs for full list of attributes at
       https://developers.digitalocean.com/documentation/v2/#list-all-droplets
     type: list
-    default: 'id,size_slug,disk,image,networks'
+    default: 'id,name,networks,region,size_slug'
   var_prefix:
     description:
       - Prefix of generated varible names (e.g. 'tags' -> 'do_tags')
