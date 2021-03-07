@@ -82,7 +82,6 @@ compose:
 '''
 
 import json
-from urllib.error import HTTPError
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.module_utils.urls import Request
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
@@ -154,7 +153,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     status=res.status,
                     json=res.read()
                 )
-        except HTTPError as error:
+        except Exception as error:
             raise AnsibleParserError(error)
 
         if result['status'] == 200:
