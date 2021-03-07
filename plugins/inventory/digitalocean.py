@@ -12,18 +12,16 @@ plugin_type: inventory
 author:
   - Janos Gerzson (@grzs)
 short_description: DigitalOcean Inventory Plugin
-version_added: "0.02"
+version_added: "0.04"
 description:
   - DigitalOcean Inventory plugin.
-  - Aquires droplet list from DO api.
+  - Acquires droplet list from DO api.
   - Uses configuration file that ends with
   - (do_hosts|digitalocean|digital_ocean).(yaml|yml)
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
   - constructed
   - inventory_cache
-requirements:
-  - requests
 options:
   plugin:
     description:
@@ -77,19 +75,16 @@ keyed_groups:
     prefix: ''
     separator: ''
 compose:
-  ansible_host: do_networks.v4 | selectattr('type','eq','private')
+  ansible_host: do_networks.v4 | selectattr('type','eq','public')
     | map(attribute='ip_address') | first
   class: do_size.description | lower
   distro: do_image.distribution | lower
 '''
 
-try:
-    import requests
-    HAS_REQUESTS = True
-except ImportError:
-    HAS_REQUESTS = False
-
+import json
+from urllib.error import HTTPError
 from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils.urls import Request
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
 
 
@@ -119,11 +114,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
               cache=True):  # Plugin interface (2)
         super(InventoryModule, self).parse(inventory, loader, path)
 
-        if not HAS_REQUESTS:
-            raise AnsibleParserError(
-                'Please install "requests" Python module as this is required'
-                ' for DigitalOcean dynamic inventory plugin.')
-
         # cache settings
         self._read_config_data(path)
         self.cache_key = self.get_cache_key(path)
@@ -143,6 +133,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self._cache[self.cache_key] = {'digitalocean': ''}
 
         # request parameters
+        method = 'GET'
+
         base_url = 'https://api.digitalocean.com/v2'
         endpoint = 'droplets'
         url = '{0}/{1}'.format(base_url, endpoint)
@@ -154,19 +146,30 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         }
 
         # send request
-        r = requests.get(url, headers=headers)
-        if r.status_code == 200:
-            results = r.json().get('droplets')
+        result = dict(status=0)
+        req = Request(headers=headers)
+        try:
+            with req.open(method, url) as res:
+                result.update(
+                    status=res.status,
+                    json=res.read()
+                )
+        except HTTPError as error:
+            raise AnsibleParserError(error)
+
+        if result['status'] == 200:
+            payload = json.loads(result['json'])
         else:
-            msg = 'Request failed... \ncode: {0}; reason: {1}'.format(
-                r.status_code, r.reason)
+            msg = 'Request failed with code {0}'.format(
+                result['code'])
             raise AnsibleParserError(msg)
 
+        # get options and process the payload
         attributes = self.get_option('attributes')
         var_prefix = self.get_option('var_prefix')
         strict = self.get_option('strict')
 
-        for record in results:
+        for record in payload['droplets']:
 
             # add host to inventory
             if record['name']:
