@@ -144,7 +144,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ('state', 'present', ['description', 'region', 'ip_range']),
+            ('state', 'present', ['name', 'region']),
         ],
     )
 
