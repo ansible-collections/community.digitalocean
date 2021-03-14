@@ -321,7 +321,7 @@ def main():
             size=dict(aliases=['size_id']),
             image=dict(aliases=['image_id']),
             region=dict(aliases=['region_id']),
-            ssh_keys=dict(type='list'),
+            ssh_keys=dict(type='list', no_log=False),
             private_networking=dict(type='bool', default=False),
             vpc_uuid=dict(type='str'),
             backups=dict(type='bool', default=False),

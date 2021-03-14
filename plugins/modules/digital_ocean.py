@@ -433,7 +433,7 @@ def main():
             size_id=dict(),
             image_id=dict(),
             region_id=dict(),
-            ssh_key_ids=dict(type='list'),
+            ssh_key_ids=dict(type='list', no_log=False),
             virtio=dict(type='bool', default=True),
             private_networking=dict(type='bool', default=False),
             backups_enabled=dict(type='bool', default=False),
