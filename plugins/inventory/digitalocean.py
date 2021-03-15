@@ -12,12 +12,11 @@ plugin_type: inventory
 author:
   - Janos Gerzson (@grzs)
 short_description: DigitalOcean Inventory Plugin
-version_added: "0.04"
+version_added: "1.1.0"
 description:
-  - DigitalOcean Inventory plugin.
-  - Acquires droplet list from DO api.
-  - Uses configuration file that ends with
-  - (do_hosts|digitalocean|digital_ocean).(yaml|yml)
+  - DigitalOcean (DO) inventory plugin.
+  - Acquires droplet list from DO API.
+  - Uses configuration file that ends with C((do_hosts|digitalocean|digital_ocean).(yaml|yml)).
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
   - constructed
@@ -27,7 +26,7 @@ options:
     description:
       - The name of the DigitalOcean Inventory Plugin,
       - this should always be 'community.digitalocean.digitalocean'.
-    required: True
+    required: true
     choices: ['community.digitalocean.digitalocean']
   api_token:
     description:
@@ -43,7 +42,12 @@ options:
       Check out the DO api docs for full list of attributes at
       https://developers.digitalocean.com/documentation/v2/#list-all-droplets
     type: list
-    default: 'id,name,networks,region,size_slug'
+    default:
+      - id
+      - name
+      - networks
+      - region
+      - size_slug
   var_prefix:
     description:
       - Prefix of generated varible names (e.g. 'tags' -> 'do_tags')
