@@ -26,13 +26,13 @@ options:
   plugin:
     description:
       - The name of the DigitalOcean Inventory Plugin,
-        this should always be 'community.digitalocean.digitalocean'.
+        this should always be C(community.digitalocean.digitalocean).
     required: true
     choices: ['community.digitalocean.digitalocean']
   api_token:
     description:
      - DigitalOcean OAuth token.
-    required: True
+    required: true
     type: str
     aliases: [ oauth_token ]
     env:
@@ -51,7 +51,7 @@ options:
       - size_slug
   var_prefix:
     description:
-      - Prefix of generated varible names (e.g. 'tags' -> 'do_tags')
+      - Prefix of generated varible names (e.g. C(tags) -> C(do_tags))
     type: str
     default: 'do_'
 '''
@@ -90,7 +90,12 @@ import json
 from ansible.errors import AnsibleParserError
 from ansible.module_utils.urls import Request
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from urllib.error import URLError, HTTPError
+try:
+    # python3
+    from urllib.error import URLError, HTTPError
+except ImportError:
+    # python2
+    from urllib2 import URLError, HTTPError
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
