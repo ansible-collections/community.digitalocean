@@ -16,7 +16,7 @@ version_added: "1.1.0"
 description:
   - DigitalOcean (DO) inventory plugin.
   - Acquires droplet list from DO API.
-  - Uses configuration file that ends with C((do_hosts|digitalocean|digital_ocean).(yaml|yml)).
+  - Uses configuration file that ends with '(do_hosts|digitalocean|digital_ocean).(yaml|yml)'.
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
   - constructed
@@ -25,7 +25,7 @@ options:
   plugin:
     description:
       - The name of the DigitalOcean Inventory Plugin,
-      - this should always be 'community.digitalocean.digitalocean'.
+        this should always be 'community.digitalocean.digitalocean'.
     required: true
     choices: ['community.digitalocean.digitalocean']
   api_token:
@@ -39,8 +39,8 @@ options:
   attributes:
     description: >-
       Droplet attributes to add as host vars to each inventory host.
-      Check out the DO api docs for full list of attributes at
-      https://developers.digitalocean.com/documentation/v2/#list-all-droplets
+      Check out the DO API docs for full list of attributes at
+      U(https://developers.digitalocean.com/documentation/v2/#list-all-droplets).
     type: list
     default:
       - id
@@ -52,7 +52,7 @@ options:
     description:
       - Prefix of generated varible names (e.g. 'tags' -> 'do_tags')
     type: str
-    default: 'do'
+    default: 'do_'
 '''
 
 EXAMPLES = r'''
@@ -106,11 +106,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 valid = True
             else:
                 self.display.vvv(
-                    'Skipping due to inventory source file name mismatch. ' +
-                    'The file name has to end with one of the followings: ' +
-                    'do_hosts.yaml, do_hosts.yml' +
-                    'digitalocean.yaml', 'digitalocean.yml' +
-                    'digital_ocean.yaml', 'digital_ocean.yml')
+                    'Skipping due to inventory source file name mismatch. '
+                    'The file name has to end with one of the followings: '
+                    'do_hosts.yaml, do_hosts.yml'
+                    'digitalocean.yaml, digitalocean.yml'
+                    'digital_ocean.yaml, digital_ocean.yml')
         return valid
 
     def parse(self, inventory, loader, path,
@@ -184,7 +184,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             for k in record.keys():
                 if k in attributes:
                     self.inventory.set_variable(
-                        host_name, '%s_%s' % (var_prefix, k), record[k])
+                        host_name, var_prefix + k, record[k])
 
             self._set_composite_vars(
                 self.get_option('compose'),
