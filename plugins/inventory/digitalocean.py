@@ -90,12 +90,7 @@ import json
 from ansible.errors import AnsibleParserError
 from ansible.module_utils.urls import Request
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-try:
-    # python3
-    from urllib.error import URLError, HTTPError
-except ImportError:
-    # python2
-    from urllib2 import URLError, HTTPError
+from ansible.module_utils.urls import urllib_error
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -158,7 +153,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             payload = json.load(req.get(url))
         except ValueError:
             raise AnsibleParserError("something went wrong with json loading")
-        except (URLError, HTTPError) as error:
+        except (urllib_error.URLError, urllib_error.HTTPError) as error:
             raise AnsibleParserError(error)
 
         # get options and process the payload
