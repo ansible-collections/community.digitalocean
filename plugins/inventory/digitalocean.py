@@ -89,8 +89,8 @@ compose:
 import json
 from ansible.errors import AnsibleParserError
 from ansible.module_utils.urls import Request
+from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
-from ansible.module_utils.urls import urllib_error
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -137,7 +137,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self._cache[self.cache_key] = {'digitalocean': ''}
 
         # request parameters
-        base_url = 'https://api.digitalocean.com/v2'
+        base_url = 'https://api.digitalocean.co/v2'
         endpoint = 'droplets'
         url = '{0}/{1}'.format(base_url, endpoint)
 
@@ -153,7 +153,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             payload = json.load(req.get(url))
         except ValueError:
             raise AnsibleParserError("something went wrong with json loading")
-        except (urllib_error.URLError, urllib_error.HTTPError) as error:
+        except (URLError, HTTPError) as error:
             raise AnsibleParserError(error)
 
         # get options and process the payload
