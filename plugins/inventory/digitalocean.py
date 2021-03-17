@@ -9,8 +9,9 @@ __metaclass__ = type
 DOCUMENTATION = r'''
 name: digitalocean
 plugin_type: inventory
-author:
+authors:
   - Janos Gerzson (@grzs)
+  - Tadej Borovšak (@tadeboro)
 short_description: DigitalOcean Inventory Plugin
 version_added: "1.1.0"
 description:
@@ -86,9 +87,10 @@ compose:
 '''
 
 import json
-from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.errors import AnsibleParserError
 from ansible.module_utils.urls import Request
-from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable, to_safe_group_name
+from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from urllib.error import URLError, HTTPError
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -107,14 +109,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             else:
                 self.display.vvv(
                     'Skipping due to inventory source file name mismatch. '
-                    'The file name has to end with one of the followings: '
-                    'do_hosts.yaml, do_hosts.yml'
-                    'digitalocean.yaml, digitalocean.yml'
-                    'digital_ocean.yaml, digital_ocean.yml')
+                    'The file name has to end with one of the following: '
+                    'do_hosts.yaml, do_hosts.yml '
+                    'digitalocean.yaml, digitalocean.yml, '
+                    'digital_ocean.yaml, digital_ocean.yml.')
         return valid
 
-    def parse(self, inventory, loader, path,
-              cache=True):  # Plugin interface (2)
+    def parse(self, inventory, loader, path, cache=True):
         super(InventoryModule, self).parse(inventory, loader, path)
 
         # cache settings
@@ -136,8 +137,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self._cache[self.cache_key] = {'digitalocean': ''}
 
         # request parameters
-        method = 'GET'
-
         base_url = 'https://api.digitalocean.com/v2'
         endpoint = 'droplets'
         url = '{0}/{1}'.format(base_url, endpoint)
@@ -149,23 +148,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         }
 
         # send request
-        result = dict(status=0)
         req = Request(headers=headers)
         try:
-            with req.open(method, url) as res:
-                result.update(
-                    status=res.status,
-                    json=res.read()
-                )
-        except Exception as error:
+            payload = json.load(req.get(url))
+        except ValueError:
+            raise AnsibleParserError("something went wrong with json loading")
+        except (URLError, HTTPError) as error:
             raise AnsibleParserError(error)
-
-        if result['status'] == 200:
-            payload = json.loads(result['json'])
-        else:
-            msg = 'Request failed with code {0}'.format(
-                result['code'])
-            raise AnsibleParserError(msg)
 
         # get options and process the payload
         attributes = self.get_option('attributes')
@@ -181,10 +170,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 continue
 
             # set variables for host
-            for k in record.keys():
+            for k, v in record.items():
                 if k in attributes:
-                    self.inventory.set_variable(
-                        host_name, var_prefix + k, record[k])
+                    self.inventory.set_variable(host_name, var_prefix + k, v)
 
             self._set_composite_vars(
                 self.get_option('compose'),
