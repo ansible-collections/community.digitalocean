@@ -137,7 +137,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self._cache[self.cache_key] = {'digitalocean': ''}
 
         # request parameters
-        base_url = 'https://api.digitalocean.co/v2'
+        base_url = 'https://api.digitalocean.com/v2'
         endpoint = 'droplets'
         url = '{0}/{1}'.format(base_url, endpoint)
 
