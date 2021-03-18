@@ -183,8 +183,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         for record in payload:
 
             # add host to inventory
-            if record['name']:
-                host_name = self.inventory.add_host(record['name'])
+            if record.get('name'):
+                host_name = self.inventory.add_host(record.get('name'))
             else:
                 continue
 
