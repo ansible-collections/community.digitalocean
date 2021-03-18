@@ -8,7 +8,6 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 name: digitalocean
-plugin_type: inventory
 authors:
   - Janos Gerzson (@grzs)
   - Tadej Borovšak (@tadeboro)
