@@ -54,6 +54,13 @@ options:
       - Prefix of generated varible names (e.g. C(tags) -> C(do_tags))
     type: str
     default: 'do_'
+  pagination:
+    description:
+      - Maximum droplet objects per response page.
+      - If the number of droplets related to the account exceeds this value,
+        the query will be broken to multiple requests (pages).
+    type: int
+    default: 200
 '''
 
 EXAMPLES = r'''
@@ -138,8 +145,9 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # request parameters
         base_url = 'https://api.digitalocean.com/v2'
-        endpoint = 'droplets'
-        url = '{0}/{1}'.format(base_url, endpoint)
+        resource = 'droplets'
+        pagination = self.get_option('pagination')
+        url = '{0}/{1}?per_page={2}'.format(base_url, resource, pagination)
 
         api_token = self.get_option('api_token')
         headers = {
@@ -150,7 +158,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # send request
         req = Request(headers=headers)
         try:
-            payload = json.load(req.get(url))
+            self.display.vvv('Sending request to {0}'.format(url))
+            response = json.load(req.get(url))
+            key = 'droplets'
+            payload = response.get(key)
+            if not payload:
+                raise AnsibleParserError(
+                    "There is no droplet information received")
+            if response.get('links'):
+                while response.get('links').get('pages').get('next'):
+                    url = response.get('links').get('pages').get('next')
+                    self.display.vvv('Sending request to {0}'.format(url))
+                    response = json.load(req.get(url))
+                    payload += response.get(key)
         except ValueError:
             raise AnsibleParserError("something went wrong with json loading")
         except (URLError, HTTPError) as error:
@@ -161,7 +181,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         var_prefix = self.get_option('var_prefix')
         strict = self.get_option('strict')
 
-        for record in payload['droplets']:
+        for record in payload:
 
             # add host to inventory
             if record['name']:
