@@ -149,9 +149,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             'Authorization': 'Bearer {0}'.format(api_token)
         }
 
-        # send request
+        # build url
+        base_url = 'https://api.digitalocean.com/v2'
+        resource = 'droplets'
+        pagination = self.get_option('pagination')
+        url = '{0}/{1}?per_page={2}'.format(base_url, resource, pagination)
+
+        # send request(s)
         req = Request(headers=headers)
-        url = 'https://api.digitalocean.com/v2/droplets?per_page' + str(pagination)
         payload = []
         try:
             while url:
