@@ -143,11 +143,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self._cache[self.cache_key] = {'digitalocean': ''}
 
         # request parameters
-        base_url = 'https://api.digitalocean.com/v2'
-        resource = 'droplets'
-        pagination = self.get_option('pagination')
-        url = '{0}/{1}?per_page={2}'.format(base_url, resource, pagination)
-
         api_token = self.get_option('api_token')
         headers = {
             'Content-Type': 'application/json',
@@ -156,20 +151,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # send request
         req = Request(headers=headers)
+        url = 'https://api.digitalocean.com/v2/droplets?per_page' + str(pagination)
+        payload = []
         try:
-            self.display.vvv('Sending request to {0}'.format(url))
-            response = json.load(req.get(url))
-            key = 'droplets'
-            payload = response.get(key)
-            if not payload:
-                raise AnsibleParserError(
-                    "There is no droplet information received")
-            if response.get('links'):
-                while response.get('links').get('pages').get('next'):
-                    url = response.get('links').get('pages').get('next')
-                    self.display.vvv('Sending request to {0}'.format(url))
-                    response = json.load(req.get(url))
-                    payload += response.get(key)
+            while url:
+                self.display.vvv('Sending request to {0}'.format(url))
+                response = json.load(req.get(url))
+                payload.extend(response['droplets'])
+                url = response.get('links', {}).get('pages', {}).get('next')
         except ValueError:
             raise AnsibleParserError("something went wrong with json loading")
         except (URLError, HTTPError) as error:
