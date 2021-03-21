@@ -12,7 +12,7 @@ from ansible.inventory.data import InventoryData
 from ansible_collections.community.digitalocean.plugins.inventory.digitalocean import InventoryModule
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def inventory():
     r = InventoryModule()
     r.inventory = InventoryData()
@@ -23,18 +23,7 @@ def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('digitalocean_foobar.yml') is False
 
 
-def test_validate_config(inventory):
-    config = {
-        'plugin': 'community.digitalocean.digitalocean',
-        'api_token': 'xxxxxxxxxxxxxxxxxxxx',
-        'attributes': ['id', 'locked', 'foo', 'size'],
-        'var_prefix': 'foo_',
-        'pagination': 25
-    }
-    with pytest.raises(AnsibleParserError) as error_message:
-        inventory._validate_config(config)
-        assert "invalid attribute: foo" in error_message
-
+def test_validate_config_var_prefix(inventory):
     config = {
         'plugin': 'community.digitalocean.digitalocean',
         'api_token': 'xxxxxxxxxxxxxxxxxxxx',
@@ -45,17 +34,6 @@ def test_validate_config(inventory):
     with pytest.raises(AnsibleParserError) as error_message:
         inventory._validate_config(config)
         assert "var_prefix contains invalid characters" in error_message
-
-    config = {
-        'plugin': 'community.digitalocean.digitalocean',
-        'api_token': 'xxxxxxxxxxxxxxxxxxxx',
-        'attributes': ['id', 'locked', 'size'],
-        'var_prefix': 'foo_',
-        'pagination': 205
-    }
-    with pytest.raises(AnsibleParserError) as error_message:
-        inventory._validate_config(config)
-        assert "pagination value is greater than the maximum" in error_message
 
 
 def get_payload():
@@ -166,7 +144,7 @@ def get_option(option):
     return options.get(option)
 
 
-def test_populate(inventory, mocker):
+def test_populate_hostvars(inventory, mocker):
     inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
     inventory._populate()
