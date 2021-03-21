@@ -8,7 +8,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 name: digitalocean
-authors:
+author:
   - Janos Gerzson (@grzs)
   - Tadej Borovšak (@tadeboro)
 short_description: DigitalOcean Inventory Plugin
@@ -42,6 +42,7 @@ options:
       Check out the DO API docs for full list of attributes at
       U(https://developers.digitalocean.com/documentation/v2/#list-all-droplets).
     type: list
+    elements: str
     default:
       - id
       - name
@@ -51,6 +52,8 @@ options:
   var_prefix:
     description:
       - Prefix of generated varible names (e.g. C(tags) -> C(do_tags))
+      - Has to start with a letter,
+        the only valid special character is underscore (C(_)).
     type: str
     default: 'do_'
   pagination:
@@ -58,6 +61,7 @@ options:
       - Maximum droplet objects per response page.
       - If the number of droplets related to the account exceeds this value,
         the query will be broken to multiple requests (pages).
+      - This value cannot be greater than 200.
     type: int
     default: 200
 '''
@@ -92,6 +96,7 @@ compose:
   distro: do_image.distribution | lower
 '''
 
+import re
 import json
 from ansible.errors import AnsibleParserError
 from ansible.module_utils.urls import Request
@@ -102,6 +107,24 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cachea
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     NAME = 'community.digitalocean.digitalocean'
+
+    def _validate_config(self, config):
+        if config['plugin'] != 'community.digitalocean.digitalocean':
+            raise AnsibleParserError("plugin doesn't match this plugin")
+        attributes = config['attributes']
+        do_fields = ['id', 'name', 'memory', 'vcpus', 'disk', 'locked',
+                     'created', 'status', 'backup', 'snapshot', 'features',
+                     'region', 'image', 'size', 'size_slug', 'networks', 'kernel',
+                     'next', 'tags', 'volume', 'vpc']
+
+        for a in attributes:
+            if a not in do_fields:
+                raise AnsibleParserError("invalid attribute: " + a)
+        if not re.match('^[a-z][a-z_]*$', config['var_prefix']):
+            raise AnsibleParserError("var_prefix contains invalid characters")
+        if config['pagination'] > 200:
+            raise AnsibleParserError("pagination value is greater than the maximum (200)")
+        return True
 
     def verify_file(self, path):
         valid = False
@@ -121,8 +144,66 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     'digital_ocean.yaml, digital_ocean.yml.')
         return valid
 
+    def _get_payload(self):
+        # request parameters
+        api_token = self.get_option('api_token')
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer {0}'.format(api_token)
+        }
+
+        # build url
+        pagination = self.get_option('pagination')
+        url = 'https://api.digitalocean.com/v2/droplets?per_page=' + str(pagination)
+
+        # send request(s)
+        self.req = Request(headers=headers)
+        payload = []
+        try:
+            while url:
+                self.display.vvv('Sending request to {0}'.format(url))
+                response = json.load(self.req.get(url))
+                payload.extend(response['droplets'])
+                url = response.get('links', {}).get('pages', {}).get('next')
+        except ValueError:
+            raise AnsibleParserError("something went wrong with json loading")
+        except (URLError, HTTPError) as error:
+            raise AnsibleParserError(error)
+
+        return payload
+
+    def _populate(self):
+        attributes = self.get_option('attributes')
+        var_prefix = self.get_option('var_prefix')
+        strict = self.get_option('strict')
+        for record in self._get_payload():
+
+            # add host to inventory
+            if record.get('name'):
+                host_name = self.inventory.add_host(record.get('name'))
+            else:
+                continue
+
+            # set variables for host
+            for k, v in record.items():
+                if k in attributes:
+                    self.inventory.set_variable(host_name, var_prefix + k, v)
+
+            self._set_composite_vars(
+                self.get_option('compose'),
+                self.inventory.get_host(host_name).get_vars(), host_name, strict)
+
+            # set composed and keyed groups
+            self._add_host_to_composed_groups(self.get_option('groups'),
+                                              dict(), host_name, strict)
+            self._add_host_to_keyed_groups(self.get_option('keyed_groups'),
+                                           dict(), host_name, strict)
+
     def parse(self, inventory, loader, path, cache=True):
         super(InventoryModule, self).parse(inventory, loader, path)
+
+        config = self._read_config_data(path)
+        self._validate_config(config)
 
         # cache settings
         self._read_config_data(path)
@@ -142,58 +223,4 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if self.cache_key not in self._cache:
                 self._cache[self.cache_key] = {'digitalocean': ''}
 
-        # request parameters
-        api_token = self.get_option('api_token')
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer {0}'.format(api_token)
-        }
-
-        # build url
-        base_url = 'https://api.digitalocean.com/v2'
-        resource = 'droplets'
-        pagination = self.get_option('pagination')
-        url = '{0}/{1}?per_page={2}'.format(base_url, resource, pagination)
-
-        # send request(s)
-        req = Request(headers=headers)
-        payload = []
-        try:
-            while url:
-                self.display.vvv('Sending request to {0}'.format(url))
-                response = json.load(req.get(url))
-                payload.extend(response['droplets'])
-                url = response.get('links', {}).get('pages', {}).get('next')
-        except ValueError:
-            raise AnsibleParserError("something went wrong with json loading")
-        except (URLError, HTTPError) as error:
-            raise AnsibleParserError(error)
-
-        # get options and process the payload
-        attributes = self.get_option('attributes')
-        var_prefix = self.get_option('var_prefix')
-        strict = self.get_option('strict')
-
-        for record in payload:
-
-            # add host to inventory
-            if record.get('name'):
-                host_name = self.inventory.add_host(record.get('name'))
-            else:
-                continue
-
-            # set variables for host
-            for k, v in record.items():
-                if k in attributes:
-                    self.inventory.set_variable(host_name, var_prefix + k, v)
-
-            self._set_composite_vars(
-                self.get_option('compose'),
-                self.inventory.get_host(host_name).get_vars(), host_name,
-                strict)
-
-            # set composed and keyed groups
-            self._add_host_to_composed_groups(self.get_option('groups'),
-                                              dict(), host_name, strict)
-            self._add_host_to_keyed_groups(self.get_option('keyed_groups'),
-                                           dict(), host_name, strict)
+        self._populate()
