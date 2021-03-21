@@ -111,19 +111,31 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def _validate_config(self, config):
         if config['plugin'] != 'community.digitalocean.digitalocean':
             raise AnsibleParserError("plugin doesn't match this plugin")
-        attributes = config['attributes']
-        do_fields = ['id', 'name', 'memory', 'vcpus', 'disk', 'locked',
-                     'created', 'status', 'backup', 'snapshot', 'features',
-                     'region', 'image', 'size', 'size_slug', 'networks', 'kernel',
-                     'next', 'tags', 'volume', 'vpc']
+        do_fields = ['id', 'name', 'memory', 'vcpus', 'disk', 'locked', 'created_at', 'status', 'backup_ids', 'snapshot_ids', 'features',
+                     'region', 'image', 'size', 'size_slug', 'networks', 'kernel', 'next_backup_window', 'tags', 'volume_ids', 'vpc_uuid']
 
-        for a in attributes:
-            if a not in do_fields:
-                raise AnsibleParserError("invalid attribute: " + a)
-        if not re.match('^[a-z][a-z_]*$', config['var_prefix']):
-            raise AnsibleParserError("var_prefix contains invalid characters")
-        if config['pagination'] > 200:
-            raise AnsibleParserError("pagination value is greater than the maximum (200)")
+        try:
+            attributes = config['attributes']
+            for a in attributes:
+                if a not in do_fields:
+                    raise AnsibleParserError("invalid attribute: " + a)
+        except KeyError:
+            pass
+
+        try:
+            var_prefix = config['var_prefix']
+            if not re.match('^[a-z][a-z_]*$', var_prefix):
+                raise AnsibleParserError("var_prefix contains invalid characters")
+        except KeyError:
+            pass
+
+        try:
+            pagination = config['pagination']
+            if pagination > 200:
+                raise AnsibleParserError("pagination value is greater than the maximum (200)")
+        except KeyError:
+            pass
+
         return True
 
     def verify_file(self, path):
