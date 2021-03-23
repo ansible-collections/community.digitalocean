@@ -61,7 +61,7 @@ options:
       - Maximum droplet objects per response page.
       - If the number of droplets related to the account exceeds this value,
         the query will be broken to multiple requests (pages).
-      - This value cannot be greater than 200.
+      - DigitalOcean currently allows a maximum of 200.
     type: int
     default: 200
 '''
@@ -148,7 +148,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 payload.extend(response['droplets'])
                 url = response.get('links', {}).get('pages', {}).get('next')
         except ValueError:
-            raise AnsibleParserError("something went wrong with json loading")
+            raise AnsibleParserError("something went wrong with JSON loading")
         except (URLError, HTTPError) as error:
             raise AnsibleParserError(error)
 
