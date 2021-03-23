@@ -108,13 +108,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     NAME = 'community.digitalocean.digitalocean'
 
-    def _validate_config(self, config):
-        if 'var_prefix' in config:
-            if not re.match('^[a-z][a-z_]*$', config['var_prefix']):
-                raise AnsibleParserError("var_prefix contains invalid characters")
-
-        return True
-
     def verify_file(self, path):
         valid = False
         if super(InventoryModule, self).verify_file(path):
@@ -190,9 +183,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def parse(self, inventory, loader, path, cache=True):
         super(InventoryModule, self).parse(inventory, loader, path)
-
-        config = self._read_config_data(path)
-        self._validate_config(config)
 
         # cache settings
         self._read_config_data(path)

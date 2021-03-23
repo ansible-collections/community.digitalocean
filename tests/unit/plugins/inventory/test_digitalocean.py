@@ -23,19 +23,6 @@ def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('digitalocean_foobar.yml') is False
 
 
-def test_validate_config_var_prefix(inventory):
-    config = {
-        'plugin': 'community.digitalocean.digitalocean',
-        'api_token': 'xxxxxxxxxxxxxxxxxxxx',
-        'attributes': ['id', 'locked', 'size'],
-        'var_prefix': 'foo-',
-        'pagination': 25
-    }
-    with pytest.raises(AnsibleParserError) as error_message:
-        inventory._validate_config(config)
-        assert "var_prefix contains invalid characters" in error_message
-
-
 def get_payload():
     return [
         {
