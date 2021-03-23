@@ -52,8 +52,6 @@ options:
   var_prefix:
     description:
       - Prefix of generated varible names (e.g. C(tags) -> C(do_tags))
-      - Has to start with a letter,
-        the only valid special character is underscore (C(_)).
     type: str
     default: 'do_'
   pagination:
