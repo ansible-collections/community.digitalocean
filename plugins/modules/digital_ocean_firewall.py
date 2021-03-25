@@ -159,9 +159,9 @@ EXAMPLES = '''
 # Allows tcp connections to ports 80 and 443 from any source
 # Allows outbound access to any destination for protocols tcp, udp and icmp
 # The firewall rules will be applied to any droplets with the tag "sample"
-- name: Create a Firewall named my_firewall
+- name: Create a Firewall named my-firewall
   digital_ocean_firewall:
-    name: my_firewall
+    name: my-firewall
     state: present
     inbound_rules:
       - protocol: "tcp"
@@ -248,7 +248,7 @@ data:
                 "protocol": "tcp"
             }
         ],
-        "name": "my_firewall",
+        "name": "my-firewall",
         "outbound_rules": [
             {
                 "destinations": {
