@@ -16,3 +16,10 @@ releases:
     - 14-docs-fqcn.yaml
     - 3-sanity-docs-fixes.yaml
     release_date: '2020-08-17'
+  1.1.0:
+    plugins:
+      inventory:
+      - description: DigitalOcean Inventory Plugin
+        name: digitalocean
+        namespace: null
+    release_date: '2021-03-25'
