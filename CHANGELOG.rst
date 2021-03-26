@@ -5,17 +5,6 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
-v1.1.0
-======
-
-New Plugins
------------
-
-Inventory
-~~~~~~~~~
-
-- digitalocean - DigitalOcean Inventory Plugin
-
 v1.0.0
 ======
 
