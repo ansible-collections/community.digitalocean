@@ -385,10 +385,14 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
         if self.record_id:
             record = self.__find_record_by_id(self.record_id)
             record_id = self.record_id
-        # if no record_id is given, try to find an exact match
+        # if no record_id is given, try to a single matching record
         else:
-            record, record_id, _tmp = self.__get_matching_records()
-
+            record, record_id, similar_records = self.__get_matching_records()
+            if not record and similar_records:
+                if len(similar_records) == 1:
+                    record, record_id = similar_records[0], similar_records[0]['id']
+                else:
+                    self.module.fail_json(msg="Can't delete record, too many similar records: %s" % similar_records)
         # record was not found, we're done
         if not record:
             changed = False
