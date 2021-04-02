@@ -10,7 +10,7 @@ authors:
   - Lucas Basquerotto (https://github.com/lucasbasquerotto)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
-documentation: ''
+documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
 homepage: https://github.com/ansible-collections/community.digitalocean
 issues: https://github.com/ansible-collections/community.digitalocean/issues
 license_file: COPYING
