@@ -1,2 +1,2 @@
 minor_changes:
-  - digital_ocean_block_storage - Included ability to resize Block Storage Volumes. 
+  - "digital_ocean_block_storage - included ability to resize Block Storage Volumes (https://github.com/ansible-collections/community.digitalocean/issues/38)."
