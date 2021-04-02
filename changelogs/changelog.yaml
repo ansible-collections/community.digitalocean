@@ -27,18 +27,11 @@ releases:
         (https://github.com/ansible-collections/community.digitalocean/issues/38).
       - digital_ocean_block_storage - included ability to resize Block Storage Volumes
         (https://github.com/ansible-collections/community.digitalocean/issues/38).
-      - digital_ocean_domain_record - Added plugin module for managing domain records
-        (https://github.com/ansible-collections/community.digitalocean/issues/6).
-      - digital_ocean_firewall - Adding a new module for DigitalOcean firewalls.
-      - digitalocean - Dynamic inventory plugin for Droplets (https://github.com/ansible-collections/community.digitalocean/issues/8).
     fragments:
-    - 16-digitalocean-firewall.yaml
     - 22-digital_ocean_domain-idempotent.yml
-    - 33-add-domain-record.yaml
     - 38-resize-volumes.yml
     - 38-resize-volumes.yml
     - 49-fix-lb-and-cert-info.yaml
-    - 8-dynamic-inventory-plugin.yaml
     plugins:
       inventory:
       - description: DigitalOcean Inventory Plugin
