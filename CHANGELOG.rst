@@ -12,9 +12,17 @@ Minor Changes
 -------------
 
 - digital_ocean_block_storage - Included ability to resize Block Storage Volumes (https://github.com/ansible-collections/community.digitalocean/issues/38).
+- digital_ocean_block_storage - included ability to resize Block Storage Volumes (https://github.com/ansible-collections/community.digitalocean/issues/38).
 - digital_ocean_domain_record - Added plugin module for managing domain records (https://github.com/ansible-collections/community.digitalocean/issues/6).
 - digital_ocean_firewall - Adding a new module for DigitalOcean firewalls.
 - digitalocean - Dynamic inventory plugin for Droplets (https://github.com/ansible-collections/community.digitalocean/issues/8).
+
+Bugfixes
+--------
+
+- digital_ocean_certificate_info - fix retrieving certificate by ID (https://github.com/ansible-collections/community.digitalocean/issues/35).
+- digital_ocean_domain - module is now idempotent when called without IP (https://github.com/ansible-collections/community.digitalocean/issues/21).
+- digital_ocean_load_balancer_info - fix retrieving load balancer by ID (https://github.com/ansible-collections/community.digitalocean/issues/35).
 
 New Plugins
 -----------
