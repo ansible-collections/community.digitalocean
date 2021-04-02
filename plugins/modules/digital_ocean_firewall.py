@@ -7,11 +7,6 @@
 from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
-ANSIBLE_METADATA = {
-    'metadata_version': '1.1',
-    'status': ['preview'],
-    'supported_by': 'community'
-}
 
 DOCUMENTATION = '''
 ---
@@ -22,7 +17,7 @@ description:
 author:
     - Anthony Bond (@BondAnthony)
     - Lucas Basquerotto (@lucasbasquerotto)
-version_added: "2.10.0"
+version_added: "1.1.0"
 options:
   name:
     type: str
@@ -149,8 +144,6 @@ options:
               - List of strings containing the names of Tags corresponding to groups of Droplets to
                 which the Firewall will allow traffic
             required: false
-requirements:
-  - "python >= 2.6"
 extends_documentation_fragment: digital_ocean.documentation
 '''
 
