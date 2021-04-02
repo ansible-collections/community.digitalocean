@@ -11,6 +11,7 @@ DOCUMENTATION = '''
 ---
 module: digital_ocean_domain_record
 author: "Adam Papai (@woohgit)"
+version_added: 1.1.0
 short_description: Manage DigitalOcean domain records
 description:
     - Create/delete a domain record in DigitalOcean.
@@ -85,8 +86,6 @@ options:
 notes:
   - Version 2 of DigitalOcean API is used.
   - The number of requests that can be made through the API is currently limited to 5,000 per hour per OAuth token.
-requirements:
-  - "python >= 2.6"
 '''
 
 EXAMPLES = '''
