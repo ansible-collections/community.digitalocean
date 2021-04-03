@@ -8,6 +8,7 @@ authors:
   - Luis (https://github.com/lalvarezguillen)
   - grzs (https://github.com/grzs)
   - Lucas Basquerotto (https://github.com/lucasbasquerotto)
+  - Tadej Borovšak (https://github.com/tadeboro)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
 documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
