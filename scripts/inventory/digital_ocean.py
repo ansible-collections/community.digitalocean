@@ -345,8 +345,8 @@ class DigitalOceanInventory(object):
         parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on DigitalOcean credentials')
 
         parser.add_argument('--list', action='store_true', help='List all active Droplets as Ansible inventory (default: True)')
-        parser.add_argument('--host', action='store',  type=int,
-            help='Get all Ansible inventory variables about the Droplet with the given ID')
+        parser.add_argument('--host', action='store', type=int,
+                            help='Get all Ansible inventory variables about the Droplet with the given ID')
 
         parser.add_argument('--all', action='store_true', help='List all DigitalOcean information as JSON')
         parser.add_argument('--droplets', '-d', action='store_true', help='List Droplets as JSON')
