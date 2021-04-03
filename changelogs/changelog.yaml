@@ -28,7 +28,6 @@ releases:
     fragments:
     - 22-digital_ocean_domain-idempotent.yml
     - 38-resize-volumes.yml
-    - 38-resize-volumes.yml
     - 49-fix-lb-and-cert-info.yaml
     modules:
     - description: Manage DigitalOcean domain records
