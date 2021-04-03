@@ -1,2 +1,0 @@
-bugfixes:
-- "digital_ocean_domain - module is now idempotent when called without IP (https://github.com/ansible-collections/community.digitalocean/issues/21)."

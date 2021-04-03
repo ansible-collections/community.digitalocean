@@ -4,6 +4,11 @@ authors:
   - Akasurde (https://github.com/Akasurde)
   - pmarques (https://github.com/pmarques)
   - geerlingguy (https://www.jeffgeerling.com/)
+  - Andres Hermosilla (https://github.com/rezen)
+  - Luis (https://github.com/lalvarezguillen)
+  - grzs (https://github.com/grzs)
+  - Lucas Basquerotto (https://github.com/lucasbasquerotto)
+  - Tadej Borovšak (https://github.com/tadeboro)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
 documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
@@ -18,7 +23,7 @@ tags:
   - digitalocean
   - cloud
   - droplet
-version: 1.0.0
+version: 1.1.0
 build_ignore:
   - .DS_Store
   - '*.tar.gz'
