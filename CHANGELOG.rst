@@ -11,7 +11,6 @@ v1.1.0
 Minor Changes
 -------------
 
-- digital_ocean_block_storage - Included ability to resize Block Storage Volumes (https://github.com/ansible-collections/community.digitalocean/issues/38).
 - digital_ocean_block_storage - included ability to resize Block Storage Volumes (https://github.com/ansible-collections/community.digitalocean/issues/38).
 
 Bugfixes
