@@ -32,6 +32,13 @@ releases:
     - 38-resize-volumes.yml
     - 38-resize-volumes.yml
     - 49-fix-lb-and-cert-info.yaml
+    modules:
+    - description: Manage DigitalOcean domain records
+      name: digital_ocean_domain_record
+      namespace: ''
+    - description: Manage cloud firewalls within DigitalOcean
+      name: digital_ocean_firewall
+      namespace: ''
     plugins:
       inventory:
       - description: DigitalOcean Inventory Plugin

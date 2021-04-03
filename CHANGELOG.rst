@@ -29,6 +29,12 @@ Inventory
 
 - digitalocean - DigitalOcean Inventory Plugin
 
+New Modules
+-----------
+
+- digital_ocean_domain_record - Manage DigitalOcean domain records
+- digital_ocean_firewall - Manage cloud firewalls within DigitalOcean
+
 v1.0.0
 ======
 
