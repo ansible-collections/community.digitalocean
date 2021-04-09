@@ -1,4 +1,4 @@
 bugfixes:
   - digital_ocean inventory script - implement unimplemented ``use_private_network`` option
-    inventory script, and register missing ``do_ip_address``, ``do_private_ip_address``
+    and register missing ``do_ip_address``, ``do_private_ip_address``
     host vars (https://github.com/ansible-collections/community.digitalocean/pull/45/files).
