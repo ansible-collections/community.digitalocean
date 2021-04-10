@@ -16,6 +16,18 @@ description:
     - This module can be used to gather information about Droplets.
 author: "Tyler Auerbeck (@tylerauerbeck)"
 
+options:
+  id:
+    description:
+      - Droplet ID that can be used to identify and reference a droplet.
+    required: false
+    type: str
+  name:
+    description:
+      - Droplet name that can be used to identify and reference a droplet.
+    required: false
+    type: str
+
 requirements:
   - "python >= 2.6"
 
@@ -40,43 +52,83 @@ EXAMPLES = r'''
     id: abc-123-d45
 '''
 
-#TODO: Update return example
 RETURN = r'''
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#droplets
 data:
-    description: a DigitalOcean Droplet
-    returned: changed
-    type: dict
-    sample: {
-        "ip_address": "104.248.118.172",
-        "ipv6_address": "2604:a880:400:d1::90a:6001",
-        "private_ipv4_address": "10.136.122.141",
-        "droplet": {
-            "id": 3164494,
-            "name": "example.com",
-            "memory": 512,
-            "vcpus": 1,
-            "disk": 20,
-            "locked": true,
-            "status": "new",
-            "kernel": {
-                "id": 2233,
-                "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic",
-                "version": "3.13.0-37-generic"
-            },
-            "created_at": "2014-11-14T16:36:31Z",
-            "features": ["virtio"],
+    description: DigitalOcean droplet information
+    returned: success
+    type: list
+    sample: [
+        {
             "backup_ids": [],
+            "created_at": "2021-04-07T00:44:53Z",
+            "disk": 25,
+            "features": ["private_networking"],
+            "id": 123456789,
+            "image":
+                "created_at": "2020-10-20T08:49:55Z",
+                "description": "Ubuntu 18.04 x86 image",
+                "distribution": "Ubuntu",
+                "id": 72061309,
+                "min_disk_size": 15,
+                "name": "18.04 (LTS) x64",
+                "public": false,
+                "regions": [],
+                "size_gigabytes": 0.34,
+                "slug": null,
+                "status": "retired",
+                "tags": [],
+                "type": "base"
+                },
+            "kernel": null,
+            "locked": false,
+            "memory": 1024,
+            "name": "ubuntu-s-1vcpu-1gb-nyc1-1234",
+            "networks": {
+                "v4": [
+                    {
+                        "gateway": "",
+                        "ip_address": "1.2.3.4",
+                        "netmask": "255.255.240.0",
+                        "type": "private"
+                    },
+                    {
+                        "gateway": "3.4.5.6",
+                        "ip_address": "1.2.3.4",
+                        "netmask": "255.255.240.0",
+                        "type": "public"
+                        }
+                ],
+                "v6": []
+            },
+            "next_backup_window": null,
+            "region": {
+                "available": true,
+                "features": ["backups", "ipv6", "metadata", "install_agent", "storage", "image_transfer"],
+                "name": "New York 1",
+                "sizes" ["list-of-sizes"]
+                "slug": "nyc1"
+            },
+            "size": {
+                    "available": true,
+                    "description": "Basic",
+                    "disk": 25,
+                    "memory": 1024,
+                    "price_hourly": 0.00744,
+                    "price_monthly": 5.0,
+                    "regions": ["ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1", "sfo3", "sgp1", "tor1"],
+                    "slug": "s-1vcpu-1gb",
+                    "transfer": 1.0,
+                    "vcpus": 1
+            },
+            "size_slug": "s-1vcpu-1gb",
             "snapshot_ids": [],
-            "image": {},
+            "status": "active",
+            "tags": ["tag1"],
+            "vcpus": 1,
             "volume_ids": [],
-            "size": {},
-            "size_slug": "512mb",
-            "networks": {},
-            "region": {},
-            "tags": ["web"]
+            "vpc_uuid": "1f5e24b6-8c1d-4ace-bd8f-430096ba42ca"
         }
-    }
+    ]
 '''
 
 from traceback import format_exc
@@ -113,7 +165,7 @@ def core(module):
       else:
         for droplet in response.json["droplets"]:
           if droplet["name"] == module.params["name"]:
-            data = {"droplet": droplet}
+            data = droplet
             break
           else:
             data = {}
