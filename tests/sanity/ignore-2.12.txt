@@ -1,0 +1,16 @@
+plugins/modules/digital_ocean.py validate-modules:doc-missing-type
+plugins/modules/digital_ocean.py validate-modules:parameter-list-no-elements
+plugins/modules/digital_ocean.py validate-modules:parameter-type-not-in-doc
+plugins/modules/digital_ocean.py validate-modules:undocumented-parameter
+plugins/modules/digital_ocean_droplet.py validate-modules:doc-missing-type
+plugins/modules/digital_ocean_droplet.py validate-modules:doc-required-mismatch
+plugins/modules/digital_ocean_droplet.py validate-modules:parameter-list-no-elements
+plugins/modules/digital_ocean_droplet.py validate-modules:parameter-type-not-in-doc
+plugins/modules/digital_ocean_floating_ip.py validate-modules:doc-default-does-not-match-spec
+plugins/modules/digital_ocean_floating_ip.py validate-modules:doc-missing-type
+plugins/modules/digital_ocean_floating_ip.py validate-modules:parameter-type-not-in-doc
+plugins/modules/digital_ocean_floating_ip.py validate-modules:undocumented-parameter
+plugins/modules/digital_ocean_sshkey.py validate-modules:doc-default-does-not-match-spec
+plugins/modules/digital_ocean_sshkey.py validate-modules:doc-missing-type
+plugins/modules/digital_ocean_sshkey.py validate-modules:parameter-type-not-in-doc
+plugins/modules/digital_ocean_sshkey.py validate-modules:undocumented-parameter

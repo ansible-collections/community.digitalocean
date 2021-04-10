@@ -32,6 +32,7 @@ options:
     - The size of the Block Storage volume in gigabytes.
     - Required when I(command=create) and I(state=present).
     - If snapshot_id is included, this will be ignored.
+    - If block_size > current size of the volume, the volume is resized.
     type: int
   volume_name:
     description:
@@ -77,6 +78,15 @@ EXAMPLES = r'''
     api_token: <TOKEN>
     region: nyc1
     block_size: 10
+    volume_name: nyc1-block-storage
+
+- name: Resize an existing Block Storage
+  community.digitalocean.digital_ocean_block_storage:
+    state: present
+    command: create
+    api_token: <TOKEN>
+    region: nyc1
+    block_size: 20
     volume_name: nyc1-block-storage
 
 - name: Delete Block Storage
@@ -151,20 +161,24 @@ class DOBlockStorage(object):
                     raise DOBlockStorageException(json['message'])
         raise DOBlockStorageException('Unable to reach api.digitalocean.com')
 
-    def get_attached_droplet_ID(self, volume_name, region):
+    def get_block_storage_by_name(self, volume_name, region):
         url = 'volumes?name={0}&region={1}'.format(volume_name, region)
-        response = self.rest.get(url)
-        status = response.status_code
-        json = response.json
-        if status == 200:
-            volumes = json['volumes']
-            if len(volumes) > 0:
-                droplet_ids = volumes[0]['droplet_ids']
-                if len(droplet_ids) > 0:
-                    return droplet_ids[0]
+        resp = self.rest.get(url)
+        if resp.status_code != 200:
+            raise DOBlockStorageException(resp.json['message'])
+
+        volumes = resp.json['volumes']
+        if not volumes:
             return None
-        else:
-            raise DOBlockStorageException(json['message'])
+
+        return volumes[0]
+
+    def get_attached_droplet_ID(self, volume_name, region):
+        volume = self.get_block_storage_by_name(volume_name, region)
+        if not volume or not volume['droplet_ids']:
+            return None
+
+        return volume['droplet_ids'][0]
 
     def attach_detach_block_storage(self, method, volume_name, region, droplet_id):
         data = {
@@ -184,6 +198,30 @@ class DOBlockStorage(object):
             return False
         else:
             raise DOBlockStorageException(json['message'])
+
+    def resize_block_storage(self, volume_name, region, desired_size):
+        if not desired_size:
+            return False
+
+        volume = self.get_block_storage_by_name(volume_name, region)
+        if volume['size_gigabytes'] == desired_size:
+            return False
+
+        data = {
+            'type': 'resize',
+            'size_gigabytes': desired_size,
+        }
+        resp = self.rest.post(
+            'volumes/{0}/actions'.format(volume['id']),
+            data=data,
+        )
+        if resp.status_code == 202:
+            return self.poll_action_for_complete_status(
+                resp.json['action']['id']
+            )
+        else:
+            # we'd get status 422 if desired_size <= current volume size
+            raise DOBlockStorageException(resp.json['message'])
 
     def create_block_storage(self):
         volume_name = self.get_key_or_fail('volume_name')
@@ -210,7 +248,9 @@ class DOBlockStorage(object):
         if status == 201:
             self.module.exit_json(changed=True, id=json['volume']['id'])
         elif status == 409 and json['id'] == 'conflict':
-            self.module.exit_json(changed=False)
+            # The volume exists already, but it might not have the desired size
+            resized = self.resize_block_storage(volume_name, region, block_size)
+            self.module.exit_json(changed=resized)
         else:
             raise DOBlockStorageException(json['message'])
 
@@ -286,9 +326,9 @@ def main():
     try:
         handle_request(module)
     except DOBlockStorageException as e:
-        module.fail_json(msg=e.message, exception=traceback.format_exc())
+        module.fail_json(msg=str(e), exception=traceback.format_exc())
     except KeyError as e:
-        module.fail_json(msg='Unable to load %s' % e.message, exception=traceback.format_exc())
+        module.fail_json(msg='Unable to load %s' % e, exception=traceback.format_exc())
 
 
 if __name__ == '__main__':
