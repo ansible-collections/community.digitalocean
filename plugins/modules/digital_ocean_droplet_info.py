@@ -230,6 +230,7 @@ def run(module):
 
     module.exit_json(changed=False, data=data)
 
+
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
@@ -242,5 +243,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
