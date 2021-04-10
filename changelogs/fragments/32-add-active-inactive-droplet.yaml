@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_droplet - adding ``active`` and ``inactive`` states (https://github.com/ansible-collections/community.digitalocean/pull/32).
