@@ -9,10 +9,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: kubernetes
+module: digital_ocean_kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
   - Create and delete a Kubernetes cluster in DigitalOcean (and optionally wait for it to be running).
+version_added: 1.2.0
 author: Mark Mercado (@mamercad)
 options:
   oauth_token:
@@ -128,7 +129,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Create a new DigitalOcean Kubernetes cluster in New York 1
-  community.digitalocean.kubernetes:
+  community.digitalocean.digital_ocean_kubernetes:
     state: present
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
@@ -146,7 +147,7 @@ EXAMPLES = r'''
     msg: "{{ my_cluster.data.kubeconfig }}"
 
 - name: Destroy (delete) an existing DigitalOcean Kubernetes cluster
-  community.digitalocean.kubernetes:
+  community.digitalocean.digital_ocean_kubernetes:
     state: absent
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest

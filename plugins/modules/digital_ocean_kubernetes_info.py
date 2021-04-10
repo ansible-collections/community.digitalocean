@@ -9,10 +9,11 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: kubernetes_info
+module: digital_ocean_kubernetes_info
 short_description: Returns information about an existing DigitalOcean Kubernetes cluster
 description:
   - Returns information about an existing DigitalOcean Kubernetes cluster.
+version_added: 1.2.0
 author: Mark Mercado (@mamercad)
 options:
   oauth_token:
@@ -39,7 +40,7 @@ requirements:
 
 EXAMPLES = r'''
 - name: Get information about an existing DigitalOcean Kubernetes cluster
-  community.digitalocean.kubernetes_info:
+  community.digitalocean.digital_ocean_kubernetes_info:
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
     return_kubeconfig: yes
