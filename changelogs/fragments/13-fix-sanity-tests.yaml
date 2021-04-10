@@ -2,4 +2,4 @@ bugfixes:
   - digital_ocean - fixing sanity tests (https://github.com/ansible-collections/community.digitalocean/issues/13).
   - digital_ocean_droplet - fixing sanity tests (https://github.com/ansible-collections/community.digitalocean/issues/13).
   - digital_ocean_floating_ip - fixing sanity tests (https://github.com/ansible-collections/community.digitalocean/issues/13).
-  - digital_ocean_floating_sshkey - fixing sanity tests (https://github.com/ansible-collections/community.digitalocean/issues/13).
+  - digital_ocean_sshkey - fixing sanity tests (https://github.com/ansible-collections/community.digitalocean/issues/13).
