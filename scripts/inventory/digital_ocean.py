@@ -446,15 +446,19 @@ class DigitalOceanInventory(object):
         for droplet in self.data['droplets']:
             for net in droplet['networks']['v4']:
                 if net['type'] == 'public':
-                    dest = net['ip_address']
-                else:
-                    continue
+                    droplet['ip_address'] = net['ip_address']
+                elif net['type'] == 'private':
+                    droplet['private_ip_address'] = net['ip_address']
 
-            self.inventory['all']['hosts'].append(dest)
+            host_indentifier = droplet['ip_address']
+            if self.use_private_network and droplet['private_ip_address']:
+                host_indentifier = droplet['private_ip_address']
 
-            self.add_host(droplet['id'], dest)
+            self.inventory['all']['hosts'].append(host_indentifier)
 
-            self.add_host(droplet['name'], dest)
+            self.add_host(droplet['id'], host_indentifier)
+
+            self.add_host(droplet['name'], host_indentifier)
 
             # groups that are always present
             for group in ('digital_ocean',
@@ -463,22 +467,22 @@ class DigitalOceanInventory(object):
                           'size_' + droplet['size']['slug'],
                           'distro_' + DigitalOceanInventory.to_safe(droplet['image']['distribution']),
                           'status_' + droplet['status']):
-                self.add_host(group, dest)
+                self.add_host(group, host_indentifier)
 
             # groups that are not always present
             for group in (droplet['image']['slug'],
                           droplet['image']['name']):
                 if group:
                     image = 'image_' + DigitalOceanInventory.to_safe(group)
-                    self.add_host(image, dest)
+                    self.add_host(image, host_indentifier)
 
             if droplet['tags']:
                 for tag in droplet['tags']:
-                    self.add_host(tag, dest)
+                    self.add_host(tag, host_indentifier)
 
             # hostvars
             info = self.do_namespace(droplet)
-            self.inventory['_meta']['hostvars'][dest] = info
+            self.inventory['_meta']['hostvars'][host_indentifier] = info
 
     def load_droplet_variables_for_host(self):
         """ Generate a JSON response to a --host call """
