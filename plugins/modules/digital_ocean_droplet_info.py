@@ -211,7 +211,7 @@ def run(module):
 
     if module.params["id"]:
         path = "droplets/" + module.params["id"]
-        return_codes = (200,404)
+        return_codes = (200, 404)
     else:
         path = "droplets"
         return_codes = (200)
@@ -233,11 +233,14 @@ def run(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-            name=dict(type='str', required=False, default=None),
-            id=dict(type='str', required=False, default=None)
+        name=dict(type='str', required=False, default=None),
+        id=dict(type='str', required=False, default=None)
     )
     module = AnsibleModule(argument_spec=argument_spec)
     run(module)
 
+
 if __name__ == '__main__':
     main()
+
+
