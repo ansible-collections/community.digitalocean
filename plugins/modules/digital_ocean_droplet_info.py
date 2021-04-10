@@ -210,23 +210,23 @@ def run(module):
     rest = DigitalOceanHelper(module)
 
     if module.params["id"]:
-      path = "droplets/" + module.params["id"]
-      return_codes = (200,404)
+        path = "droplets/" + module.params["id"]
+        return_codes = (200,404)
     else:
-      path = "droplets"
-      return_codes = (200)
+        path = "droplets"
+        return_codes = (200)
 
     response = rest.get(path)
 
     if response.status_code not in return_codes:
-      module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
+        module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
 
     if module.params["id"]:
-      data = [response.json["droplet"]]
+        data = [response.json["droplet"]]
     elif module.params["name"]:
-      data = [d for d in response.json["droplets"] if d["name"] == module.params["name"]
+        data = [d for d in response.json["droplets"] if d["name"] == module.params["name"]]
     else:
-      data = response.json["droplets"]
+        data = response.json["droplets"]
 
     module.exit_json(changed=False, data=data)
 
