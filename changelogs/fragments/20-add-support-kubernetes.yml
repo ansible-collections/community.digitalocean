@@ -1,2 +1,0 @@
-minor_changes:
-  - Added support for Kubernetes (https://github.com/ansible-collections/community.digitalocean/issues/20).
