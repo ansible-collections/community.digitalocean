@@ -1,0 +1,6 @@
+plugins/modules/digital_ocean.py validate-modules:deprecation-mismatch
+plugins/modules/digital_ocean.py validate-modules:invalid-documentation
+plugins/modules/digital_ocean.py validate-modules:missing-main-call
+plugins/modules/digital_ocean_sshkey_facts.py validate-modules:deprecation-mismatch
+plugins/modules/digital_ocean_sshkey_facts.py validate-modules:invalid-documentation
+plugins/modules/digital_ocean_sshkey_facts.py validate-modules:missing-main-call
