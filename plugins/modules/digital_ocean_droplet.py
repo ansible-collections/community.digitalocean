@@ -118,7 +118,6 @@ options:
     description:
      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
     aliases: ['API_TOKEN']
-    required: True
     type: str
 requirements:
   - "python >= 2.6"
@@ -331,7 +330,6 @@ def main():
                 aliases=['API_TOKEN'],
                 no_log=True,
                 fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
-                required=True,
             ),
             name=dict(type='str'),
             size=dict(aliases=['size_id']),
