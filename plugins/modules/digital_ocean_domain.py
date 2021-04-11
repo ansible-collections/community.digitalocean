@@ -162,7 +162,8 @@ def core(module):
             if 'message' in domain:
                 module.fail_json(changed=False, msg=domain['message'])
             else:
-                module.exit_json(changed=True, domain=domain)
+                records = do_manager.all_domain_records()
+                module.exit_json(changed=True, domain=do_manager.domain_record())
         else:
             records = do_manager.all_domain_records()
             if module.params.get('ip'):
