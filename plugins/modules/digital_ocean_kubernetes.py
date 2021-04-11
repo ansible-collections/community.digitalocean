@@ -21,7 +21,7 @@ options:
       - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
     type: str
     aliases: ['API_TOKEN']
-    required: yes
+    required: true
   state:
     description:
       - The usual, C(present) to create, C(absent) to destroy
@@ -32,7 +32,7 @@ options:
     description:
       - A human-readable name for a Kubernetes cluster.
     type: str
-    required: yes
+    required: true
   region:
     description:
       - The slug identifier for the region where the Kubernetes cluster will be created.
@@ -43,33 +43,33 @@ options:
     description:
       - The slug identifier for the version of Kubernetes used for the cluster. See the /v2/kubernetes/options endpoint for available versions.
     type: str
-    required: no
+    required: false
     default: 1.18.8-do.1
   auto_upgrade:
     description:
       - A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
     type: bool
-    required: no
-    default: False
+    required: false
+    default: false
   surge_upgrade:
     description:
       - A boolean value indicating whether surge upgrade is enabled/disabled for the cluster.
       - Surge upgrade makes cluster upgrades fast and reliable by bringing up new nodes before destroying the outdated nodes.
     type: bool
-    required: no
-    default: False
+    required: false
+    default: false
   tags:
     description:
       - A flat array of tag names as strings to be applied to the Kubernetes cluster.
       - All clusters will be automatically tagged "k8s" and "k8s:$K8S_CLUSTER_ID" in addition to any tags provided by the user.
-    required: no
+    required: false
     type: list
     elements: str
   maintenance_policy:
     description:
       - An object specifying the maintenance window policy for the Kubernetes cluster (see table below).
     type: dict
-    required: no
+    required: false
   node_pools:
     description:
       - An object specifying the details of the worker nodes available to the Kubernetes cluster (see table below).
@@ -104,26 +104,24 @@ options:
       - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned.
       - If excluded, the cluster will be assigned to your account's default VPC for the region.
     type: str
-    required: no
+    required: false
   return_kubeconfig:
     description:
       - Controls whether or not to return the C(kubeconfig).
     type: bool
-    required: no
-    default: False
+    required: false
+    default: false
   wait:
     description:
       - Wait for the cluster to be running before returning.
     type: bool
-    required: no
-    default: True
+    required: false
+    default: true
   wait_timeout:
     description:
       - How long before wait gives up, in seconds, when creating a cluster.
     type: int
     default: 600
-requirements:
-    - python >= 2.6
 '''
 
 

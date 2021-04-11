@@ -21,35 +21,33 @@ options:
       - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
     type: str
     aliases: ['API_TOKEN']
-    required: yes
+    required: true
   name:
     description:
       - A human-readable name for a Kubernetes cluster.
     type: str
-    required: yes
+    required: true
   return_kubeconfig:
     description:
       - Controls whether or not to return the C(kubeconfig).
     type: bool
-    required: no
-    default: False
-requirements:
-  - python >= 2.6
+    required: true
+    default: false
 '''
 
 
 EXAMPLES = r'''
 - name: Get information about an existing DigitalOcean Kubernetes cluster
   community.digitalocean.digital_ocean_kubernetes_info:
-    oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
     return_kubeconfig: yes
   register: my_cluster
 
-- debug:
+- ansible.builtin.debug:
     msg: "Cluster name is {{ my_cluster.data.name }}, ID is {{ my_cluster.data.id }}"
 
-- debug:
+- ansible.builtin.debug:
     msg: "Cluster kubeconfig is {{ my_cluster.data.kubeconfig }}"
 '''
 
