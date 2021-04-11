@@ -75,7 +75,7 @@ EXAMPLES = r'''
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
-from time import sleep
+import time
 
 
 class DoManager(DigitalOceanHelper, object):
