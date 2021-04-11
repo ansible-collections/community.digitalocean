@@ -41,12 +41,11 @@ data:
     }
 '''
 
-from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 
 
-def core(module):
+def run(module):
     rest = DigitalOceanHelper(module)
 
     response = rest.get("customers/my/balance")
@@ -59,14 +58,8 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_balance_facts', 'community.digitalocean.digital_ocean_balance_facts'):
-        module.deprecate("The 'digital_ocean_balance_facts' module has been renamed to 'digital_ocean_balance_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
 
-    try:
-        core(module)
-    except Exception as e:
-        module.fail_json(msg=str(e), exception=format_exc())
+    run(module)
 
 
 if __name__ == '__main__':
