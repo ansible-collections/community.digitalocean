@@ -31,7 +31,7 @@ options:
     description:
       - Controls whether or not to return the C(kubeconfig).
     type: bool
-    required: true
+    required: false
     default: false
 '''
 
