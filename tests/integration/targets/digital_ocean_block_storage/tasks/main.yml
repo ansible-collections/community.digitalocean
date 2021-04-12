@@ -1,0 +1,88 @@
+---
+- name: Test API key is provided.
+  fail:
+    msg: do_api_key should be defined in integration_config.yml
+  when: do_api_key is not defined
+
+- name: Make sure the volume is absent
+  digital_ocean_block_storage:
+    command: create
+    state: absent
+    oauth_token: "{{ do_api_key }}"
+    volume_name: "{{ volume_name }}"
+    region: "{{ do_region }}"
+  register: result
+- name: Verify volume is absent
+  assert:
+    that:
+      - "not result.changed"
+
+- name: Create a volume
+  digital_ocean_block_storage:
+    command: create
+    state: present
+    volume_name: "{{ volume_name }}"
+    region: "{{ do_region }}"
+    block_size: 15
+    oauth_token: "{{ do_api_key }}"
+  register: result
+- name: Verify volume is present
+  assert:
+    that:
+      - "result.changed"
+
+- name: Resize to same size
+  digital_ocean_block_storage:
+    command: create
+    state: present
+    volume_name: "{{ volume_name }}"
+    region: "{{ do_region }}"
+    block_size: 15
+    oauth_token: "{{ do_api_key }}"
+  register: result
+- name: Verify resizing to same size is ignored
+  assert:
+    that:
+      - "not result.changed"
+
+- name: Downsize the volume
+  digital_ocean_block_storage:
+    command: create
+    state: present
+    volume_name: "{{ volume_name }}"
+    region: "{{ do_region }}"
+    block_size: 10
+    oauth_token: "{{ do_api_key }}"
+  ignore_errors: true
+  register: result
+- name: Verify downsizing fails
+  assert:
+    that:
+      - "result.failed"
+
+- name: Enlarge the volume
+  digital_ocean_block_storage:
+    command: create
+    state: present
+    volume_name: "{{ volume_name }}"
+    region: "{{ do_region }}"
+    block_size: 20
+    oauth_token: "{{ do_api_key }}"
+  register: result
+- name: Verify enlarging volume succeeds
+  assert:
+    that:
+      - "result.changed"
+
+- name: Remove volume
+  digital_ocean_block_storage:
+    command: create
+    state: absent
+    oauth_token: "{{ do_api_key }}"
+    volume_name: "{{ volume_name }}"
+    region: "{{ do_region }}"
+  register: result
+- name: Verify removing succeeds
+  assert:
+    that:
+      - "result.changed"

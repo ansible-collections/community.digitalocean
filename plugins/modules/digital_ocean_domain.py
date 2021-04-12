@@ -165,19 +165,19 @@ def core(module):
                 module.exit_json(changed=True, domain=domain)
         else:
             records = do_manager.all_domain_records()
-            at_record = None
-            for record in records['domain_records']:
-                if record['name'] == "@" and record['type'] == 'A':
-                    at_record = record
+            if module.params.get('ip'):
+                at_record = None
+                for record in records['domain_records']:
+                    if record['name'] == "@" and record['type'] == 'A':
+                        at_record = record
 
-            if not at_record:
-                do_manager.create_domain_record()
-                module.exit_json(changed=True, domain=do_manager.find())
-            elif not at_record['data'] == module.params.get('ip'):
-                do_manager.edit_domain_record(at_record)
-                module.exit_json(changed=True, domain=do_manager.find())
-            else:
-                module.exit_json(changed=False, domain=do_manager.domain_record())
+                if not at_record:
+                    do_manager.create_domain_record()
+                    module.exit_json(changed=True, domain=do_manager.find())
+                elif not at_record['data'] == module.params.get('ip'):
+                    do_manager.edit_domain_record(at_record)
+                    module.exit_json(changed=True, domain=do_manager.find())
+            module.exit_json(changed=False, domain=do_manager.domain_record())
 
     elif state == 'absent':
         if not domain:
