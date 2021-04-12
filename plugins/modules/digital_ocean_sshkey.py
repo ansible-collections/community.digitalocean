@@ -21,20 +21,36 @@ options:
      - Indicate desired state of the target.
     default: present
     choices: ['present', 'absent']
+    type: str
   fingerprint:
     description:
      - This is a unique identifier for the SSH key used to delete a key
     aliases: ['id']
+    type: str
   name:
     description:
      - The name for the SSH key
+    type: str
   ssh_pub_key:
     description:
      - The Public SSH key to add.
+    type: str
   oauth_token:
     description:
      - DigitalOcean OAuth token.
     required: true
+    type: str
+  timeout:
+    description:
+    - The timeout in seconds used for polling DigitalOcean's API.
+    type: int
+    default: 30
+  validate_certs:
+    description:
+    - If set to C(no), the SSL certificates will not be validated.
+    - This should only set to C(no) used on personally controlled sites using self-signed certificates.
+    type: bool
+    default: true
 notes:
   - Version 2 of DigitalOcean API is used.
 requirements:

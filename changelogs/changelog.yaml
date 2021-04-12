@@ -16,3 +16,29 @@ releases:
     - 14-docs-fqcn.yaml
     - 3-sanity-docs-fixes.yaml
     release_date: '2020-08-17'
+  1.1.0:
+    changes:
+      bugfixes:
+      - digital_ocean_certificate_info - fix retrieving certificate by ID (https://github.com/ansible-collections/community.digitalocean/issues/35).
+      - digital_ocean_domain - module is now idempotent when called without IP (https://github.com/ansible-collections/community.digitalocean/issues/21).
+      - digital_ocean_load_balancer_info - fix retrieving load balancer by ID (https://github.com/ansible-collections/community.digitalocean/issues/35).
+      minor_changes:
+      - digital_ocean_block_storage - included ability to resize Block Storage Volumes
+        (https://github.com/ansible-collections/community.digitalocean/issues/38).
+    fragments:
+    - 22-digital_ocean_domain-idempotent.yml
+    - 38-resize-volumes.yml
+    - 49-fix-lb-and-cert-info.yaml
+    modules:
+    - description: Manage DigitalOcean domain records
+      name: digital_ocean_domain_record
+      namespace: ''
+    - description: Manage cloud firewalls within DigitalOcean
+      name: digital_ocean_firewall
+      namespace: ''
+    plugins:
+      inventory:
+      - description: DigitalOcean Inventory Plugin
+        name: digitalocean
+        namespace: null
+    release_date: '2021-04-01'

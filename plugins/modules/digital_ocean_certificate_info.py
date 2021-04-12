@@ -79,7 +79,7 @@ def core(module):
     certificate_id = module.params.get('certificate_id', None)
     rest = DigitalOceanHelper(module)
 
-    base_url = 'certificates?'
+    base_url = 'certificates'
     if certificate_id is not None:
         response = rest.get("%s/%s" % (base_url, certificate_id))
         status_code = response.status_code
@@ -90,7 +90,7 @@ def core(module):
         resp_json = response.json
         certificate = resp_json['certificate']
     else:
-        certificate = rest.get_paginated_data(base_url=base_url, data_key_name='certificates')
+        certificate = rest.get_paginated_data(base_url=base_url + '?', data_key_name='certificates')
 
     module.exit_json(changed=False, data=certificate)
 
