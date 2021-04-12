@@ -171,7 +171,7 @@ def run(module):
                 # Arguably, it's nice to see the records versus null, so, we'll just try a
                 # few times before giving up and returning null.
                 for i in range(5):
-                    if do_manager.domain_record()['domain']['zone_file'] != 'null':
+                    if do_manager.domain_record()['domain']['zone_file'] is not None:
                         module.exit_json(changed=True, domain=do_manager.domain_record()['domain'])
                     time.sleep(3)
                 module.exit_json(changed=True, domain=domain)
