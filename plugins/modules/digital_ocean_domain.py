@@ -80,6 +80,7 @@ import time
 ZONE_FILE_ATTEMPTS = 5
 ZONE_FILE_SLEEP = 3
 
+
 class DoManager(DigitalOceanHelper, object):
     def __init__(self, module):
         super(DoManager, self).__init__(module)
