@@ -173,8 +173,11 @@ def run(module):
                 # Arguably, it's nice to see the records versus null, so, we'll just try a
                 # few times before giving up and returning null.
                 for i in range(ZONE_FILE_ATTEMPTS):
-                    if do_manager.domain_record()['domain']['zone_file'] is not None:
-                        module.exit_json(changed=True, domain=do_manager.domain_record()['domain'])
+                    record = do_manager.domain_record()
+                    if record is not None and 'domain' in record:
+                        domain = record['domain']
+                        if domain is not None and 'zone_file' in domain:
+                            module.exit_json(changed=True, domain=domain)
                     time.sleep(ZONE_FILE_SLEEP)
                 module.exit_json(changed=True, domain=domain)
         else:
