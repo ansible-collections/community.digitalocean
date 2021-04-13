@@ -78,7 +78,7 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 import time
 
 ZONE_FILE_ATTEMPTS = 5
-ZONE_FILE_SLEEP    = 3
+ZONE_FILE_SLEEP = 3
 
 class DoManager(DigitalOceanHelper, object):
     def __init__(self, module):
