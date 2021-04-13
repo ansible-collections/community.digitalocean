@@ -77,6 +77,8 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 import time
 
+ZONE_FILE_ATTEMPTS = 5
+ZONE_FILE_SLEEP    = 3
 
 class DoManager(DigitalOceanHelper, object):
     def __init__(self, module):
@@ -170,10 +172,10 @@ def run(module):
                 #
                 # Arguably, it's nice to see the records versus null, so, we'll just try a
                 # few times before giving up and returning null.
-                for i in range(5):
+                for i in range(ZONE_FILE_ATTEMPTS):
                     if do_manager.domain_record()['domain']['zone_file'] is not None:
                         module.exit_json(changed=True, domain=do_manager.domain_record()['domain'])
-                    time.sleep(3)
+                    time.sleep(ZONE_FILE_SLEEP)
                 module.exit_json(changed=True, domain=domain)
         else:
             records = do_manager.all_domain_records()
