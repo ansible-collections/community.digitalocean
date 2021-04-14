@@ -18,10 +18,10 @@ options:
   state:
     description:
      - Indicate desired state of the target.
-     - C(present) will create named droplet, be mindful of the C(unique_name) parameter
-     - C(absent) will delete named droplet if it exists
-     - C(active) will create the droplet, if it doesn't already exist, and ensure that it is powered on
-     - C(inactive) will create the droplet, if it does not already exist, and ensure that it is powered off
+     - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
+     - C(absent) will delete the named droplet, if it exists.
+     - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
+     - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
     default: present
     choices: ['present', 'absent', 'active', 'inactive']
     type: str
