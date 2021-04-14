@@ -279,14 +279,19 @@ class DODroplet(object):
         if json_data:  # The droplet exists already
             droplet_data = self.get_addresses(json_data)
             # If state is active or inactive, ensure requested and desired power states match
-            if state == 'active' and json_data['droplet']['status'] != 'active':
-                json_data = self.ensure_power_on(json_data['droplet']['id'])
-                self.module.exit_json(changed=True, data=droplet_data)
-            elif state == 'inactive' and json_data['droplet']['status'] != 'off':
-                json_data = self.ensure_power_off(json_data['droplet']['id'])
-                self.module.exit_json(changed=True, data=droplet_data)
-            else:
-                self.module.exit_json(changed=False, data=droplet_data)
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                droplet_id = droplet.get('id', None)
+                droplet_status = droplet.get('status', None)
+                if droplet_id is not None and droplet_status is not None:
+                    if state == 'active' and droplet_status != 'active':
+                        json_data = self.ensure_power_on(droplet_id)
+                        self.module.exit_json(changed=True, data=droplet_data)
+                    elif state == 'inactive' and droplet_status != 'off':
+                        json_data = self.ensure_power_off(droplet_id)
+                        self.module.exit_json(changed=True, data=droplet_data)
+                    else:
+                        self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
             self.module.exit_json(changed=True)
         request_params = dict(self.module.params)
