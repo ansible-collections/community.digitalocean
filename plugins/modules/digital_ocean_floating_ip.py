@@ -316,7 +316,7 @@ def main():
             state=dict(choices=['present', 'absent'], default='present'),
             ip=dict(aliases=['id'], required=False),
             region=dict(required=False),
-            droplet_id=dict(type='int', required=False),
+            droplet_id=dict(required=False),
             oauth_token=dict(
                 no_log=True,
                 # Support environment variable for DigitalOcean OAuth Token
