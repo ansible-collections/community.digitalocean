@@ -233,10 +233,12 @@ class DODroplet(object):
         response = self.rest.get('droplets/{0}'.format(droplet_id))
         json_data = response.json
         if response.status_code == 200:
-            self.id = json_data['droplet']['id']
-            self.name = json_data['droplet']['name']
-            self.size = json_data['droplet']['size_slug']
-            self.status = json_data['droplet']['status']
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                self.id = droplet.get('id', None)
+                self.name = droplet.get('name', None)
+                self.size = droplet.get('size_slug', None)
+                self.status = droplet.get('status', None)
             return json_data
         return None
 
@@ -249,11 +251,11 @@ class DODroplet(object):
             json_data = response.json
             if response.status_code == 200:
                 for droplet in json_data['droplets']:
-                    if droplet['name'] == droplet_name:
-                        self.id = droplet['id']
-                        self.name = droplet['name']
-                        self.size = droplet['size_slug']
-                        self.status = droplet['status']
+                    if droplet.get('name', None) == droplet_name:
+                        self.id = droplet.get('id', None)
+                        self.name = droplet.get('name', None)
+                        self.size = droplet.get('size_slug', None)
+                        self.status = droplet.get('status', None)
                         return {'droplet': droplet}
                 if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
                     page += 1
@@ -296,7 +298,7 @@ class DODroplet(object):
                     self.name, self.id, self.size, self.module.params['size']))
             else:
                 self.module.fail_json(msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
-                    self.name, self.id, response.status_code, response.json['message']))
+                    self.name, self.id, response.status_code, response.json.get('message', None)))
         else:
             self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
 
@@ -304,8 +306,10 @@ class DODroplet(object):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
-            if json_data['droplet']['size']['slug'] != self.module.params['size']:
-                self.resize_droplet()
+            if json_data.get('droplet', None) is not None:
+                if json_data['droplet'].get('size_slug', None) is not None:
+                    if json_data['droplet']['size_slug'] != self.module.params['size']:
+                        self.resize_droplet()
             droplet_data = self.get_addresses(json_data)
             self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
