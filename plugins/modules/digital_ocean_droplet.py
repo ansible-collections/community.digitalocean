@@ -344,7 +344,7 @@ class DODroplet(object):
 def core(module):
     state = module.params.pop('state')
     droplet = DODroplet(module)
-    if state == 'present' or state == 'active' or state == 'inactive':  # These states imply that we have, or create, the droplet
+    if state == 'present' or state == 'active' or state == 'inactive':
         droplet.create(state)
     elif state == 'absent':
         droplet.delete()
