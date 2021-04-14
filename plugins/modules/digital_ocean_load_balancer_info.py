@@ -81,7 +81,7 @@ def core(module):
     load_balancer_id = module.params.get('load_balancer_id', None)
     rest = DigitalOceanHelper(module)
 
-    base_url = 'load_balancers?'
+    base_url = 'load_balancers'
     if load_balancer_id is not None:
         response = rest.get("%s/%s" % (base_url, load_balancer_id))
         status_code = response.status_code
@@ -92,7 +92,7 @@ def core(module):
         resp_json = response.json
         load_balancer = resp_json['load_balancer']
     else:
-        load_balancer = rest.get_paginated_data(base_url=base_url, data_key_name='load_balancers')
+        load_balancer = rest.get_paginated_data(base_url=base_url + '?', data_key_name='load_balancers')
 
     module.exit_json(changed=False, data=load_balancer)
 

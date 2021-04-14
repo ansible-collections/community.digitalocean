@@ -21,20 +21,36 @@ options:
      - Indicate desired state of the target.
     default: present
     choices: ['present', 'absent']
+    type: str
   ip:
     description:
      - Public IP address of the Floating IP. Used to remove an IP
+    type: str
+    aliases: ['id']
   region:
     description:
      - The region that the Floating IP is reserved to.
+    type: str
   droplet_id:
     description:
      - The Droplet that the Floating IP has been assigned to.
-    type: int
+    type: str
   oauth_token:
     description:
      - DigitalOcean OAuth token.
     required: true
+    type: str
+  timeout:
+    description:
+      - Floating IP creation timeout.
+    type: int
+    default: 30
+  validate_certs:
+    description:
+      - If set to C(no), the SSL certificates will not be validated.
+      - This should only set to C(no) used on personally controlled sites using self-signed certificates.
+    type: bool
+    default: true
 notes:
   - Version 2 of DigitalOcean API is used.
 requirements:

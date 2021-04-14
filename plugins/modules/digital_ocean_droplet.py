@@ -20,13 +20,16 @@ options:
      - Indicate desired state of the target.
     default: present
     choices: ['present', 'absent']
+    type: str
   id:
     description:
      - Numeric, the droplet id you want to operate on.
     aliases: ['droplet_id']
+    type: int
   name:
     description:
      - String, this is the name of the droplet - must be formatted by hostname rules.
+    type: str
   unique_name:
     description:
      - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
@@ -37,18 +40,23 @@ options:
     description:
      - This is the slug of the size you would like the droplet created with.
     aliases: ['size_id']
+    type: str
   image:
     description:
      - This is the slug of the image you would like the droplet created with.
     aliases: ['image_id']
+    type: str
   region:
     description:
      - This is the slug of the region you would like your server to be created in.
     aliases: ['region_id']
+    type: str
   ssh_keys:
     description:
      - array of SSH key Fingerprint that you would like to be added to the server.
     required: False
+    type: list
+    elements: str
   private_networking:
     description:
      - add an additional, private network interface to droplet for inter-droplet communication.
@@ -64,6 +72,7 @@ options:
     description:
       - opaque blob of data which is made available to the droplet
     required: False
+    type: str
   ipv6:
     description:
       - enable IPv6 for your droplet.
@@ -80,6 +89,7 @@ options:
     description:
      - How long before wait gives up, in seconds, when creating a droplet.
     default: 120
+    type: int
   backups:
     description:
      - indicates whether automated backups should be enabled.
@@ -96,15 +106,20 @@ options:
     description:
      - List, A list of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.
     required: False
+    type: list
+    elements: str
   volumes:
     description:
      - List, A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
     required: False
+    type: list
+    elements: str
   oauth_token:
     description:
      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
     aliases: ['API_TOKEN']
-    required: True
+    type: str
+    required: true
 requirements:
   - "python >= 2.6"
 '''
@@ -315,13 +330,14 @@ def main():
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN'])
+                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                required=True,
             ),
             name=dict(type='str'),
             size=dict(aliases=['size_id']),
             image=dict(aliases=['image_id']),
             region=dict(aliases=['region_id']),
-            ssh_keys=dict(type='list'),
+            ssh_keys=dict(type='list', elements='str', no_log=False),
             private_networking=dict(type='bool', default=False),
             vpc_uuid=dict(type='str'),
             backups=dict(type='bool', default=False),
@@ -329,8 +345,8 @@ def main():
             id=dict(aliases=['droplet_id'], type='int'),
             user_data=dict(default=None),
             ipv6=dict(type='bool', default=False),
-            volumes=dict(type='list'),
-            tags=dict(type='list'),
+            volumes=dict(type='list', elements='str'),
+            tags=dict(type='list', elements='str'),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(default=120, type='int'),
             unique_name=dict(type='bool', default=False),
