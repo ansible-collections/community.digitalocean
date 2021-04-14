@@ -277,9 +277,11 @@ def create_floating_ips(module, rest):
 
     # Exit unchanged if any of them are assigned to this Droplet already
     if status_code == 200:
-        for floating_ip in json_data['floating_ips']:
-            if floating_ip['droplet']['id'] == module.params['droplet_id']:
-                module.exit_json(changed=False, data={'floating_ip': floating_ip['ip']})
+        for floating_ip in json_data.get('floating_ips', []):
+            if floating_ip.get('droplet', None) is not None:
+                if floating_ip['droplet'].get('id', None) is not None:
+                    if floating_ip['droplet']['id'] == module.params['droplet_id']:
+                        module.exit_json(changed=False, data={'floating_ip': floating_ip['ip']})
 
     response = rest.post("floating_ips", data=payload)
     status_code = response.status_code
