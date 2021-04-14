@@ -30,6 +30,7 @@ options:
   droplet_id:
     description:
      - The Droplet that the Floating IP has been assigned to.
+    type: int
   oauth_token:
     description:
      - DigitalOcean OAuth token.
