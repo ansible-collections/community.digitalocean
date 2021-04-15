@@ -120,8 +120,12 @@ options:
     aliases: ['API_TOKEN']
     type: str
     required: true
-requirements:
-  - "python >= 2.6"
+  resize_disk:
+    description:
+    - Whether to increase disk size (only consulted if the C(unique_name) is C(True) and C(size) dictates an increase)
+    required: False
+    default: False
+    type: bool
 '''
 
 
@@ -218,6 +222,10 @@ class DODroplet(object):
         self.unique_name = self.module.params.pop('unique_name', False)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
+        self.id = None
+        self.name = None
+        self.size = None
+        self.status = None
 
     def get_by_id(self, droplet_id):
         if not droplet_id:
@@ -225,6 +233,12 @@ class DODroplet(object):
         response = self.rest.get('droplets/{0}'.format(droplet_id))
         json_data = response.json
         if response.status_code == 200:
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                self.id = droplet.get('id', None)
+                self.name = droplet.get('name', None)
+                self.size = droplet.get('size_slug', None)
+                self.status = droplet.get('status', None)
             return json_data
         return None
 
@@ -237,7 +251,11 @@ class DODroplet(object):
             json_data = response.json
             if response.status_code == 200:
                 for droplet in json_data['droplets']:
-                    if droplet['name'] == droplet_name:
+                    if droplet.get('name', None) == droplet_name:
+                        self.id = droplet.get('id', None)
+                        self.name = droplet.get('name', None)
+                        self.size = droplet.get('size_slug', None)
+                        self.status = droplet.get('status', None)
                         return {'droplet': droplet}
                 if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
                     page += 1
@@ -246,9 +264,7 @@ class DODroplet(object):
         return None
 
     def get_addresses(self, data):
-        """
-         Expose IP addresses as their own property allowing users extend to additional tasks
-        """
+        """Expose IP addresses as their own property allowing users extend to additional tasks"""
         _data = data
         for k, v in data.items():
             setattr(self, k, v)
@@ -271,10 +287,31 @@ class DODroplet(object):
             json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
+    def resize_droplet(self):
+        """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
+        if self.status == 'off':
+            response = self.rest.post('droplets/{0}/actions'.format(self.id),
+                                      data={'type': 'resize', 'disk': self.module.params['resize_disk'], 'size': self.module.params['size']})
+            json_data = response.json
+            if response.status_code == 201:
+                self.module.exit_json(changed=True, msg='Resized Droplet {0} ({1}) from {2} to {3}'.format(
+                    self.name, self.id, self.size, self.module.params['size']))
+            else:
+                self.module.fail_json(msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
+                    self.name, self.id, response.status_code, response.json.get('message', None)))
+        else:
+            self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
+
     def create(self):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                droplet_size = droplet.get('size_slug', None)
+                if droplet_size is not None:
+                    if droplet_size != self.module.params['size']:
+                        self.resize_droplet()
             droplet_data = self.get_addresses(json_data)
             self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
@@ -350,6 +387,7 @@ def main():
             wait=dict(type='bool', default=True),
             wait_timeout=dict(default=120, type='int'),
             unique_name=dict(type='bool', default=False),
+            resize_disk=dict(type='bool', default=False),
         ),
         required_one_of=(
             ['id', 'name'],
