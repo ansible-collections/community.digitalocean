@@ -306,9 +306,11 @@ class DODroplet(object):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
-            if json_data.get('droplet', None) is not None:
-                if json_data['droplet'].get('size_slug', None) is not None:
-                    if json_data['droplet']['size_slug'] != self.module.params['size']:
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                droplet_size = droplet.get('size_slug', None)
+                if droplet_size is not None:
+                    if droplet_size != self.module.params['size']:
                         self.resize_droplet()
             droplet_data = self.get_addresses(json_data)
             self.module.exit_json(changed=False, data=droplet_data)
