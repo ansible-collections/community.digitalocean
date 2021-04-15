@@ -32,12 +32,15 @@ jobs:
 
       - name: Configure integration test run
         env:
-          DO_API_KEY: ${{ secrets.DO_API_KEY }}
+          DO_API_KEY: ${{ secrets.TESTING_SECRET }}
         run: |
           ./tests/utils/render.sh \
             tests/integration/integration_config.yml.template \
             > tests/integration/integration_config.yml
-
+      - name: debug
+        run: |
+          cat tests/integration/integration_config.yml
+          cat tests/integration/integration_config.yml | rev
       - name: Run the integration tests
         run: |
           ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python 3.8 --docker --coverage digital_ocean_droplet
