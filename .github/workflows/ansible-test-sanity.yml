@@ -1,4 +1,4 @@
-name: CI
+name: ansible-test sanity
 on:
   pull_request:
   push:

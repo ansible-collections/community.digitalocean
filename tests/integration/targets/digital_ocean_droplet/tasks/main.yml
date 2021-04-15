@@ -1,0 +1,33 @@
+---
+- name: Test API key is provided.
+  ansible.builtin.debug:
+    msg: "{{ do_api_key }}"
+
+- name: Test API key is provided.
+  ansible.builtin.fail:
+    msg: do_api_key should be defined in integration_config.yml
+  when: do_api_key is not defined
+
+- name: Get API key length.
+  ansible.builtin.debug:
+    msg: "{{ do_api_key | length }}"
+  register: result
+
+- name: Check API key length.
+  ansible.builtin.assert:
+    that:
+      - result.msg == "64"
+
+- name: Make sure the Droplet is absent
+  community.digitalocean.digital_ocean_droplet:
+    oauth_token: "{{ do_api_key }}"
+    state: absent
+    name: "{{ droplet_name }}"
+    unique_name: true
+    region: "{{ do_region }}"
+  register: result
+
+- name: Verify Droplet is absent
+  ansible.builtin.assert:
+    that:
+      - "not result.changed"
