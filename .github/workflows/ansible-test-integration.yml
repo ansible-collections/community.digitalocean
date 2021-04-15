@@ -17,34 +17,27 @@ jobs:
         working-directory: ansible_collections/community/digitalocean
 
     steps:
-      # - name: Clone the repo
-      #   uses: actions/checkout@v2
-      #   with:
-      #     path: ansible_collections/community/digitalocean
+      - name: Clone the repo
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/community/digitalocean
 
-      # - name: Set up Python 3.8
-      #   uses: actions/setup-python@v2
-      #   with:
-      #     python-version: 3.8
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-      # - name: Install Ansible
-      #   run: pip install ansible
+      - name: Install Ansible
+        run: pip install ansible
 
-      # - name: Configure integration test run
-      #   env:
-      #     DO_API_KEY: ${{ secrets.DO_API_KEY }}
-      #   run: |
-      #     ./tests/utils/render.sh \
-      #       tests/integration/integration_config.yml.template \
-      #       > tests/integration/integration_config.yml
-
-      - name: Test API key
+      - name: Configure integration test run
         env:
           DO_API_KEY: ${{ secrets.DO_API_KEY }}
         run: |
-          apt-get install -y curl
-          curl -X GET -H "Authorization: Bearer ${DO_API_KEY}" https://api.digitalocean.com/v2/droplets
+          ./tests/utils/render.sh \
+            tests/integration/integration_config.yml.template \
+            > tests/integration/integration_config.yml
 
-      # - name: Run the integration tests
-      #   run: |
-      #     ansible-test integration digital_ocean_droplet --python 3.8
+      - name: Run the integration tests
+        run: |
+          ansible-test integration digital_ocean_droplet --python 3.8
