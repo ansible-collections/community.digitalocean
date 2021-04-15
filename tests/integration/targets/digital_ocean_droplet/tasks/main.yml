@@ -2,7 +2,9 @@
 - name: Test API key is provided.
   ansible.builtin.fail:
     msg: do_api_key should be defined in integration_config.yml
-  when: do_api_key is not defined
+  when:
+    - do_api_key is not defined
+    - do_api_key | length == 0
 
 - name: Get API key length.
   ansible.builtin.debug:
