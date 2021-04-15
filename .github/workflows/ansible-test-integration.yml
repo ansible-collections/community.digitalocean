@@ -42,6 +42,7 @@ jobs:
         env:
           DO_API_KEY: ${{ secrets.DO_API_KEY }}
         run: |
+          apt-get install -y curl
           curl -X GET -H "Authorization: Bearer ${DO_API_KEY}" https://api.digitalocean.com/v2/droplets
 
       # - name: Run the integration tests
