@@ -1,0 +1,42 @@
+name: ansible-test integration
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 6 * * *'
+
+jobs:
+
+  integration:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ansible_collections/community/digitalocean
+
+    steps:
+      - name: Clone the repo
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/community/digitalocean
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Configure integration test run
+        env:
+          DO_API_TOKEN: ${{ secrets.DO_API_TOKEN }}
+        run: |
+          ./tests/utils/render.sh \
+            tests/integration/integration_config.yml.template \
+            > tests/integration/integration_config.yml
+      - name: Run the integration tests
+        run: |
+          ansible-test integration digital_ocean_droplet --python 3.8
