@@ -37,6 +37,7 @@ jobs:
           ./tests/utils/render.sh \
             tests/integration/integration_config.yml.template \
             > tests/integration/integration_config.yml
+
       - name: Run the integration tests
         run: |
           ansible-test integration digital_ocean_droplet --python 3.8
