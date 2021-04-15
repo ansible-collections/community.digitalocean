@@ -32,7 +32,7 @@ jobs:
 
       - name: Configure integration test run
         env:
-          DO_API_TOKEN: ${{ secrets.DO_API_TOKEN }}
+          DO_API_KEY: ${{ secrets.DO_API_KEY }}
         run: |
           ./tests/utils/render.sh \
             tests/integration/integration_config.yml.template \
