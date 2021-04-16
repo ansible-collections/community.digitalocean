@@ -40,6 +40,12 @@ jobs:
             tests/integration/integration_config.yml.template \
             > tests/integration/integration_config.yml
 
-      - name: Run the integration tests
+      - name: Run the Droplet integration test
         run: |
-          ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python 3.8 --docker --coverage digital_ocean_droplet
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_droplet
+
+      - name: Run the Block volume integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_block_storage
