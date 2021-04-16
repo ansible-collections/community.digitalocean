@@ -7,7 +7,7 @@
     - do_api_key is not defined
     - do_api_key | length == 0
 
-- name: Ensure the Droplet is absent
+- name: Ensure Droplet is absent
   community.digitalocean.digital_ocean_droplet:
     oauth_token: "{{ do_api_key }}"
     state: absent
@@ -18,12 +18,12 @@
     size: "{{ droplet_size }}"
   register: result
 
-- name: Verify previous play did not require changes
+- name: Verify Droplet is absent
   ansible.builtin.assert:
     that:
       - not result.changed
 
-- name: Ensure the Droplet is present
+- name: Create the Droplet
   community.digitalocean.digital_ocean_droplet:
     oauth_token: "{{ do_api_key }}"
     state: present
@@ -35,16 +35,16 @@
     wait_timeout: 500
   register: result
 
-- name: Verify previous play did require changes
+- name: Verify Droplet is present
   ansible.builtin.assert:
     that:
       - result.changed
 
-- name: Give the cloud a few minutes to settle
+- name: Give the cloud a minute to settle
   ansible.builtin.pause:
-    minutes: 3
+    minutes: 1
 
-- name: Ensure the Droplet is absent
+- name: Delete the Droplet
   community.digitalocean.digital_ocean_droplet:
     oauth_token: "{{ do_api_key }}"
     state: absent
@@ -55,7 +55,7 @@
     size: "{{ droplet_size }}"
   register: result
 
-- name: Verify previous play did require changes
+- name: Verify the Droplet is deleted
   ansible.builtin.assert:
     that:
       - result.changed
