@@ -1,7 +1,10 @@
 name: ansible-test integration
 on:
-  pull_request:
+  # pull_request:
+  # push:
   push:
+    branches:
+      - ci
   schedule:
     - cron: '0 6 * * *'
 
