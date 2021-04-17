@@ -1,0 +1,38 @@
+---
+
+- name: Ensure API key is provided
+  ansible.builtin.fail:
+    msg: do_api_key should be defined in tests/integration/integration_config.yml
+  when:
+    - do_api_key is not defined
+    - do_api_key | length == 0
+
+- name: Create a certificate
+  community.digitalocean.digital_ocean_certificate:
+    oauth_token: "{{ do_api_key }}"
+    state: present
+    name: "{{ cert_name }}"
+    private_key: "{{ cert_key }}"
+    leaf_certificate: "{{ cert_crt }}"
+  register: result
+
+- name: Ensure certificate was created
+  ansible.builtin.assert:
+    that:
+      - result.changed
+      - result.response is defined
+      - result.response.certificate is defined
+      - result.response.certificate.name is defined
+      - result.response.certificate.name == cert_name
+
+- name: Delete a certificate
+  community.digitalocean.digital_ocean_certificate:
+    oauth_token: "{{ do_api_key }}"
+    state: absent
+    name: "{{ cert_name }}"
+  register: result
+
+- name: Ensure certificate was removed
+  ansible.builtin.assert:
+    that:
+      - result.changed
