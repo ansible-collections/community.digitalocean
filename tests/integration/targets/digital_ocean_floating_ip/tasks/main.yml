@@ -25,19 +25,43 @@
         state: present
         region: "{{ do_region }}"
         oauth_token: "{{ do_api_key }}"
-      register: result
+      register: floating_ip
 
     - name: Verify that a Floating IP was created
       ansible.builtin.assert:
         that:
-          - "result.changed"
+          - floating_ip.changed
+
+    - name: Gather information about all Floating IPs
+      community.digitalocean.digital_ocean_floating_ip_info:
+        oauth_token: "{{ do_api_key }}"
+      register: result
+
+    - name: Verify we retrieved all Floating IPs
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - not result.failed
+
+    - name: Find our Floating IP
+      set_fact:
+        ci_floating_ip: "{{ result.floating_ips | selectattr('ip', 'equalto', floating_ip.data.floating_ip.ip) }}"
+      register: result_find
+
+    - name: Verify we found our Floating IP
+      ansible.builtin.assert:
+        that:
+          - not result_find.changed
+          - not result_find.failed
+          - result_find.ansible_facts.ci_floating_ip is defined
+          - result_find.ansible_facts.ci_floating_ip | length == 1
 
   always:
 
     - name: "Delete the Floating IP"
       community.digitalocean.digital_ocean_floating_ip:
         state: absent
-        ip: "{{ result.data.floating_ip.ip }}"
+        ip: "{{ floating_ip.data.floating_ip.ip }}"
         region: "{{ do_region }}"
         oauth_token: "{{ do_api_key }}"
       register: result
@@ -45,4 +69,4 @@
     - name: Verify that a Floating IP was deleted
       ansible.builtin.assert:
         that:
-          - " result.changed"
+          - result.changed
