@@ -40,27 +40,32 @@ jobs:
             tests/integration/integration_config.yml.template \
             > tests/integration/integration_config.yml
 
-      # - name: Run the Droplet integration test
+      # - name: Run the digital_ocean_droplet integration test
       #   run: |
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_droplet
 
-      # - name: Run the Block volume integration test
+      # - name: Run the digital_ocean_block_storage integration test
       #   run: |
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_block_storage
 
-      - name: Run the Floating IP integration test
-        run: |
-          ansible-test integration -v --color --retry-on-error --continue-on-error \
-            --diff --python 3.8 --docker --coverage digital_ocean_floating_ip
+      # - name: Run the digital_ocean_floating_ip integration test
+      #   run: |
+      #     ansible-test integration -v --color --retry-on-error --continue-on-error \
+      #       --diff --python 3.8 --docker --coverage digital_ocean_floating_ip
 
-      # - name: Run the SSH key integration test
+      # - name: Run the digital_ocean_sshkey integration test
       #   run: |
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_sshkey
 
-      # - name: Run the Tag integration test
+      # - name: Run the digital_ocean_tag integration test
       #   run: |
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_tag
+
+      - name: Run the digital_ocean_account_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_account_info
