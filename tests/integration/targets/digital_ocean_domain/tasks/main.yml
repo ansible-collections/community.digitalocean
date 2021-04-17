@@ -37,6 +37,24 @@
           - result.data is defined
           - result.data | length == 1
 
+    - name: Create A record for domain
+      community.digitalocean.digital_ocean_domain_record:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        domain: "{{ domain_name }}"
+        type: A
+        name: www
+        data: 127.0.0.1
+      register: result
+
+    - name: Ensure domain record was created
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - not result.failed
+          - result.result.name == "www"
+          - result.result.data == "127.0.0.1"
+
   always:
 
     - name: Delete the domain
