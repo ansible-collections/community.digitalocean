@@ -60,10 +60,10 @@ jobs:
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_sshkey
 
-      - name: Run the digital_ocean_tag integration test
-        run: |
-          ansible-test integration -v --color --retry-on-error --continue-on-error \
-            --diff --python 3.8 --docker --coverage digital_ocean_tag
+      # - name: Run the digital_ocean_tag integration test
+      #   run: |
+      #     ansible-test integration -v --color --retry-on-error --continue-on-error \
+      #       --diff --python 3.8 --docker --coverage digital_ocean_tag
 
       # - name: Run the digital_ocean_account_info integration test
       #   run: |
@@ -74,3 +74,8 @@ jobs:
       #   run: |
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_certificate
+
+      - name: Run the digital_ocean_domain integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_domain
