@@ -32,6 +32,26 @@
     that:
       - result.changed
 
+- name: Fetch all SSH keys
+  community.digitalocean.digital_ocean_sshkey_info:
+    oauth_token: "{{ do_api_key }}"
+  register: ssh_keys
+
+- name: Find our dummy ci SSH key
+  set_fact:
+    ci_ssh_key: "{{ ssh_keys.data | selectattr('name', 'equalto', key_name) }}"
+  register: result_find
+
+- name: Verify that ci SSH key was found
+  ansible.builtin.assert:
+    that:
+      - not result_find.failed
+      - not result_find.changed
+      - result_find.ansible_facts is defined
+      - result_find.ansible_facts.ci_ssh_key is defined
+      - result_find.ansible_facts.ci_ssh_key.0 is defined
+      - result_find.ansible_facts.ci_ssh_key.0.name == key_name
+
 - name: Delete SSH key
   community.digitalocean.digital_ocean_sshkey:
     state: "absent"
