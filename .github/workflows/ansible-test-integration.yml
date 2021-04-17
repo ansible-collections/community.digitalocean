@@ -55,7 +55,12 @@ jobs:
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_floating_ip
 
-      - name: Run the SSH key integration test
+      # - name: Run the SSH key integration test
+      #   run: |
+      #     ansible-test integration -v --color --retry-on-error --continue-on-error \
+      #       --diff --python 3.8 --docker --coverage digital_ocean_sshkey
+
+      - name: Run the Tag integration test
         run: |
           ansible-test integration -v --color --retry-on-error --continue-on-error \
-            --diff --python 3.8 --docker --coverage digital_ocean_sshkey
+            --diff --python 3.8 --docker --coverage digital_ocean_tag
