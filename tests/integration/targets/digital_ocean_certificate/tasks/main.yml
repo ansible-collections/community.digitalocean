@@ -22,8 +22,26 @@
       - result.changed
       - result.response is defined
       - result.response.certificate is defined
+      - result.response.certificate.id is defined
       - result.response.certificate.name is defined
       - result.response.certificate.name == cert_name
+
+- name: Store the certificate id
+  ansible.builtin.set_fact:
+    certificate_id: "{{ result.response.certificate.id }}"
+
+- name: Gather information about the certificate
+  community.digitalocean.digital_ocean_certificate_info:
+    oauth_token: "{{ do_api_key }}"
+    certificate_id: "{{ certificate_id }}"
+  register: result
+
+- name: Ensure certificate information was gathered
+  ansible.builtin.assert:
+    that:
+      - not result.changed
+      - result.data is defined
+      - result.data.name == cert_name
 
 - name: Delete a certificate
   community.digitalocean.digital_ocean_certificate:
