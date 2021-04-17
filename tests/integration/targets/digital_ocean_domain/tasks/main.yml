@@ -24,6 +24,19 @@
           - result.domain.name is defined
           - result.domain.name == domain_name
 
+    - name: Fetch domain information
+      community.digitalocean.digital_ocean_domain_info:
+        oauth_token: "{{ do_api_key }}"
+        domain_name: "{{ domain_name }}"
+      register: result
+
+    - name: Ensure domain was found
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.data is defined
+          - result.data | length == 1
+
   always:
 
     - name: Delete the domain
