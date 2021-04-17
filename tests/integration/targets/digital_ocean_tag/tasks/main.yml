@@ -11,14 +11,14 @@
   - name: Create a new tag
     community.digitalocean.digital_ocean_tag:
       oauth_token: "{{ do_api_key }}"
-      name: integration-test
+      name: "{{ tag_name }}"
       state: present
     register: create_tag
 
   - name: Create a new tag for idempotency
     community.digitalocean.digital_ocean_tag:
       oauth_token: "{{ do_api_key }}"
-      name: integration-test
+      name: "{{ tag_name }}"
       state: present
     register: create_tag_idempotent
 
@@ -27,7 +27,22 @@
       that:
         - create_tag.changed == True
         - create_tag_idempotent.changed == False
-        - create_tag.data.tag.name == "integration-test"
+        - create_tag.data.tag.name == tag_name
+
+  - name: Gather information about tag with given name
+    community.digitalocean.digital_ocean_tag_info:
+      oauth_token: "{{ do_api_key }}"
+      tag_name: "{{ tag_name }}"
+    register: result_find
+
+  - name: Verify that ci tag was found
+    ansible.builtin.assert:
+      that:
+        - not result_find.failed
+        - not result_find.changed
+        - result_find.data is defined
+        - result_find.data.name is defined
+        - result_find.data.name == tag_name
 
   always:
 
