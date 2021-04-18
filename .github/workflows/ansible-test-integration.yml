@@ -1,4 +1,4 @@
-name: ansible-test integration
+name: integration
 on:
   # ! Don't enable pwn requests !
   # pull_request:

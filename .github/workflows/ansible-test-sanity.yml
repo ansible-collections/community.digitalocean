@@ -1,4 +1,4 @@
-name: ansible-test sanity
+name: sanity
 on:
   pull_request:
   push:
