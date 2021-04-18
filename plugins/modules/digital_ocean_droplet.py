@@ -306,7 +306,7 @@ class DODroplet(object):
         else:
             self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
 
-    def create(self):
+    def create(self, state):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
