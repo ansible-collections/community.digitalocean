@@ -1,5 +1,8 @@
 # DigitalOcean Community Collection
-[![CI](https://github.com/ansible-collections/community.digitalocean/workflows/CI/badge.svg?event=push)](https://github.com/ansible-collections/community.digitalocean/actions) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.digitalocean)](https://codecov.io/gh/ansible-collections/community.digitalocean)
+
+[![coverage](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-coverage.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-coverage.yml)
+[![integration](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-integration.yml)
+[![sanity](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml)
 
 This collection contains modules and plugins to assist in automating [DigitalOcean](https://www.digitalocean.com) infrastructure and API interactions with Ansible.
 
