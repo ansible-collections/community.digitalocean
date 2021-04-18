@@ -39,8 +39,9 @@ jobs:
 
       # ansible-test support producing code coverage date
       - name: Generate coverage report
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/digitalocean
+        run: |
+          mkdir -p tests/output/coverage
+          ansible-test coverage xml -v --requirements --group-by command --group-by version
 
       # See the reports at https://app.codecov.io/gh/ansible-collections/community.digitalocean
       - uses: codecov/codecov-action@v1
