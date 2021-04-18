@@ -80,7 +80,12 @@ jobs:
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_domain
 
-      - name: Run the digital_ocean_firewall integration test
+      # - name: Run the digital_ocean_firewall integration test
+      #   run: |
+      #     ansible-test integration -v --color --retry-on-error --continue-on-error \
+      #       --diff --python 3.8 --docker --coverage digital_ocean_firewall
+
+      - name: Run the digital_ocean_image_info integration test
         run: |
           ansible-test integration -v --color --retry-on-error --continue-on-error \
-            --diff --python 3.8 --docker --coverage digital_ocean_firewall
+            --diff --python 3.8 --docker --coverage digital_ocean_image_info
