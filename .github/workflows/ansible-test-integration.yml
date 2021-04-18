@@ -3,6 +3,10 @@ on:
   # ! Don't enable pwn requests !
   # pull_request:
   push:
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - '.github/workflows/ansible-test-*.yml'
     branches:
       - ci
       - main
