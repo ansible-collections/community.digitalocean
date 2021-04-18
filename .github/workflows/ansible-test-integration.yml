@@ -1,12 +1,13 @@
 name: ansible-test integration
 on:
+  # ! Don't enable pwn requests !
   # pull_request:
-  # push:
   push:
     branches:
       - ci
+      - main
   schedule:
-    - cron: '0 6 * * *'
+    - cron: '10 6 * * *'
 
 jobs:
 
