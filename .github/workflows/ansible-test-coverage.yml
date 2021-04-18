@@ -1,7 +1,7 @@
 name: ansible-test coverage
 on:
-  # pull_request:
-  # push:
+  pull_request:
+  push:
   schedule:
     - cron: '0 6 * * *'
 
