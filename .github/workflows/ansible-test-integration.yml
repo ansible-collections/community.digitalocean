@@ -105,7 +105,12 @@ jobs:
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_size_info
 
-      - name: Run the digital_ocean_snapshot_info integration test
+      # - name: Run the digital_ocean_snapshot_info integration test
+      #   run: |
+      #     ansible-test integration -v --color --retry-on-error --continue-on-error \
+      #       --diff --python 3.8 --docker --coverage digital_ocean_snapshot_info
+
+      - name: Run the digital_ocean_volume_info integration test
         run: |
           ansible-test integration -v --color --retry-on-error --continue-on-error \
-            --diff --python 3.8 --docker --coverage digital_ocean_snapshot_info
+            --diff --python 3.8 --docker --coverage digital_ocean_volume_info
