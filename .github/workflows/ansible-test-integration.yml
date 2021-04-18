@@ -50,10 +50,10 @@ jobs:
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_block_storage
 
-      - name: Run the digital_ocean_floating_ip integration test
-        run: |
-          ansible-test integration -v --color --retry-on-error --continue-on-error \
-            --diff --python 3.8 --docker --coverage digital_ocean_floating_ip
+      # - name: Run the digital_ocean_floating_ip integration test
+      #   run: |
+      #     ansible-test integration -v --color --retry-on-error --continue-on-error \
+      #       --diff --python 3.8 --docker --coverage digital_ocean_floating_ip
 
       # - name: Run the digital_ocean_sshkey integration test
       #   run: |
@@ -79,3 +79,8 @@ jobs:
       #   run: |
       #     ansible-test integration -v --color --retry-on-error --continue-on-error \
       #       --diff --python 3.8 --docker --coverage digital_ocean_domain
+
+      - name: Run the digital_ocean_firewall integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_firewall
