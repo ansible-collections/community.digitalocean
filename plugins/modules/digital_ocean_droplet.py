@@ -324,11 +324,11 @@ class DODroplet(object):
                 droplet_status = droplet.get('status', None)
                 if droplet_id is not None and droplet_status is not None:
                     if state == 'active' and droplet_status != 'active':
-                        json_data = self.ensure_power_on(droplet_id)
-                        self.module.exit_json(changed=True, data=droplet_data)
+                        power_on_json_data = self.ensure_power_on(droplet_id)
+                        self.module.exit_json(changed=True, data=self.get_addresses(power_on_json_data))
                     elif state == 'inactive' and droplet_status != 'off':
-                        json_data = self.ensure_power_off(droplet_id)
-                        self.module.exit_json(changed=True, data=droplet_data)
+                        power_off_json_data = self.ensure_power_off(droplet_id)
+                        self.module.exit_json(changed=True, data=self.get_addresses(power_off_json_data))
                     else:
                         self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
