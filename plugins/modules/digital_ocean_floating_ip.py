@@ -295,7 +295,7 @@ def create_floating_ips(module, rest):
     # Exit unchanged if any of them are assigned to this Droplet already
     if status_code == 200:
         floating_ips = json_data.get('floating_ips', [])
-        if floating_ips != []:
+        if len(floating_ips) != 0:
             for floating_ip in floating_ips:
                 droplet = floating_ip.get('droplet', None)
                 if droplet is not None:
