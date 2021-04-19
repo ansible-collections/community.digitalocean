@@ -5,6 +5,14 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.1.1
+======
+
+Bugfixes
+--------
+
+- digitalocean - Update collection version in README.md.
+
 v1.1.0
 ======
 
