@@ -11,7 +11,7 @@ v1.1.1
 Bugfixes
 --------
 
-- digitalocean - Update collection version in README.md.
+- digitalocean - Drop collection version from README.md.
 
 v1.1.0
 ======
