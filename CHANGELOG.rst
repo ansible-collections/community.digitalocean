@@ -5,6 +5,14 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.1.1
+======
+
+Bugfixes
+--------
+
+- digitalocean - Drop collection version from README.md (https://github.com/ansible-collections/community.digitalocean/issues/63).
+
 v1.1.0
 ======
 

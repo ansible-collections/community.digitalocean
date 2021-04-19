@@ -62,7 +62,6 @@ You can also include it in a `requirements.yml` file and install it via `ansible
 ---
 collections:
   - name: community.digitalocean
-    version: 1.0.0
 ```
 
 ### Using modules from the DigitalOcean Collection in your playbooks
