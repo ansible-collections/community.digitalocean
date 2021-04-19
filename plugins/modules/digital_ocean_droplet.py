@@ -424,6 +424,7 @@ def main():
         required_if=([
             ('state', 'present', ['name', 'size', 'image', 'region']),
             ('state', 'active', ['name', 'size', 'image', 'region']),
+            ('state', 'inactive', ['name', 'size', 'image', 'region']),
         ]),
         supports_check_mode=True,
     )
