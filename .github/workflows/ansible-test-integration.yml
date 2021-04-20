@@ -1,0 +1,138 @@
+name: integration
+on:
+  # ! Don't enable pwn requests !
+  # pull_request:
+  push:
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - '.github/workflows/ansible-test-*.yml'
+    branches:
+      - ci
+      - main
+  schedule:
+    - cron: '10 6 * * *'
+
+jobs:
+
+  integration:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ansible_collections/community/digitalocean
+
+    steps:
+      - name: Clone the repo
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/community/digitalocean
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Configure integration test run
+        env:
+          DO_API_KEY: ${{ secrets.DO_API_KEY }}
+        run: |
+          ./tests/utils/render.sh \
+            tests/integration/integration_config.yml.template \
+            > tests/integration/integration_config.yml
+
+      - name: Run the digital_ocean_account_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_account_info
+
+      - name: Run the digital_ocean_balance_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_balance_info
+
+      - name: Run the digital_ocean_block_storage integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_block_storage
+
+      - name: Run the digital_ocean_certificate integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_certificate
+
+      - name: Run the digital_ocean_domain integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_domain
+
+      - name: Run the digital_ocean_droplet integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_droplet
+
+      - name: Run the digital_ocean_firewall integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_firewall
+
+      - name: Run the digital_ocean_floating_ip integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_floating_ip
+
+      - name: Run the digital_ocean_image_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_image_info
+
+      - name: Run the digital_ocean_load_balancer_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_load_balancer_info
+
+      - name: Run the digital_ocean_region_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_region_info
+
+      - name: Run the digital_ocean_size_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_size_info
+
+      - name: Run the digital_ocean_snapshot_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_snapshot_info
+
+      - name: Run the digital_ocean_sshkey integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_sshkey
+
+      - name: Run the digital_ocean_tag integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_tag
+
+      - name: Run the digital_ocean_volume_info integration test
+        run: |
+          ansible-test integration -v --color --retry-on-error --continue-on-error \
+            --diff --python 3.8 --docker --coverage digital_ocean_volume_info
+
+      # ansible-test support producing code coverage date
+      - name: Generate coverage report
+        run: |
+          mkdir -p tests/output/coverage
+          ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ansible_collections/community/digitalocean
+
+      # See the reports at https://app.codecov.io/gh/ansible-collections/community.digitalocean
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false

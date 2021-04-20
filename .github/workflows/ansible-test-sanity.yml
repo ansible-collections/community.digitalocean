@@ -1,7 +1,15 @@
-name: CI
+name: sanity
 on:
   pull_request:
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - '.github/workflows/ansible-test-*.yml'
   push:
+    paths:
+      - 'plugins/**'
+      - 'tests/**'
+      - '.github/workflows/ansible-test-*.yml'
   schedule:
     - cron: '0 6 * * *'
 
