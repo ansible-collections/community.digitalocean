@@ -186,19 +186,19 @@ def run(module):
     database = DODatabaseInfo(module)
 
     if id is not None or name is not None:
-      the_database = database.get_database()
-      if the_database:  # Found it
-        module.exit_json(changed=False, data=the_database)
-      else:  # Didn't find it
-        if id is not None and name is not None:
-          module.fail_json(change=False, msg='Database {0} ({1}) not found'.format(id, name))
-        elif id is not None and name is None:
-          module.fail_json(change=False, msg='Database {0} not found'.format(id))
-        elif id is None and name is not None:
-          module.fail_json(change=False, msg='Database {0} not found'.format(name))
+        the_database = database.get_database()
+        if the_database:  # Found it
+            module.exit_json(changed=False, data=the_database)
+        else:  # Didn't find it
+            if id is not None and name is not None:
+                module.fail_json(change=False, msg='Database {0} ({1}) not found'.format(id, name))
+            elif id is not None and name is None:
+                module.fail_json(change=False, msg='Database {0} not found'.format(id))
+            elif id is None and name is not None:
+                module.fail_json(change=False, msg='Database {0} not found'.format(name))
     else:
-      all_databases = database.get_databases()
-      module.exit_json(changed=False, data=all_databases)
+        all_databases = database.get_databases()
+        module.exit_json(changed=False, data=all_databases)
 
 
 def main():
