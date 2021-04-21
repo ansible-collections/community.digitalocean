@@ -44,7 +44,7 @@ options:
       - The slug identifier for the version of Kubernetes used for the cluster. See the /v2/kubernetes/options endpoint for available versions.
     type: str
     required: false
-    default: 1.18.8-do.1
+    default: 1.20.2-do.0
   auto_upgrade:
     description:
       - A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
