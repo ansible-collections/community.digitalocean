@@ -1,0 +1,59 @@
+name: integration
+on:
+  # ! Don't enable pwn requests !
+  # pull_request:
+  push:
+    branches:
+      - ci*
+      - main
+  schedule:
+    - cron: '10 6 * * *'
+
+env:
+  NAMESPACE: community
+  COLLECTION_NAME: digitalocean
+
+jobs:
+
+  integration:
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+
+    steps:
+      - name: Clone the repo
+        uses: actions/checkout@v2
+        with:
+          path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Configure integration test run
+        env:
+          DO_API_KEY: ${{ secrets.DO_API_KEY }}
+        run: |
+          ./tests/utils/render.sh \
+            tests/integration/integration_config.yml.template \
+            > tests/integration/integration_config.yml
+
+      - name: Run the integration tests
+        run: ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage
+
+      # ansible-test support producing code coverage date
+      - name: Generate coverage report
+        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
+        working-directory: ./ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+
+      # See the reports at https://app.codecov.io/gh/ansible-collections/community.digitalocean
+      - uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: false

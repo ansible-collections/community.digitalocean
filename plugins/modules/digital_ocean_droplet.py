@@ -18,8 +18,12 @@ options:
   state:
     description:
      - Indicate desired state of the target.
+     - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
+     - C(absent) will delete the named droplet, if it exists.
+     - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
+     - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
     default: present
-    choices: ['present', 'absent']
+    choices: ['present', 'absent', 'active', 'inactive']
     type: str
   id:
     description:
@@ -302,7 +306,7 @@ class DODroplet(object):
         else:
             self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
 
-    def create(self):
+    def create(self, state):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
@@ -313,7 +317,20 @@ class DODroplet(object):
                     if droplet_size != self.module.params['size']:
                         self.resize_droplet()
             droplet_data = self.get_addresses(json_data)
-            self.module.exit_json(changed=False, data=droplet_data)
+            # If state is active or inactive, ensure requested and desired power states match
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                droplet_id = droplet.get('id', None)
+                droplet_status = droplet.get('status', None)
+                if droplet_id is not None and droplet_status is not None:
+                    if state == 'active' and droplet_status != 'active':
+                        power_on_json_data = self.ensure_power_on(droplet_id)
+                        self.module.exit_json(changed=True, data=self.get_addresses(power_on_json_data))
+                    elif state == 'inactive' and droplet_status != 'off':
+                        power_off_json_data = self.ensure_power_off(droplet_id)
+                        self.module.exit_json(changed=True, data=self.get_addresses(power_off_json_data))
+                    else:
+                        self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
             self.module.exit_json(changed=True)
         request_params = dict(self.module.params)
@@ -341,6 +358,7 @@ class DODroplet(object):
             self.module.exit_json(changed=False, msg='Droplet not found')
 
     def ensure_power_on(self, droplet_id):
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_on'})
         end_time = time.time() + self.wait_timeout
         while time.time() < end_time:
             response = self.rest.get('droplets/{0}'.format(droplet_id))
@@ -350,12 +368,23 @@ class DODroplet(object):
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for droplet powering on timeout')
 
+    def ensure_power_off(self, droplet_id):
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
+        end_time = time.time() + self.wait_timeout
+        while time.time() < end_time:
+            response = self.rest.get('droplets/{0}'.format(droplet_id))
+            json_data = response.json
+            if json_data['droplet']['status'] == 'off':
+                return json_data
+            time.sleep(min(2, end_time - time.time()))
+        self.module.fail_json(msg='Wait for droplet powering off timeout')
+
 
 def core(module):
     state = module.params.pop('state')
     droplet = DODroplet(module)
-    if state == 'present':
-        droplet.create()
+    if state == 'present' or state == 'active' or state == 'inactive':
+        droplet.create(state)
     elif state == 'absent':
         droplet.delete()
 
@@ -363,7 +392,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent', 'active', 'inactive'], default='present'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
@@ -394,6 +423,8 @@ def main():
         ),
         required_if=([
             ('state', 'present', ['name', 'size', 'image', 'region']),
+            ('state', 'active', ['name', 'size', 'image', 'region']),
+            ('state', 'inactive', ['name', 'size', 'image', 'region']),
         ]),
         supports_check_mode=True,
     )
