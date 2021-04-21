@@ -20,6 +20,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_certificate](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_module.html) – Manage certificates in DigitalOcean.
 - [digital_ocean_certificate_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_facts_module.html) – Gather information about DigitalOcean certificates
 - [digital_ocean_certificate_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_info_module.html) – Gather information about DigitalOcean certificates
+- [digital_ocean_database](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_database_module.html) – Create/delete a database in DigitalOcean
+- [digital_ocean_database_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_database_info_module.html) – Gather information about DigitalOcean databases
 - [digital_ocean_domain](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_module.html) – Create/delete a DNS domain in DigitalOcean
 - [digital_ocean_domain_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_facts_module.html) – Gather information about DigitalOcean Domains
 - [digital_ocean_domain_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_info_module.html) – Gather information about DigitalOcean Domains
