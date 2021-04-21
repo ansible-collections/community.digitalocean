@@ -1,0 +1,5 @@
+do_region: nyc1
+database_name: gh-ci-database
+database_engine: redis
+database_size: db-s-1vcpu-1gb
+database_num_nodes: 1
