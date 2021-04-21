@@ -401,7 +401,7 @@ def main():
             ),
             name=dict(type='str', required=True),
             region=dict(aliases=['region_id'], default='nyc1'),
-            version=dict(type='str', default='1.18.8-do.1'),
+            version=dict(type='str', default='1.20.2-do.0'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list', elements='str'),
