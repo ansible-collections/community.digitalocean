@@ -85,28 +85,74 @@ options:
   wait_timeout:
     description:
       - How long before wait gives up, in seconds, when creating a database.
-    default: 300
+    default: 600
     type: int
-  oauth_token:
-    description:
-      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables.
-    aliases: ['API_TOKEN']
-    type: str
-    required: true
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 '''
 
 
-EXAMPLES='''
-- name: Create a MySQL database
+EXAMPLES = r'''
+- name: Create a Redis database
   community.digitalocean.digital_ocean_database:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
     state: present
     name: testdatabase1
-    engine: mysql
+    engine: redis
     size: db-s-1vcpu-1gb
     region: nyc1
     num_nodes: 1
   register: my_database
+'''
+
+
+RETURN = r'''
+data:
+  description: A DigitalOcean database
+  returned: success
+  type: dict
+  sample: {
+    "database": {
+      "connection": {
+         "database": "",
+         "host": "testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com",
+         "password": "REDACTED",
+         "port": 25061,
+         "protocol": "rediss",
+         "ssl": true,
+         "uri": "rediss://default:REDACTED@testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061",
+         "user": "default"
+      },
+      "created_at": "2021-04-21T15:41:14Z",
+      "db_names": null,
+      "engine": "redis",
+      "id": "37de10e4-808b-4f4b-b25f-7b5b3fd194ac",
+      "maintenance_window": {
+         "day": "monday",
+         "hour": "11:33:47",
+         "pending": false
+      },
+      "name": "testdatabase1",
+      "num_nodes": 1,
+      "private_connection": {
+         "database": "",
+         "host": "private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com",
+         "password": "REDIS",
+         "port": 25061,
+         "protocol": "rediss",
+         "ssl": true,
+         "uri": "rediss://default:REDACTED@private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061",
+         "user": "default"
+      },
+      "private_network_uuid": "0db3519b-9efc-414a-8868-8f2e6934688c",
+      "region": "nyc1",
+      "size": "db-s-1vcpu-1gb",
+      "status": "online",
+      "tags": null,
+      "users": null,
+      "version": "6"
+    }
+  }
 '''
 
 
@@ -122,7 +168,7 @@ class DODatabase(object):
         self.rest = DigitalOceanHelper(module)
         # pop wait and wait_timeout so we don't include it in the POST data
         self.wait = self.module.params.pop('wait', True)
-        self.wait_timeout = self.module.params.pop('wait_timeout', 300)
+        self.wait_timeout = self.module.params.pop('wait_timeout', 600)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
         self.id = None
@@ -242,7 +288,9 @@ class DODatabase(object):
                 json_data = response.json
                 if response.status_code == 204:
                     self.module.exit_json(changed=True, msg='Deleted database {0} ({1}) in {2}'.format(database_name, database_id, database_region))
-                self.module.fail_json(changed=False, msg='Failed to delete database {0} ({1}) in {2}: {3}'.format(database_name, database_id, database_region, json_data['message']))
+                self.module.fail_json(changed=False,
+                                      msg='Failed to delete database {0} ({1}) in {2}: {3}'
+                                      .format(database_name, database_id, database_region, json_data['message']))
             else:
                 self.module.fail_json(changed=False, msg='Unexpected error, please file a bug')
         else:
@@ -263,10 +311,9 @@ def main():
         argument_spec=dict(
             state=dict(choices=['present', 'absent'], default='present'),
             oauth_token=dict(
-                aliases=['API_TOKEN'],
+                aliases=['api_token'],
                 no_log=True,
                 fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
-                required=True,
             ),
             id=dict(type='int', aliases=['database_id']),
             name=dict(type='str', required=True),
@@ -274,11 +321,13 @@ def main():
             version=dict(type='str'),
             size=dict(type='str', aliases=['size_id'], required=True),
             region=dict(type='str', aliases=['region_id'], required=True),
-            num_nodes=dict(type='int', choices=[1,2,3], default=1),
+            num_nodes=dict(type='int', choices=[1, 2, 3], default=1),
             tags=dict(type='list', elements='str'),
             private_network_uuid=dict(type='str'),
+            validate_certs=dict(type='bool', default=True),
+            timeout=dict(type='int', default=30),
             wait=dict(type='bool', default=True),
-            wait_timeout=dict(default=300, type='int'),
+            wait_timeout=dict(default=600, type='int'),
         ),
         required_one_of=(
             ['id', 'name'],
