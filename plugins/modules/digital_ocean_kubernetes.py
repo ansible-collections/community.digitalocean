@@ -379,7 +379,7 @@ class DOKubernetes(object):
                 changed=False, msg='Kubernetes cluster not found')
 
 
-def core(module):
+def run(module):
     state = module.params.pop('state')
     cluster = DOKubernetes(module)
     if state == 'present':
@@ -426,10 +426,7 @@ def main():
         supports_check_mode=True,
     )
 
-    try:
-        core(module)
-    except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+    run(module)
 
 
 if __name__ == '__main__':

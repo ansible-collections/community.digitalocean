@@ -200,7 +200,7 @@ class DOKubernetesInfo(object):
             changed=False, msg='Kubernetes cluster not found')
 
 
-def core(module):
+def run(module):
     cluster = DOKubernetesInfo(module)
     cluster.get()
 
@@ -220,10 +220,7 @@ def main():
         ),
     )
 
-    try:
-        core(module)
-    except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+    run(module)
 
 
 if __name__ == '__main__':
