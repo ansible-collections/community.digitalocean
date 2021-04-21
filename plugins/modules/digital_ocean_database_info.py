@@ -213,23 +213,7 @@ def main():
             name=dict(type='str'),
             validate_certs=dict(type='bool', default=True),
             timeout=dict(type='int', default=30),
-            # engine=dict(choices=['pg', 'mysql', 'redis'], required=True),
-            # version=dict(type='str'),
-            # size=dict(type='str', aliases=['size_id'], required=True),
-            # region=dict(type='str', aliases=['region_id'], required=True),
-            # num_nodes=dict(type='int', default=1),
-            # tags=dict(type='list', elements='str'),
-            # private_network_uuid=dict(type='str'),
-            # wait=dict(type='bool', default=True),
-            # wait_timeout=dict(default=300, type='int'),
         ),
-        # required_one_of=(
-        #     ['id', 'name'],
-        # ),
-        # required_if=([
-        #     ('state', 'present', ['name', 'size', 'engine', 'region']),
-        #     ('state', 'absent', ['name', 'size', 'engine', 'region']),
-        # ]),
         supports_check_mode=False,
     )
     run(module)
