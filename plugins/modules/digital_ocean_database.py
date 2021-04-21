@@ -12,74 +12,80 @@ DOCUMENTATION = r'''
 module: digital_ocean_database
 short_description: Create and delete a DigitalOcean database
 description:
-    - Create and delete a database in DigitalOcean and optionally wait for it to be active.
+    - Create and delete a database in DigitalOcean and optionally wait for it to be online.
+    - DigitalOcean's managed database service simplifies the creation and management of highly available database clusters.
+    - Currently, it offers support for PostgreSQL, Redis, and MySQL.
 author: "Mark Mercado (@mamercad)"
 options:
     state:
         description:
-            - Indicate desired state of the target.
+            - Indicates the desired state of the target.
         default: present
-        choices: ['present', 'active']
+        choices: ['present', 'absent']
         type: str
     id:
         description:
-            - ID of the database.
+            - A unique ID that can be used to identify and reference a database cluster.
         type: int
         aliases: ['database_id']
     name:
         description:
-            - Name of the database.
+            - A unique, human-readable name for the database cluster.
         type: str
         required: true
     engine:
         description:
-            - Database engine.
+            - A slug representing the database engine used for the cluster.
+            - The possible values are: C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
         type: str
         required: true
         choices: ['pg', 'mysql', 'redis']
     version:
         description:
-            - Database version.
-            - For Postgres (pg), versions are 10, 11 and 12.
-            - For MySQL, version is 8.
-            - For Redis, version is 5.
+            - A string representing the version of the database engine in use for the cluster.
+            - For C(pg), versions are 10, 11 and 12.
+            - For C(mysql), version is 8.
+            - For C(redis), version is 5.
         type: str
     size:
         description:
-            - Database size.
+            - The slug identifier representing the size of the nodes in the database cluster.
+            - See U(https://developers.digitalocean.com/documentation/v2/#create-a-new-database-cluster) for supported sizes.
         type: str
         required: true
         aliases: ['size_id']
     region:
         description:
-            - Database region.
+            - The slug identifier for the region where the database cluster is located.
         type: str
         required: true
         aliases: ['region_id']
     num_nodes:
         description:
-            - Database nodes.
+            - The number of nodes in the database cluster.
+            - Valid choices are 1, 2 or 3.
         type: int
         default: 1
+        choices: [1, 2, 3]
     tags:
         description:
-            - List of tags.
+            - An array of tags that have been applied to the database cluster.
         type: list
         elements: str
     private_network_uuid:
         description:
-            - VPC UUID to place in.
+            - A string specifying the UUID of the VPC to which the database cluster is assigned.
         type: str
     wait:
         description:
-            - Wait for the database to be active before returning.
+            - Wait for the database to be online before returning.
         required: False
         default: True
         type: bool
     wait_timeout:
         description:
             - How long before wait gives up, in seconds, when creating a database.
-        default: 120
+        default: 300
         type: int
 '''
 
@@ -94,8 +100,9 @@ class DODatabase(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
+        # pop wait and wait_timeout so we don't include it in the POST data
         self.wait = self.module.params.pop('wait', True)
-        self.wait_timeout = self.module.params.pop('wait_timeout', 120)
+        self.wait_timeout = self.module.params.pop('wait_timeout', 300)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
         self.id = None
@@ -251,7 +258,7 @@ def main():
             tags=dict(type='list', elements='str'),
             private_network_uuid=dict(type='str'),
             wait=dict(type='bool', default=True),
-            wait_timeout=dict(default=120, type='int'),
+            wait_timeout=dict(default=300, type='int'),
         ),
         required_one_of=(
             ['id', 'name'],
