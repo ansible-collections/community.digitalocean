@@ -12,81 +12,101 @@ DOCUMENTATION = r'''
 module: digital_ocean_database
 short_description: Create and delete a DigitalOcean database
 description:
-    - Create and delete a database in DigitalOcean and optionally wait for it to be online.
-    - DigitalOcean's managed database service simplifies the creation and management of highly available database clusters.
-    - Currently, it offers support for PostgreSQL, Redis, and MySQL.
+  - Create and delete a database in DigitalOcean and optionally wait for it to be online.
+  - DigitalOcean's managed database service simplifies the creation and management of highly available database clusters.
+  - Currently, it offers support for PostgreSQL, Redis, and MySQL.
 author: "Mark Mercado (@mamercad)"
 options:
-    state:
-        description:
-            - Indicates the desired state of the target.
-        default: present
-        choices: ['present', 'absent']
-        type: str
-    id:
-        description:
-            - A unique ID that can be used to identify and reference a database cluster.
-        type: int
-        aliases: ['database_id']
-    name:
-        description:
-            - A unique, human-readable name for the database cluster.
-        type: str
-        required: true
-    engine:
-        description:
-            - A slug representing the database engine used for the cluster.
-            - The possible values are: C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
-        type: str
-        required: true
-        choices: ['pg', 'mysql', 'redis']
-    version:
-        description:
-            - A string representing the version of the database engine in use for the cluster.
-            - For C(pg), versions are 10, 11 and 12.
-            - For C(mysql), version is 8.
-            - For C(redis), version is 5.
-        type: str
-    size:
-        description:
-            - The slug identifier representing the size of the nodes in the database cluster.
-            - See U(https://developers.digitalocean.com/documentation/v2/#create-a-new-database-cluster) for supported sizes.
-        type: str
-        required: true
-        aliases: ['size_id']
-    region:
-        description:
-            - The slug identifier for the region where the database cluster is located.
-        type: str
-        required: true
-        aliases: ['region_id']
-    num_nodes:
-        description:
-            - The number of nodes in the database cluster.
-            - Valid choices are 1, 2 or 3.
-        type: int
-        default: 1
-        choices: [1, 2, 3]
-    tags:
-        description:
-            - An array of tags that have been applied to the database cluster.
-        type: list
-        elements: str
-    private_network_uuid:
-        description:
-            - A string specifying the UUID of the VPC to which the database cluster is assigned.
-        type: str
-    wait:
-        description:
-            - Wait for the database to be online before returning.
-        required: False
-        default: True
-        type: bool
-    wait_timeout:
-        description:
-            - How long before wait gives up, in seconds, when creating a database.
-        default: 300
-        type: int
+  state:
+    description:
+      - Indicates the desired state of the target.
+    default: present
+    choices: ['present', 'absent']
+    type: str
+  id:
+    description:
+      - A unique ID that can be used to identify and reference a database cluster.
+    type: int
+    aliases: ['database_id']
+  name:
+    description:
+      - A unique, human-readable name for the database cluster.
+    type: str
+    required: true
+  engine:
+    description:
+      - A slug representing the database engine used for the cluster.
+      - The possible values are: C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
+    type: str
+    required: true
+    choices: ['pg', 'mysql', 'redis']
+  version:
+    description:
+      - A string representing the version of the database engine in use for the cluster.
+      - For C(pg), versions are 10, 11 and 12.
+      - For C(mysql), version is 8.
+      - For C(redis), version is 5.
+    type: str
+  size:
+    description:
+      - The slug identifier representing the size of the nodes in the database cluster.
+      - See U(https://developers.digitalocean.com/documentation/v2/#create-a-new-database-cluster) for supported sizes.
+    type: str
+    required: true
+    aliases: ['size_id']
+  region:
+    description:
+      - The slug identifier for the region where the database cluster is located.
+    type: str
+    required: true
+    aliases: ['region_id']
+  num_nodes:
+    description:
+      - The number of nodes in the database cluster.
+      - Valid choices are 1, 2 or 3.
+    type: int
+    default: 1
+    choices: [1, 2, 3]
+  tags:
+    description:
+      - An array of tags that have been applied to the database cluster.
+    type: list
+    elements: str
+  private_network_uuid:
+    description:
+      - A string specifying the UUID of the VPC to which the database cluster is assigned.
+    type: str
+  wait:
+    description:
+      - Wait for the database to be online before returning.
+    required: False
+    default: True
+    type: bool
+  wait_timeout:
+    description:
+      - How long before wait gives up, in seconds, when creating a database.
+    default: 300
+    type: int
+  oauth_token:
+    description:
+      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables.
+    aliases: ['API_TOKEN']
+    type: str
+    required: true
+'''
+
+
+EXAMPLES='''
+- name: Create a MySQL database
+  community.digitalocean.digital_ocean_database:
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
+    state: present
+    name: testdatabase1
+    engine: mysql
+    size: db-s-1vcpu-1gb
+    region: nyc1
+    num_nodes: 1
+    register: my_database
 '''
 
 
@@ -248,13 +268,13 @@ def main():
                 fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
                 required=True,
             ),
-            id=dict(type=int, aliases=['database_id']),
+            id=dict(type='int', aliases=['database_id']),
             name=dict(type='str', required=True),
             engine=dict(choices=['pg', 'mysql', 'redis'], required=True),
             version=dict(type='str'),
             size=dict(type='str', aliases=['size_id'], required=True),
             region=dict(type='str', aliases=['region_id'], required=True),
-            num_nodes=dict(type=int, default=1),
+            num_nodes=dict(type='int', default=1),
             tags=dict(type='list', elements='str'),
             private_network_uuid=dict(type='str'),
             wait=dict(type='bool', default=True),
