@@ -36,7 +36,7 @@ options:
   engine:
     description:
       - A slug representing the database engine used for the cluster.
-      - The possible values are: C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
+      - The possible values are C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
     type: str
     required: true
     choices: ['pg', 'mysql', 'redis']
@@ -106,7 +106,7 @@ EXAMPLES='''
     size: db-s-1vcpu-1gb
     region: nyc1
     num_nodes: 1
-    register: my_database
+  register: my_database
 '''
 
 
@@ -274,7 +274,7 @@ def main():
             version=dict(type='str'),
             size=dict(type='str', aliases=['size_id'], required=True),
             region=dict(type='str', aliases=['region_id'], required=True),
-            num_nodes=dict(type='int', default=1),
+            num_nodes=dict(type='int', choices=[1,2,3], default=1),
             tags=dict(type='list', elements='str'),
             private_network_uuid=dict(type='str'),
             wait=dict(type='bool', default=True),
