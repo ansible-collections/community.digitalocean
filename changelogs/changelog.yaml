@@ -42,3 +42,10 @@ releases:
         name: digitalocean
         namespace: null
     release_date: '2021-04-01'
+  1.1.1:
+    changes:
+      bugfixes:
+      - digitalocean - Drop collection version from README.md (https://github.com/ansible-collections/community.digitalocean/issues/63).
+    fragments:
+    - 63-readme-version.yml
+    release_date: '2021-04-18'

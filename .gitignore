@@ -1,4 +1,5 @@
 /tests/output/
+/tests/integration/integration_config.yml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

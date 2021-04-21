@@ -1,9 +1,12 @@
-name: CI
+name: sanity
 on:
   pull_request:
   push:
   schedule:
     - cron: '0 6 * * *'
+env:
+  NAMESPACE: community
+  COLLECTION_NAME: digitalocean 
 
 jobs:
   sanity:
@@ -21,7 +24,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
         with:
-          path: ansible_collections/community/digitalocean
+          path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
 
       - name: Set up Python
         uses: actions/setup-python@v1
