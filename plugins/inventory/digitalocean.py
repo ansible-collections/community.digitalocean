@@ -145,10 +145,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 response = json.load(self.req.get(url))
                 payload.extend(response['droplets'])
                 url = response.get('links', {}).get('pages', {}).get('next')
-        except ValueError:
-            raise AnsibleParserError("something went wrong with JSON loading")
+        except ValueError as error:
+            raise AnsibleParserError("something went wrong with JSON loading") from error
         except (URLError, HTTPError) as error:
-            raise AnsibleParserError(error)
+            raise AnsibleParserError(error) from error
 
         return payload
 
