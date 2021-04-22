@@ -8,6 +8,17 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
+    - name: Ensure database is absent (leftover)
+      community.digitalocean.digital_ocean_database:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ database_name }}"
+        region: "{{ do_region }}"
+        engine: "{{ database_engine }}"
+        size: "{{ database_size }}"
+      ignore_errors: true  # In case one was left from previous run
+      register: result
+
     - name: Ensure database is absent
       community.digitalocean.digital_ocean_database:
         oauth_token: "{{ do_api_key }}"
@@ -41,6 +52,21 @@
           - result.data.database is defined
           - result.data.database.name is defined
           - result.data.database.name == database_name
+
+    - name: Create the database (again; idempotency check)
+      community.digitalocean.digital_ocean_database:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ database_name }}"
+        region: "{{ do_region }}"
+        engine: "{{ database_engine }}"
+        size: "{{ database_size }}"
+      register: result
+
+    - name: Verify database is present
+      ansible.builtin.assert:
+        that:
+          - not result.changed
 
     - name: Fetch all databases
       community.digitalocean.digital_ocean_database_info:
@@ -88,3 +114,18 @@
       ansible.builtin.assert:
         that:
           - result.changed
+
+    - name: Delete the database (again; idempotency check)
+      community.digitalocean.digital_ocean_database:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ database_name }}"
+        region: "{{ do_region }}"
+        engine: "{{ database_engine }}"
+        size: "{{ database_size }}"
+      register: result
+
+    - name: Verify the database is deleted
+      ansible.builtin.assert:
+        that:
+          - not result.changed
