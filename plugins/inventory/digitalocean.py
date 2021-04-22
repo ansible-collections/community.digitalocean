@@ -108,7 +108,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def verify_file(self, path):
         valid = False
-        if super(InventoryModule, self).verify_file(path):
+        if super().verify_file(path):
             if path.endswith(
                     ('do_hosts.yaml', 'do_hosts.yml',
                      'digitalocean.yaml', 'digitalocean.yml',
@@ -180,7 +180,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                                            dict(), host_name, strict)
 
     def parse(self, inventory, loader, path, cache=True):
-        super(InventoryModule, self).parse(inventory, loader, path)
+        super().parse(inventory, loader, path)
 
         # cache settings
         self._read_config_data(path)
