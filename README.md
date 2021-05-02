@@ -1,5 +1,8 @@
 # DigitalOcean Community Collection
-[![CI](https://github.com/ansible-collections/community.digitalocean/workflows/CI/badge.svg?event=push)](https://github.com/ansible-collections/community.digitalocean/actions) [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.digitalocean)](https://codecov.io/gh/ansible-collections/community.digitalocean)
+
+[![coverage](https://img.shields.io/codecov/c/github/ansible-collections/community.digitalocean)](https://codecov.io/gh/ansible-collections/community.digitalocean)
+[![integration](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-integration.yml)
+[![sanity](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml)
 
 This collection contains modules and plugins to assist in automating [DigitalOcean](https://www.digitalocean.com) infrastructure and API interactions with Ansible.
 
@@ -12,6 +15,7 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_module.html) – Create/delete a droplet/SSH_key in DigitalOcean
 - [digital_ocean_account_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_account_facts_module.html) – Gather information about DigitalOcean User account
 - [digital_ocean_account_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_account_info_module.html) – Gather information about DigitalOcean User account
+- [digital_ocean_balance_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_balance_info_module.html) – Display DigitalOcean customer balance
 - [digital_ocean_block_storage](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_block_storage_module.html) – Create/destroy or attach/detach Block Storage volumes in DigitalOcean
 - [digital_ocean_certificate](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_module.html) – Manage certificates in DigitalOcean.
 - [digital_ocean_certificate_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_facts_module.html) – Gather information about DigitalOcean certificates

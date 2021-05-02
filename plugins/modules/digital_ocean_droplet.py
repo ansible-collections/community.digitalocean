@@ -18,15 +18,22 @@ options:
   state:
     description:
      - Indicate desired state of the target.
+     - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
+     - C(absent) will delete the named droplet, if it exists.
+     - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
+     - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
     default: present
-    choices: ['present', 'absent']
+    choices: ['present', 'absent', 'active', 'inactive']
+    type: str
   id:
     description:
      - Numeric, the droplet id you want to operate on.
     aliases: ['droplet_id']
+    type: int
   name:
     description:
      - String, this is the name of the droplet - must be formatted by hostname rules.
+    type: str
   unique_name:
     description:
      - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
@@ -37,18 +44,23 @@ options:
     description:
      - This is the slug of the size you would like the droplet created with.
     aliases: ['size_id']
+    type: str
   image:
     description:
      - This is the slug of the image you would like the droplet created with.
     aliases: ['image_id']
+    type: str
   region:
     description:
      - This is the slug of the region you would like your server to be created in.
     aliases: ['region_id']
+    type: str
   ssh_keys:
     description:
      - array of SSH key Fingerprint that you would like to be added to the server.
     required: False
+    type: list
+    elements: str
   private_networking:
     description:
      - add an additional, private network interface to droplet for inter-droplet communication.
@@ -64,6 +76,7 @@ options:
     description:
       - opaque blob of data which is made available to the droplet
     required: False
+    type: str
   ipv6:
     description:
       - enable IPv6 for your droplet.
@@ -80,6 +93,7 @@ options:
     description:
      - How long before wait gives up, in seconds, when creating a droplet.
     default: 120
+    type: int
   backups:
     description:
      - indicates whether automated backups should be enabled.
@@ -96,17 +110,26 @@ options:
     description:
      - List, A list of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.
     required: False
+    type: list
+    elements: str
   volumes:
     description:
      - List, A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
     required: False
+    type: list
+    elements: str
   oauth_token:
     description:
      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
     aliases: ['API_TOKEN']
-    required: True
-requirements:
-  - "python >= 2.6"
+    type: str
+    required: true
+  resize_disk:
+    description:
+    - Whether to increase disk size (only consulted if the C(unique_name) is C(True) and C(size) dictates an increase)
+    required: False
+    default: False
+    type: bool
 '''
 
 
@@ -203,6 +226,10 @@ class DODroplet(object):
         self.unique_name = self.module.params.pop('unique_name', False)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
+        self.id = None
+        self.name = None
+        self.size = None
+        self.status = None
 
     def get_by_id(self, droplet_id):
         if not droplet_id:
@@ -210,6 +237,12 @@ class DODroplet(object):
         response = self.rest.get('droplets/{0}'.format(droplet_id))
         json_data = response.json
         if response.status_code == 200:
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                self.id = droplet.get('id', None)
+                self.name = droplet.get('name', None)
+                self.size = droplet.get('size_slug', None)
+                self.status = droplet.get('status', None)
             return json_data
         return None
 
@@ -222,7 +255,11 @@ class DODroplet(object):
             json_data = response.json
             if response.status_code == 200:
                 for droplet in json_data['droplets']:
-                    if droplet['name'] == droplet_name:
+                    if droplet.get('name', None) == droplet_name:
+                        self.id = droplet.get('id', None)
+                        self.name = droplet.get('name', None)
+                        self.size = droplet.get('size_slug', None)
+                        self.status = droplet.get('status', None)
                         return {'droplet': droplet}
                 if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
                     page += 1
@@ -231,9 +268,7 @@ class DODroplet(object):
         return None
 
     def get_addresses(self, data):
-        """
-         Expose IP addresses as their own property allowing users extend to additional tasks
-        """
+        """Expose IP addresses as their own property allowing users extend to additional tasks"""
         _data = data
         for k, v in data.items():
             setattr(self, k, v)
@@ -256,12 +291,46 @@ class DODroplet(object):
             json_data = self.get_by_name(self.module.params['name'])
         return json_data
 
-    def create(self):
+    def resize_droplet(self):
+        """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
+        if self.status == 'off':
+            response = self.rest.post('droplets/{0}/actions'.format(self.id),
+                                      data={'type': 'resize', 'disk': self.module.params['resize_disk'], 'size': self.module.params['size']})
+            json_data = response.json
+            if response.status_code == 201:
+                self.module.exit_json(changed=True, msg='Resized Droplet {0} ({1}) from {2} to {3}'.format(
+                    self.name, self.id, self.size, self.module.params['size']))
+            else:
+                self.module.fail_json(msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
+                    self.name, self.id, response.status_code, response.json.get('message', None)))
+        else:
+            self.module.fail_json(msg='Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)')
+
+    def create(self, state):
         json_data = self.get_droplet()
         droplet_data = None
         if json_data:
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                droplet_size = droplet.get('size_slug', None)
+                if droplet_size is not None:
+                    if droplet_size != self.module.params['size']:
+                        self.resize_droplet()
             droplet_data = self.get_addresses(json_data)
-            self.module.exit_json(changed=False, data=droplet_data)
+            # If state is active or inactive, ensure requested and desired power states match
+            droplet = json_data.get('droplet', None)
+            if droplet is not None:
+                droplet_id = droplet.get('id', None)
+                droplet_status = droplet.get('status', None)
+                if droplet_id is not None and droplet_status is not None:
+                    if state == 'active' and droplet_status != 'active':
+                        power_on_json_data = self.ensure_power_on(droplet_id)
+                        self.module.exit_json(changed=True, data=self.get_addresses(power_on_json_data))
+                    elif state == 'inactive' and droplet_status != 'off':
+                        power_off_json_data = self.ensure_power_off(droplet_id)
+                        self.module.exit_json(changed=True, data=self.get_addresses(power_off_json_data))
+                    else:
+                        self.module.exit_json(changed=False, data=droplet_data)
         if self.module.check_mode:
             self.module.exit_json(changed=True)
         request_params = dict(self.module.params)
@@ -289,6 +358,7 @@ class DODroplet(object):
             self.module.exit_json(changed=False, msg='Droplet not found')
 
     def ensure_power_on(self, droplet_id):
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_on'})
         end_time = time.time() + self.wait_timeout
         while time.time() < end_time:
             response = self.rest.get('droplets/{0}'.format(droplet_id))
@@ -298,12 +368,23 @@ class DODroplet(object):
             time.sleep(min(2, end_time - time.time()))
         self.module.fail_json(msg='Wait for droplet powering on timeout')
 
+    def ensure_power_off(self, droplet_id):
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
+        end_time = time.time() + self.wait_timeout
+        while time.time() < end_time:
+            response = self.rest.get('droplets/{0}'.format(droplet_id))
+            json_data = response.json
+            if json_data['droplet']['status'] == 'off':
+                return json_data
+            time.sleep(min(2, end_time - time.time()))
+        self.module.fail_json(msg='Wait for droplet powering off timeout')
+
 
 def core(module):
     state = module.params.pop('state')
     droplet = DODroplet(module)
-    if state == 'present':
-        droplet.create()
+    if state == 'present' or state == 'active' or state == 'inactive':
+        droplet.create(state)
     elif state == 'absent':
         droplet.delete()
 
@@ -311,17 +392,18 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent', 'active', 'inactive'], default='present'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN'])
+                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                required=True,
             ),
             name=dict(type='str'),
             size=dict(aliases=['size_id']),
             image=dict(aliases=['image_id']),
             region=dict(aliases=['region_id']),
-            ssh_keys=dict(type='list', no_log=False),
+            ssh_keys=dict(type='list', elements='str', no_log=False),
             private_networking=dict(type='bool', default=False),
             vpc_uuid=dict(type='str'),
             backups=dict(type='bool', default=False),
@@ -329,17 +411,20 @@ def main():
             id=dict(aliases=['droplet_id'], type='int'),
             user_data=dict(default=None),
             ipv6=dict(type='bool', default=False),
-            volumes=dict(type='list'),
-            tags=dict(type='list'),
+            volumes=dict(type='list', elements='str'),
+            tags=dict(type='list', elements='str'),
             wait=dict(type='bool', default=True),
             wait_timeout=dict(default=120, type='int'),
             unique_name=dict(type='bool', default=False),
+            resize_disk=dict(type='bool', default=False),
         ),
         required_one_of=(
             ['id', 'name'],
         ),
         required_if=([
             ('state', 'present', ['name', 'size', 'image', 'region']),
+            ('state', 'active', ['name', 'size', 'image', 'region']),
+            ('state', 'inactive', ['name', 'size', 'image', 'region']),
         ]),
         supports_check_mode=True,
     )
