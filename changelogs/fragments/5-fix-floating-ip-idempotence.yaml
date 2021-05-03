@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_floating_ip - fixes idempotence (https://github.com/ansible-collections/community.digitalocean/issues/5).
