@@ -11,6 +11,7 @@ name: digitalocean
 author:
   - Janos Gerzson (@grzs)
   - Tadej Borovšak (@tadeboro)
+  - Tomasz Skręt (@krecik)
 short_description: DigitalOcean Inventory Plugin
 version_added: "1.1.0"
 description:
@@ -49,6 +50,11 @@ options:
       - networks
       - region
       - size_slug
+  filter_by_tag:
+    description:
+      - Filter droplets by tag
+    type: str
+    default: ''
   var_prefix:
     description:
       - Prefix of generated varible names (e.g. C(tags) -> C(do_tags))
@@ -80,6 +86,7 @@ attributes:
   - volume_ids
   - tags
   - region
+filter_by_tag: 'my-tag'
 keyed_groups:
   - key: do_region.slug
     prefix: 'region'
@@ -135,6 +142,10 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         # build url
         pagination = self.get_option('pagination')
         url = 'https://api.digitalocean.com/v2/droplets?per_page=' + str(pagination)
+        # filter droplets by tag
+        filter_by_tag = self.get_option('filter_by_tag')
+        if filter_by_tag:
+            url += '&tag_name=' + str(filter_by_tag)
 
         # send request(s)
         self.req = Request(headers=headers)
