@@ -112,7 +112,7 @@ class DODatabaseInfo(object):
         self.name = None
 
     def get_by_id(self, database_id):
-        if not database_id:
+        if database_id is None:
             return None
         response = self.rest.get('databases/{0}'.format(database_id))
         json_data = response.json
@@ -131,7 +131,7 @@ class DODatabaseInfo(object):
         return None
 
     def get_by_name(self, database_name):
-        if not database_name:
+        if database_name is None:
             return None
         page = 1
         while page is not None:
@@ -169,7 +169,7 @@ class DODatabaseInfo(object):
             json_data = response.json
             if response.status_code == 200:
                 databases = json_data.get('databases', None)
-                if databases is not None:
+                if databases is not None and isinstance(databases, list):
                     all_databases.append(databases)
                 if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
                     page += 1

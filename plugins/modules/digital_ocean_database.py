@@ -183,7 +183,7 @@ class DODatabase(object):
         self.size = None
 
     def get_by_id(self, database_id):
-        if not database_id:
+        if database_id is None:
             return None
         response = self.rest.get('databases/{0}'.format(database_id))
         json_data = response.json
@@ -202,14 +202,17 @@ class DODatabase(object):
         return None
 
     def get_by_name(self, database_name):
-        if not database_name:
+        if database_name is None:
             return None
         page = 1
         while page is not None:
             response = self.rest.get('databases?page={0}'.format(page))
             json_data = response.json
             if response.status_code == 200:
-                for database in json_data['databases']:
+                databases = json_data.get('databases', None)
+                if databases is None or not isinstance(databases, list):
+                    return None
+                for database in databases:
                     if database.get('name', None) == database_name:
                         self.id = database.get('id', None)
                         self.name = database.get('name', None)
@@ -233,8 +236,8 @@ class DODatabase(object):
         return json_data
 
     def ensure_online(self, database_id):
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
             response = self.rest.get('databases/{0}'.format(database_id))
             json_data = response.json
             database = json_data.get('database', None)
@@ -268,11 +271,11 @@ class DODatabase(object):
             self.module.fail_json(changed=False, msg=json_data['message'])
         database = json_data.get('database', None)
         if database is None:
-            self.module.fail_json(changed=False, msg='Unexpected error, please file a bug')
+            self.module.fail_json(changed=False, msg='Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues')
         if self.wait:
             database_id = database.get('id', None)
             if database_id is None:
-                self.module.fail_json(changed=False, msg='Unexpected error, please file a bug')
+                self.module.fail_json(changed=False, msg='Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues')
             json_data = self.ensure_online(database_id)
         self.module.exit_json(changed=True, data=json_data)
 
@@ -289,14 +292,14 @@ class DODatabase(object):
                 response = self.rest.delete('databases/{0}'.format(database_id))
                 json_data = response.json
                 if response.status_code == 204:
-                    self.module.exit_json(changed=True, msg='Deleted database {0} ({1}) in {2}'.format(database_name, database_id, database_region))
+                    self.module.exit_json(changed=True, msg='Deleted database {0} ({1}) in region {2}'.format(database_name, database_id, database_region))
                 self.module.fail_json(changed=False,
-                                      msg='Failed to delete database {0} ({1}) in {2}: {3}'
+                                      msg='Failed to delete database {0} ({1}) in region {2}: {3}'
                                       .format(database_name, database_id, database_region, json_data['message']))
             else:
                 self.module.fail_json(changed=False, msg='Unexpected error, please file a bug')
         else:
-            self.module.exit_json(changed=False, msg='Database {0} in {1} not found'.format(self.module.params['name'], self.module.params['region']))
+            self.module.exit_json(changed=False, msg='Database {0} in region {1} not found'.format(self.module.params['name'], self.module.params['region']))
 
 
 def run(module):
