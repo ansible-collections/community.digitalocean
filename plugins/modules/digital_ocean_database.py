@@ -275,7 +275,8 @@ class DODatabase(object):
         if self.wait:
             database_id = database.get('id', None)
             if database_id is None:
-                self.module.fail_json(changed=False, msg='Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues')
+                self.module.fail_json(changed=False,
+                                      msg='Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues')
             json_data = self.ensure_online(database_id)
         self.module.exit_json(changed=True, data=json_data)
 
