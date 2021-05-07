@@ -14,7 +14,7 @@ module: digital_ocean_database_info
 short_description: Gather information about DigitalOcean databases
 description:
   - Gather information about DigitalOcean databases.
-version_added: 1.2.0
+version_added: 1.3.0
 author: "Mark Mercado (@mamercad)"
 options:
   state:

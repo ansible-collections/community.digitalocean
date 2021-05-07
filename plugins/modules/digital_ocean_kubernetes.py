@@ -13,7 +13,7 @@ module: digital_ocean_kubernetes
 short_description: Create and delete a DigitalOcean Kubernetes cluster
 description:
   - Create and delete a Kubernetes cluster in DigitalOcean (and optionally wait for it to be running).
-version_added: 1.2.0
+version_added: 1.3.0
 author: Mark Mercado (@mamercad)
 options:
   oauth_token:

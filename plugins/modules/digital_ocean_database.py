@@ -16,7 +16,7 @@ description:
   - Create and delete a database in DigitalOcean and optionally wait for it to be online.
   - DigitalOcean's managed database service simplifies the creation and management of highly available database clusters.
   - Currently, it offers support for PostgreSQL, Redis, and MySQL.
-version_added: 1.2.0
+version_added: 1.3.0
 author: "Mark Mercado (@mamercad)"
 options:
   state:

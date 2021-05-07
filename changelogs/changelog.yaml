@@ -83,3 +83,18 @@ releases:
       name: digital_ocean_balance_info
       namespace: ''
     release_date: '2021-05-02'
+  1.3.0:
+    modules:
+    - description: Create and delete a DigitalOcean database
+      name: digital_ocean_database
+      namespace: ''
+    - description: Gather information about DigitalOcean databases
+      name: digital_ocean_database_info
+      namespace: ''
+    - description: Create and delete a DigitalOcean Kubernetes cluster
+      name: digital_ocean_kubernetes
+      namespace: ''
+    - description: Returns information about an existing DigitalOcean Kubernetes cluster
+      name: digital_ocean_kubernetes_info
+      namespace: ''
+    release_date: '2021-05-07'

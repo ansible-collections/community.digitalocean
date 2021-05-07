@@ -13,7 +13,7 @@ module: digital_ocean_kubernetes_info
 short_description: Returns information about an existing DigitalOcean Kubernetes cluster
 description:
   - Returns information about an existing DigitalOcean Kubernetes cluster.
-version_added: 1.2.0
+version_added: 1.3.0
 author: Mark Mercado (@mamercad)
 options:
   oauth_token:
