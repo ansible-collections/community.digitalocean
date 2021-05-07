@@ -83,7 +83,7 @@ ZONE_FILE_SLEEP = 3
 
 class DoManager(DigitalOceanHelper, object):
     def __init__(self, module):
-        super(DoManager, self).__init__(module)
+        super().__init__(module)
         self.domain_name = module.params.get('name', None)
         self.domain_ip = module.params.get('ip', None)
         self.domain_id = module.params.get('id', None)

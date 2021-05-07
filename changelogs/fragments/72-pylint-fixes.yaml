@@ -1,0 +1,6 @@
+bugfixes:
+  - digitalocean inventory - Switch to PEP 3135 ``super()`` (https://github.com/ansible-collections/community.digitalocean/issues/72).
+  - digitalocean inventory - Re-raise using ``from`` (https://github.com/ansible-collections/community.digitalocean/issues/72).
+  - digital_ocean - Switch to PEP 3135 ``super()`` (https://github.com/ansible-collections/community.digitalocean/issues/72).
+  - digital_ocean_domain - Switch to PEP 3135 ``super()`` (https://github.com/ansible-collections/community.digitalocean/issues/72).
+  - digital_ocean_domain_record - Switch to PEP 3135 ``super()`` (https://github.com/ansible-collections/community.digitalocean/issues/72).

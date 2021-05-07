@@ -182,7 +182,7 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
 
     def __init__(self, module):
-        super(DigitalOceanDomainRecordManager, self).__init__(module)
+        super().__init__(module)
         self.module = module
         self.domain = module.params.get('domain').lower()
         self.records = self.__get_all_records()

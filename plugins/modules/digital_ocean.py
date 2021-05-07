@@ -212,7 +212,7 @@ from ansible.module_utils.basic import AnsibleModule, env_fallback
 class TimeoutError(Exception):
 
     def __init__(self, msg, id_):
-        super(TimeoutError, self).__init__(msg)
+        super().__init__(msg)
         self.id = id_
 
 
