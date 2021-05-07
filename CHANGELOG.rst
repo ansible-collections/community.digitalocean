@@ -5,6 +5,17 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.3.0
+======
+
+New Modules
+-----------
+
+- digital_ocean_database - Create and delete a DigitalOcean database
+- digital_ocean_database_info - Gather information about DigitalOcean databases
+- digital_ocean_kubernetes - Create and delete a DigitalOcean Kubernetes cluster
+- digital_ocean_kubernetes_info - Returns information about an existing DigitalOcean Kubernetes cluster
+
 v1.2.0
 ======
 
