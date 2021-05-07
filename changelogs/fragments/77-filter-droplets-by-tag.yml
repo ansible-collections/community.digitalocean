@@ -1,2 +1,2 @@
 minor_changes:
-  - digitalocean - filter droplets by tag in dynamic inventory plugin
+  - digitalocean - filter droplets by tag in dynamic inventory plugin (https://github.com/ansible-collections/community.digitalocean/pull/77)

@@ -130,6 +130,14 @@ def get_option(option):
     }
     return options.get(option)
 
+def get_option_with_filter_tag(option):
+    options = {
+        'filter_by_tag': 'my-tag',
+        'var_prefix': 'do_',
+        'strict': False,
+    }
+    return options.get(option)
+
 
 def test_populate_hostvars(inventory, mocker):
     inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
@@ -141,3 +149,12 @@ def test_populate_hostvars(inventory, mocker):
 
     assert host_foo.vars['do_id'] == 3164444
     assert host_bar.vars['do_size_slug'] == "s-1vcpu-1gb"
+
+def test_populate_hostvars_with_filter_by_tag(inventory, mocker):
+    inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option_with_filter_tag)
+    inventory._populate()
+
+    host_foo = inventory.inventory.get_host('foo')
+
+    assert host_foo.vars['do_id'] == 3164444
