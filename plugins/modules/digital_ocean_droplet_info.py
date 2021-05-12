@@ -46,6 +46,15 @@ EXAMPLES = r'''
   community.digitalocean.digital_ocean_account_info:
     oauth_token: "{{ oauth_token }}"
     id: abc-123-d45
+
+- name: Get information about all droplets to loop through
+  community.digitalocean.digital_ocean_droplet_info:
+    oauth_token: "{{ oauth_token }}"
+  register: droplets
+
+- name: Get number of droplets
+  set_fact:
+    droplet_count: "{{ droplets.data | length }}"
 '''
 
 RETURN = r'''
@@ -203,30 +212,26 @@ data:
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
-from ansible.module_utils._text import to_native
-
 
 def run(module):
     rest = DigitalOceanHelper(module)
 
     if module.params["id"]:
         path = "droplets/" + module.params["id"]
-        return_codes = (200, 404)
+        response = rest.get(path)
+        if response.status_code != 200:
+          module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
     else:
-        path = "droplets"
-        return_codes = (200)
-
-    response = rest.get(path)
-
-    if response.status_code not in return_codes:
-        module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
+        response = rest.get_paginated_data(base_url='droplets?', data_key_name='droplets')
 
     if module.params["id"]:
-        data = [response.json["droplet"]]
+      data = [response.json["droplet"]]
     elif module.params["name"]:
-        data = [d for d in response.json["droplets"] if d["name"] == module.params["name"]]
+      data = [d for d in response if d["name"] == module.params["name"]]
+      if not data:
+        module.fail_json(msg="Failed to fetch 'droplets' information due to error: Unable to find droplet with name %s" % module.params["name"])
     else:
-        data = response.json["droplets"]
+      data = response
 
     module.exit_json(changed=False, data=data)
 
@@ -237,7 +242,9 @@ def main():
         name=dict(type='str', required=False, default=None),
         id=dict(type='str', required=False, default=None)
     )
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(
+      argument_spec=argument_spec,  
+      mutually_exclusive=[('id', 'name')])
     run(module)
 
 
