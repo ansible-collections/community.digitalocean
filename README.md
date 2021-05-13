@@ -25,6 +25,7 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_domain_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_info_module.html) – Gather information about DigitalOcean Domains
 - [digital_ocean_domain_record](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_record.html) – Create and delete DigitalOcean Domain Records
 - [digital_ocean_droplet](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) – Create and delete a DigitalOcean droplet
+- [digital_ocean_droplet_info](https;//docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_info.html) - Gather information about DigitalOcean Droplets
 - [digital_ocean_firewall](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_firewall_module.html) – Create and delete DigitalOcean firewalls
 - [digital_ocean_firewall_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_firewall_facts_module.html) – Gather information about DigitalOcean firewalls
 - [digital_ocean_firewall_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_firewall_info_module.html) – Gather information about DigitalOcean firewalls
