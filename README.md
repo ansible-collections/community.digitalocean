@@ -20,6 +20,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_certificate](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_module.html) – Manage certificates in DigitalOcean.
 - [digital_ocean_certificate_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_facts_module.html) – Gather information about DigitalOcean certificates
 - [digital_ocean_certificate_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_info_module.html) – Gather information about DigitalOcean certificates
+- [digital_ocean_database_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_database_info_module.html) – Gather information about DigitalOcean databases
+- [digital_ocean_database](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_database_module.html) – Create and delete DigitalOcean databases
 - [digital_ocean_domain](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_module.html) – Create/delete a DNS domain in DigitalOcean
 - [digital_ocean_domain_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_facts_module.html) – Gather information about DigitalOcean Domains
 - [digital_ocean_domain_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_info_module.html) – Gather information about DigitalOcean Domains
@@ -33,6 +35,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_floating_ip_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_floating_ip_info_module.html) – DigitalOcean Floating IPs information
 - [digital_ocean_image_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_image_facts_module.html) – Gather information about DigitalOcean images
 - [digital_ocean_image_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_image_info_module.html) – Gather information about DigitalOcean images
+- [digital_ocean_kubernetes_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_kubernetes_info_module.html) – Gather information about DigitalOcean Kubernetes clusters
+- [digital_ocean_kubernetes](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_kubernetes_module.html) – Create and delete DigitalOcean Kubernetes clusters
 - [digital_ocean_load_balancer_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_facts_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_load_balancer_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_info_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_region_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_region_facts_module.html) – Gather information about DigitalOcean regions
