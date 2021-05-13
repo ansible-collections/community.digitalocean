@@ -213,6 +213,7 @@ from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
 
+
 def run(module):
     rest = DigitalOceanHelper(module)
 
@@ -220,18 +221,18 @@ def run(module):
         path = "droplets/" + module.params["id"]
         response = rest.get(path)
         if response.status_code != 200:
-          module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
+            module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
     else:
         response = rest.get_paginated_data(base_url='droplets?', data_key_name='droplets')
 
     if module.params["id"]:
-      data = [response.json["droplet"]]
+        data = [response.json["droplet"]]
     elif module.params["name"]:
-      data = [d for d in response if d["name"] == module.params["name"]]
-      if not data:
-        module.fail_json(msg="Failed to fetch 'droplets' information due to error: Unable to find droplet with name %s" % module.params["name"])
+        data = [d for d in response if d["name"] == module.params["name"]]
+        if not data:
+            module.fail_json(msg="Failed to fetch 'droplets' information due to error: Unable to find droplet with name %s" % module.params["name"])
     else:
-      data = response
+        data = response
 
     module.exit_json(changed=False, data=data)
 
@@ -243,8 +244,8 @@ def main():
         id=dict(type='str', required=False, default=None)
     )
     module = AnsibleModule(
-      argument_spec=argument_spec,  
-      mutually_exclusive=[('id', 'name')])
+        argument_spec=argument_spec,
+        mutually_exclusive=[('id', 'name')])
     run(module)
 
 
