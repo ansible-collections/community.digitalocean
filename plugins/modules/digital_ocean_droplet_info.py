@@ -15,7 +15,7 @@ short_description: Gather information about DigitalOcean Droplets
 description:
     - This module can be used to gather information about Droplets.
 author: "Tyler Auerbeck (@tylerauerbeck)"
-version_added: 1.2.0
+version_added: 1.4.0
 
 options:
   id:
