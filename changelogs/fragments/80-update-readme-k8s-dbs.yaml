@@ -1,0 +1,2 @@
+bugfixes:
+  - digitalocean - Update README.md for K8s and databases (https://github.com/ansible-collections/community.digitalocean/pull/80).

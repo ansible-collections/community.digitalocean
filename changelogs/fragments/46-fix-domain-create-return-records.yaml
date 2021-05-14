@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_domain - return zone records when creating a new zone (https://github.com/ansible-collections/community.digitalocean/issues/46).

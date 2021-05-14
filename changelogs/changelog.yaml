@@ -42,3 +42,59 @@ releases:
         name: digitalocean
         namespace: null
     release_date: '2021-04-01'
+  1.1.1:
+    changes:
+      bugfixes:
+      - digitalocean - Drop collection version from README.md (https://github.com/ansible-collections/community.digitalocean/issues/63).
+    fragments:
+    - 63-readme-version.yml
+    release_date: '2021-04-18'
+  1.2.0:
+    changes:
+      bugfixes:
+      - digital_ocean inventory script - fail cleaner on invalid ``HOST`` argument
+        to ``--host`` option (https://github.com/ansible-collections/community.digitalocean/pull/44).
+      - digital_ocean inventory script - implement unimplemented ``use_private_network``
+        option and register missing ``do_ip_address``, ``do_private_ip_address`` host
+        vars (https://github.com/ansible-collections/community.digitalocean/pull/45/files).
+      - digital_ocean inventory script - return JSON consistent with specification
+        with ``--host`` (https://github.com/ansible-collections/community.digitalocean/pull/44).
+      - digital_ocean_domain - return zone records when creating a new zone (https://github.com/ansible-collections/community.digitalocean/issues/46).
+      - digital_ocean_droplet - add missing ``required=True`` on ``do_oauth_token``
+        in ``argument_spec`` (https://github.com/ansible-collections/community.digitalocean/issues/13).
+      - digital_ocean_floating_ip - fixes idempotence (https://github.com/ansible-collections/community.digitalocean/issues/5).
+      minor_changes:
+      - digital_ocean - ``ssh_key_ids`` list entries are now validated to be strings
+        (https://github.com/ansible-collections/community.digitalocean/issues/13).
+      - digital_ocean_droplet - ``ssh_keys``, ``tags``, and ``volumes`` list entries
+        are now validated to be strings (https://github.com/ansible-collections/community.digitalocean/issues/13).
+      - digital_ocean_droplet - adding ``active`` and ``inactive`` states (https://github.com/ansible-collections/community.digitalocean/issues/23).
+      - digital_ocean_droplet - adds Droplet resize functionality (https://github.com/ansible-collections/community.digitalocean/issues/4).
+    fragments:
+    - 13-fix-sanity-tests.yaml
+    - 23-add-active-inactive-droplet.yaml
+    - 4-droplet-resize.yaml
+    - 44-fixes-inv-script-host-option.yaml
+    - 45-fix-use_private_network.yaml
+    - 46-fix-domain-create-return-records.yaml
+    - 5-fix-floating-ip-idempotence.yaml
+    modules:
+    - description: Display DigitalOcean customer balance
+      name: digital_ocean_balance_info
+      namespace: ''
+    release_date: '2021-05-02'
+  1.3.0:
+    modules:
+    - description: Create and delete a DigitalOcean database
+      name: digital_ocean_database
+      namespace: ''
+    - description: Gather information about DigitalOcean databases
+      name: digital_ocean_database_info
+      namespace: ''
+    - description: Create and delete a DigitalOcean Kubernetes cluster
+      name: digital_ocean_kubernetes
+      namespace: ''
+    - description: Returns information about an existing DigitalOcean Kubernetes cluster
+      name: digital_ocean_kubernetes_info
+      namespace: ''
+    release_date: '2021-05-07'
