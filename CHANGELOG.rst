@@ -5,6 +5,15 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.4.1
+======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - Add integration tests for Droplet active and inactive states (https://github.com/ansible-collections/community.digitalocean/issues/66).
+- digital_ocean_droplet - Fix Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/issues/83).
+
 v1.4.0
 ======
 
