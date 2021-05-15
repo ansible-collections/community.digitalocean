@@ -17,6 +17,7 @@
         region: "{{ do_region }}"
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
+      ignore_errors: true  # In case one was left from previous run
       register: result
 
     - name: Verify Droplet is absent
