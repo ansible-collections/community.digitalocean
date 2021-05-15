@@ -1,2 +1,0 @@
-bugfixes:
-  - digitalocean - Fix return docs for digital_ocean_sshkey_info (https://github.com/ansible-collections/community.digitalocean/issues/56).

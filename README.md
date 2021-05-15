@@ -158,13 +158,18 @@ See the [changelog](https://github.com/ansible-collections/community.digitalocea
 
 Releases are automatically built and pushed to Ansible Galaxy for any new tag. Before tagging a release, make sure to do the following:
 
-  1. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection.
+  1. Update `galaxy.yml` and this README's `requirements.yml` example with the new `version` for the collection. Make sure all new modules have references above.
   1. Update the CHANGELOG:
       1. Make sure you have [`antsibull-changelog`](https://pypi.org/project/antsibull-changelog/) installed.
       1. Make sure there are fragments for all known changes in `changelogs/fragments`.
       1. Run `antsibull-changelog release`.
+      1. Don't forget to add new folks to `galaxy.yml`.
   1. Commit the changes and create a PR with the changes. Wait for tests to pass, then merge it once they have.
   1. Tag the version in Git and push to GitHub.
+      1. Determine the next version (collections follow [semver](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections.html#collection-versions) semantics) by listing tags or looking at the [releases](https://github.com/ansible-collections/community.digitalocean/releases).
+      1. List tags with `git tag --list`
+      1. Create a new tag with `git tag 1.2.3`
+      1. Push tags upstream with `git push upstream --tags`
 
 After the version is published, verify it exists on the [DigitalOcean Collection Galaxy page](https://galaxy.ansible.com/community/digitalocean).
 
