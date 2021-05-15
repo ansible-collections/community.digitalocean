@@ -40,6 +40,103 @@
       ansible.builtin.assert:
         that:
           - result.changed
+          - result.data is defined
+          - result.data.droplet is defined
+          - result.data.droplet.name is defined
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status == "active"
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Ensure Droplet is absent
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      register: result
+
+    - name: Verify Droplet is absent
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create the Droplet (active)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: active
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify Droplet is present (and active)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data.droplet is defined
+          - result.data.droplet.name is defined
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status == "active"
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Ensure Droplet is absent
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      register: result
+
+    - name: Verify Droplet is absent
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create the Droplet (inactive)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: inactive
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify Droplet is present (and off)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data.droplet is defined
+          - result.data.droplet.name is defined
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status == "off"
 
     - name: Give the cloud a minute to settle
       ansible.builtin.pause:

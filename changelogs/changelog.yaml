@@ -98,3 +98,28 @@ releases:
       name: digital_ocean_kubernetes_info
       namespace: ''
     release_date: '2021-05-07'
+  1.4.0:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet_info - Fix documentation link for `digital_ocean_droplet_info`
+        (https://github.com/ansible-collections/community.digitalocean/pull/81).
+      - digitalocean - Fix return docs for digital_ocean_sshkey_info (https://github.com/ansible-collections/community.digitalocean/issues/56).
+      - digitalocean - Update README.md for K8s and databases (https://github.com/ansible-collections/community.digitalocean/pull/80).
+    fragments:
+    - 80-update-readme-k8s-dbs.yaml
+    - 81-fix-document-link-digital-ocean-droplet-info.yml
+    - 82-fix-sshkey-info.yaml
+    modules:
+    - description: Gather information about DigitalOcean Droplets
+      name: digital_ocean_droplet_info
+      namespace: ''
+    release_date: '2021-05-14'
+  1.4.1:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - Add integration tests for Droplet active and inactive
+        states (https://github.com/ansible-collections/community.digitalocean/issues/66).
+      - digital_ocean_droplet - Fix Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/issues/83).
+    fragments:
+    - 83-droplet-inactive.yaml
+    release_date: '2021-05-15'

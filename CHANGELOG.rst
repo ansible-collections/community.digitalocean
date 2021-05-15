@@ -5,6 +5,30 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.4.1
+======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - Add integration tests for Droplet active and inactive states (https://github.com/ansible-collections/community.digitalocean/issues/66).
+- digital_ocean_droplet - Fix Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/issues/83).
+
+v1.4.0
+======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet_info - Fix documentation link for `digital_ocean_droplet_info` (https://github.com/ansible-collections/community.digitalocean/pull/81).
+- digitalocean - Fix return docs for digital_ocean_sshkey_info (https://github.com/ansible-collections/community.digitalocean/issues/56).
+- digitalocean - Update README.md for K8s and databases (https://github.com/ansible-collections/community.digitalocean/pull/80).
+
+New Modules
+-----------
+
+- digital_ocean_droplet_info - Gather information about DigitalOcean Droplets
+
 v1.3.0
 ======
 

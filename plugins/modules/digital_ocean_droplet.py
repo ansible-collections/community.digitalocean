@@ -309,7 +309,7 @@ class DODroplet(object):
     def create(self, state):
         json_data = self.get_droplet()
         droplet_data = None
-        if json_data:
+        if json_data is not None:
             droplet = json_data.get('droplet', None)
             if droplet is not None:
                 droplet_size = droplet.get('size_slug', None)
@@ -339,9 +339,23 @@ class DODroplet(object):
         json_data = response.json
         if response.status_code >= 400:
             self.module.fail_json(changed=False, msg=json_data['message'])
-        if self.wait:
-            json_data = self.ensure_power_on(json_data['droplet']['id'])
-            droplet_data = self.get_addresses(json_data)
+        droplet_data = json_data.get("droplet", None)
+        if droplet_data is not None:
+            droplet_id = droplet_data.get("id", None)
+            if droplet_id is not None:
+                if self.wait:
+                    if state == "active":
+                        json_data = self.ensure_power_on(droplet_id)
+                    if state == "inactive":
+                        json_data = self.ensure_power_off(droplet_id)
+                    droplet_data = self.get_addresses(json_data)
+                else:
+                    if state == "inactive":
+                        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
+            else:
+                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug")
+        else:
+            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug")
         self.module.exit_json(changed=True, data=droplet_data)
 
     def delete(self):
