@@ -140,6 +140,10 @@
         wait_timeout: 500
       register: result
 
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
     - name: Verify Droplet is present (and off)
       ansible.builtin.assert:
         that:
