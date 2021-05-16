@@ -8,7 +8,7 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Ensure Droplet is absent
+    - name: Ensure Droplet is absent (leftover)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
@@ -18,6 +18,17 @@
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
       ignore_errors: true  # In case one was left from previous run
+      register: result
+
+    - name: Ensure Droplet is absent
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
       register: result
 
     - name: Verify Droplet is absent
