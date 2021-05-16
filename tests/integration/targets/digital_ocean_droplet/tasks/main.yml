@@ -60,7 +60,7 @@
           - result.data.droplet is defined
           - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
-          - result.data.droplet.status == "active"
+          - result.data.droplet.status in ["new", "active", "available"]
 
     - name: Ensure Droplet is absent
       community.digitalocean.digital_ocean_droplet:
@@ -106,7 +106,7 @@
           - result.data.droplet is defined
           - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
-          - result.data.droplet.status == "active"
+          - result.data.droplet.status in ["new", "active", "available"]
 
     - name: Ensure Droplet is absent
       community.digitalocean.digital_ocean_droplet:
