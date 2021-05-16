@@ -37,6 +37,10 @@
         wait_timeout: 500
       register: result
 
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
     - name: Verify Droplet is present
       ansible.builtin.assert:
         that:
@@ -46,10 +50,6 @@
           - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
           - result.data.droplet.status == "active"
-
-    - name: Give the cloud a minute to settle
-      ansible.builtin.pause:
-        minutes: 1
 
     - name: Ensure Droplet is absent
       community.digitalocean.digital_ocean_droplet:
@@ -83,6 +83,10 @@
         wait_timeout: 500
       register: result
 
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
     - name: Verify Droplet is present (and active)
       ansible.builtin.assert:
         that:
@@ -92,10 +96,6 @@
           - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
           - result.data.droplet.status == "active"
-
-    - name: Give the cloud a minute to settle
-      ansible.builtin.pause:
-        minutes: 1
 
     - name: Ensure Droplet is absent
       community.digitalocean.digital_ocean_droplet:
