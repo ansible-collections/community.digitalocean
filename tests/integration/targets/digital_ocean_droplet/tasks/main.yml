@@ -137,7 +137,7 @@
         region: "{{ do_region }}"
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
-        wait_timeout: 500
+        wait_timeout: 1000
       register: result
 
     - name: Give the cloud a minute to settle
