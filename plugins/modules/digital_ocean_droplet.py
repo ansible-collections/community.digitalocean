@@ -401,7 +401,6 @@ class DODroplet(object):
                 self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no status)")
 
             if droplet_status == "active":
-                f.write("active {0}\n".format(droplet_status))
                 break
 
             time.sleep(min(10, end_time - time.time()))
