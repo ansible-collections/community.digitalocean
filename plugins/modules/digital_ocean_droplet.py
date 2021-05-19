@@ -379,7 +379,7 @@ class DODroplet(object):
             json_data = response.json
             if json_data['droplet']['status'] == 'active':
                 return json_data
-            time.sleep(10, end_time - time.time()))
+            time.sleep(min(10, end_time - time.time()))
         self.module.fail_json(msg='Wait for droplet powering on timeout')
 
     def ensure_power_off(self, droplet_id):
