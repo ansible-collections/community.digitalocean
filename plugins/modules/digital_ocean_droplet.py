@@ -379,18 +379,66 @@ class DODroplet(object):
             json_data = response.json
             if json_data['droplet']['status'] == 'active':
                 return json_data
-            time.sleep(min(2, end_time - time.time()))
+            time.sleep(min(10, end_time - time.time()))
         self.module.fail_json(msg='Wait for droplet powering on timeout')
 
     def ensure_power_off(self, droplet_id):
-        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
+
+        # Make sure Droplet is active first
         end_time = time.time() + self.wait_timeout
         while time.time() < end_time:
             response = self.rest.get('droplets/{0}'.format(droplet_id))
             json_data = response.json
-            if json_data['droplet']['status'] == 'off':
-                return json_data
-            time.sleep(min(2, end_time - time.time()))
+            if response.status_code >= 400:
+                self.module.fail_json(changed=False, msg=json_data['message'])
+
+            droplet = json_data.get("droplet", None)
+            if droplet is None:
+                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no droplet)")
+
+            droplet_status = droplet.get("status", None)
+            if droplet_status is None:
+                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no status)")
+
+            if droplet_status == "active":
+                break
+
+            time.sleep(min(10, end_time - time.time()))
+
+        # Trigger power-off
+        response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
+        json_data = response.json
+        if response.status_code >= 400:
+            self.module.fail_json(changed=False, msg=json_data['message'])
+
+        # Save the power-off action
+        action = json_data.get("action", None)
+        action_id = action.get("id", None)
+        if action is None or action_id is None:
+            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no power-off action or id)")
+
+        # Keep checking till it is done or times out
+        end_time = time.time() + self.wait_timeout
+        while time.time() < end_time:
+            response = self.rest.get('droplets/{0}/actions/{1}'.format(droplet_id, action_id))
+            json_data = response.json
+            if response.status_code >= 400:
+                self.module.fail_json(changed=False, msg=json_data['message'])
+
+            action = json_data.get("action", None)
+            action_status = action.get("status", None)
+            if action is None or action_status is None:
+                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action or status)")
+
+            if action_status == "completed":
+                response = self.rest.get('droplets/{0}'.format(droplet_id))
+                json_data = response.json
+                if response.status_code >= 400:
+                    self.module.fail_json(changed=False, msg=json_data['message'])
+                return(json_data)
+
+            time.sleep(min(10, end_time - time.time()))
+
         self.module.fail_json(msg='Wait for droplet powering off timeout')
 
 

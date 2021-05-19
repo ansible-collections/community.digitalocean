@@ -8,6 +8,18 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
+    - name: Ensure Droplet is absent (leftover)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      ignore_errors: true  # In case one was left from previous run
+      register: result
+
     - name: Ensure Droplet is absent
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
@@ -24,7 +36,7 @@
         that:
           - not result.changed
 
-    - name: Create the Droplet
+    - name: Create the Droplet (present)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: present
@@ -36,7 +48,11 @@
         wait_timeout: 500
       register: result
 
-    - name: Verify Droplet is present
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Verify Droplet is present (from present)
       ansible.builtin.assert:
         that:
           - result.changed
@@ -44,13 +60,9 @@
           - result.data.droplet is defined
           - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
-          - result.data.droplet.status == "active"
+          - result.data.droplet.status in ["new", "active", "available"]
 
-    - name: Give the cloud a minute to settle
-      ansible.builtin.pause:
-        minutes: 1
-
-    - name: Ensure Droplet is absent
+    - name: Destroy the Droplet (absent)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
@@ -61,7 +73,7 @@
         size: "{{ droplet_size }}"
       register: result
 
-    - name: Verify Droplet is absent
+    - name: Verify Droplet is absent (from absent)
       ansible.builtin.assert:
         that:
           - result.changed
@@ -82,7 +94,11 @@
         wait_timeout: 500
       register: result
 
-    - name: Verify Droplet is present (and active)
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Verify Droplet is present (from active)
       ansible.builtin.assert:
         that:
           - result.changed
@@ -90,13 +106,9 @@
           - result.data.droplet is defined
           - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
-          - result.data.droplet.status == "active"
+          - result.data.droplet.status in ["new", "active", "available"]
 
-    - name: Give the cloud a minute to settle
-      ansible.builtin.pause:
-        minutes: 1
-
-    - name: Ensure Droplet is absent
+    - name: Delete the Droplet (absent)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
@@ -107,7 +119,7 @@
         size: "{{ droplet_size }}"
       register: result
 
-    - name: Verify Droplet is absent
+    - name: Verify Droplet is absent (from absent)
       ansible.builtin.assert:
         that:
           - result.changed
@@ -125,8 +137,12 @@
         region: "{{ do_region }}"
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
-        wait_timeout: 500
+        wait_timeout: 1500
       register: result
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
 
     - name: Verify Droplet is present (and off)
       ansible.builtin.assert:
@@ -144,7 +160,7 @@
 
   always:
 
-    - name: Delete the Droplet
+    - name: Delete the Droplet (always)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
@@ -153,9 +169,4 @@
         region: "{{ do_region }}"
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
-      register: result
-
-    - name: Verify the Droplet is deleted
-      ansible.builtin.assert:
-        that:
-          - result.changed
+      ignore_errors: true  # Should this fail, we'll clean it up next run
