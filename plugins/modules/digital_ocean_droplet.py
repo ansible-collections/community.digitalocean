@@ -373,20 +373,20 @@ class DODroplet(object):
 
     def ensure_power_on(self, droplet_id):
         response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_on'})
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
             response = self.rest.get('droplets/{0}'.format(droplet_id))
             json_data = response.json
             if json_data['droplet']['status'] == 'active':
                 return json_data
-            time.sleep(min(10, end_time - time.time()))
+            time.sleep(min(10, end_time - time.monotonic()))
         self.module.fail_json(msg='Wait for droplet powering on timeout')
 
     def ensure_power_off(self, droplet_id):
 
         # Make sure Droplet is active first
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
             response = self.rest.get('droplets/{0}'.format(droplet_id))
             json_data = response.json
             if response.status_code >= 400:
@@ -403,7 +403,7 @@ class DODroplet(object):
             if droplet_status == "active":
                 break
 
-            time.sleep(min(10, end_time - time.time()))
+            time.sleep(min(10, end_time - time.monotonic()))
 
         # Trigger power-off
         response = self.rest.post('droplets/{0}/actions'.format(droplet_id), data={'type': 'power_off'})
@@ -418,8 +418,8 @@ class DODroplet(object):
             self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no power-off action or id)")
 
         # Keep checking till it is done or times out
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
             response = self.rest.get('droplets/{0}/actions/{1}'.format(droplet_id, action_id))
             json_data = response.json
             if response.status_code >= 400:
@@ -437,7 +437,7 @@ class DODroplet(object):
                     self.module.fail_json(changed=False, msg=json_data['message'])
                 return(json_data)
 
-            time.sleep(min(10, end_time - time.time()))
+            time.sleep(min(10, end_time - time.monotonic()))
 
         self.module.fail_json(msg='Wait for droplet powering off timeout')
 
