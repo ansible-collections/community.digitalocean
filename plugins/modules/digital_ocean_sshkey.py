@@ -172,7 +172,7 @@ def core(module):
     rest = Rest(module, {'Authorization': 'Bearer {0}'.format(api_token),
                          'Content-type': 'application/json'})
 
-    fingerprint = fingerprint or ssh_key_fingerprint(ssh_pub_key)
+    fingerprint = fingerprint or ssh_key_fingerprint(module,ssh_pub_key)
     response = rest.get('account/keys/{0}'.format(fingerprint))
     status_code = response.status_code
     json = response.json
@@ -238,10 +238,13 @@ def core(module):
             status_code, response.json['message']))
 
 
-def ssh_key_fingerprint(ssh_pub_key):
-    key = ssh_pub_key.split(None, 2)[1]
-    fingerprint = hashlib.md5(base64.b64decode(key)).hexdigest()
-    return ':'.join(a + b for a, b in zip(fingerprint[::2], fingerprint[1::2]))
+def ssh_key_fingerprint(module, ssh_pub_key):
+    try:
+        key = ssh_pub_key.split(None, 2)[1]
+        fingerprint = hashlib.md5(base64.b64decode(key)).hexdigest()
+        return ':'.join(a + b for a, b in zip(fingerprint[::2], fingerprint[1::2]))
+    except:
+        module.fail_json(msg="This does not appear to be a valid public key. Please verify the format and value provided in ssh_public_key.")
 
 
 def main():
