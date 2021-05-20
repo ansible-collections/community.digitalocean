@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - Fixed Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/pull/88).
