@@ -123,3 +123,12 @@ releases:
     fragments:
     - 83-droplet-inactive.yaml
     release_date: '2021-05-15'
+  1.4.2:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - Fixed Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/pull/88).
+      - digital_ocean_sshkey - Fixed SSH Key Traceback Issue (https://github.com/ansible-collections/community.digitalocean/issues/68).
+    fragments:
+    - 68-fix-sshkey-traceback.yaml
+    - 88-droplet-integration-tests.yaml
+    release_date: '2021-05-21'

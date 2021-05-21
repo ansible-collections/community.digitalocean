@@ -5,6 +5,15 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.4.2
+======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - Fixed Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/pull/88).
+- digital_ocean_sshkey - Fixed SSH Key Traceback Issue (https://github.com/ansible-collections/community.digitalocean/issues/68).
+
 v1.4.1
 ======
 
