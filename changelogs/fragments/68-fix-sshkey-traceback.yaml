@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_sshkey - Fixed SSH Key Traceback Issue (https://github.com/ansible-collections/community.digitalocean/issues/68).
