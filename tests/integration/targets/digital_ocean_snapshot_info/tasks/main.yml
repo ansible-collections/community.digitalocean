@@ -56,4 +56,3 @@
       ansible.builtin.assert:
         that:
           - result.failed
-
