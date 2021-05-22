@@ -194,10 +194,10 @@ class DODatabase(object):
                 self.name = database.get('name', None)
                 self.engine = database.get('engine', None)
                 self.version = database.get('version', None)
-                self.version = database.get('num_nodes', None)
-                self.version = database.get('region', None)
-                self.version = database.get('status', None)
-                self.version = database.get('size', None)
+                self.num_nodes = database.get('num_nodes', None)
+                self.region = database.get('region', None)
+                self.status = database.get('status', None)
+                self.size = database.get('size', None)
             return json_data
         return None
 
@@ -216,12 +216,12 @@ class DODatabase(object):
                     if database.get('name', None) == database_name:
                         self.id = database.get('id', None)
                         self.name = database.get('name', None)
-                        self.size = database.get('engine', None)
-                        self.status = database.get('version', None)
-                        self.version = database.get('num_nodes', None)
-                        self.version = database.get('region', None)
-                        self.version = database.get('status', None)
-                        self.version = database.get('size', None)
+                        self.engine = database.get('engine', None)
+                        self.version = database.get('version', None)
+                        self.status = database.get('s', None)
+                        self.num_nodes = database.get('num_nodes', None)
+                        self.region = database.get('region', None)
+                        self.size = database.get('size', None)
                         return {'database': database}
                 if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
                     page += 1
