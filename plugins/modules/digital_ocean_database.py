@@ -218,7 +218,7 @@ class DODatabase(object):
                         self.name = database.get('name', None)
                         self.engine = database.get('engine', None)
                         self.version = database.get('version', None)
-                        self.status = database.get('s', None)
+                        self.status = database.get('status', None)
                         self.num_nodes = database.get('num_nodes', None)
                         self.region = database.get('region', None)
                         self.size = database.get('size', None)
