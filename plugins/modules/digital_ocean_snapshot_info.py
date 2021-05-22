@@ -121,7 +121,7 @@ def core(module):
 
         if status_code != 200:
             module.fail_json(msg="Failed to fetch snapshot information due to error : %s" % response.json['message'])
-        
+
         snapshot.extend(response.json["snapshots"])
     else:
         if snapshot_type == 'droplet':
