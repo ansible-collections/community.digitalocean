@@ -31,6 +31,7 @@ options:
   api_token:
     description:
      - DigitalOcean OAuth token.
+     - Template expressions can be used in this field.
     required: true
     type: str
     aliases: [ oauth_token ]
@@ -67,7 +68,7 @@ options:
 EXAMPLES = r'''
 # Using keyed groups and compose for hostvars
 plugin: community.digitalocean.digitalocean
-api_token: "{{ api_token }}"
+api_token: '{{ lookup("pipe", "./get-do-token.sh" }}'
 attributes:
   - id
   - name
@@ -124,9 +125,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     'digital_ocean.yaml, digital_ocean.yml.')
         return valid
 
+    def _template_option(self, option):
+        value = self.get_option(option)
+        self.templar.available_variables = {}
+        return self.templar.template(value)
+
     def _get_payload(self):
         # request parameters
-        api_token = self.get_option('api_token')
+        api_token = self._template_option('api_token')
         headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {0}'.format(api_token)

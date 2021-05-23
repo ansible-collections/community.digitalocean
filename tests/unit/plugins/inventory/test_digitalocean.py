@@ -6,9 +6,13 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
+from subprocess import CompletedProcess
 
 from ansible.errors import AnsibleParserError
 from ansible.inventory.data import InventoryData
+from ansible.template import Templar
+from ansible.parsing.dataloader import DataLoader
+import ansible_collections.community.digitalocean.plugins.inventory.digitalocean as module_under_test
 from ansible_collections.community.digitalocean.plugins.inventory.digitalocean import InventoryModule
 
 
@@ -16,6 +20,7 @@ from ansible_collections.community.digitalocean.plugins.inventory.digitalocean i
 def inventory():
     r = InventoryModule()
     r.inventory = InventoryData()
+    r.templar = Templar(loader=DataLoader())
     return r
 
 
@@ -141,3 +146,27 @@ def test_populate_hostvars(inventory, mocker):
 
     assert host_foo.vars['do_id'] == 3164444
     assert host_bar.vars['do_size_slug'] == "s-1vcpu-1gb"
+
+
+def get_option_with_templated_api_token(option):
+    options = {
+        # "random_choice" with just a single input always returns the same result.
+        'api_token': '{{ lookup("random_choice", "my-do-token") }}',
+        'pagination': 100,
+    }
+    return options.get(option)
+
+
+def test_get_payload_with_templated_api_token(inventory, mocker):
+    inventory.get_option = mocker.MagicMock(side_effect=get_option_with_templated_api_token)
+
+    mocker.patch(module_under_test.__name__ + '.Request')
+    RequestMock = module_under_test.Request
+
+    req_instance = RequestMock.return_value
+    req_instance.get.return_value.read.return_value = '{"droplets": []}'
+
+    inventory._get_payload()
+
+    init_headers = RequestMock.call_args.kwargs['headers']
+    assert init_headers['Authorization'] == 'Bearer my-do-token'
