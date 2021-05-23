@@ -11,6 +11,7 @@ name: digitalocean
 author:
   - Janos Gerzson (@grzs)
   - Tadej Borovšak (@tadeboro)
+  - Max Truxa (@maxtruxa)
 short_description: DigitalOcean Inventory Plugin
 version_added: "1.1.0"
 description:
@@ -63,6 +64,13 @@ options:
       - DigitalOcean currently allows a maximum of 200.
     type: int
     default: 200
+  filters:
+    description:
+      - Filter hosts with Jinja templates.
+      - If no filters are specified, all hosts are added to the inventory.
+    type: list
+    elements: str
+    default: []
 '''
 
 EXAMPLES = r'''
@@ -93,11 +101,15 @@ compose:
     | map(attribute='ip_address') | first
   class: do_size.description | lower
   distro: do_image.distribution | lower
+filters:
+  - '"kubernetes" in tags'
+  - 'region.slug == "fra1"'
 '''
 
 import re
 import json
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils._text import to_native
 from ansible.module_utils.urls import Request
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
@@ -162,13 +174,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         attributes = self.get_option('attributes')
         var_prefix = self.get_option('var_prefix')
         strict = self.get_option('strict')
+        host_filters = self.get_option('filters')
         for record in self._get_payload():
 
-            # add host to inventory
-            if record.get('name'):
-                host_name = self.inventory.add_host(record.get('name'))
-            else:
+            host_name = record.get('name')
+            if not host_name:
                 continue
+
+            if not self._passes_filters(host_filters, record, host_name, strict):
+                self.display.vvv('Host {0} did not pass all filters'.format(host_name))
+                continue
+
+            # add host to inventory
+            self.inventory.add_host(host_name)
 
             # set variables for host
             for k, v in record.items():
@@ -184,6 +202,20 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                                               dict(), host_name, strict)
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'),
                                            dict(), host_name, strict)
+
+    def _passes_filters(self, filters, variables, host, strict=False):
+        if filters and isinstance(filters, list):
+            for template in filters:
+                try:
+                    if not self._compose(template, variables):
+                        return False
+                except Exception as e:
+                    if strict:
+                        raise AnsibleError('Could not evaluate host filter {0} for host {1}: {2}'
+                                           .format(template, host, to_native(e)))
+                    # Better be safe and not include any hosts by accident.
+                    return False
+        return True
 
     def parse(self, inventory, loader, path, cache=True):
         super(InventoryModule, self).parse(inventory, loader, path)
