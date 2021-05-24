@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_database - Fixed DB attribute settings (https://github.com/ansible-collections/community.digitalocean/issues/94).
