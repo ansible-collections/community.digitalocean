@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_snapshot_info - Fix lookup of snapshot_info by_id (https://github.com/ansible-collections/community.digitalocean/issues/92).
