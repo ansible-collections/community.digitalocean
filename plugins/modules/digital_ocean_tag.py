@@ -118,7 +118,6 @@ def core(module):
     response = rest.get('tags/{0}'.format(name))
 
     if state == 'present':
-        # response = rest.get('tags/{0}'.format(name))
         status_code = response.status_code
         resp_json = response.json
         changed = False
@@ -186,8 +185,6 @@ def core(module):
                 response = rest.delete(url)
             if response.status_code == 204:
                 module.exit_json(changed=True)
-           # else:
-           #     module.exit_json(changed=False, data=response.json)
         else:
             module.exit_json(changed=False)
 
