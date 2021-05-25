@@ -116,7 +116,7 @@ def core(module):
 
     rest = DigitalOceanHelper(module)
     response = rest.get('tags/{0}'.format(name))
-    
+
     if state == 'present':
         # response = rest.get('tags/{0}'.format(name))
         status_code = response.status_code
@@ -190,7 +190,6 @@ def core(module):
            #     module.exit_json(changed=False, data=response.json)
         else:
             module.exit_json(changed=False)
-        
 
 
 def main():
