@@ -8,7 +8,7 @@ __metaclass__ = type
 import pytest
 from subprocess import CompletedProcess
 
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.inventory.data import InventoryData
 from ansible.template import Templar
 from ansible.parsing.dataloader import DataLoader
@@ -170,3 +170,79 @@ def test_get_payload_with_templated_api_token(inventory, mocker):
 
     init_headers = RequestMock.call_args.kwargs['headers']
     assert init_headers['Authorization'] == 'Bearer my-do-token'
+
+
+def get_option_with_filters(option):
+    options = {
+        'attributes': ['id', 'size_slug'],
+        'var_prefix': 'do_',
+        'strict': False,
+        'filters': [
+            'region.slug == "fra1"',
+        ],
+    }
+    return options.get(option)
+
+
+def test_populate_hostvars_with_filters(inventory, mocker):
+    inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option_with_filters)
+    inventory._populate()
+
+    host_foo = inventory.inventory.get_host('foo')
+    host_bar = inventory.inventory.get_host('bar')
+
+    assert host_foo is None
+    assert host_bar.vars['do_size_slug'] == "s-1vcpu-1gb"
+
+
+def get_variables():
+    return {
+        'region': {
+            'slug': 'fra1',
+        },
+        'tags': ['something'],
+    }
+
+
+def test_passes_filters_accept_empty(inventory, mocker):
+    filters = []
+    variables = get_variables()
+    assert inventory._passes_filters(filters, variables, 'foo')
+
+
+def test_passes_filters_accept(inventory, mocker):
+    filters = ['region.slug == "fra1"']
+    variables = get_variables()
+    assert inventory._passes_filters(filters, variables, 'foo')
+
+
+def test_passes_filters_reject(inventory, mocker):
+    filters = ['region.slug == "nyc3"']
+    variables = get_variables()
+    assert not inventory._passes_filters(filters, variables, 'foo')
+
+
+def test_passes_filters_reject_any(inventory, mocker):
+    filters = [
+        'region.slug == "fra1"',  # accept
+        '"nope" in tags',         # reject
+    ]
+    variables = get_variables()
+    assert not inventory._passes_filters(filters, variables, 'foo')
+
+
+def test_passes_filters_invalid_filters(inventory, mocker):
+    filters = ['not a valid filter']
+    variables = get_variables()
+    assert not inventory._passes_filters(filters, variables, 'foo')
+
+
+def test_passes_filters_invalid_filters_strict(inventory, mocker):
+    filters = ['not a valid filter']
+    variables = get_variables()
+    try:
+        inventory._passes_filters(filters, variables, 'foo', True)
+        assert False, 'expected _passes_filters() to raise AnsibleError'
+    except AnsibleError as e:
+        pass
