@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_database_info - cleanup unused attribs (https://github.com/ansible-collections/community.digitalocean/pulls/100)
