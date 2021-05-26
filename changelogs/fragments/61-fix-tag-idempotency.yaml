@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_tag - fix tag idempotency (https://github.com/ansible-collections/community.digitalocean/issues/61)

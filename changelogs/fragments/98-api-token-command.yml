@@ -1,2 +1,0 @@
-minor_changes:
-  - digitalocean - support templates in API tokens when using the dynamic inventory plugin (https://github.com/ansible-collections/community.digitalocean/pull/98).
