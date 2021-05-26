@@ -132,3 +132,23 @@ releases:
     - 68-fix-sshkey-traceback.yaml
     - 88-droplet-integration-tests.yaml
     release_date: '2021-05-21'
+  1.5.0:
+    changes:
+      bugfixes:
+      - digital_ocean_database - Fixed DB attribute settings (https://github.com/ansible-collections/community.digitalocean/issues/94).
+      - digital_ocean_database_info - Cleanup unused attribs (https://github.com/ansible-collections/community.digitalocean/pulls/100).
+      - digital_ocean_snapshot_info - Fix lookup of snapshot_info by_id (https://github.com/ansible-collections/community.digitalocean/issues/92).
+      - digital_ocean_tag - Fix tag idempotency (https://github.com/ansible-collections/community.digitalocean/issues/61).
+      minor_changes:
+      - digitalocean - Filter droplets in dynamic inventory plugin using arbitrary.
+        jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
+      - digitalocean - Support templates in API tokens when using the dynamic inventory
+        plugin (https://github.com/ansible-collections/community.digitalocean/pull/98).
+    fragments:
+    - 100-fix-database-info.yaml
+    - 61-fix-tag-idempotency.yaml
+    - 92-snapshot-info-fix-get-by-id.yaml
+    - 94-fix-db-attribs.yaml
+    - 96-filter-droplets-through-jinja.yml
+    - 98-api-token-command.yml
+    release_date: '2021-05-26'

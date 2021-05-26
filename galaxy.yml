@@ -19,6 +19,7 @@ authors:
   - Andrew Klychkov (https://github.com/Andersson007)
   - Tyler Auerbeck (https://github.com/tylerauerbeck)
   - Angel Aviel Domaoan (https://github.com/tenshiAMD)
+  - Max Truxa (https://github.com/maxtruxa)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
 documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
@@ -33,7 +34,7 @@ tags:
   - digitalocean
   - cloud
   - droplet
-version: 1.4.2
+version: 1.5.0
 build_ignore:
   - .DS_Store
   - '*.tar.gz'
