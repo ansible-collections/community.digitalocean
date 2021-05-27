@@ -71,6 +71,7 @@ options:
     type: list
     elements: str
     default: []
+    version_added: '1.5.0'
 '''
 
 EXAMPLES = r'''
@@ -102,8 +103,8 @@ compose:
   class: do_size.description | lower
   distro: do_image.distribution | lower
 filters:
-  - '"kubernetes" in tags'
-  - 'region.slug == "fra1"'
+  - '"kubernetes" in do_tags'
+  - 'do_region.slug == "fra1"'
 '''
 
 import re
@@ -181,7 +182,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if not host_name:
                 continue
 
-            if not self._passes_filters(host_filters, record, host_name, strict):
+            host_vars = {}
+            for k, v in record.items():
+                if k in attributes:
+                    host_vars[var_prefix + k] = v
+
+            if not self._passes_filters(host_filters, host_vars, host_name, strict):
                 self.display.vvv('Host {0} did not pass all filters'.format(host_name))
                 continue
 
@@ -189,9 +195,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.inventory.add_host(host_name)
 
             # set variables for host
-            for k, v in record.items():
-                if k in attributes:
-                    self.inventory.set_variable(host_name, var_prefix + k, v)
+            for k, v in host_vars.items():
+                self.inventory.set_variable(host_name, k, v)
 
             self._set_composite_vars(
                 self.get_option('compose'),

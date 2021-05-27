@@ -147,6 +147,10 @@ def test_populate_hostvars(inventory, mocker):
     assert host_foo.vars['do_id'] == 3164444
     assert host_bar.vars['do_size_slug'] == "s-1vcpu-1gb"
 
+    # if a prefix is set, unprefixed attributes should not appear in host vars
+    assert 'id' not in host_foo.vars
+    assert 'size_slug' not in host_bar.vars
+
 
 def get_option_with_templated_api_token(option):
     options = {
@@ -174,11 +178,11 @@ def test_get_payload_with_templated_api_token(inventory, mocker):
 
 def get_option_with_filters(option):
     options = {
-        'attributes': ['id', 'size_slug'],
+        'attributes': ['id', 'size_slug', 'region'],
         'var_prefix': 'do_',
         'strict': False,
         'filters': [
-            'region.slug == "fra1"',
+            'do_region.slug == "fra1"',
         ],
     }
     return options.get(option)
@@ -198,10 +202,10 @@ def test_populate_hostvars_with_filters(inventory, mocker):
 
 def get_variables():
     return {
-        'region': {
+        'do_region': {
             'slug': 'fra1',
         },
-        'tags': ['something'],
+        'do_tags': ['something'],
     }
 
 
@@ -212,21 +216,21 @@ def test_passes_filters_accept_empty(inventory, mocker):
 
 
 def test_passes_filters_accept(inventory, mocker):
-    filters = ['region.slug == "fra1"']
+    filters = ['do_region.slug == "fra1"']
     variables = get_variables()
     assert inventory._passes_filters(filters, variables, 'foo')
 
 
 def test_passes_filters_reject(inventory, mocker):
-    filters = ['region.slug == "nyc3"']
+    filters = ['do_region.slug == "nyc3"']
     variables = get_variables()
     assert not inventory._passes_filters(filters, variables, 'foo')
 
 
 def test_passes_filters_reject_any(inventory, mocker):
     filters = [
-        'region.slug == "fra1"',  # accept
-        '"nope" in tags',         # reject
+        'do_region.slug == "fra1"',  # accept
+        '"nope" in do_tags',         # reject
     ]
     variables = get_variables()
     assert not inventory._passes_filters(filters, variables, 'foo')
