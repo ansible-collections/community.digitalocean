@@ -71,6 +71,7 @@ options:
     type: list
     elements: str
     default: []
+    version_added: '1.5.0'
 '''
 
 EXAMPLES = r'''
@@ -113,6 +114,7 @@ from ansible.module_utils._text import to_native
 from ansible.module_utils.urls import Request
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
+from ansible.utils.vars import combine_vars
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
@@ -181,7 +183,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             if not host_name:
                 continue
 
-            if not self._passes_filters(host_filters, record, host_name, strict):
+            host_vars = {}
+            for k, v in record.items():
+                if k in attributes:
+                    host_vars[var_prefix + k] = v
+
+            all_vars = combine_vars(record, host_vars)
+            if not self._passes_filters(host_filters, all_vars, host_name, strict):
                 self.display.vvv('Host {0} did not pass all filters'.format(host_name))
                 continue
 
@@ -189,19 +197,22 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self.inventory.add_host(host_name)
 
             # set variables for host
-            for k, v in record.items():
-                if k in attributes:
-                    self.inventory.set_variable(host_name, var_prefix + k, v)
+            for k, v in host_vars.items():
+                self.inventory.set_variable(host_name, k, v)
 
-            self._set_composite_vars(
-                self.get_option('compose'),
-                self.inventory.get_host(host_name).get_vars(), host_name, strict)
+            # reload host_vars from inventory, which includes some default
+            # values in addition to the variables set above
+            host_vars = self.inventory.get_host(host_name).get_vars()
+
+            combined_vars = combine_vars(record, host_vars)
+            self._set_composite_vars(self.get_option('compose'),
+                                     combined_vars, host_name, strict)
 
             # set composed and keyed groups
             self._add_host_to_composed_groups(self.get_option('groups'),
-                                              dict(), host_name, strict)
+                                              record, host_name, strict)
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'),
-                                           dict(), host_name, strict)
+                                           record, host_name, strict)
 
     def _passes_filters(self, filters, variables, host, strict=False):
         if filters and isinstance(filters, list):

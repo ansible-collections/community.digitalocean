@@ -147,6 +147,10 @@ def test_populate_hostvars(inventory, mocker):
     assert host_foo.vars['do_id'] == 3164444
     assert host_bar.vars['do_size_slug'] == "s-1vcpu-1gb"
 
+    # if a prefix is set, unprefixed attributes should not appear in host vars
+    assert 'id' not in host_foo.vars
+    assert 'size_slug' not in host_bar.vars
+
 
 def get_option_with_templated_api_token(option):
     options = {
@@ -246,3 +250,49 @@ def test_passes_filters_invalid_filters_strict(inventory, mocker):
         assert False, 'expected _passes_filters() to raise AnsibleError'
     except AnsibleError as e:
         pass
+
+
+def test_populate_hostvars_compose_gets_all_vars(inventory, mocker):
+    inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory._passes_filters = mocker.MagicMock(return_value=True)
+
+    composite_vars_spy = mocker.spy(inventory, '_set_composite_vars')
+
+    inventory._populate()
+
+    # `_set_composite_vars` does not automatically use host variables, so they
+    # need to be passed in explicitly.
+    combined_vars = composite_vars_spy.call_args.args[1]
+    assert composite_vars_spy.call_count == 2
+    assert 'id' in combined_vars
+    assert 'size_slug' in combined_vars
+    assert 'do_id' in combined_vars
+    assert 'do_size_slug' in combined_vars
+
+
+def test_populate_hostvars_groups_gets_all_vars(inventory, mocker):
+    inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    inventory._passes_filters = mocker.MagicMock(return_value=True)
+
+    composed_groups_spy = mocker.spy(inventory, '_add_host_to_composed_groups')
+    keyed_groups_spy = mocker.spy(inventory, '_add_host_to_keyed_groups')
+
+    inventory._populate()
+
+    # `_add_host_to_composed_groups` and `_add_host_to_keyed_groups` on the
+    # other hand do use host variables, so they don't need to be passed in.
+    extra_vars = composed_groups_spy.call_args.args[1]
+    assert composed_groups_spy.call_count == 2
+    assert 'id' in extra_vars
+    assert 'size_slug' in extra_vars
+    assert 'do_id' not in extra_vars
+    assert 'do_size_slug' not in extra_vars
+
+    extra_vars = keyed_groups_spy.call_args.args[1]
+    assert keyed_groups_spy.call_count == 2
+    assert 'id' in extra_vars
+    assert 'size_slug' in extra_vars
+    assert 'do_id' not in extra_vars
+    assert 'do_size_slug' not in extra_vars
