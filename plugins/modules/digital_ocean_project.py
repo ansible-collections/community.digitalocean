@@ -15,60 +15,60 @@ description:
      - Manage a project in DigitalOcean
 author: "Tyler Auerbeck (@tylerauerbeck)"
 version_added: 1.6.0
+
 options:
   state:
     description:
-     - Indicate desired state of the target.
-     - C(present) will create the project
-     - C(absent) will delete the project, if it exists.
+      - Indicate desired state of the target.
+      - C(present) will create the project
+      - C(absent) will delete the project, if it exists.
     default: present
     choices: ['present', 'absent']
     type: str
-  id:
+  oauth_token:
     description:
-     - UUID, the project id you want to operate on.
-    type: str
-  name:
-    description:
-     - String, this is the name of the project. The maximum length of the name is 175 characters and must be unique.
-    type: str
-    required: true
-  description:
-    description:
-     - String, this is the description of the project. The maximum length of the description is 255 characters.
-    type: str 
-  purpose:
-    description:
-     - String, the purpose of the project. The maximum length of the purpose is 255 characters.
-     - Options provided by DigitalOcean are: ['Just trying out DigitalOcean','Class project/Educational Purposes','Website or blog','Web Application','Service or API','Mobile Application','Machine Learning/AI/Data Processing','IoT','Operational/Developer tooling']
-     - If any other value is provided, it will be prefixed with 'Other: '
+      - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
+    aliases: ['API_TOKEN']
     type: str
     required: true
   environment:
     description:
-     - String, the environment of the projects resources.
+      - The environment of the projects resources.
+    choices: ['Development', 'Staging', 'Production']
     type: str
   is_default:
     description:
-     - If true, this will be the project that resources will be added to if no project is provided.
+      - If true, all resources will be added to this project if no project is specified.
+    default: False
     type: bool
-  oauth_token:
+  name:
     description:
-     - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    aliases: ['API_TOKEN']
+      - The human-readable name for the project. The maximum length is 175 characters and the name must be unique.
     type: str
-    required: true
-  wait_timeout:
+  id:
     description:
-      - How long before wait gives up, in seconds, when creating a cluster.
-    type: int
-    default: 600
-  wait:
+      - UUID of the project
+    type: str
+  purpose:
     description:
-      - Wait for the cluster to be running before returning.
-    type: bool
-    required: false
-    default: true
+      - The purpose of the project. The maximum length is 255 characters
+      - Required if state is C(present)
+      - If not one of DO provided purposes, will be prefixed with C(Other)
+      - DO provided purposes can be found below
+      - C(Just trying out DigitalOcean)
+      - C(Class project/Educational Purposes)
+      - C(Website or blog)
+      - C(Web Application)
+      - C(Service or API)
+      - C(Mobile Application)
+      - C(Machine Learning/AI/Data Processing)
+      - C(IoT)
+      - C(Operational/Developer tooling)
+    type: str
+  description:
+    description:
+      - The description of the project. The maximum length is 255 characters.
+    type: str
 '''
 
 
@@ -144,8 +144,6 @@ class DOProject(object):
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
-        self.wait = self.module.params.pop('wait', False)
-        self.wait_timeout = self.module.params.pop('wait_timeout', 120)
         # pop the oauth token so we don't include it in the POST data
         self.module.params.pop('oauth_token')
         self.id = None
@@ -207,7 +205,15 @@ class DOProject(object):
 
         if json_data is not None:
             changed = False
-            valid_purpose = ['Just trying out DigitalOcean','Class project/Educational Purposes','Website or blog','Web Application','Service or API','Mobile Application','Machine Learning/AI/Data Processing','IoT','Operational/Developer tooling']
+            valid_purpose = ['Just trying out DigitalOcean',
+                             'Class project/Educational Purposes',
+                             'Website or blog',
+                             'Web Application',
+                             'Service or API',
+                             'Mobile Application',
+                             'Machine Learning/AI/Data Processing',
+                             'IoT',
+                             'Operational/Developer tooling']
             for key in request_params.keys():
                 if key == "purpose" and request_params[key] is not None and request_params[key] not in valid_purpose:
                     param = "Other: " + request_params[key]
@@ -216,7 +222,6 @@ class DOProject(object):
 
                 if json_data["project"][key] != param and param is not None:
                     changed = True
-                    print(key)
 
             if changed:
                 response = self.rest.put('projects/{0}'.format(json_data["project"]["id"]), data=request_params)
@@ -227,7 +232,7 @@ class DOProject(object):
                 self.module.exit_json(changed=False, data=json_data)
         else:
             response = self.rest.post('projects', data=request_params)
-        
+
             if response.status_code != 201:
                 self.module.fail_json(changed=False, msg="Unable to create project")
             self.module.exit_json(changed=True, data=response.json)
@@ -245,6 +250,7 @@ class DOProject(object):
         else:
             self.module.exit_json(changed=False, msg='Project not found')
 
+
 def core(module):
     state = module.params.pop('state')
     project = DOProject(module)
@@ -257,7 +263,7 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=['present', 'absent'], default='present', type='str'),
             oauth_token=dict(
                 aliases=['API_TOKEN'],
                 no_log=True,
@@ -266,12 +272,10 @@ def main():
             ),
             name=dict(type='str'),
             id=dict(type='str'),
-            wait_timeout=dict(default=120, type='int'),
-            wait=dict(default=False,type='bool'),
             description=dict(type='str'),
             purpose=dict(type='str'),
-            is_default=dict(type='bool',default=False),
-            environment=dict(choices=['Development','Staging','Production'],type='str'),
+            is_default=dict(type='bool', default=False),
+            environment=dict(choices=['Development', 'Staging', 'Production'], type='str'),
         ),
         required_one_of=(
             ['id', 'name'],
