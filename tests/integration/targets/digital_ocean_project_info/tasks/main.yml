@@ -8,12 +8,12 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Gather droplet information
-      community.digitalocean.digital_ocean_droplet_info:
+    - name: Gather project information
+      community.digitalocean.digital_ocean_project_info:
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify droplet info fetched
+    - name: Verify project info fetched
       ansible.builtin.assert:
         that:
           - not result.changed

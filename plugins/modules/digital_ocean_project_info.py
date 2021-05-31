@@ -10,10 +10,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r'''
 ---
-module: digital_ocean_droplet_info
-short_description: Gather information about DigitalOcean Droplets
+module: digital_ocean_project_info
+short_description: Gather information about DigitalOcean Projects
 description:
-    - This module can be used to gather information about Droplets.
+    - This module can be used to gather information about Projects.
 author: "Tyler Auerbeck (@tylerauerbeck)"
 version_added: 1.6.0
 
@@ -33,16 +33,36 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r'''
-TODO: Add examples
+# Get specific project by id
+- community.digitalocean.digital_ocean_project_info:
+    id: cb1ef55e-3cd8-4c7c-aa5d-07c32bf41627
+
+# Get specific project by name
+- community.digitalocean.digital_ocean_project_info:
+    name: my-project-name
+
+# Get all projects
+- community.digitalocean.digital_ocean_project_info:
+  register: projects
 '''
 
 RETURN = r'''
 data:
-  description: "DigitalOcean droplet information"
+  description: "DigitalOcean project information"
   elements: dict
   returned: success
+  type: list
   sample:
-    TODO: Add sample
+    - created_at: "2021-03-11T00:00:00Z"
+      description: "My project description"
+      environment: "Development"
+      id: "12345678-abcd-efgh-5678-10111213"
+      is_default: false
+      name: "my-test-project"
+      owner_id: 12345678
+      owner_uuid: "12345678-1234-4321-abcd-20212223"
+      purpose: ""
+      updated_at: "2021-03-11T00:00:00Z"
 '''
 
 from traceback import format_exc
