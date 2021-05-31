@@ -146,6 +146,7 @@
       community.digitalocean.digital_ocean_project:
         name: my-non-existant-project
         state: absent
+        oauth_token: "{{ do_api_key }}"
       register: result
 
     - name: Verify project deletion (non-existing project)
@@ -156,6 +157,7 @@
     - name: Delete test project
       community.digitalocean.digital_ocean_project:
         name: "my-updated-test-project"
+        oauth_token: "{{ do_api_key }}"
         state: absent
       register: result
 
