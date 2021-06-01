@@ -28,7 +28,8 @@ def test_verify_file_bad_config(inventory):
     assert inventory.verify_file('digitalocean_foobar.yml') is False
 
 
-def get_payload():
+@pytest.fixture()
+def payload():
     return [
         {
             "id": 3164444,
@@ -136,10 +137,10 @@ def get_option(option):
     return options.get(option)
 
 
-def test_populate_hostvars(inventory, mocker):
-    inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
+def test_populate_hostvars(inventory, payload, mocker):
     inventory.get_option = mocker.MagicMock(side_effect=get_option)
-    inventory._populate()
+
+    inventory._populate(payload)
 
     host_foo = inventory.inventory.get_host('foo')
     host_bar = inventory.inventory.get_host('bar')
@@ -184,10 +185,9 @@ def get_option_with_filters(option):
     return options.get(option)
 
 
-def test_populate_hostvars_with_filters(inventory, mocker):
-    inventory._get_payload = mocker.MagicMock(side_effect=get_payload)
+def test_populate_hostvars_with_filters(inventory, payload, mocker):
     inventory.get_option = mocker.MagicMock(side_effect=get_option_with_filters)
-    inventory._populate()
+    inventory._populate(payload)
 
     host_foo = inventory.inventory.get_host('foo')
     host_bar = inventory.inventory.get_host('bar')

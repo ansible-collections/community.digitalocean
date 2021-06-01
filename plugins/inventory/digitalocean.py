@@ -170,12 +170,12 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         return payload
 
-    def _populate(self):
+    def _populate(self, records):
         attributes = self.get_option('attributes')
         var_prefix = self.get_option('var_prefix')
         strict = self.get_option('strict')
         host_filters = self.get_option('filters')
-        for record in self._get_payload():
+        for record in records:
 
             host_name = record.get('name')
             if not host_name:
@@ -220,22 +220,24 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
     def parse(self, inventory, loader, path, cache=True):
         super(InventoryModule, self).parse(inventory, loader, path)
 
-        # cache settings
         self._read_config_data(path)
-        self.cache_key = self.get_cache_key(path)
 
-        self.use_cache = self.get_option('cache') and cache
-        self.update_cache = self.get_option('cache') and not cache
+        # cache settings
+        cache_key = self.get_cache_key(path)
+        use_cache = self.get_option('cache') and cache
+        update_cache = self.get_option('cache') and not cache
 
-        results = []
-        if not self.update_cache:
+        records = None
+        if use_cache:
             try:
-                results = self._cache[self.cache_key]['digitalocean']
+                records = self._cache[cache_key]
             except KeyError:
-                pass
+                update_cache = True
 
-        if not results:
-            if self.cache_key not in self._cache:
-                self._cache[self.cache_key] = {'digitalocean': ''}
+        if records is None:
+            records = self._get_payload()
 
-        self._populate()
+        if update_cache:
+            self._cache[cache_key] = records
+
+        self._populate(records)
