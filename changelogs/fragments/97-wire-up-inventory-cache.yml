@@ -1,3 +1,0 @@
-bugfixes:
-  - digitalocean inventory plugin - wire up advertised caching functionality
-    (https://github.com/ansible-collections/community.digitalocean/pull/97).

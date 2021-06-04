@@ -5,13 +5,21 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.5.1
+======
+
+Bugfixes
+--------
+
+- digitalocean inventory plugin - Wire up advertised caching functionality (https://github.com/ansible-collections/community.digitalocean/pull/97).
+
 v1.5.0
 ======
 
 Minor Changes
 -------------
 
-- digitalocean - Filter droplets in dynamic inventory plugin using arbitrary jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
+- digitalocean - Filter droplets in dynamic inventory plugin using arbitrary. jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
 - digitalocean - Support templates in API tokens when using the dynamic inventory plugin (https://github.com/ansible-collections/community.digitalocean/pull/98).
 
 Bugfixes
