@@ -152,3 +152,10 @@ releases:
     - 96-filter-droplets-through-jinja.yml
     - 98-api-token-command.yml
     release_date: '2021-05-26'
+  1.5.1:
+    changes:
+      bugfixes:
+      - digitalocean inventory plugin - Wire up advertised caching functionality (https://github.com/ansible-collections/community.digitalocean/pull/97).
+    fragments:
+    - 97-wire-up-inventory-cache.yml
+    release_date: '2021-06-04'

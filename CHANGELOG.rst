@@ -5,6 +5,14 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.5.1
+======
+
+Bugfixes
+--------
+
+- digitalocean inventory plugin - Wire up advertised caching functionality (https://github.com/ansible-collections/community.digitalocean/pull/97).
+
 v1.5.0
 ======
 
