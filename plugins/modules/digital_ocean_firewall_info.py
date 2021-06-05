@@ -58,6 +58,7 @@ data:
     description: DigitalOcean firewall information
     returned: success
     type: list
+    elements: dict
     sample: [
         {
             "id": "435tbg678-1db53-32b6-t543-28322569t252",
@@ -107,7 +108,8 @@ def core(module):
         for firewall in firewalls:
             if firewall['name'] == firewall_name:
                 rule.update(firewall)
-        module.exit_json(changed=False, data=rule)
+        firewalls = [rule]
+        module.exit_json(changed=False, data=firewalls)
     else:
         module.exit_json(changed=False, data=firewalls)
 
