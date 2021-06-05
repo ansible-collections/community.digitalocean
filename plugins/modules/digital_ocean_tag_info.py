@@ -58,6 +58,7 @@ data:
     description: DigitalOcean tag information
     returned: success
     type: list
+    elements: dict
     sample: [
         {
             "name": "extra-awesome",
@@ -89,8 +90,7 @@ def core(module):
         if status_code != 200:
             module.fail_json(msg="Failed to retrieve tags for DigitalOcean")
 
-        resp_json = response.json
-        tag = resp_json['tag']
+        tag = [response.json['tag']]
     else:
         tag = rest.get_paginated_data(base_url=base_url + '?', data_key_name='tags')
 
