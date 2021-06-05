@@ -107,7 +107,7 @@ EXAMPLES = r'''
     environment: "Production"
 
 # This removes a project
-- community.digitlocean.digital_ocean_project:
+- community.digitalocean.digital_ocean_project:
     name: "ProdProj"
     state: "absent"
 '''

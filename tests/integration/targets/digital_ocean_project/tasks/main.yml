@@ -18,7 +18,7 @@
         - "my-test-project"
         - "my-updated-test-project"
 
-    - name: Verify Droplet is absent
+    - name: Verify Project is absent
       ansible.builtin.assert:
         that:
           - not result.changed
@@ -33,7 +33,7 @@
         environment: "Development"
       register: result
 
-    - name: Verify Droplet is present (from present)
+    - name: Verify Project is present (from present)
       ansible.builtin.assert:
         that:
           - result.changed
@@ -52,7 +52,7 @@
         environment: "Development"
       register: result
 
-    - name: Verify Droplet is present (from existing)
+    - name: Verify Project is present (from existing)
       ansible.builtin.assert:
         that:
           - not result.changed
