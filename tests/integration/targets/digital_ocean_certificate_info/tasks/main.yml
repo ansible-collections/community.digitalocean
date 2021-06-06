@@ -8,12 +8,12 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Gather information about all load balancers
-      community.digitalocean.digital_ocean_load_balancer_info:
+    - name: Gather certificate information
+      community.digitalocean.digital_ocean_certificate_info:
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify load balancer information fetched
+    - name: Verify certificate information fetched
       ansible.builtin.assert:
         that:
           - not result.changed

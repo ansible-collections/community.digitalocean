@@ -58,6 +58,7 @@ data:
     description: DigitalOcean Load balancer information
     returned: success
     type: list
+    elements: dict
     sample: [
         {
           "id": "4de7ac8b-495b-4884-9a69-1050c6793cd6",
@@ -89,8 +90,7 @@ def core(module):
         if status_code != 200:
             module.fail_json(msg="Failed to retrieve load balancers for DigitalOcean")
 
-        resp_json = response.json
-        load_balancer = resp_json['load_balancer']
+        load_balancer = [response.json['load_balancer']]
     else:
         load_balancer = rest.get_paginated_data(base_url=base_url + '?', data_key_name='load_balancers')
 
