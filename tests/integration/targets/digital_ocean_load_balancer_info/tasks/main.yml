@@ -13,7 +13,7 @@
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify load balancer info fetched
+    - name: Verify load balancer information fetched
       ansible.builtin.assert:
         that:
           - not result.changed

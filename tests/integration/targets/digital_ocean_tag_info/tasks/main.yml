@@ -13,7 +13,7 @@
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify droplet info fetched
+    - name: Verify tag information fetched
       ansible.builtin.assert:
         that:
           - not result.changed
