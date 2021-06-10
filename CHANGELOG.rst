@@ -5,6 +5,25 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.6.0
+======
+
+Bugfixes
+--------
+
+- digital_ocean_certificate_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_domain_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_firewall_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_load_balancer_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_tag_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digitalocean inventory plugin - attributes available to filters are limited to explicitly required attributes and are prefixed with ``var_prefix`` (https://github.com/ansible-collections/community.digitalocean/pull/102).
+
+New Modules
+-----------
+
+- digital_ocean_project - Manage a DigitalOcean project
+- digital_ocean_project_info - Gather information about DigitalOcean Projects
+
 v1.5.1
 ======
 
