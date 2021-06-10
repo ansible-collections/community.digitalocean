@@ -159,3 +159,24 @@ releases:
     fragments:
     - 97-wire-up-inventory-cache.yml
     release_date: '2021-06-04'
+  1.6.0:
+    changes:
+      bugfixes:
+      - digital_ocean_certificate_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_domain_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_firewall_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_load_balancer_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_tag_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digitalocean inventory plugin - attributes available to filters are limited
+        to explicitly required attributes and are prefixed with ``var_prefix`` (https://github.com/ansible-collections/community.digitalocean/pull/102).
+    fragments:
+    - 102-filters-prefixed-vars.yml
+    - 55-fix-info-module-return-type.yaml
+    modules:
+    - description: Manage a DigitalOcean project
+      name: digital_ocean_project
+      namespace: ''
+    - description: Gather information about DigitalOcean Projects
+      name: digital_ocean_project_info
+      namespace: ''
+    release_date: '2021-06-10'

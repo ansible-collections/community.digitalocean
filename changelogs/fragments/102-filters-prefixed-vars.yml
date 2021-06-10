@@ -1,4 +1,0 @@
-bugfixes:
-  - digitalocean inventory plugin - attributes available to filters are limited
-    to explicitly required attributes and are prefixed with ``var_prefix``
-    (https://github.com/ansible-collections/community.digitalocean/pull/102).
