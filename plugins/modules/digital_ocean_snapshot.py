@@ -175,10 +175,9 @@ class DOSnapshot(object):
                 self.action_id = json["action"]["id"]
                 if self.wait:
                     json = self.wait_finished()
-                    raise Exception(str(json))
                     self.module.exit_json(
                         changed=True,
-                        msg="Created snapshot, snapshot {0}".format(
+                        msg="Created snapshot, resource {0}".format(
                             json["action"]["resource_id"]
                         ),
                     )
