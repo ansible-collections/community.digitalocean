@@ -257,6 +257,8 @@ def main():
         required_if=[
             ("state", "present", ["snapshot_name"]),
             ("state", "absent", ["snapshot_id"]),
+            ("snapshot_type", "droplet", ["droplet_id"]),
+            ("snapshot_type", "volume", ["volume_id"]),
         ],
     )
 
