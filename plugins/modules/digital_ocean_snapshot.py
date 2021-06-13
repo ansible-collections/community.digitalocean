@@ -80,15 +80,13 @@ EXAMPLES = r"""
     snapshot_type: droplet
     snapshot_name: mysnapshot1
     droplet_id: 250329179
-    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
   register: result
 
 - name: Delete a Droplet snapshot
   community.digitalocean.digital_ocean_snapshot:
     state: absent
     snapshot_type: volume
-    snapshot_id: 250329179:
-    oauth_token: "{{ oauth_token }}"
+    snapshot_id: 85905825
   register: result
 
 - name: Snapshot a Volume
@@ -97,14 +95,12 @@ EXAMPLES = r"""
     snapshot_type: volume
     snapshot_name: mysnapshot2
     volume_id: 9db5e329-cc68-11eb-b027-0a58ac144f91
-    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
 
 - name: Delete a Volume snapshot
   community.digitalocean.digital_ocean_snapshot:
     state: absent
     snapshot_type: volume
     snapshot_id: a902cdba-cc68-11eb-a701-0a58ac145708
-    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
 """
 
 
@@ -116,7 +112,7 @@ result:
   sample:
     changed: true
     failed: false
-    msg: Created snapshot, snapshot 250329179
+    msg: Created snapshot, snapshot 85905825
 """
 
 
@@ -176,6 +172,7 @@ class DOSnapshot(object):
                 self.action_id = json["action"]["id"]
                 if self.wait:
                     json = self.wait_finished()
+                    raise Exception(str(json))
                     self.module.exit_json(
                         changed=True,
                         msg="Created snapshot, snapshot {0}".format(
