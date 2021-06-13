@@ -113,11 +113,7 @@ result:
   sample:
     changed: true
     failed: false
-    msg: Created snapshot, resource 250329179
-  sample:
-    changed: true
-    failed: false
-    msg: Created snapshot, snapshot 1ef3915a-cc73-11eb-b13c-0a58ac145472
+    msg: Created snapshot, resource 250329179 (or snapshot 1ef3915a-cc73-11eb-b13c-0a58ac145472)
 """
 
 
