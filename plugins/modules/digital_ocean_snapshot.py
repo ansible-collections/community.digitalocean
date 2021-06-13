@@ -85,7 +85,7 @@ EXAMPLES = r"""
 - name: Delete a Droplet snapshot
   community.digitalocean.digital_ocean_snapshot:
     state: absent
-    snapshot_type: volume
+    snapshot_type: droplet
     snapshot_id: 85905825
   register: result
 
@@ -106,13 +106,17 @@ EXAMPLES = r"""
 
 RETURN = r"""
 result:
-  description: Snapshot creation or deletion result
+  description: Snapshot creation or deletion result (resource ID for Droplets, snapshot ID for volumes).
   returned: success
   type: dict
   sample:
     changed: true
     failed: false
-    msg: Created snapshot, snapshot 85905825
+    msg: Created snapshot, resource 250329179
+  sample:
+    changed: true
+    failed: false
+    msg: Created snapshot, snapshot 1ef3915a-cc73-11eb-b13c-0a58ac145472
 """
 
 
