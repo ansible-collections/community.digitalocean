@@ -59,42 +59,38 @@
         wait_timeout: 500
       register: result
 
-    - name: Debug
-      ansible.builtin.debug:
-        var: result
-
-    - name: Verify Snapshot is present
+    - name: Verify snapshot is present
       ansible.builtin.assert:
         that:
           - result.changed
           - not result.failed
           - result.msg is search("Created snapshot")
 
-    - name: Get information about snapshot named {{ snapshot_name }}
+    - name: Gather information about all snapshots
       community.digitalocean.digital_ocean_snapshot_info:
         oauth_token: "{{ do_api_key }}"
       register: snapshot_info
 
-    - name: Set a fact for the Snapshot id
+    - name: Set a fact for the snapshot id
       ansible.builtin.set_fact:
         snapshot_id: "{{ item.id }}"
       loop: "{{ snapshot_info.data | community.general.json_query(name) }}"
       vars:
         name: "[?name=='{{ snapshot_name }}']"
 
-    - name: Verify Snapshot id is defined
+    - name: Verify snapshot id is defined
       ansible.builtin.assert:
         that:
           - snapshot_id is defined
 
-    - name: Delete the Snapshot
+    - name: Delete the snapshot
       community.digitalocean.digital_ocean_snapshot:
         state: absent
         snapshot_id: "{{ snapshot_id }}"
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify Snapshot is absent
+    - name: Verify snapshot is absent
       ansible.builtin.assert:
         that:
           - result.changed
@@ -105,7 +101,7 @@
     #  Volume snapshot
     #
 
-    - name: Ensure Volume is absent (leftover)
+    - name: Ensure volume is absent (leftover)
       community.digitalocean.digital_ocean_block_storage:
         oauth_token: "{{ do_api_key }}"
         command: create
@@ -132,11 +128,11 @@
           - not result.failed
           - result.id is defined
 
-    - name: Set a fact for the Volume id
+    - name: Set a fact for the volume id
       ansible.builtin.set_fact:
         volume_id: "{{ result.id }}"
 
-    - name: Snapshot the Volume
+    - name: Snapshot the volume
       community.digitalocean.digital_ocean_snapshot:
         state: present
         snapshot_type: volume
@@ -146,38 +142,38 @@
         wait_timeout: 500
       register: result
 
-    - name: Verify Snapshot is present
+    - name: Verify snapshot is present
       ansible.builtin.assert:
         that:
           - result.changed
           - not result.failed
           - result.msg is search("Created snapshot")
 
-    - name: Get information about snapshot named {{ snapshot_name }}
+    - name: Get information about all snapshots
       community.digitalocean.digital_ocean_snapshot_info:
         oauth_token: "{{ do_api_key }}"
       register: snapshot_info
 
-    - name: Set a fact for the Snapshot id
+    - name: Set a fact for the snapshot id
       ansible.builtin.set_fact:
         snapshot_id: "{{ item.id }}"
       loop: "{{ snapshot_info.data | community.general.json_query(name) }}"
       vars:
         name: "[?name=='{{ snapshot_name }}']"
 
-    - name: Verify Snapshot id is defined
+    - name: Verify snapshot id is defined
       ansible.builtin.assert:
         that:
           - snapshot_id is defined
 
-    - name: Delete the Snapshot
+    - name: Delete the snapshot
       community.digitalocean.digital_ocean_snapshot:
         state: absent
         snapshot_id: "{{ snapshot_id }}"
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify Snapshot is absent
+    - name: Verify snapshot is absent
       ansible.builtin.assert:
         that:
           - result.changed
@@ -211,7 +207,7 @@
         size: "{{ droplet_size }}"
       ignore_errors: true  # Should this fail, we'll clean it up next run
 
-    - name: Remove the Volume
+    - name: Remove the volume
       community.digitalocean.digital_ocean_block_storage:
         oauth_token: "{{ do_api_key }}"
         command: create
