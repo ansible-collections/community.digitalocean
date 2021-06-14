@@ -35,7 +35,6 @@ options:
       - droplet
       - volume
     default: droplet
-    required: false
     type: str
   snapshot_name:
     description:
@@ -48,22 +47,18 @@ options:
   droplet_id:
     description:
       - Droplet ID to snapshot.
-    required: false
     type: str
   volume_id:
     description:
       - Volume ID to snapshot.
-    required: false
     type: str
   snapshot_id:
     description:
       - Snapshot ID to delete.
-    required: false
     type: str
   wait:
     description:
       - Wait for the snapshot to be created before returning.
-    required: False
     default: True
     type: bool
   wait_timeout:
