@@ -198,8 +198,9 @@ class DOSnapshot(object):
             droplet_id = self.module.params["droplet_id"]
             data = {
                 "type": "snapshot",
-                "name": self.snapshot_name,
             }
+            if self.snapshot_name is not None:
+                data["name"] = self.snapshot_name
             response = self.rest.post(
                 "droplets/{0}/actions".format(str(droplet_id)), data=data
             )
