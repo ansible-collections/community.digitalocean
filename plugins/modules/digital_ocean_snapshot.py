@@ -109,14 +109,47 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-result:
-  description: Snapshot creation or deletion result (resource ID for Droplets, snapshot ID for volumes).
+data:
+  description: Snapshot creation or deletion action.
   returned: success
   type: dict
   sample:
-    changed: true
-    failed: false
-    msg: Created snapshot, resource 250329179 (or snapshot 1ef3915a-cc73-11eb-b13c-0a58ac145472)
+    - completed_at: '2021-06-14T12:36:00Z'
+      id: 1229119156
+      region:
+        available: true
+        features:
+          - backups
+          - ipv6
+          - metadata
+          - install_agent
+          - storage
+          - image_transfer
+        name: New York 1
+        sizes:
+          - s-1vcpu-1gb
+          - s-1vcpu-1gb-amd
+          - s-1vcpu-1gb-intel
+          - <snip>
+        slug: nyc1
+      region_slug: nyc1
+      resource_id: 250445117
+      resource_type: droplet
+      started_at: '2021-06-14T12:35:25Z'
+      status: completed
+      type: snapshot
+    - created_at: '2021-06-14T12:55:10Z'
+      id: c06d4a86-cd0f-11eb-b13c-0a58ac145472
+      min_disk_size: 1
+      name: my-snapshot-1
+      regions:
+        - nbg1
+      resource_id: f0adea7e-cd0d-11eb-b027-0a58ac144f91
+      resource_type: volume
+      size_gigabytes: 0
+      tags:
+        - tag1
+        - tag2
 """
 
 
