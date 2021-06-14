@@ -170,6 +170,7 @@ class DOSnapshot(object):
         self.module.params.pop("oauth_token")
         self.snapshot_type = module.params["snapshot_type"]
         self.snapshot_name = module.params["snapshot_name"]
+        self.snapshot_tags = module.params["snapshot_tags"]
         self.snapshot_id = module.params["snapshot_id"]
         self.volume_id = module.params["volume_id"]
 
@@ -226,6 +227,7 @@ class DOSnapshot(object):
         elif self.snapshot_type == "volume":
             data = {
                 "name": self.snapshot_name,
+                "tags": self.snapshot_tags,
             }
             response = self.rest.post(
                 "volumes/{0}/snapshots".format(str(self.volume_id)), data=data
@@ -278,6 +280,7 @@ def main():
             type="str", required=False, choices=["droplet", "volume"], default="droplet"
         ),
         snapshot_name=dict(type="str"),
+        snapshot_tags=dict(type="list", elements="str", default=[]),
         droplet_id=dict(type="str"),
         volume_id=dict(type="str"),
         snapshot_id=dict(type="str"),
