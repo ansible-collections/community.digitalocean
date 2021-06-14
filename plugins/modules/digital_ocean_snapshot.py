@@ -77,7 +77,6 @@ EXAMPLES = r"""
   community.digitalocean.digital_ocean_snapshot:
     state: present
     snapshot_type: droplet
-    snapshot_name: mysnapshot1
     droplet_id: 250329179
   register: result
 
@@ -92,7 +91,7 @@ EXAMPLES = r"""
   community.digitalocean.digital_ocean_snapshot:
     state: present
     snapshot_type: volume
-    snapshot_name: mysnapshot2
+    snapshot_name: mysnapshot1
     volume_id: 9db5e329-cc68-11eb-b027-0a58ac144f91
 
 - name: Delete a Volume snapshot
