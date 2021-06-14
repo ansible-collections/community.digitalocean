@@ -286,13 +286,13 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_if=(
-            ("state", "present", ("droplet_id", "volume_id")),
-            ("state", "absent", ("snapshot_id")),
-        ),
-        mutually_exclusive=(
-            ("droplet_id", "volume_id")
-        ),
+        required_if=[
+            ["state", "present", ["droplet_id", "volume_id"]],
+            ["state", "absent", ["snapshot_id"]],
+        ],
+        mutually_exclusive=[
+            ["droplet_id", "volume_id"]
+        ],
     )
 
     run(module)
