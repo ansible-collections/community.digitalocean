@@ -211,13 +211,13 @@ class DOSnapshot(object):
                     json = self.wait_finished()
                     self.module.exit_json(
                         changed=True,
-                        msg="Created snapshot, resource {0}".format(
-                            json["action"]["resource_id"]
-                        ),
+                        msg="Created snapshot, action {0}".format(self.action_id),
+                        data=json["action"],
                     )
                 self.module.exit_json(
                     changed=True,
                     msg="Created snapshot, action {0}".format(self.action_id),
+                    data=json["action"],
                 )
             else:
                 self.module.fail_json(
@@ -238,6 +238,7 @@ class DOSnapshot(object):
                 self.module.exit_json(
                     changed=True,
                     msg="Created snapshot, snapshot {0}".format(json["snapshot"]["id"]),
+                    data=json["snapshot"],
                 )
             else:
                 self.module.fail_json(
