@@ -43,6 +43,7 @@ options:
   snapshot_tags:
     description:
       - List of tags to apply to the snapshot.
+    type: list
     elements: str
   droplet_id:
     description:
