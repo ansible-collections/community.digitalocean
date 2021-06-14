@@ -13,7 +13,7 @@ DOCUMENTATION = r"""
 ---
 module: digital_ocean_snapshot
 short_description: Create and delete DigitalOcean snapshots
-version_added: 1.6.1
+version_added: 1.7.0
 description:
   - This module can be used to create and delete DigitalOcean Droplet and volume snapshots.
 author: "Mark Mercado (@mamercad)"
