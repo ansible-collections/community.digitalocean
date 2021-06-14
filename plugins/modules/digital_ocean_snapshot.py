@@ -287,7 +287,7 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ["state", "present", ["droplet_id", "volume_id"]],
+            ["state", "present", ["droplet_id", "volume_id"], True],
             ["state", "absent", ["snapshot_id"]],
         ],
         mutually_exclusive=[
