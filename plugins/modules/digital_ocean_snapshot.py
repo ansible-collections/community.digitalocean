@@ -40,8 +40,11 @@ options:
   snapshot_name:
     description:
       - Name of the snapshot to create.
-    required: false
     type: str
+  snapshot_tags:
+    description:
+      - List of tags to apply to the snapshot.
+    elements: str
   droplet_id:
     description:
       - Droplet ID to snapshot.
