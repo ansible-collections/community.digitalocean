@@ -105,7 +105,7 @@
       community.digitalocean.digital_ocean_block_storage:
         oauth_token: "{{ do_api_key }}"
         command: create
-        state: present
+        state: absent
         volume_name: "{{ volume_name }}"
         region: "{{ do_region }}"
         block_size: "{{ volume_size }}"
@@ -126,7 +126,6 @@
         that:
           - result.changed
           - not result.failed
-          - result.id is defined
 
     - name: Set a fact for the volume id
       ansible.builtin.set_fact:
