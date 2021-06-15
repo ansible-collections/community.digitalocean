@@ -1,0 +1,2 @@
+bugfixes:
+  - digitalocean - update README.md with project_info and project module (https://github.com/ansible-collections/community.digitalocean/pull/112).
