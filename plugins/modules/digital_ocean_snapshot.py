@@ -42,7 +42,8 @@ options:
     type: str
   snapshot_tags:
     description:
-      - List of tags to apply to the snapshot.
+      - List of tags to apply to the volume snapshot.
+      - Only applies to volume snapshots (not Droplets).
     type: list
     elements: str
   droplet_id:
