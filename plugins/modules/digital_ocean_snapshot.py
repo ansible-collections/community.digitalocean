@@ -191,6 +191,9 @@ class DOSnapshot(object):
         )
 
     def create(self):
+        if self.module.check_mode:
+            return self.module.exit_json(changed=True)
+
         if self.snapshot_type == "droplet":
             droplet_id = self.module.params["droplet_id"]
             data = {
@@ -245,6 +248,9 @@ class DOSnapshot(object):
                 )
 
     def delete(self):
+        if self.module.check_mode:
+            return self.module.exit_json(changed=True)
+
         response = self.rest.delete("snapshots/{0}".format(str(self.snapshot_id)))
         status = response.status_code
         if status == 204:
@@ -295,6 +301,7 @@ def main():
         mutually_exclusive=[
             ["droplet_id", "volume_id"]
         ],
+        supports_check_mode=True,
     )
 
     run(module)
