@@ -171,8 +171,9 @@ class DOSnapshot(object):
         self.volume_id = module.params["volume_id"]
 
     def wait_finished(self):
-        end_time = time.monotonic() + self.wait_timeout
-        while time.monotonic() < end_time:
+        current_time = time.monotonic()
+        end_time = current_time + self.wait_timeout
+        while current_time < end_time:
             response = self.rest.get("actions/{0}".format(str(self.action_id)))
             status = response.status_code
             if status != 200:
@@ -184,7 +185,7 @@ class DOSnapshot(object):
             json = response.json
             if json["action"]["status"] == "completed":
                 return json
-            time.sleep(min(10, end_time - time.monotonic()))
+            time.sleep(10)
         self.module.fail_json(
             msg="Timed out waiting for snapshot, action {0}".format(str(self.action_id))
         )
