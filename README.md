@@ -40,6 +40,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_kubernetes](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_kubernetes_module.html) – Create and delete DigitalOcean Kubernetes clusters
 - [digital_ocean_load_balancer_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_facts_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_load_balancer_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_info_module.html) – Gather information about DigitalOcean load balancers
+- [digital_ocean_project_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_project_info_module.html) – Gather information about DigitalOcean projects
+- [digital_ocean_project](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_project_module.html) – Manage DigitalOcean projects
 - [digital_ocean_region_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_region_facts_module.html) – Gather information about DigitalOcean regions
 - [digital_ocean_region_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_region_info_module.html) – Gather information about DigitalOcean regions
 - [digital_ocean_size_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_size_facts_module.html) – Gather information about DigitalOcean Droplet sizes
