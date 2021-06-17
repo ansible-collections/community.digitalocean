@@ -56,6 +56,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_tag_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_tag_info_module.html) – Gather information about DigitalOcean tags
 - [digital_ocean_volume_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_volume_facts_module.html) – Gather information about DigitalOcean volumes
 - [digital_ocean_volume_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_volume_info_module.html) – Gather information about DigitalOcean volumes
+- [digital_ocean_vpc](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_vpc_module.html) – Create and delete DigitalOcean VPCs
+- [digital_ocean_vpc_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_vpc_info_module.html) – Gather information about DigitalOcean VPCs
 - [digitalocean](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digitalocean_inventory.html) – DigitalOcean Inventory Plugin
 
 ## Installation and Usage
