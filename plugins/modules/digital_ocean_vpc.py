@@ -31,11 +31,21 @@ options:
       - The name of the VPC.
       - Must be unique and contain alphanumeric characters, dashes, and periods only.
     type: str
+    required: true
   description:
     description:
       - A free-form text field for describing the VPC's purpose.
       - It may be a maximum of 255 characters.
     type: str
+  default:
+    description:
+      - A boolean value indicating whether or not the VPC is the default network for the region.
+      - All applicable resources are placed into the default VPC network unless otherwise specified during their creation.
+      - The C(default) field cannot be unset from C(true).
+      - If you want to set a new default VPC network, update the C(default) field of another VPC network in the same region.
+      - The previous network's C(default) field will be set to C(false) when a new default VPC has been defined.
+    type: bool
+    default: false
   region:
     description:
       - The slug identifier for the region where the VPC will be created.
@@ -103,33 +113,70 @@ class DOVPC(object):
         self.module.params.pop("oauth_token")
         self.name = module.params.get("name", None)
         self.description = module.params.get("description", None)
+        self.default = module.params.get("default", False)
         self.region = module.params.get("region", None)
         self.ip_range = module.params.get("ip_range", None)
         self.vpc_id = module.params.get("vpc_id", None)
+
+    def get_by_name(self):
+        page = 1
+        while page is not None:
+            response = self.rest.get("vpcs?page={0}".format(page))
+            json_data = response.json
+            if response.status_code == 200:
+                for vpc in json_data["vpcs"]:
+                    if vpc.get("name", None) == self.name:
+                        return vpc
+                if "links" in json_data and "pages" in json_data["links"] and "next" in json_data["links"]["pages"]:
+                    page += 1
+                else:
+                    page = None
+        return None
 
     def create(self):
         if self.module.check_mode:
             return self.module.exit_json(changed=True)
 
-        data = {
-            "name": self.name,
-            "region": self.region,
-        }
-        if self.description is not None:
-            data["description"] = self.description
-        if self.ip_range is not None:
-            data["ip_range"] = self.ip_range
+        vpc = self.get_by_name()
+        if vpc is not None:  # update
+            vpc_id = vpc.get("id", None)
+            if vpc_id is not None:
+                data = {
+                    "name": self.name,
+                }
+                if self.description is not None:
+                    data["description"] = self.description
+                if self.default is not False:
+                    data["default"] = True
+                response = self.rest.put("vpcs/{0}".format(vpc_id), data=data)
+                json = response.json
+                if response.status_code != 200:
+                    self.module.fail_json(msg="Failed to update VPC named {0}: {1}".format(self.name, json["message"]))
+                else:
+                    self.module.exit_json(changed=False, data=json)
+            else:
+                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug")
 
-        response = self.rest.post("vpcs", data=data)
-        status = response.status_code
-        json = response.json
-        if status == 201:
-            self.module.exit_json(changed=True, data=json["vpc"])
-        else:
-            self.module.fail_json(
-                changed=False,
-                msg="Failed to create VPC: {0}".format(json["message"]),
-            )
+        else:  # create
+            data = {
+                "name": self.name,
+                "region": self.region,
+            }
+            if self.description is not None:
+                data["description"] = self.description
+            if self.ip_range is not None:
+                data["ip_range"] = self.ip_range
+
+            response = self.rest.post("vpcs", data=data)
+            status = response.status_code
+            json = response.json
+            if status == 201:
+                self.module.exit_json(changed=True, data=json["vpc"])
+            else:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Failed to create VPC: {0}".format(json["message"]),
+                )
 
     def delete(self):
         if self.module.check_mode:
@@ -165,8 +212,9 @@ def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
         state=dict(choices=["present", "absent"], default="present"),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         description=dict(type="str"),
+        default=dict(type="bool", default=False),
         region=dict(type="str"),
         ip_range=dict(type="str"),
         vpc_id=dict(type="str"),
