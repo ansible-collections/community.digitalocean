@@ -28,6 +28,23 @@
       ansible.builtin.set_fact:
         vpc_id: "{{ result.data.id }}"
 
+    - name: Fetch VPC members
+      community.digitalocean.digital_ocean_vpc_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ vpc_name }}"
+        members: true
+      register: result
+
+    - name: Verify VPC members fetched
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.data is defined
+          - result.data != {}
+          - result.data.links is defined
+          - result.data.members is defined
+          - result.data.meta is defined
+
     - name: Delete a VPC
       community.digitalocean.digital_ocean_vpc:
         state: absent
@@ -39,3 +56,13 @@
       ansible.builtin.assert:
         that:
           - result.changed
+
+  always:
+
+    - name: Delete a VPC
+      community.digitalocean.digital_ocean_vpc:
+        state: absent
+        oauth_token: "{{ do_api_key }}"
+        vpc_id: "{{ vpc_id }}"
+      register: result
+      ignore_errors: true
