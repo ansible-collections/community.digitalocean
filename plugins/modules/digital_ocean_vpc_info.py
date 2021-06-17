@@ -16,12 +16,17 @@ short_description: Gather information about DigitalOcean VPCs
 version_added: 1.7.0
 description:
   - This module can be used to gather information about DigitalOcean VPCs.
+author: "Mark Mercado (@mamercad)"
 options:
   members:
-    description: Return VPC members (instead of all VPCs).
-  type: bool
-  default: False
-author: "Mark Mercado (@mamercad)"
+    description:
+      - Return VPC members (instead of all VPCs).
+    type: bool
+    default: False
+  name:
+    description:
+      - The name of the VPC.
+    type: str
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 """
@@ -115,6 +120,7 @@ class DOVPCInfo(object):
                     self.module.fail_json(changed=False, msg="Unexpected error, please file a bug")
             else:
                 self.module.fail_json(changed=False, msg="Could not find a VPC named {0}".format(self.name))
+
 
 def run(module):
     vpcs = DOVPCInfo(module)
