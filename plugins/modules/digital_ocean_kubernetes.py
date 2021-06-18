@@ -402,7 +402,7 @@ def main():
             ),
             name=dict(type='str', required=True),
             region=dict(aliases=['region_id'], default='nyc1'),
-            version=dict(type='str', default='default'),
+            version=dict(type='str', default='latest'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list', elements='str'),
