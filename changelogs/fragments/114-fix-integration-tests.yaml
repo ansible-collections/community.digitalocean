@@ -1,0 +1,7 @@
+bugfixes:
+  - digital_ocean_certificate - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+  - digital_ocean_firewall - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+  - digital_ocean_tag - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+
+minor_changes:
+  - digital_ocean_kubernetes - set "latest" as the default version for new clusters (https://github.com/ansible-collections/community.digitalocean/issues/114).

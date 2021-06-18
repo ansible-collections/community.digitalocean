@@ -44,7 +44,7 @@ options:
       - The slug identifier for the version of Kubernetes used for the cluster. See the /v2/kubernetes/options endpoint for available versions.
     type: str
     required: false
-    default: 1.20.2-do.0
+    default: latest
   auto_upgrade:
     description:
       - A boolean value indicating whether the cluster will be automatically upgraded to new patch releases during its maintenance window.
@@ -325,6 +325,7 @@ class DOKubernetes(object):
         # Validate version
         valid_versions = [str(x['slug'])
                           for x in kubernetes_options['versions']]
+        valid_versions.append('latest')
         if self.module.params.get('version') not in valid_versions:
             self.module.fail_json(msg='Invalid version {0} (valid versions are {1})'.format(
                 self.module.params.get('version'), ', '.join(valid_versions)))
@@ -401,7 +402,7 @@ def main():
             ),
             name=dict(type='str', required=True),
             region=dict(aliases=['region_id'], default='nyc1'),
-            version=dict(type='str', default='1.20.2-do.0'),
+            version=dict(type='str', default='latest'),
             auto_upgrade=dict(type='bool', default=False),
             surge_upgrade=dict(type='bool', default=False),
             tags=dict(type='list', elements='str'),
