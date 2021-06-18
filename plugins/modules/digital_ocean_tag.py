@@ -115,9 +115,9 @@ def core(module):
     resource_type = module.params['resource_type']
 
     rest = DigitalOceanHelper(module)
+    response = rest.get('tags/{0}'.format(name))
 
     if state == 'present':
-        response = rest.get('tags/{0}'.format(name))
         status_code = response.status_code
         resp_json = response.json
         changed = False
@@ -172,20 +172,21 @@ def core(module):
                 module.fail_json(msg=resp_json['message'])
 
     elif state == 'absent':
-        if resource_id:
-            url = "tags/{0}/resources".format(name)
-            payload = {
-                'resources': [{
-                    'resource_id': resource_id,
-                    'resource_type': resource_type}]}
-            response = rest.delete(url, data=payload)
+        if response.status_code == 200:
+            if resource_id:
+                url = "tags/{0}/resources".format(name)
+                payload = {
+                    'resources': [{
+                        'resource_id': resource_id,
+                        'resource_type': resource_type}]}
+                response = rest.delete(url, data=payload)
+            else:
+                url = "tags/{0}".format(name)
+                response = rest.delete(url)
+            if response.status_code == 204:
+                module.exit_json(changed=True)
         else:
-            url = "tags/{0}".format(name)
-            response = rest.delete(url)
-        if response.status_code == 204:
-            module.exit_json(changed=True)
-        else:
-            module.exit_json(changed=False, data=response.json)
+            module.exit_json(changed=False)
 
 
 def main():

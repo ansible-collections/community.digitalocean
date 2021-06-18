@@ -123,3 +123,60 @@ releases:
     fragments:
     - 83-droplet-inactive.yaml
     release_date: '2021-05-15'
+  1.4.2:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - Fixed Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/pull/88).
+      - digital_ocean_sshkey - Fixed SSH Key Traceback Issue (https://github.com/ansible-collections/community.digitalocean/issues/68).
+    fragments:
+    - 68-fix-sshkey-traceback.yaml
+    - 88-droplet-integration-tests.yaml
+    release_date: '2021-05-21'
+  1.5.0:
+    changes:
+      bugfixes:
+      - digital_ocean_database - Fixed DB attribute settings (https://github.com/ansible-collections/community.digitalocean/issues/94).
+      - digital_ocean_database_info - Cleanup unused attribs (https://github.com/ansible-collections/community.digitalocean/pulls/100).
+      - digital_ocean_snapshot_info - Fix lookup of snapshot_info by_id (https://github.com/ansible-collections/community.digitalocean/issues/92).
+      - digital_ocean_tag - Fix tag idempotency (https://github.com/ansible-collections/community.digitalocean/issues/61).
+      minor_changes:
+      - digitalocean - Filter droplets in dynamic inventory plugin using arbitrary.
+        jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
+      - digitalocean - Support templates in API tokens when using the dynamic inventory
+        plugin (https://github.com/ansible-collections/community.digitalocean/pull/98).
+    fragments:
+    - 100-fix-database-info.yaml
+    - 61-fix-tag-idempotency.yaml
+    - 92-snapshot-info-fix-get-by-id.yaml
+    - 94-fix-db-attribs.yaml
+    - 96-filter-droplets-through-jinja.yml
+    - 98-api-token-command.yml
+    release_date: '2021-05-26'
+  1.5.1:
+    changes:
+      bugfixes:
+      - digitalocean inventory plugin - Wire up advertised caching functionality (https://github.com/ansible-collections/community.digitalocean/pull/97).
+    fragments:
+    - 97-wire-up-inventory-cache.yml
+    release_date: '2021-06-04'
+  1.6.0:
+    changes:
+      bugfixes:
+      - digital_ocean_certificate_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_domain_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_firewall_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_load_balancer_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digital_ocean_tag_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+      - digitalocean inventory plugin - attributes available to filters are limited
+        to explicitly required attributes and are prefixed with ``var_prefix`` (https://github.com/ansible-collections/community.digitalocean/pull/102).
+    fragments:
+    - 102-filters-prefixed-vars.yml
+    - 55-fix-info-module-return-type.yaml
+    modules:
+    - description: Manage a DigitalOcean project
+      name: digital_ocean_project
+      namespace: ''
+    - description: Gather information about DigitalOcean Projects
+      name: digital_ocean_project_info
+      namespace: ''
+    release_date: '2021-06-10'

@@ -17,12 +17,6 @@ description:
 version_added: 1.3.0
 author: "Mark Mercado (@mamercad)"
 options:
-  state:
-    description:
-      - Indicates the desired state of the target.
-    default: present
-    choices: ['present', 'absent']
-    type: str
   id:
     description:
       - A unique ID that can be used to identify and reference a database cluster.
@@ -121,12 +115,6 @@ class DODatabaseInfo(object):
             if database is not None:
                 self.id = database.get('id', None)
                 self.name = database.get('name', None)
-                self.engine = database.get('engine', None)
-                self.version = database.get('version', None)
-                self.version = database.get('num_nodes', None)
-                self.version = database.get('region', None)
-                self.version = database.get('status', None)
-                self.version = database.get('size', None)
             return json_data
         return None
 
@@ -142,12 +130,6 @@ class DODatabaseInfo(object):
                     if database.get('name', None) == database_name:
                         self.id = database.get('id', None)
                         self.name = database.get('name', None)
-                        self.size = database.get('engine', None)
-                        self.status = database.get('version', None)
-                        self.version = database.get('num_nodes', None)
-                        self.version = database.get('region', None)
-                        self.version = database.get('status', None)
-                        self.version = database.get('size', None)
                         return {'database': database}
                 if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
                     page += 1
@@ -179,7 +161,6 @@ class DODatabaseInfo(object):
 
 
 def run(module):
-    state = module.params.pop('state')
     id = module.params.get('id', None)
     name = module.params.get('name', None)
 
@@ -204,7 +185,6 @@ def run(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
             oauth_token=dict(
                 aliases=['api_token'],
                 no_log=True,

@@ -5,6 +5,59 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.6.0
+======
+
+Bugfixes
+--------
+
+- digital_ocean_certificate_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_domain_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_firewall_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_load_balancer_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digital_ocean_tag_info - ensure return type is a list (https://github.com/ansible-collections/community.digitalocean/issues/55).
+- digitalocean inventory plugin - attributes available to filters are limited to explicitly required attributes and are prefixed with ``var_prefix`` (https://github.com/ansible-collections/community.digitalocean/pull/102).
+
+New Modules
+-----------
+
+- digital_ocean_project - Manage a DigitalOcean project
+- digital_ocean_project_info - Gather information about DigitalOcean Projects
+
+v1.5.1
+======
+
+Bugfixes
+--------
+
+- digitalocean inventory plugin - Wire up advertised caching functionality (https://github.com/ansible-collections/community.digitalocean/pull/97).
+
+v1.5.0
+======
+
+Minor Changes
+-------------
+
+- digitalocean - Filter droplets in dynamic inventory plugin using arbitrary jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
+- digitalocean - Support templates in API tokens when using the dynamic inventory plugin (https://github.com/ansible-collections/community.digitalocean/pull/98).
+
+Bugfixes
+--------
+
+- digital_ocean_database - Fixed DB attribute settings (https://github.com/ansible-collections/community.digitalocean/issues/94).
+- digital_ocean_database_info - Cleanup unused attribs (https://github.com/ansible-collections/community.digitalocean/pulls/100).
+- digital_ocean_snapshot_info - Fix lookup of snapshot_info by_id (https://github.com/ansible-collections/community.digitalocean/issues/92).
+- digital_ocean_tag - Fix tag idempotency (https://github.com/ansible-collections/community.digitalocean/issues/61).
+
+v1.4.2
+======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - Fixed Droplet inactive state (https://github.com/ansible-collections/community.digitalocean/pull/88).
+- digital_ocean_sshkey - Fixed SSH Key Traceback Issue (https://github.com/ansible-collections/community.digitalocean/issues/68).
+
 v1.4.1
 ======
 

@@ -11,6 +11,7 @@ name: digitalocean
 author:
   - Janos Gerzson (@grzs)
   - Tadej Borovšak (@tadeboro)
+  - Max Truxa (@maxtruxa)
 short_description: DigitalOcean Inventory Plugin
 version_added: "1.1.0"
 description:
@@ -31,6 +32,7 @@ options:
   api_token:
     description:
      - DigitalOcean OAuth token.
+     - Template expressions can be used in this field.
     required: true
     type: str
     aliases: [ oauth_token ]
@@ -62,12 +64,20 @@ options:
       - DigitalOcean currently allows a maximum of 200.
     type: int
     default: 200
+  filters:
+    description:
+      - Filter hosts with Jinja templates.
+      - If no filters are specified, all hosts are added to the inventory.
+    type: list
+    elements: str
+    default: []
+    version_added: '1.5.0'
 '''
 
 EXAMPLES = r'''
 # Using keyed groups and compose for hostvars
 plugin: community.digitalocean.digitalocean
-api_token: "{{ api_token }}"
+api_token: '{{ lookup("pipe", "./get-do-token.sh" }}'
 attributes:
   - id
   - name
@@ -92,11 +102,15 @@ compose:
     | map(attribute='ip_address') | first
   class: do_size.description | lower
   distro: do_image.distribution | lower
+filters:
+  - '"kubernetes" in do_tags'
+  - 'do_region.slug == "fra1"'
 '''
 
 import re
 import json
-from ansible.errors import AnsibleParserError
+from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.module_utils._text import to_native
 from ansible.module_utils.urls import Request
 from ansible.module_utils.six.moves.urllib.error import URLError, HTTPError
 from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cacheable
@@ -124,9 +138,14 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     'digital_ocean.yaml, digital_ocean.yml.')
         return valid
 
+    def _template_option(self, option):
+        value = self.get_option(option)
+        self.templar.available_variables = {}
+        return self.templar.template(value)
+
     def _get_payload(self):
         # request parameters
-        api_token = self.get_option('api_token')
+        api_token = self._template_option('api_token')
         headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer {0}'.format(api_token)
@@ -152,22 +171,32 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         return payload
 
-    def _populate(self):
+    def _populate(self, records):
         attributes = self.get_option('attributes')
         var_prefix = self.get_option('var_prefix')
         strict = self.get_option('strict')
-        for record in self._get_payload():
+        host_filters = self.get_option('filters')
+        for record in records:
 
-            # add host to inventory
-            if record.get('name'):
-                host_name = self.inventory.add_host(record.get('name'))
-            else:
+            host_name = record.get('name')
+            if not host_name:
                 continue
 
-            # set variables for host
+            host_vars = {}
             for k, v in record.items():
                 if k in attributes:
-                    self.inventory.set_variable(host_name, var_prefix + k, v)
+                    host_vars[var_prefix + k] = v
+
+            if not self._passes_filters(host_filters, host_vars, host_name, strict):
+                self.display.vvv('Host {0} did not pass all filters'.format(host_name))
+                continue
+
+            # add host to inventory
+            self.inventory.add_host(host_name)
+
+            # set variables for host
+            for k, v in host_vars.items():
+                self.inventory.set_variable(host_name, k, v)
 
             self._set_composite_vars(
                 self.get_option('compose'),
@@ -179,25 +208,41 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
             self._add_host_to_keyed_groups(self.get_option('keyed_groups'),
                                            dict(), host_name, strict)
 
+    def _passes_filters(self, filters, variables, host, strict=False):
+        if filters and isinstance(filters, list):
+            for template in filters:
+                try:
+                    if not self._compose(template, variables):
+                        return False
+                except Exception as e:
+                    if strict:
+                        raise AnsibleError('Could not evaluate host filter {0} for host {1}: {2}'
+                                           .format(template, host, to_native(e)))
+                    # Better be safe and not include any hosts by accident.
+                    return False
+        return True
+
     def parse(self, inventory, loader, path, cache=True):
         super(InventoryModule, self).parse(inventory, loader, path)
 
-        # cache settings
         self._read_config_data(path)
-        self.cache_key = self.get_cache_key(path)
 
-        self.use_cache = self.get_option('cache') and cache
-        self.update_cache = self.get_option('cache') and not cache
+        # cache settings
+        cache_key = self.get_cache_key(path)
+        use_cache = self.get_option('cache') and cache
+        update_cache = self.get_option('cache') and not cache
 
-        results = []
-        if not self.update_cache:
+        records = None
+        if use_cache:
             try:
-                results = self._cache[self.cache_key]['digitalocean']
+                records = self._cache[cache_key]
             except KeyError:
-                pass
+                update_cache = True
 
-        if not results:
-            if self.cache_key not in self._cache:
-                self._cache[self.cache_key] = {'digitalocean': ''}
+        if records is None:
+            records = self._get_payload()
 
-        self._populate()
+        if update_cache:
+            self._cache[cache_key] = records
+
+        self._populate(records)
