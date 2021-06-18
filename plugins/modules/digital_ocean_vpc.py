@@ -57,10 +57,6 @@ options:
       - It may not be smaller than /24 nor larger than /16.
       - If no IP range is specified, a /20 network range is generated that won't conflict with other VPC networks in your account.
     type: str
-  vpc_id:
-    description:
-      - VPC ID to delete.
-    type: str
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
@@ -151,7 +147,7 @@ class DOVPC(object):
                 response = self.rest.put("vpcs/{0}".format(vpc_id), data=data)
                 json = response.json
                 if response.status_code != 200:
-                    self.module.fail_json(msg="Failed to update VPC named {0}: {1}".format(self.name, json["message"]))
+                    self.module.fail_json(msg="Failed to update VPC {0}: {1}".format(self.name, json["message"]))
                 else:
                     self.module.exit_json(changed=False, data=json)
             else:
@@ -182,21 +178,28 @@ class DOVPC(object):
         if self.module.check_mode:
             return self.module.exit_json(changed=True)
 
-        response = self.rest.delete("vpcs/{0}".format(str(self.vpc_id)))
-        status = response.status_code
-        if status == 204:
-            self.module.exit_json(
-                changed=True,
-                msg="Deleted VPC {0}".format(str(self.vpc_id)),
-            )
+        vpc = self.get_by_name()
+        if vpc is None:
+            self.module.fail_json(msg="Unable to find VPC {0}".format(self.name))
         else:
-            json = response.json
-            self.module.fail_json(
-                changed=False,
-                msg="Failed to delete VPC {0}: {1}".format(
-                    self.vpc_id, json["message"]
-                ),
-            )
+            vpc_id = vpc.get("id", None)
+            if vpc_id is not None:
+                response = self.rest.delete("vpcs/{0}".format(str(vpc_id)))
+                status = response.status_code
+                json = response.json
+                if status == 204:
+                    self.module.exit_json(
+                        changed=True,
+                        msg="Deleted VPC {0} ({1})".format(self.name, vpc_id),
+                    )
+                else:
+                    json = response.json
+                    self.module.fail_json(
+                        changed=False,
+                        msg="Failed to delete VPC {0} ({1}): {2}".format(
+                            self.name, vpc_id, json["message"]
+                        ),
+                    )
 
 
 def run(module):
@@ -217,15 +220,13 @@ def main():
         default=dict(type="bool", default=False),
         region=dict(type="str"),
         ip_range=dict(type="str"),
-        vpc_id=dict(type="str"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
             ["state", "present", ["name", "region"]],
-            ["state", "absent", ["vpc_id"]],
+            ["state", "absent", ["name"]],
         ],
-        mutually_exclusive=[["name", "vpc_id"]],
         supports_check_mode=True,
     )
 
