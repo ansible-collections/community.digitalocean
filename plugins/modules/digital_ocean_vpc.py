@@ -70,6 +70,27 @@ EXAMPLES = r"""
     name: myvpc1
     region: nyc1
 
+- name: Create a VPC (choose IP range)
+  community.digitalocean.digital_ocean_vpc:
+    state: present
+    name: myvpc1
+    region: nyc1
+    ip_range: 192.168.192.0/24
+
+- name: Update a VPC (make it default)
+  community.digitalocean.digital_ocean_vpc:
+    state: present
+    name: myvpc1
+    region: nyc1
+    default: true
+
+- name: Update a VPC (change description)
+  community.digitalocean.digital_ocean_vpc:
+    state: present
+    name: myvpc1
+    region: nyc1
+    description: myvpc
+
 - name: Delete a VPC
   community.digitalocean.digital_ocean_vpc:
     state: absent
