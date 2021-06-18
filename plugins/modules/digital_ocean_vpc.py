@@ -73,7 +73,7 @@ EXAMPLES = r"""
 - name: Delete a VPC
   community.digitalocean.digital_ocean_vpc:
     state: absent
-    vpc_id: a3b72d97-192f-4984-9d71-08a5faf2e0c7
+    name: myvpc1
 """
 
 
