@@ -42,7 +42,9 @@
         that:
           - not result.changed
           - result.data is defined
-          - result.data.name == cert_name
+          - result.data | length == 1
+          - result.data.0.name is defined
+          - result.data.0.name == cert_name
 
   always:
 
