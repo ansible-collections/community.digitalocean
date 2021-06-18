@@ -49,7 +49,7 @@
       community.digitalocean.digital_ocean_vpc:
         state: absent
         oauth_token: "{{ do_api_key }}"
-        vpc_id: "{{ vpc_id }}"
+        name: "{{ vpc_name }}"
       register: result
 
     - name: Verify VPC deleted
@@ -63,6 +63,6 @@
       community.digitalocean.digital_ocean_vpc:
         state: absent
         oauth_token: "{{ do_api_key }}"
-        vpc_id: "{{ vpc_id }}"
+        name: "{{ vpc_name }}"
       register: result
       ignore_errors: true
