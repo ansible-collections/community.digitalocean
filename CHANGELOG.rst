@@ -5,6 +5,31 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.7.0
+======
+
+Minor Changes
+-------------
+
+- digital_ocean_kubernetes - set "latest" as the default version for new clusters (https://github.com/ansible-collections/community.digitalocean/issues/114).
+
+Bugfixes
+--------
+
+- digital_ocean_certificate - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+- digital_ocean_droplet - state `present` with `wait` was not waiting (https://github.com/ansible-collections/community.digitalocean/issues/116).
+- digital_ocean_firewall - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+- digital_ocean_tag - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+- digitalocean - update README.md with project_info and project module (https://github.com/ansible-collections/community.digitalocean/pull/112).
+
+New Modules
+-----------
+
+- digital_ocean_snapshot - Create and delete DigitalOcean snapshots
+- digital_ocean_snapshot_info - Gather information about DigitalOcean snapshots
+- digital_ocean_vpc - Create and delete DigitalOcean VPCs
+- digital_ocean_vpc_info - Gather information about DigitalOcean VPCs
+
 v1.6.0
 ======
 
@@ -38,7 +63,7 @@ v1.5.0
 Minor Changes
 -------------
 
-- digitalocean - Filter droplets in dynamic inventory plugin using arbitrary jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
+- digitalocean - Filter droplets in dynamic inventory plugin using arbitrary. jinja2 expressions (https://github.com/ansible-collections/community.digitalocean/pull/96).
 - digitalocean - Support templates in API tokens when using the dynamic inventory plugin (https://github.com/ansible-collections/community.digitalocean/pull/98).
 
 Bugfixes

@@ -180,3 +180,29 @@ releases:
       name: digital_ocean_project_info
       namespace: ''
     release_date: '2021-06-10'
+  1.7.0:
+    changes:
+      bugfixes:
+      - digital_ocean_certificate - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+      - digital_ocean_droplet - state `present` with `wait` was not waiting (https://github.com/ansible-collections/community.digitalocean/issues/116).
+      - digital_ocean_firewall - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+      - digital_ocean_tag - fixing integration test (https://github.com/ansible-collections/community.digitalocean/issues/114).
+      - digitalocean - update README.md with project_info and project module (https://github.com/ansible-collections/community.digitalocean/pull/112).
+      minor_changes:
+      - digital_ocean_kubernetes - set "latest" as the default version for new clusters
+        (https://github.com/ansible-collections/community.digitalocean/issues/114).
+    fragments:
+    - 112-update-readme.yaml
+    - 114-fix-integration-tests.yaml
+    - 116-droplet-present-wait.yaml
+    modules:
+    - description: Create and delete DigitalOcean snapshots
+      name: digital_ocean_snapshot
+      namespace: ''
+    - description: Create and delete DigitalOcean VPCs
+      name: digital_ocean_vpc
+      namespace: ''
+    - description: Gather information about DigitalOcean VPCs
+      name: digital_ocean_vpc_info
+      namespace: ''
+    release_date: '2021-06-21'
