@@ -344,7 +344,7 @@ class DODroplet(object):
             droplet_id = droplet_data.get("id", None)
             if droplet_id is not None:
                 if self.wait:
-                    if state == "active":
+                    if state == "present" or state == "active":
                         json_data = self.ensure_power_on(droplet_id)
                     if state == "inactive":
                         json_data = self.ensure_power_off(droplet_id)

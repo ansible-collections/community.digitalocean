@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - state `present` with `wait` was not waiting (https://github.com/ansible-collections/community.digitalocean/issues/116).
