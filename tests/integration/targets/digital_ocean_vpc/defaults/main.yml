@@ -1,0 +1,2 @@
+do_region: nyc1
+vpc_name: gh-ci-vpc
