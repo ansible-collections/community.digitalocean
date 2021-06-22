@@ -48,6 +48,7 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_size_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_size_info_module.html) – Gather information about DigitalOcean Droplet sizes
 - [digital_ocean_snapshot_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_snapshot_facts_module.html) – Gather information about DigitalOcean Snapshot
 - [digital_ocean_snapshot_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_snapshot_info_module.html) – Gather information about DigitalOcean Snapshot
+- [digital_ocean_snapshot](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_snapshot_module.html) – Manage DigitalOcean Snapshots
 - [digital_ocean_sshkey](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_sshkey_module.html) – Manage DigitalOcean SSH keys
 - [digital_ocean_sshkey_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_sshkey_facts_module.html) – DigitalOcean SSH keys facts
 - [digital_ocean_sshkey_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_sshkey_info_module.html) – Gather information about DigitalOcean SSH keys
@@ -56,6 +57,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_tag_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_tag_info_module.html) – Gather information about DigitalOcean tags
 - [digital_ocean_volume_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_volume_facts_module.html) – Gather information about DigitalOcean volumes
 - [digital_ocean_volume_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_volume_info_module.html) – Gather information about DigitalOcean volumes
+- [digital_ocean_vpc](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_vpc_module.html) – Create and delete DigitalOcean VPCs
+- [digital_ocean_vpc_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_vpc_info_module.html) – Gather information about DigitalOcean VPCs
 - [digitalocean](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digitalocean_inventory.html) – DigitalOcean Inventory Plugin
 
 ## Installation and Usage

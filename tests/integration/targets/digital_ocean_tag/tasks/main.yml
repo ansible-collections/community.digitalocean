@@ -41,8 +41,9 @@
         - not result_find.failed
         - not result_find.changed
         - result_find.data is defined
-        - result_find.data.name is defined
-        - result_find.data.name == tag_name
+        - result_find.data | length == 1
+        - result_find.data.0.name is defined
+        - result_find.data.0.name == tag_name
 
   always:
 
@@ -53,17 +54,15 @@
         state: absent
       register: delete_tag
 
-    # FIXME: Deleting a tag isn't idempotent
-    # https://github.com/ansible-collections/community.digitalocean/issues/61
-    # - name: Delete tag with idempotency
-    #   community.digitalocean.digital_ocean_tag:
-    #     oauth_token: '{{do_api_key}}'
-    #     name: integration-test
-    #     state: absent
-    #   register: delete_tag_idempotent
+    - name: Delete tag with idempotency
+      community.digitalocean.digital_ocean_tag:
+        oauth_token: '{{do_api_key}}'
+        name: integration-test-2
+        state: absent
+      register: delete_tag_idempotent
 
     - name: Verify that tag was deleted
       ansible.builtin.assert:
         that:
           - delete_tag.changed == True
-          # - delete_tag_idempotent.changed == False  # FIXME: Deleting a tag isn't idempotent
+          - delete_tag_idempotent.changed == False
