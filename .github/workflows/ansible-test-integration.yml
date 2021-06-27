@@ -45,12 +45,11 @@ jobs:
             tests/integration/integration_config.yml.template \
             > tests/integration/integration_config.yml
 
-      - name: Install community.general
-        run: ansible-galaxy collection install community.general
-
       - name: Run the integration tests
         # run: ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage
-        run: ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage digital_ocean_snapshot
+        run: |
+          ansible-galaxy collection install community.general
+          ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage digital_ocean_snapshot
 
       # ansible-test support producing code coverage date
       - name: Generate coverage report
