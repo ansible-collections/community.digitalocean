@@ -50,7 +50,7 @@ jobs:
         run: |
           pip install jmespath
           ansible-galaxy collection install community.general
-          ansible-test integration -v --color --python 3.8 --diff digital_ocean_snapshot
+          ansible-test integration --docker -v --color --python 3.8 --diff digital_ocean_snapshot
 
       # ansible-test support producing code coverage date
       - name: Generate coverage report
