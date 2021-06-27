@@ -34,10 +34,8 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Install Ansible (and deps)
-        run: |
-          pip install ansible
-          pip install jmespath
+      - name: Install Ansible
+        run: pip install ansible
 
       - name: Configure integration test run
         env:
@@ -53,6 +51,7 @@ jobs:
       - name: Run the integration tests
         # run: ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage
         run: |
+          pip install jmespath
           ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage digital_ocean_snapshot
 
       # ansible-test support producing code coverage date
