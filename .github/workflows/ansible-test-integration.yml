@@ -53,6 +53,8 @@ jobs:
         # ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage digital_ocean_snapshot
         run: |
           pip freeze
+          pip install jmespath
+          pip freeze
           ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage digital_ocean_snapshot
 
       # ansible-test support producing code coverage date
