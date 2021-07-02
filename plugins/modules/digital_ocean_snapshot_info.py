@@ -83,6 +83,7 @@ RETURN = r'''
 data:
     description: DigitalOcean snapshot information
     returned: success
+    elements: dict
     type: list
     sample: [
         {
@@ -111,7 +112,7 @@ def core(module):
 
     rest = DigitalOceanHelper(module)
 
-    base_url = 'snapshots?'
+    base_url = 'snapshots'
     snapshot = []
 
     if snapshot_type == 'by_id':
@@ -122,12 +123,14 @@ def core(module):
         if status_code != 200:
             module.fail_json(msg="Failed to fetch snapshot information due to error : %s" % response.json['message'])
 
-        snapshot.extend(response.json["snapshot"])
+        snapshot.extend(response.json["snapshots"])
     else:
         if snapshot_type == 'droplet':
-            base_url += "resource_type=droplet&"
+            base_url += "?resource_type=droplet&"
         elif snapshot_type == 'volume':
-            base_url += "resource_type=volume&"
+            base_url += "?resource_type=volume&"
+        else:
+            base_url += "?"
 
         snapshot = rest.get_paginated_data(base_url=base_url, data_key_name='snapshots')
     module.exit_json(changed=False, data=snapshot)

@@ -8,7 +8,7 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-DOCUMENTATION = '''
+DOCUMENTATION = r'''
 ---
 module: digital_ocean
 short_description: Create/delete a droplet/SSH_key in DigitalOcean
@@ -25,21 +25,28 @@ options:
      - Which target you want to operate on.
     default: droplet
     choices: ['droplet', 'ssh']
+    type: str
   state:
     description:
      - Indicate desired state of the target.
     default: present
     choices: ['present', 'active', 'absent', 'deleted']
+    type: str
   api_token:
     description:
      - DigitalOcean api token.
+    type: str
+    aliases:
+      - API_TOKEN
   id:
     description:
      - Numeric, the droplet id you want to operate on.
     aliases: ['droplet_id']
+    type: int
   name:
     description:
      - String, this is the name of the droplet - must be formatted by hostname rules, or the name of a SSH key.
+    type: str
   unique_name:
     description:
      - Bool, require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
@@ -49,15 +56,20 @@ options:
   size_id:
     description:
      - This is the slug of the size you would like the droplet created with.
+    type: str
   image_id:
     description:
      - This is the slug of the image you would like the droplet created with.
+    type: str
   region_id:
     description:
      - This is the slug of the region you would like your server to be created in.
+    type: str
   ssh_key_ids:
     description:
      - Optional, array of SSH key (numeric) ID that you would like to be added to the server.
+    type: list
+    elements: str
   virtio:
     description:
      - "Bool, turn on virtio driver in droplet for improved network and storage I/O."
@@ -76,6 +88,7 @@ options:
   user_data:
     description:
       - opaque blob of data which is made available to the droplet
+    type: str
   ipv6:
     description:
       - Optional, Boolean, enable IPv6 for your droplet.
@@ -90,9 +103,11 @@ options:
     description:
      - How long before wait gives up, in seconds.
     default: 300
+    type: int
   ssh_pub_key:
     description:
      - The public SSH key you want to add to your account.
+    type: str
 
 notes:
   - Two environment variables can be used, DO_API_KEY and DO_API_TOKEN. They both refer to the v2 token.
@@ -105,13 +120,13 @@ requirements:
 '''
 
 
-EXAMPLES = '''
+EXAMPLES = r'''
 # Ensure a SSH key is present
 # If a key matches this name, will return the ssh key id and changed = False
 # If no existing key matches this name, a new key is created, the ssh key id is returned and changed = False
 
 - name: Ensure a SSH key is present
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     command: ssh
     name: my_ssh_key
@@ -120,7 +135,7 @@ EXAMPLES = '''
 
 # Will return the droplet details including the droplet id (used for idempotence)
 - name: Create a new Droplet
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     command: droplet
     name: mydroplet
@@ -142,7 +157,7 @@ EXAMPLES = '''
 # If no droplet matches the id, a new droplet will be created and the droplet details (including the new id) are returned, changed = True.
 
 - name: Ensure a droplet is present
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     command: droplet
     id: 123
@@ -159,7 +174,7 @@ EXAMPLES = '''
 # The keys are used to connect as root to the droplet.
 
 - name: Create a droplet with ssh key
-  digital_ocean:
+  community.digitalocean.digital_ocean:
     state: present
     ssh_key_ids: 123,456
     name: mydroplet
@@ -433,7 +448,7 @@ def main():
             size_id=dict(),
             image_id=dict(),
             region_id=dict(),
-            ssh_key_ids=dict(type='list'),
+            ssh_key_ids=dict(type='list', elements='str', no_log=False),
             virtio=dict(type='bool', default=True),
             private_networking=dict(type='bool', default=False),
             backups_enabled=dict(type='bool', default=False),

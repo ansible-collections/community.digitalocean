@@ -1,29 +1,68 @@
 ---
-- name: Test API key is provided.
-  fail:
-    msg: do_api_key should be defined in integration_config.yml
-  when: do_api_key is not defined
+- block:
 
-- name: Create ssh key
-  digital_ocean_sshkey:
-    name: test-key1
-    ssh_pub_key: "{{ dummy_ssh_pub_key }}"
-    oauth_token: "{{ do_api_key }}"
-  register: result
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
 
-- name: Verify that SSH key was created
-  assert:
-    that:
-      - "result.changed"
+    - name: Create an invalid SSH key
+      community.digitalocean.digital_ocean_sshkey:
+        name: "{{ invalid_key_name }}"
+        ssh_pub_key: "{{ invalid_ssh_pub_key }}"
+        oauth_token: "{{ do_api_key }}"
+      ignore_errors: true
+      register: result
 
-- name: "Delete ssh key"
-  digital_ocean_sshkey:
-    state: "absent"
-    fingerprint: "{{ result.data.ssh_key.fingerprint }}"
-    oauth_token: "{{ do_api_key }}"
-  register: result
+    - name: Verify that the invalid SSH key failed
+      ansible.builtin.assert:
+        that:
+          - result.failed
 
-- name: Verify that SSH key was deleted
-  assert:
-    that:
-      - "result.changed"
+    - name: Create a valid SSH key
+      community.digitalocean.digital_ocean_sshkey:
+        name: "{{ key_name }}"
+        ssh_pub_key: "{{ dummy_ssh_pub_key }}"
+        oauth_token: "{{ do_api_key }}"
+      register: result
+
+    - name: Verify that SSH key was created
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Fetch all SSH keys
+      community.digitalocean.digital_ocean_sshkey_info:
+        oauth_token: "{{ do_api_key }}"
+      register: ssh_keys
+
+    - name: Find our dummy ci SSH key
+      set_fact:
+        ci_ssh_key: "{{ ssh_keys.data | selectattr('name', 'equalto', key_name) }}"
+      register: result_find
+
+    - name: Verify that ci SSH key was found
+      ansible.builtin.assert:
+        that:
+          - not result_find.failed
+          - not result_find.changed
+          - result_find.ansible_facts is defined
+          - result_find.ansible_facts.ci_ssh_key is defined
+          - result_find.ansible_facts.ci_ssh_key.0 is defined
+          - result_find.ansible_facts.ci_ssh_key.0.name == key_name
+
+  always:
+
+    - name: Delete the SSH key
+      community.digitalocean.digital_ocean_sshkey:
+        state: "absent"
+        fingerprint: "{{ result.data.ssh_key.fingerprint }}"
+        oauth_token: "{{ do_api_key }}"
+      register: result
+
+    - name: Verify that the SSH key was deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed

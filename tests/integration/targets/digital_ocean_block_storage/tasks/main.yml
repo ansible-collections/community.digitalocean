@@ -1,0 +1,101 @@
+---
+- block:
+
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
+
+    - name: Ensure the volume is absent
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: absent
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify volume is absent
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Create a volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: present
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_size }}"
+      register: result
+
+    - name: Verify volume is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Resize to same size
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: present
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_size }}"
+      register: result
+
+    - name: Verify resizing to same size is ignored
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Shrink the volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: present
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_down_size }}"
+      ignore_errors: true
+      register: result
+
+    - name: Verify shrinking fails
+      ansible.builtin.assert:
+        that:
+          - result.failed
+
+    - name: Grow the volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: present
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_up_size }}"
+        timeout: "{{ timeout }}"
+      register: result
+
+    - name: Verify growing volume succeeded
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+  always:
+
+    - name: Remove the volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: absent
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify the volume is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed

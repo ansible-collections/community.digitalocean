@@ -57,6 +57,7 @@ RETURN = r'''
 data:
     description: DigitalOcean Domain information
     returned: success
+    elements: dict
     type: list
     sample: [
         {

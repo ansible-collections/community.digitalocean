@@ -58,6 +58,7 @@ data:
     description: DigitalOcean certificate information
     returned: success
     type: list
+    elements: dict
     sample: [
         {
           "id": "892071a0-bb95-49bc-8021-3afd67a210bf",
@@ -79,7 +80,7 @@ def core(module):
     certificate_id = module.params.get('certificate_id', None)
     rest = DigitalOceanHelper(module)
 
-    base_url = 'certificates?'
+    base_url = 'certificates'
     if certificate_id is not None:
         response = rest.get("%s/%s" % (base_url, certificate_id))
         status_code = response.status_code
@@ -87,10 +88,9 @@ def core(module):
         if status_code != 200:
             module.fail_json(msg="Failed to retrieve certificates for DigitalOcean")
 
-        resp_json = response.json
-        certificate = resp_json['certificate']
+        certificate = [response.json['certificate']]
     else:
-        certificate = rest.get_paginated_data(base_url=base_url, data_key_name='certificates')
+        certificate = rest.get_paginated_data(base_url=base_url + '?', data_key_name='certificates')
 
     module.exit_json(changed=False, data=certificate)
 

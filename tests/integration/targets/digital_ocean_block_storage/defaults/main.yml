@@ -1,0 +1,6 @@
+do_region: nyc1
+volume_name: gh-ci-volume
+volume_size: 15
+volume_down_size: 10
+volume_up_size: 20
+timeout: 900

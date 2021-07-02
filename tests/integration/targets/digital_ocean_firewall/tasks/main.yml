@@ -1,0 +1,54 @@
+---
+- block:
+
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
+
+    - name: Create a Firewall
+      community.digitalocean.digital_ocean_firewall:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ firewall_name }}"
+        inbound_rules: "{{ firewall_inbound_rules }}"
+        outbound_rules: "{{ firewall_outbound_rules }}"
+      register: result
+
+    - name: Verify Firewall created
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Find the Firewall
+      community.digitalocean.digital_ocean_firewall_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ firewall_name }}"
+      register: result
+
+    - name: Verify Firewall found
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.data is defined
+          - result.data | length == 1
+          - result.data.0.name is defined
+          - result.data.0.name == firewall_name
+
+  always:
+
+    - name: Delete a Firewall
+      community.digitalocean.digital_ocean_firewall:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ firewall_name }}"
+        inbound_rules: "{{ firewall_inbound_rules }}"
+        outbound_rules: "{{ firewall_outbound_rules }}"
+      register: result
+
+    - name: Verify Firewall deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
