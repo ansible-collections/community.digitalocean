@@ -331,7 +331,7 @@ class DOFirewall(object):
                 info.update({'status_code_success': status_code_success})
                 self.module.fail_json(msg=info)
             else:
-                msg_error = 'Failed to retrieve firewalls from Digital Ocean'
+                msg_error = 'Failed to retrieve firewalls from DigitalOcean'
                 self.module.fail_json(
                     msg=msg_error + ' (url=' + self.rest.baseurl + '/' + self.baseurl
                     + ', status=' + str(status_code or '')
@@ -440,7 +440,7 @@ class DOFirewall(object):
         if status_code != status_code_success:
             error = resp.json
             error.update({'context': 'error when trying to ' +
-                ('create' if (id is None) else 'update') + ' firewalls'})
+                         ('create' if (id is None) else 'update') + ' firewalls'})
             error.update({'status_code': status_code})
             error.update({'status_code_success': status_code_success})
             self.module.fail_json(msg=error)
