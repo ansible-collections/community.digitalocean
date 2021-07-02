@@ -15,7 +15,7 @@ short_description: Create and delete a DigitalOcean database
 description:
   - Create and delete a database in DigitalOcean and optionally wait for it to be online.
   - DigitalOcean's managed database service simplifies the creation and management of highly available database clusters.
-  - Currently, it offers support for PostgreSQL, Redis, and MySQL.
+  - Currently, it offers support for PostgreSQL, Redis, MySQL, and MongoDB.
 version_added: 1.3.0
 author: "Mark Mercado (@mamercad)"
 options:
@@ -324,7 +324,7 @@ def main():
             ),
             id=dict(type='int', aliases=['database_id']),
             name=dict(type='str', required=True),
-            engine=dict(choices=['pg', 'mysql', 'redis'], required=True),
+            engine=dict(choices=['pg', 'mysql', 'redis', 'mongodb'], required=True),
             version=dict(type='str'),
             size=dict(type='str', aliases=['size_id'], required=True),
             region=dict(type='str', aliases=['region_id'], required=True),
