@@ -1,0 +1,4 @@
+do_region: nyc1
+droplet_name: gh-ci-droplet
+droplet_image: ubuntu-18-04-x64
+droplet_size: s-1vcpu-1gb

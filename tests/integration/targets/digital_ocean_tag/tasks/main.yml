@@ -1,51 +1,68 @@
 ---
 - block:
-  - name: Test API key is provided.
-    fail:
-      msg: do_api_key should be defined in integration_config.yml
-    when: do_api_key is not defined
+
+  - name: Ensure API key is provided
+    ansible.builtin.fail:
+      msg: do_api_key should be defined in tests/integration/integration_config.yml
+    when:
+      - do_api_key is not defined
+      - do_api_key | length == 0
 
   - name: Create a new tag
-    digital_ocean_tag:
-      oauth_token: '{{do_api_key}}'
-      name: integration-test
+    community.digitalocean.digital_ocean_tag:
+      oauth_token: "{{ do_api_key }}"
+      name: "{{ tag_name }}"
       state: present
     register: create_tag
 
   - name: Create a new tag for idempotency
-    digital_ocean_tag:
-      oauth_token: '{{do_api_key}}'
-      name: integration-test
+    community.digitalocean.digital_ocean_tag:
+      oauth_token: "{{ do_api_key }}"
+      name: "{{ tag_name }}"
       state: present
     register: create_tag_idempotent
 
-  - debug:
-      var: create_tag
-
-  - assert:
+  - name: Verify tag created and idempotent
+    ansible.builtin.assert:
       that:
         - create_tag.changed == True
         - create_tag_idempotent.changed == False
-        - create_tag.data.tag.name == "integration-test"
+        - create_tag.data.tag.name == tag_name
+
+  - name: Gather information about tag with given name
+    community.digitalocean.digital_ocean_tag_info:
+      oauth_token: "{{ do_api_key }}"
+      tag_name: "{{ tag_name }}"
+    register: result_find
+
+  - name: Verify that ci tag was found
+    ansible.builtin.assert:
+      that:
+        - not result_find.failed
+        - not result_find.changed
+        - result_find.data is defined
+        - result_find.data | length == 1
+        - result_find.data.0.name is defined
+        - result_find.data.0.name == tag_name
 
   always:
-  - name: Delete tag
-    digital_ocean_tag:
-      oauth_token: '{{do_api_key}}'
-      name: integration-test
-      state: absent
-    register: delete_tag
 
-# FIXME: Deleting a tag isn't idempotent
-#  - name: Delete tag with idempotency
-#    digital_ocean_tag:
-#      oauth_token: '{{do_api_key}}'
-#      name: integration-test
-#      state: absent
-#    register: delete_tag_idempotent
+    - name: Delete tag
+      community.digitalocean.digital_ocean_tag:
+        oauth_token: "{{ do_api_key }}"
+        name: integration-test
+        state: absent
+      register: delete_tag
 
-  - assert:
-      that:
-        - delete_tag.changed == True
-# FIXME: Deleting a tag isn't idempotent
-#        - delete_tag_idempotent.changed == False
+    - name: Delete tag with idempotency
+      community.digitalocean.digital_ocean_tag:
+        oauth_token: '{{do_api_key}}'
+        name: integration-test-2
+        state: absent
+      register: delete_tag_idempotent
+
+    - name: Verify that tag was deleted
+      ansible.builtin.assert:
+        that:
+          - delete_tag.changed == True
+          - delete_tag_idempotent.changed == False

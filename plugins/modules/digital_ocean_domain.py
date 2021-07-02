@@ -73,10 +73,12 @@ EXAMPLES = r'''
 
 '''
 
-import traceback
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
-from ansible.module_utils._text import to_native
+import time
+
+ZONE_FILE_ATTEMPTS = 5
+ZONE_FILE_SLEEP = 3
 
 
 class DoManager(DigitalOceanHelper, object):
@@ -151,7 +153,7 @@ class DoManager(DigitalOceanHelper, object):
         return json['domain_record']
 
 
-def core(module):
+def run(module):
     do_manager = DoManager(module)
     state = module.params.get('state')
 
@@ -162,22 +164,38 @@ def core(module):
             if 'message' in domain:
                 module.fail_json(changed=False, msg=domain['message'])
             else:
+                # We're at the mercy of a backend process which we have no visibility into:
+                # https://developers.digitalocean.com/documentation/v2/#create-a-new-domain
+                #
+                # In particular: "Keep in mind that, upon creation, the zone_file field will
+                # have a value of null until a zone file is generated and propagated through
+                # an automatic process on the DigitalOcean servers."
+                #
+                # Arguably, it's nice to see the records versus null, so, we'll just try a
+                # few times before giving up and returning null.
+                for i in range(ZONE_FILE_ATTEMPTS):
+                    record = do_manager.domain_record()
+                    if record is not None and 'domain' in record:
+                        domain = record['domain']
+                        if domain is not None and 'zone_file' in domain:
+                            module.exit_json(changed=True, domain=domain)
+                    time.sleep(ZONE_FILE_SLEEP)
                 module.exit_json(changed=True, domain=domain)
         else:
             records = do_manager.all_domain_records()
-            at_record = None
-            for record in records['domain_records']:
-                if record['name'] == "@" and record['type'] == 'A':
-                    at_record = record
+            if module.params.get('ip'):
+                at_record = None
+                for record in records['domain_records']:
+                    if record['name'] == "@" and record['type'] == 'A':
+                        at_record = record
 
-            if not at_record:
-                do_manager.create_domain_record()
-                module.exit_json(changed=True, domain=do_manager.find())
-            elif not at_record['data'] == module.params.get('ip'):
-                do_manager.edit_domain_record(at_record)
-                module.exit_json(changed=True, domain=do_manager.find())
-            else:
-                module.exit_json(changed=False, domain=do_manager.domain_record())
+                if not at_record:
+                    do_manager.create_domain_record()
+                    module.exit_json(changed=True, domain=do_manager.find())
+                elif not at_record['data'] == module.params.get('ip'):
+                    do_manager.edit_domain_record(at_record)
+                    module.exit_json(changed=True, domain=do_manager.find())
+            module.exit_json(changed=False, domain=do_manager.domain_record())
 
     elif state == 'absent':
         if not domain:
@@ -208,10 +226,7 @@ def main():
         ),
     )
 
-    try:
-        core(module)
-    except Exception as e:
-        module.fail_json(msg=to_native(e), exception=traceback.format_exc())
+    run(module)
 
 
 if __name__ == '__main__':

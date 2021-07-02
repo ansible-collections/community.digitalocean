@@ -1,6 +1,12 @@
-name: CI
+name: sanity
 on:
-- pull_request
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 6 * * *'
+env:
+  NAMESPACE: community
+  COLLECTION_NAME: digitalocean 
 
 jobs:
   sanity:
@@ -10,6 +16,7 @@ jobs:
         ansible:
         - stable-2.9
         - stable-2.10
+        - stable-2.11
         - devel
     runs-on: ubuntu-latest
     steps:
@@ -17,15 +24,15 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
         with:
-          path: ansible_collections/community/digitalocean
+          path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
 
-      - name: Set up Python 3.6
+      - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6
+          python-version: 3.8
 
       - name: Install ansible-base (${{ matrix.ansible }})
         run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
 
       - name: Run sanity tests
-        run: ansible-test sanity --docker -v --color --python 3.6
+        run: ansible-test sanity --docker -v --color

@@ -1,0 +1,7 @@
+do_region: nyc1
+cluster_name: gh-ci-k8s
+cluster_version: latest
+cluster_node_pools:
+  - name: gh-ci-k8s-workers
+    size: s-1vcpu-2gb
+    count: 1

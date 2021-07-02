@@ -46,12 +46,13 @@ EXAMPLES = r'''
 '''
 
 
-RETURN = '''
+RETURN = r'''
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
 data:
     description: List of SSH keys on DigitalOcean
     returned: success and no resource constraint
-    type: dict
+    type: list
+    elements: dict
     sample: [
       {
         "id": 512189,
@@ -84,7 +85,9 @@ def main():
         argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(),
         supports_check_mode=True,
     )
-
+    if module._name in ('digital_ocean_sshkey_facts', 'community.digitalocean.digital_ocean_sshkey_facts'):
+        module.deprecate("The 'digital_ocean_sshkey_facts' module has been renamed to 'digital_ocean_sshkey_info'",
+                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
     core(module)
 
 

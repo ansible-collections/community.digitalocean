@@ -87,8 +87,8 @@ optional arguments:
   -h, --help            show this help message and exit
   --list                List all active Droplets as Ansible inventory
                         (default: True)
-  --host HOST           Get all Ansible inventory variables about a specific
-                        Droplet
+  --host HOST           Get all Ansible inventory variables about the Droplet
+                        with the given ID
   --all                 List all DigitalOcean information as JSON
   --droplets, -d        List Droplets as JSON
   --regions             List Regions as JSON
@@ -208,7 +208,7 @@ class DoManager:
 
     def show_droplet(self, droplet_id):
         resp = self.send('droplets/%s' % droplet_id)
-        return resp['droplet']
+        return resp.get('droplet', {})
 
     def all_tags(self):
         resp = self.send('tags')
@@ -345,7 +345,8 @@ class DigitalOceanInventory(object):
         parser = argparse.ArgumentParser(description='Produce an Ansible Inventory file based on DigitalOcean credentials')
 
         parser.add_argument('--list', action='store_true', help='List all active Droplets as Ansible inventory (default: True)')
-        parser.add_argument('--host', action='store', help='Get all Ansible inventory variables about a specific Droplet')
+        parser.add_argument('--host', action='store', type=int,
+                            help='Get all Ansible inventory variables about the Droplet with the given ID')
 
         parser.add_argument('--all', action='store_true', help='List all DigitalOcean information as JSON')
         parser.add_argument('--droplets', '-d', action='store_true', help='List Droplets as JSON')
@@ -445,15 +446,19 @@ class DigitalOceanInventory(object):
         for droplet in self.data['droplets']:
             for net in droplet['networks']['v4']:
                 if net['type'] == 'public':
-                    dest = net['ip_address']
-                else:
-                    continue
+                    droplet['ip_address'] = net['ip_address']
+                elif net['type'] == 'private':
+                    droplet['private_ip_address'] = net['ip_address']
 
-            self.inventory['all']['hosts'].append(dest)
+            host_indentifier = droplet['ip_address']
+            if self.use_private_network and droplet['private_ip_address']:
+                host_indentifier = droplet['private_ip_address']
 
-            self.add_host(droplet['id'], dest)
+            self.inventory['all']['hosts'].append(host_indentifier)
 
-            self.add_host(droplet['name'], dest)
+            self.add_host(droplet['id'], host_indentifier)
+
+            self.add_host(droplet['name'], host_indentifier)
 
             # groups that are always present
             for group in ('digital_ocean',
@@ -462,29 +467,28 @@ class DigitalOceanInventory(object):
                           'size_' + droplet['size']['slug'],
                           'distro_' + DigitalOceanInventory.to_safe(droplet['image']['distribution']),
                           'status_' + droplet['status']):
-                self.add_host(group, dest)
+                self.add_host(group, host_indentifier)
 
             # groups that are not always present
             for group in (droplet['image']['slug'],
                           droplet['image']['name']):
                 if group:
                     image = 'image_' + DigitalOceanInventory.to_safe(group)
-                    self.add_host(image, dest)
+                    self.add_host(image, host_indentifier)
 
             if droplet['tags']:
                 for tag in droplet['tags']:
-                    self.add_host(tag, dest)
+                    self.add_host(tag, host_indentifier)
 
             # hostvars
             info = self.do_namespace(droplet)
-            self.inventory['_meta']['hostvars'][dest] = info
+            self.inventory['_meta']['hostvars'][host_indentifier] = info
 
     def load_droplet_variables_for_host(self):
         """ Generate a JSON response to a --host call """
-        host = int(self.args.host)
-        droplet = self.manager.show_droplet(host)
+        droplet = self.manager.show_droplet(self.args.host)
         info = self.do_namespace(droplet)
-        return {'droplet': info}
+        return info
 
     ###########################################################################
     # Cache Management

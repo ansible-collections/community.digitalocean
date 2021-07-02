@@ -21,19 +21,36 @@ options:
      - Indicate desired state of the target.
     default: present
     choices: ['present', 'absent']
+    type: str
   ip:
     description:
      - Public IP address of the Floating IP. Used to remove an IP
+    type: str
+    aliases: ['id']
   region:
     description:
      - The region that the Floating IP is reserved to.
+    type: str
   droplet_id:
     description:
      - The Droplet that the Floating IP has been assigned to.
+    type: str
   oauth_token:
     description:
      - DigitalOcean OAuth token.
     required: true
+    type: str
+  timeout:
+    description:
+      - Floating IP creation timeout.
+    type: int
+    default: 30
+  validate_certs:
+    description:
+      - If set to C(no), the SSL certificates will not be validated.
+      - This should only set to C(no) used on personally controlled sites using self-signed certificates.
+    type: bool
+    default: true
 notes:
   - Version 2 of DigitalOcean API is used.
 requirements:
@@ -269,6 +286,27 @@ def create_floating_ips(module, rest):
         payload["region"] = module.params['region']
     if module.params['droplet_id'] is not None:
         payload["droplet_id"] = module.params['droplet_id']
+
+    # Get existing floating IPs
+    response = rest.get('floating_ips/')
+    status_code = response.status_code
+    json_data = response.json
+
+    # Exit unchanged if any of them are assigned to this Droplet already
+    if status_code == 200:
+        floating_ips = json_data.get('floating_ips', [])
+        if len(floating_ips) != 0:
+            for floating_ip in floating_ips:
+                droplet = floating_ip.get('droplet', None)
+                if droplet is not None:
+                    droplet_id = droplet.get('id', None)
+                    if droplet_id is not None:
+                        if str(droplet_id) == module.params['droplet_id']:
+                            ip = floating_ip.get('ip', None)
+                            if ip is not None:
+                                module.exit_json(changed=False, data={'floating_ip': ip})
+                            else:
+                                module.fail_json(changed=False, msg="Unexpected error querying floating ip")
 
     response = rest.post("floating_ips", data=payload)
     status_code = response.status_code
