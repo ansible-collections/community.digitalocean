@@ -38,16 +38,17 @@ options:
   engine:
     description:
       - A slug representing the database engine used for the cluster.
-      - The possible values are C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
+      - The possible values are C(pg) for PostgreSQL, C(mysql) for MySQL, C(redis) for Redis, and C(mongodb) for MongoDB.
     type: str
     required: true
-    choices: ['pg', 'mysql', 'redis']
+    choices: ['pg', 'mysql', 'redis', 'mongodb']
   version:
     description:
       - A string representing the version of the database engine in use for the cluster.
       - For C(pg), versions are 10, 11 and 12.
       - For C(mysql), version is 8.
       - For C(redis), version is 5.
+      - For C(mongodb), version is 4.
     type: str
   size:
     description:
