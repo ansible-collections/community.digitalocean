@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean - integration tests need community.general and jmespath (https://github.com/ansible-collections/community.digitalocean/issues/121).

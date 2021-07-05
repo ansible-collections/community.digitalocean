@@ -206,3 +206,15 @@ releases:
       name: digital_ocean_vpc_info
       namespace: ''
     release_date: '2021-06-21'
+  1.8.0:
+    changes:
+      bugfixes:
+      - digital_ocean - integration tests need community.general and jmespath (https://github.com/ansible-collections/community.digitalocean/issues/121).
+      - digital_ocean_firewall - fixed idempotence (https://github.com/ansible-collections/community.digitalocean/issues/122).
+      minor_changes:
+      - digital_ocean_database - add support for MongoDB (https://github.com/ansible-collections/community.digitalocean/issues/124).
+    fragments:
+    - 121-integration-tests.yaml
+    - 122-firewall-idempotence.yaml
+    - 124-add-mongodb.yaml
+    release_date: '2021-07-05'
