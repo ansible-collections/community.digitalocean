@@ -40,6 +40,7 @@ New Modules
 -----------
 
 - digital_ocean_snapshot - Create and delete DigitalOcean snapshots
+- digital_ocean_snapshot_info - Gather information about DigitalOcean snapshots
 - digital_ocean_vpc - Create and delete DigitalOcean VPCs
 - digital_ocean_vpc_info - Gather information about DigitalOcean VPCs
 
