@@ -5,6 +5,20 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.8.0
+======
+
+Minor Changes
+-------------
+
+- digital_ocean_database - add support for MongoDB (https://github.com/ansible-collections/community.digitalocean/issues/124).
+
+Bugfixes
+--------
+
+- digital_ocean - integration tests need community.general and jmespath (https://github.com/ansible-collections/community.digitalocean/issues/121).
+- digital_ocean_firewall - fixed idempotence (https://github.com/ansible-collections/community.digitalocean/issues/122).
+
 v1.7.0
 ======
 
@@ -26,7 +40,6 @@ New Modules
 -----------
 
 - digital_ocean_snapshot - Create and delete DigitalOcean snapshots
-- digital_ocean_snapshot_info - Gather information about DigitalOcean snapshots
 - digital_ocean_vpc - Create and delete DigitalOcean VPCs
 - digital_ocean_vpc_info - Gather information about DigitalOcean VPCs
 
