@@ -314,11 +314,30 @@ class DOFirewall(object):
         self.firewalls = self.get_firewalls()
 
     def get_firewalls(self):
-        base_url = self.baseurl + "?"
-        response = self.rest.get("%s" % base_url)
+        base_url = self.baseurl + '?'
+        response = self.rest.get('%s' % base_url)
         status_code = response.status_code
-        if status_code != 200:
-            self.module.fail_json(msg="Failed to retrieve firewalls from DigitalOcean")
+        status_code_success = 200
+
+        if status_code != status_code_success:
+            error = response.json
+            info = response.info
+
+            if error:
+                error.update({'status_code': status_code})
+                error.update({'status_code_success': status_code_success})
+                self.module.fail_json(msg=error)
+            elif info:
+                info.update({'status_code_success': status_code_success})
+                self.module.fail_json(msg=info)
+            else:
+                msg_error = 'Failed to retrieve firewalls from DigitalOcean'
+                self.module.fail_json(
+                    msg=msg_error + ' (url=' + self.rest.baseurl + '/' + self.baseurl
+                    + ', status=' + str(status_code or '')
+                    + ' - expected:' + str(status_code_success) + ')'
+                )
+
         return self.rest.get_paginated_data(base_url=base_url, data_key_name='firewalls')
 
     def get_firewall_by_name(self):
@@ -344,25 +363,15 @@ class DOFirewall(object):
         return obj
 
     def fill_source_and_destination_defaults_inner(self, obj):
-        addresses = obj.get('addresses')
+        addresses = obj.get('addresses') or []
 
-        if addresses is None:
-            addresses = []
+        droplet_ids = obj.get('droplet_ids') or []
+        droplet_ids = [str(droplet_id) for droplet_id in droplet_ids]
 
-        droplet_ids = obj.get('droplet_ids')
+        load_balancer_uids = obj.get('load_balancer_uids') or []
+        load_balancer_uids = [str(uid) for uid in load_balancer_uids]
 
-        if droplet_ids is None:
-            droplet_ids = []
-
-        load_balancer_uids = obj.get('load_balancer_uids')
-
-        if load_balancer_uids is None:
-            load_balancer_uids = []
-
-        tags = obj.get('tags')
-
-        if tags is None:
-            tags = []
+        tags = obj.get('tags') or []
 
         data = {
             "addresses": addresses,
@@ -402,15 +411,10 @@ class DOFirewall(object):
             outbound_rules = [self.fill_protocol_defaults(x) for x in outbound_rules]
             outbound_rules = [self.fill_sources_and_destinations_defaults(x, 'destinations') for x in outbound_rules]
 
-        droplet_ids = obj.get('droplet_ids')
+        droplet_ids = obj.get('droplet_ids') or []
+        droplet_ids = [str(droplet_id) for droplet_id in droplet_ids]
 
-        if droplet_ids is None:
-            droplet_ids = []
-
-        tags = obj.get('tags')
-
-        if tags is None:
-            tags = []
+        tags = obj.get('tags') or []
 
         data = {
             "name": obj.get('name'),
@@ -435,6 +439,8 @@ class DOFirewall(object):
         status_code = resp.status_code
         if status_code != status_code_success:
             error = resp.json
+            error.update({'context': 'error when trying to ' +
+                         ('create' if (id is None) else 'update') + ' firewalls'})
             error.update({'status_code': status_code})
             error.update({'status_code_success': status_code_success})
             self.module.fail_json(msg=error)

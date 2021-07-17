@@ -15,7 +15,7 @@ short_description: Create and delete a DigitalOcean database
 description:
   - Create and delete a database in DigitalOcean and optionally wait for it to be online.
   - DigitalOcean's managed database service simplifies the creation and management of highly available database clusters.
-  - Currently, it offers support for PostgreSQL, Redis, and MySQL.
+  - Currently, it offers support for PostgreSQL, Redis, MySQL, and MongoDB.
 version_added: 1.3.0
 author: "Mark Mercado (@mamercad)"
 options:
@@ -38,16 +38,17 @@ options:
   engine:
     description:
       - A slug representing the database engine used for the cluster.
-      - The possible values are C(pg) for PostgreSQL, C(mysql) for MySQL, and C(redis) for Redis.
+      - The possible values are C(pg) for PostgreSQL, C(mysql) for MySQL, C(redis) for Redis, and C(mongodb) for MongoDB.
     type: str
     required: true
-    choices: ['pg', 'mysql', 'redis']
+    choices: ['pg', 'mysql', 'redis', 'mongodb']
   version:
     description:
       - A string representing the version of the database engine in use for the cluster.
       - For C(pg), versions are 10, 11 and 12.
       - For C(mysql), version is 8.
       - For C(redis), version is 5.
+      - For C(mongodb), version is 4.
     type: str
   size:
     description:
@@ -323,7 +324,7 @@ def main():
             ),
             id=dict(type='int', aliases=['database_id']),
             name=dict(type='str', required=True),
-            engine=dict(choices=['pg', 'mysql', 'redis'], required=True),
+            engine=dict(choices=['pg', 'mysql', 'redis', 'mongodb'], required=True),
             version=dict(type='str'),
             size=dict(type='str', aliases=['size_id'], required=True),
             region=dict(type='str', aliases=['region_id'], required=True),
