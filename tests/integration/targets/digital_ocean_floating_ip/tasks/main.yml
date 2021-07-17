@@ -8,17 +8,23 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: "Make sure that the Floating IP is absent"
-      community.digitalocean.digital_ocean_floating_ip:
-        state: absent
-        ip: "8.8.8.8"
+    - name: Gather information about all Floating IPs
+      community.digitalocean.digital_ocean_floating_ip_info:
         oauth_token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify that the Floating IP didn't change
+    - name: Verify we retrieved all Floating IPs
       ansible.builtin.assert:
         that:
-          - "not result.changed"
+          - not result.changed
+          - not result.failed
+
+    - name: Delete existing Floating IPs
+      community.digitalocean.digital_ocean_floating_ip:
+        state: absent
+        ip: "{{ item.ip }}"
+        oauth_token: "{{ do_api_key }}"
+      loop: "{{ result.floating_ips }}"
 
     - name: "Create a Floating IP"
       community.digitalocean.digital_ocean_floating_ip:
@@ -65,8 +71,12 @@
         region: "{{ do_region }}"
         oauth_token: "{{ do_api_key }}"
       register: result
+      when:
+        - floating_ip.data.floating_ip.ip is defined
 
     - name: Verify that a Floating IP was deleted
       ansible.builtin.assert:
         that:
           - result.changed
+      when:
+        - floating_ip.data.floating_ip.ip is defined
