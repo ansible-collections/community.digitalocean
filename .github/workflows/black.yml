@@ -1,5 +1,5 @@
 # https://black.readthedocs.io/en/stable/integrations/github_actions.html
-name: Lint
+name: psf/black
 
 on: [push, pull_request]
 
