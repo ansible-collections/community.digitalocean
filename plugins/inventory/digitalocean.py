@@ -4,9 +4,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 name: digitalocean
 author:
   - Janos Gerzson (@grzs)
@@ -72,9 +73,9 @@ options:
     elements: str
     default: []
     version_added: '1.5.0'
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Using keyed groups and compose for hostvars
 plugin: community.digitalocean.digitalocean
 api_token: '{{ lookup("pipe", "./get-do-token.sh" }}'
@@ -105,7 +106,7 @@ compose:
 filters:
   - '"kubernetes" in do_tags'
   - 'do_region.slug == "fra1"'
-'''
+"""
 
 import re
 import json
@@ -118,24 +119,30 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cachea
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
-    NAME = 'community.digitalocean.digitalocean'
+    NAME = "community.digitalocean.digitalocean"
 
     def verify_file(self, path):
         valid = False
         if super(InventoryModule, self).verify_file(path):
             if path.endswith(
-                    ('do_hosts.yaml', 'do_hosts.yml',
-                     'digitalocean.yaml', 'digitalocean.yml',
-                     'digital_ocean.yaml', 'digital_ocean.yml')
+                (
+                    "do_hosts.yaml",
+                    "do_hosts.yml",
+                    "digitalocean.yaml",
+                    "digitalocean.yml",
+                    "digital_ocean.yaml",
+                    "digital_ocean.yml",
+                )
             ):
                 valid = True
             else:
                 self.display.vvv(
-                    'Skipping due to inventory source file name mismatch. '
-                    'The file name has to end with one of the following: '
-                    'do_hosts.yaml, do_hosts.yml '
-                    'digitalocean.yaml, digitalocean.yml, '
-                    'digital_ocean.yaml, digital_ocean.yml.')
+                    "Skipping due to inventory source file name mismatch. "
+                    "The file name has to end with one of the following: "
+                    "do_hosts.yaml, do_hosts.yml "
+                    "digitalocean.yaml, digitalocean.yml, "
+                    "digital_ocean.yaml, digital_ocean.yml."
+                )
         return valid
 
     def _template_option(self, option):
@@ -145,25 +152,25 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _get_payload(self):
         # request parameters
-        api_token = self._template_option('api_token')
+        api_token = self._template_option("api_token")
         headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer {0}'.format(api_token)
+            "Content-Type": "application/json",
+            "Authorization": "Bearer {0}".format(api_token),
         }
 
         # build url
-        pagination = self.get_option('pagination')
-        url = 'https://api.digitalocean.com/v2/droplets?per_page=' + str(pagination)
+        pagination = self.get_option("pagination")
+        url = "https://api.digitalocean.com/v2/droplets?per_page=" + str(pagination)
 
         # send request(s)
         self.req = Request(headers=headers)
         payload = []
         try:
             while url:
-                self.display.vvv('Sending request to {0}'.format(url))
+                self.display.vvv("Sending request to {0}".format(url))
                 response = json.load(self.req.get(url))
-                payload.extend(response['droplets'])
-                url = response.get('links', {}).get('pages', {}).get('next')
+                payload.extend(response["droplets"])
+                url = response.get("links", {}).get("pages", {}).get("next")
         except ValueError:
             raise AnsibleParserError("something went wrong with JSON loading")
         except (URLError, HTTPError) as error:
@@ -172,13 +179,13 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         return payload
 
     def _populate(self, records):
-        attributes = self.get_option('attributes')
-        var_prefix = self.get_option('var_prefix')
-        strict = self.get_option('strict')
-        host_filters = self.get_option('filters')
+        attributes = self.get_option("attributes")
+        var_prefix = self.get_option("var_prefix")
+        strict = self.get_option("strict")
+        host_filters = self.get_option("filters")
         for record in records:
 
-            host_name = record.get('name')
+            host_name = record.get("name")
             if not host_name:
                 continue
 
@@ -188,7 +195,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                     host_vars[var_prefix + k] = v
 
             if not self._passes_filters(host_filters, host_vars, host_name, strict):
-                self.display.vvv('Host {0} did not pass all filters'.format(host_name))
+                self.display.vvv("Host {0} did not pass all filters".format(host_name))
                 continue
 
             # add host to inventory
@@ -199,14 +206,19 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                 self.inventory.set_variable(host_name, k, v)
 
             self._set_composite_vars(
-                self.get_option('compose'),
-                self.inventory.get_host(host_name).get_vars(), host_name, strict)
+                self.get_option("compose"),
+                self.inventory.get_host(host_name).get_vars(),
+                host_name,
+                strict,
+            )
 
             # set composed and keyed groups
-            self._add_host_to_composed_groups(self.get_option('groups'),
-                                              dict(), host_name, strict)
-            self._add_host_to_keyed_groups(self.get_option('keyed_groups'),
-                                           dict(), host_name, strict)
+            self._add_host_to_composed_groups(
+                self.get_option("groups"), dict(), host_name, strict
+            )
+            self._add_host_to_keyed_groups(
+                self.get_option("keyed_groups"), dict(), host_name, strict
+            )
 
     def _passes_filters(self, filters, variables, host, strict=False):
         if filters and isinstance(filters, list):
@@ -216,8 +228,11 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
                         return False
                 except Exception as e:
                     if strict:
-                        raise AnsibleError('Could not evaluate host filter {0} for host {1}: {2}'
-                                           .format(template, host, to_native(e)))
+                        raise AnsibleError(
+                            "Could not evaluate host filter {0} for host {1}: {2}".format(
+                                template, host, to_native(e)
+                            )
+                        )
                     # Better be safe and not include any hosts by accident.
                     return False
         return True
@@ -229,8 +244,8 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
         # cache settings
         cache_key = self.get_cache_key(path)
-        use_cache = self.get_option('cache') and cache
-        update_cache = self.get_option('cache') and not cache
+        use_cache = self.get_option("cache") and cache
+        update_cache = self.get_option("cache") and not cache
 
         records = None
         if use_cache:

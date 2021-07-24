@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_snapshot_info
 short_description: Gather information about DigitalOcean Snapshot
@@ -40,10 +41,10 @@ requirements:
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about all snapshots
   community.digitalocean.digital_ocean_snapshot_info:
     snapshot_type: all
@@ -76,10 +77,10 @@ EXAMPLES = r'''
 - debug:
     var: snapshot_id
 
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
     description: DigitalOcean snapshot information
     returned: success
@@ -99,62 +100,74 @@ data:
             "size_gigabytes": 0
         },
     ]
-'''
+"""
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 from ansible.module_utils._text import to_native
 
 
 def core(module):
-    snapshot_type = module.params['snapshot_type']
+    snapshot_type = module.params["snapshot_type"]
 
     rest = DigitalOceanHelper(module)
 
-    base_url = 'snapshots'
+    base_url = "snapshots"
     snapshot = []
 
-    if snapshot_type == 'by_id':
-        base_url += "/{0}".format(module.params.get('snapshot_id'))
+    if snapshot_type == "by_id":
+        base_url += "/{0}".format(module.params.get("snapshot_id"))
         response = rest.get(base_url)
         status_code = response.status_code
 
         if status_code != 200:
-            module.fail_json(msg="Failed to fetch snapshot information due to error : %s" % response.json['message'])
+            module.fail_json(
+                msg="Failed to fetch snapshot information due to error : %s"
+                % response.json["message"]
+            )
 
         snapshot.extend(response.json["snapshots"])
     else:
-        if snapshot_type == 'droplet':
+        if snapshot_type == "droplet":
             base_url += "?resource_type=droplet&"
-        elif snapshot_type == 'volume':
+        elif snapshot_type == "volume":
             base_url += "?resource_type=volume&"
         else:
             base_url += "?"
 
-        snapshot = rest.get_paginated_data(base_url=base_url, data_key_name='snapshots')
+        snapshot = rest.get_paginated_data(base_url=base_url, data_key_name="snapshots")
     module.exit_json(changed=False, data=snapshot)
 
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        snapshot_type=dict(type='str',
-                           required=False,
-                           choices=['all', 'droplet', 'volume', 'by_id'],
-                           default='all'),
-        snapshot_id=dict(type='str',
-                         required=False),
+        snapshot_type=dict(
+            type="str",
+            required=False,
+            choices=["all", "droplet", "volume", "by_id"],
+            default="all",
+        ),
+        snapshot_id=dict(type="str", required=False),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[
-            ['snapshot_type', 'by_id', ['snapshot_id']],
+            ["snapshot_type", "by_id", ["snapshot_id"]],
         ],
     )
-    if module._name in ('digital_ocean_snapshot_facts', 'community.digitalocean.digital_ocean_snapshot_facts'):
-        module.deprecate("The 'digital_ocean_snapshot_facts' module has been renamed to 'digital_ocean_snapshot_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    if module._name in (
+        "digital_ocean_snapshot_facts",
+        "community.digitalocean.digital_ocean_snapshot_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_snapshot_facts' module has been renamed to 'digital_ocean_snapshot_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
 
     try:
         core(module)
@@ -162,5 +175,5 @@ def main():
         module.fail_json(msg=to_native(e), exception=format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

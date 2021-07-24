@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_block_storage
 short_description: Create/destroy or attach/detach Block Storage volumes in DigitalOcean
@@ -68,9 +69,9 @@ notes:
 
 author:
     - "Harnek Sidhu (@harneksidhu)"
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create new Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: present
@@ -114,21 +115,23 @@ EXAMPLES = r'''
     volume_name: nyc1-block-storage
     region: nyc1
     droplet_id: <ID>
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 id:
     description: Unique identifier of a Block Storage volume returned during creation.
     returned: changed
     type: str
     sample: "69b25d9a-494c-12e6-a5af-001f53126b44"
-'''
+"""
 
 import time
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 
 
 class DOBlockStorageException(Exception):
@@ -143,31 +146,31 @@ class DOBlockStorage(object):
     def get_key_or_fail(self, k):
         v = self.module.params[k]
         if v is None:
-            self.module.fail_json(msg='Unable to load %s' % k)
+            self.module.fail_json(msg="Unable to load %s" % k)
         return v
 
     def poll_action_for_complete_status(self, action_id):
-        url = 'actions/{0}'.format(action_id)
-        end_time = time.time() + self.module.params['timeout']
+        url = "actions/{0}".format(action_id)
+        end_time = time.time() + self.module.params["timeout"]
         while time.time() < end_time:
             time.sleep(2)
             response = self.rest.get(url)
             status = response.status_code
             json = response.json
             if status == 200:
-                if json['action']['status'] == 'completed':
+                if json["action"]["status"] == "completed":
                     return True
-                elif json['action']['status'] == 'errored':
-                    raise DOBlockStorageException(json['message'])
-        raise DOBlockStorageException('Unable to reach api.digitalocean.com')
+                elif json["action"]["status"] == "errored":
+                    raise DOBlockStorageException(json["message"])
+        raise DOBlockStorageException("Unable to reach api.digitalocean.com")
 
     def get_block_storage_by_name(self, volume_name, region):
-        url = 'volumes?name={0}&region={1}'.format(volume_name, region)
+        url = "volumes?name={0}&region={1}".format(volume_name, region)
         resp = self.rest.get(url)
         if resp.status_code != 200:
-            raise DOBlockStorageException(resp.json['message'])
+            raise DOBlockStorageException(resp.json["message"])
 
-        volumes = resp.json['volumes']
+        volumes = resp.json["volumes"]
         if not volumes:
             return None
 
@@ -175,92 +178,92 @@ class DOBlockStorage(object):
 
     def get_attached_droplet_ID(self, volume_name, region):
         volume = self.get_block_storage_by_name(volume_name, region)
-        if not volume or not volume['droplet_ids']:
+        if not volume or not volume["droplet_ids"]:
             return None
 
-        return volume['droplet_ids'][0]
+        return volume["droplet_ids"][0]
 
     def attach_detach_block_storage(self, method, volume_name, region, droplet_id):
         data = {
-            'type': method,
-            'volume_name': volume_name,
-            'region': region,
-            'droplet_id': droplet_id
+            "type": method,
+            "volume_name": volume_name,
+            "region": region,
+            "droplet_id": droplet_id,
         }
-        response = self.rest.post('volumes/actions', data=data)
+        response = self.rest.post("volumes/actions", data=data)
         status = response.status_code
         json = response.json
         if status == 202:
-            return self.poll_action_for_complete_status(json['action']['id'])
+            return self.poll_action_for_complete_status(json["action"]["id"])
         elif status == 200:
             return True
         elif status == 422:
             return False
         else:
-            raise DOBlockStorageException(json['message'])
+            raise DOBlockStorageException(json["message"])
 
     def resize_block_storage(self, volume_name, region, desired_size):
         if not desired_size:
             return False
 
         volume = self.get_block_storage_by_name(volume_name, region)
-        if volume['size_gigabytes'] == desired_size:
+        if volume["size_gigabytes"] == desired_size:
             return False
 
         data = {
-            'type': 'resize',
-            'size_gigabytes': desired_size,
+            "type": "resize",
+            "size_gigabytes": desired_size,
         }
         resp = self.rest.post(
-            'volumes/{0}/actions'.format(volume['id']),
+            "volumes/{0}/actions".format(volume["id"]),
             data=data,
         )
         if resp.status_code == 202:
-            return self.poll_action_for_complete_status(
-                resp.json['action']['id']
-            )
+            return self.poll_action_for_complete_status(resp.json["action"]["id"])
         else:
             # we'd get status 422 if desired_size <= current volume size
-            raise DOBlockStorageException(resp.json['message'])
+            raise DOBlockStorageException(resp.json["message"])
 
     def create_block_storage(self):
-        volume_name = self.get_key_or_fail('volume_name')
-        snapshot_id = self.module.params['snapshot_id']
+        volume_name = self.get_key_or_fail("volume_name")
+        snapshot_id = self.module.params["snapshot_id"]
         if snapshot_id:
-            self.module.params['block_size'] = None
-            self.module.params['region'] = None
+            self.module.params["block_size"] = None
+            self.module.params["region"] = None
             block_size = None
             region = None
         else:
-            block_size = self.get_key_or_fail('block_size')
-            region = self.get_key_or_fail('region')
-        description = self.module.params['description']
+            block_size = self.get_key_or_fail("block_size")
+            region = self.get_key_or_fail("region")
+        description = self.module.params["description"]
         data = {
-            'size_gigabytes': block_size,
-            'name': volume_name,
-            'description': description,
-            'region': region,
-            'snapshot_id': snapshot_id,
+            "size_gigabytes": block_size,
+            "name": volume_name,
+            "description": description,
+            "region": region,
+            "snapshot_id": snapshot_id,
         }
         response = self.rest.post("volumes", data=data)
         status = response.status_code
         json = response.json
         if status == 201:
-            self.module.exit_json(changed=True, id=json['volume']['id'])
-        elif status == 409 and json['id'] == 'conflict':
+            self.module.exit_json(changed=True, id=json["volume"]["id"])
+        elif status == 409 and json["id"] == "conflict":
             # The volume exists already, but it might not have the desired size
             resized = self.resize_block_storage(volume_name, region, block_size)
             self.module.exit_json(changed=resized)
         else:
-            raise DOBlockStorageException(json['message'])
+            raise DOBlockStorageException(json["message"])
 
     def delete_block_storage(self):
-        volume_name = self.get_key_or_fail('volume_name')
-        region = self.get_key_or_fail('region')
-        url = 'volumes?name={0}&region={1}'.format(volume_name, region)
+        volume_name = self.get_key_or_fail("volume_name")
+        region = self.get_key_or_fail("region")
+        url = "volumes?name={0}&region={1}".format(volume_name, region)
         attached_droplet_id = self.get_attached_droplet_ID(volume_name, region)
         if attached_droplet_id is not None:
-            self.attach_detach_block_storage('detach', volume_name, region, attached_droplet_id)
+            self.attach_detach_block_storage(
+                "detach", volume_name, region, attached_droplet_id
+            )
         response = self.rest.delete(url)
         status = response.status_code
         json = response.json
@@ -269,56 +272,62 @@ class DOBlockStorage(object):
         elif status == 404:
             self.module.exit_json(changed=False)
         else:
-            raise DOBlockStorageException(json['message'])
+            raise DOBlockStorageException(json["message"])
 
     def attach_block_storage(self):
-        volume_name = self.get_key_or_fail('volume_name')
-        region = self.get_key_or_fail('region')
-        droplet_id = self.get_key_or_fail('droplet_id')
+        volume_name = self.get_key_or_fail("volume_name")
+        region = self.get_key_or_fail("region")
+        droplet_id = self.get_key_or_fail("droplet_id")
         attached_droplet_id = self.get_attached_droplet_ID(volume_name, region)
         if attached_droplet_id is not None:
             if attached_droplet_id == droplet_id:
                 self.module.exit_json(changed=False)
             else:
-                self.attach_detach_block_storage('detach', volume_name, region, attached_droplet_id)
-        changed_status = self.attach_detach_block_storage('attach', volume_name, region, droplet_id)
+                self.attach_detach_block_storage(
+                    "detach", volume_name, region, attached_droplet_id
+                )
+        changed_status = self.attach_detach_block_storage(
+            "attach", volume_name, region, droplet_id
+        )
         self.module.exit_json(changed=changed_status)
 
     def detach_block_storage(self):
-        volume_name = self.get_key_or_fail('volume_name')
-        region = self.get_key_or_fail('region')
-        droplet_id = self.get_key_or_fail('droplet_id')
-        changed_status = self.attach_detach_block_storage('detach', volume_name, region, droplet_id)
+        volume_name = self.get_key_or_fail("volume_name")
+        region = self.get_key_or_fail("region")
+        droplet_id = self.get_key_or_fail("droplet_id")
+        changed_status = self.attach_detach_block_storage(
+            "detach", volume_name, region, droplet_id
+        )
         self.module.exit_json(changed=changed_status)
 
 
 def handle_request(module):
     block_storage = DOBlockStorage(module)
-    command = module.params['command']
-    state = module.params['state']
-    if command == 'create':
-        if state == 'present':
+    command = module.params["command"]
+    state = module.params["state"]
+    if command == "create":
+        if state == "present":
             block_storage.create_block_storage()
-        elif state == 'absent':
+        elif state == "absent":
             block_storage.delete_block_storage()
-    elif command == 'attach':
-        if state == 'present':
+    elif command == "attach":
+        if state == "present":
             block_storage.attach_block_storage()
-        elif state == 'absent':
+        elif state == "absent":
             block_storage.detach_block_storage()
 
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        state=dict(choices=['present', 'absent'], required=True),
-        command=dict(choices=['create', 'attach'], required=True),
-        block_size=dict(type='int', required=False),
-        volume_name=dict(type='str', required=True),
-        description=dict(type='str'),
-        region=dict(type='str', required=False),
-        snapshot_id=dict(type='str', required=False),
-        droplet_id=dict(type='int')
+        state=dict(choices=["present", "absent"], required=True),
+        command=dict(choices=["create", "attach"], required=True),
+        block_size=dict(type="int", required=False),
+        volume_name=dict(type="str", required=True),
+        description=dict(type="str"),
+        region=dict(type="str", required=False),
+        snapshot_id=dict(type="str", required=False),
+        droplet_id=dict(type="int"),
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
@@ -328,8 +337,8 @@ def main():
     except DOBlockStorageException as e:
         module.fail_json(msg=str(e), exception=traceback.format_exc())
     except KeyError as e:
-        module.fail_json(msg='Unable to load %s' % e, exception=traceback.format_exc())
+        module.fail_json(msg="Unable to load %s" % e, exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

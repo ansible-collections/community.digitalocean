@@ -4,13 +4,14 @@
 # Copyright: (c) 2018, Abhijeet Kasurde (akasurde@redhat.com)
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
 class ModuleDocFragment(object):
     # Parameters for DigitalOcean modules
-    DOCUMENTATION = r'''
+    DOCUMENTATION = r"""
 options:
   oauth_token:
     description:
@@ -30,4 +31,4 @@ options:
     - This should only set to C(no) used on personally controlled sites using self-signed certificates.
     type: bool
     default: yes
-'''
+"""

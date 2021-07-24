@@ -6,9 +6,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_database
 short_description: Create and delete a DigitalOcean database
@@ -92,10 +93,10 @@ options:
     type: int
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a Redis database
   community.digitalocean.digital_ocean_database:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
@@ -106,10 +107,10 @@ EXAMPLES = r'''
     region: nyc1
     num_nodes: 1
   register: my_database
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
   description: A DigitalOcean database
   returned: success
@@ -156,13 +157,15 @@ data:
       "version": "6"
     }
   }
-'''
+"""
 
 
 import json
 import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 
 
 class DODatabase(object):
@@ -170,10 +173,10 @@ class DODatabase(object):
         self.module = module
         self.rest = DigitalOceanHelper(module)
         # pop wait and wait_timeout so we don't include it in the POST data
-        self.wait = self.module.params.pop('wait', True)
-        self.wait_timeout = self.module.params.pop('wait_timeout', 600)
+        self.wait = self.module.params.pop("wait", True)
+        self.wait_timeout = self.module.params.pop("wait_timeout", 600)
         # pop the oauth token so we don't include it in the POST data
-        self.module.params.pop('oauth_token')
+        self.module.params.pop("oauth_token")
         self.id = None
         self.name = None
         self.engine = None
@@ -186,19 +189,19 @@ class DODatabase(object):
     def get_by_id(self, database_id):
         if database_id is None:
             return None
-        response = self.rest.get('databases/{0}'.format(database_id))
+        response = self.rest.get("databases/{0}".format(database_id))
         json_data = response.json
         if response.status_code == 200:
-            database = json_data.get('database', None)
+            database = json_data.get("database", None)
             if database is not None:
-                self.id = database.get('id', None)
-                self.name = database.get('name', None)
-                self.engine = database.get('engine', None)
-                self.version = database.get('version', None)
-                self.num_nodes = database.get('num_nodes', None)
-                self.region = database.get('region', None)
-                self.status = database.get('status', None)
-                self.size = database.get('size', None)
+                self.id = database.get("id", None)
+                self.name = database.get("name", None)
+                self.engine = database.get("engine", None)
+                self.version = database.get("version", None)
+                self.num_nodes = database.get("num_nodes", None)
+                self.region = database.get("region", None)
+                self.status = database.get("status", None)
+                self.size = database.get("size", None)
             return json_data
         return None
 
@@ -207,77 +210,88 @@ class DODatabase(object):
             return None
         page = 1
         while page is not None:
-            response = self.rest.get('databases?page={0}'.format(page))
+            response = self.rest.get("databases?page={0}".format(page))
             json_data = response.json
             if response.status_code == 200:
-                databases = json_data.get('databases', None)
+                databases = json_data.get("databases", None)
                 if databases is None or not isinstance(databases, list):
                     return None
                 for database in databases:
-                    if database.get('name', None) == database_name:
-                        self.id = database.get('id', None)
-                        self.name = database.get('name', None)
-                        self.engine = database.get('engine', None)
-                        self.version = database.get('version', None)
-                        self.status = database.get('status', None)
-                        self.num_nodes = database.get('num_nodes', None)
-                        self.region = database.get('region', None)
-                        self.size = database.get('size', None)
-                        return {'database': database}
-                if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
+                    if database.get("name", None) == database_name:
+                        self.id = database.get("id", None)
+                        self.name = database.get("name", None)
+                        self.engine = database.get("engine", None)
+                        self.version = database.get("version", None)
+                        self.status = database.get("status", None)
+                        self.num_nodes = database.get("num_nodes", None)
+                        self.region = database.get("region", None)
+                        self.size = database.get("size", None)
+                        return {"database": database}
+                if (
+                    "links" in json_data
+                    and "pages" in json_data["links"]
+                    and "next" in json_data["links"]["pages"]
+                ):
                     page += 1
                 else:
                     page = None
         return None
 
     def get_database(self):
-        json_data = self.get_by_id(self.module.params['id'])
+        json_data = self.get_by_id(self.module.params["id"])
         if not json_data:
-            json_data = self.get_by_name(self.module.params['name'])
+            json_data = self.get_by_name(self.module.params["name"])
         return json_data
 
     def ensure_online(self, database_id):
         end_time = time.monotonic() + self.wait_timeout
         while time.monotonic() < end_time:
-            response = self.rest.get('databases/{0}'.format(database_id))
+            response = self.rest.get("databases/{0}".format(database_id))
             json_data = response.json
-            database = json_data.get('database', None)
+            database = json_data.get("database", None)
             if database is not None:
-                status = database.get('status', None)
+                status = database.get("status", None)
                 if status is not None:
-                    if status == 'online':
+                    if status == "online":
                         return json_data
             time.sleep(10)
-        self.module.fail_json(msg='Waiting for database online timeout')
+        self.module.fail_json(msg="Waiting for database online timeout")
 
     def create(self):
         json_data = self.get_database()
 
         if json_data is not None:
-            database = json_data.get('database', None)
+            database = json_data.get("database", None)
             if database is not None:
                 self.module.exit_json(changed=False, data=json_data)
             else:
-                self.module.fail_json(changed=False, msg='Unexpected error, please file a bug')
+                self.module.fail_json(
+                    changed=False, msg="Unexpected error, please file a bug"
+                )
 
         if self.module.check_mode:
             self.module.exit_json(changed=True)
 
         request_params = dict(self.module.params)
-        del request_params['id']
+        del request_params["id"]
 
-        response = self.rest.post('databases', data=request_params)
+        response = self.rest.post("databases", data=request_params)
         json_data = response.json
         if response.status_code >= 400:
-            self.module.fail_json(changed=False, msg=json_data['message'])
-        database = json_data.get('database', None)
+            self.module.fail_json(changed=False, msg=json_data["message"])
+        database = json_data.get("database", None)
         if database is None:
-            self.module.fail_json(changed=False, msg='Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues')
+            self.module.fail_json(
+                changed=False,
+                msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
+            )
         if self.wait:
-            database_id = database.get('id', None)
+            database_id = database.get("id", None)
             if database_id is None:
-                self.module.fail_json(changed=False,
-                                      msg='Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues')
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
+                )
             json_data = self.ensure_online(database_id)
         self.module.exit_json(changed=True, data=json_data)
 
@@ -286,67 +300,88 @@ class DODatabase(object):
         if json_data is not None:
             if self.module.check_mode:
                 self.module.exit_json(changed=True)
-            database = json_data.get('database', None)
-            database_id = database.get('id', None)
-            database_name = database.get('name', None)
-            database_region = database.get('region', None)
+            database = json_data.get("database", None)
+            database_id = database.get("id", None)
+            database_name = database.get("name", None)
+            database_region = database.get("region", None)
             if database_id is not None:
-                response = self.rest.delete('databases/{0}'.format(database_id))
+                response = self.rest.delete("databases/{0}".format(database_id))
                 json_data = response.json
                 if response.status_code == 204:
-                    self.module.exit_json(changed=True, msg='Deleted database {0} ({1}) in region {2}'.format(database_name, database_id, database_region))
-                self.module.fail_json(changed=False,
-                                      msg='Failed to delete database {0} ({1}) in region {2}: {3}'
-                                      .format(database_name, database_id, database_region, json_data['message']))
+                    self.module.exit_json(
+                        changed=True,
+                        msg="Deleted database {0} ({1}) in region {2}".format(
+                            database_name, database_id, database_region
+                        ),
+                    )
+                self.module.fail_json(
+                    changed=False,
+                    msg="Failed to delete database {0} ({1}) in region {2}: {3}".format(
+                        database_name,
+                        database_id,
+                        database_region,
+                        json_data["message"],
+                    ),
+                )
             else:
-                self.module.fail_json(changed=False, msg='Unexpected error, please file a bug')
+                self.module.fail_json(
+                    changed=False, msg="Unexpected error, please file a bug"
+                )
         else:
-            self.module.exit_json(changed=False, msg='Database {0} in region {1} not found'.format(self.module.params['name'], self.module.params['region']))
+            self.module.exit_json(
+                changed=False,
+                msg="Database {0} in region {1} not found".format(
+                    self.module.params["name"], self.module.params["region"]
+                ),
+            )
 
 
 def run(module):
-    state = module.params.pop('state')
+    state = module.params.pop("state")
     database = DODatabase(module)
-    if state == 'present':
+    if state == "present":
         database.create()
-    elif state == 'absent':
+    elif state == "absent":
         database.delete()
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
+            state=dict(choices=["present", "absent"], default="present"),
             oauth_token=dict(
-                aliases=['api_token'],
+                aliases=["api_token"],
                 no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                fallback=(
+                    env_fallback,
+                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
+                ),
             ),
-            id=dict(type='int', aliases=['database_id']),
-            name=dict(type='str', required=True),
-            engine=dict(choices=['pg', 'mysql', 'redis', 'mongodb'], required=True),
-            version=dict(type='str'),
-            size=dict(type='str', aliases=['size_id'], required=True),
-            region=dict(type='str', aliases=['region_id'], required=True),
-            num_nodes=dict(type='int', choices=[1, 2, 3], default=1),
-            tags=dict(type='list', elements='str'),
-            private_network_uuid=dict(type='str'),
-            validate_certs=dict(type='bool', default=True),
-            timeout=dict(type='int', default=30),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(default=600, type='int'),
+            id=dict(type="int", aliases=["database_id"]),
+            name=dict(type="str", required=True),
+            engine=dict(choices=["pg", "mysql", "redis", "mongodb"], required=True),
+            version=dict(type="str"),
+            size=dict(type="str", aliases=["size_id"], required=True),
+            region=dict(type="str", aliases=["region_id"], required=True),
+            num_nodes=dict(type="int", choices=[1, 2, 3], default=1),
+            tags=dict(type="list", elements="str"),
+            private_network_uuid=dict(type="str"),
+            validate_certs=dict(type="bool", default=True),
+            timeout=dict(type="int", default=30),
+            wait=dict(type="bool", default=True),
+            wait_timeout=dict(default=600, type="int"),
         ),
-        required_one_of=(
-            ['id', 'name'],
+        required_one_of=(["id", "name"],),
+        required_if=(
+            [
+                ("state", "present", ["name", "size", "engine", "region"]),
+                ("state", "absent", ["name", "size", "engine", "region"]),
+            ]
         ),
-        required_if=([
-            ('state', 'present', ['name', 'size', 'engine', 'region']),
-            ('state', 'absent', ['name', 'size', 'engine', 'region']),
-        ]),
         supports_check_mode=True,
     )
     run(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

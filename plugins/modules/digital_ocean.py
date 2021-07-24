@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean
 short_description: Create/delete a droplet/SSH_key in DigitalOcean
@@ -117,10 +118,10 @@ notes:
 requirements:
   - "python >= 2.6"
   - dopy
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 # Ensure a SSH key is present
 # If a key matches this name, will return the ssh key id and changed = False
 # If no existing key matches this name, a new key is created, the ssh key id is returned and changed = False
@@ -182,7 +183,7 @@ EXAMPLES = r'''
     size_id: 2gb
     region_id: ams2
     image_id: fedora-19-x64
-'''
+"""
 
 import os
 import time
@@ -193,6 +194,7 @@ from distutils.version import LooseVersion
 try:
     # Imported as a dependency for dopy
     import ansible.module_utils.six
+
     HAS_SIX = True
 except ImportError:
     HAS_SIX = False
@@ -201,7 +203,8 @@ HAS_DOPY = False
 try:
     import dopy
     from dopy.manager import DoError, DoManager
-    if LooseVersion(dopy.__version__) >= LooseVersion('0.3.2'):
+
+    if LooseVersion(dopy.__version__) >= LooseVersion("0.3.2"):
         HAS_DOPY = True
 except ImportError:
     pass
@@ -210,14 +213,12 @@ from ansible.module_utils.basic import AnsibleModule, env_fallback
 
 
 class TimeoutError(Exception):
-
     def __init__(self, msg, id_):
         super(TimeoutError, self).__init__(msg)
         self.id = id_
 
 
 class JsonfyMixIn(object):
-
     def to_json(self):
         return self.__dict__
 
@@ -226,37 +227,37 @@ class Droplet(JsonfyMixIn):
     manager = None
 
     def __init__(self, droplet_json):
-        self.status = 'new'
+        self.status = "new"
         self.__dict__.update(droplet_json)
 
     def is_powered_on(self):
-        return self.status == 'active'
+        return self.status == "active"
 
     def update_attr(self, attrs=None):
         if attrs:
             for k, v in attrs.items():
                 setattr(self, k, v)
-            networks = attrs.get('networks', {})
-            for network in networks.get('v6', []):
-                if network['type'] == 'public':
-                    setattr(self, 'public_ipv6_address', network['ip_address'])
+            networks = attrs.get("networks", {})
+            for network in networks.get("v6", []):
+                if network["type"] == "public":
+                    setattr(self, "public_ipv6_address", network["ip_address"])
                 else:
-                    setattr(self, 'private_ipv6_address', network['ip_address'])
+                    setattr(self, "private_ipv6_address", network["ip_address"])
         else:
             json = self.manager.show_droplet(self.id)
-            if json['ip_address']:
+            if json["ip_address"]:
                 self.update_attr(json)
 
     def power_on(self):
-        if self.status != 'off':
-            raise AssertionError('Can only power on a closed one.')
+        if self.status != "off":
+            raise AssertionError("Can only power on a closed one.")
         json = self.manager.power_on_droplet(self.id)
         self.update_attr(json)
 
     def ensure_powered_on(self, wait=True, wait_timeout=300):
         if self.is_powered_on():
             return
-        if self.status == 'off':  # powered off
+        if self.status == "off":  # powered off
             self.power_on()
 
         if wait:
@@ -266,9 +267,9 @@ class Droplet(JsonfyMixIn):
                 self.update_attr()
                 if self.is_powered_on():
                     if not self.ip_address:
-                        raise TimeoutError('No ip is found.', self.id)
+                        raise TimeoutError("No ip is found.", self.id)
                     return
-            raise TimeoutError('Wait for droplet running timeout', self.id)
+            raise TimeoutError("Wait for droplet running timeout", self.id)
 
     def destroy(self):
         return self.manager.destroy_droplet(self.id, scrub_data=True)
@@ -278,14 +279,34 @@ class Droplet(JsonfyMixIn):
         cls.manager = DoManager(None, api_token, api_version=2)
 
     @classmethod
-    def add(cls, name, size_id, image_id, region_id, ssh_key_ids=None, virtio=True, private_networking=False, backups_enabled=False, user_data=None,
-            ipv6=False):
+    def add(
+        cls,
+        name,
+        size_id,
+        image_id,
+        region_id,
+        ssh_key_ids=None,
+        virtio=True,
+        private_networking=False,
+        backups_enabled=False,
+        user_data=None,
+        ipv6=False,
+    ):
         private_networking_lower = str(private_networking).lower()
         backups_enabled_lower = str(backups_enabled).lower()
         ipv6_lower = str(ipv6).lower()
-        json = cls.manager.new_droplet(name, size_id, image_id, region_id,
-                                       ssh_key_ids=ssh_key_ids, virtio=virtio, private_networking=private_networking_lower,
-                                       backups_enabled=backups_enabled_lower, user_data=user_data, ipv6=ipv6_lower)
+        json = cls.manager.new_droplet(
+            name,
+            size_id,
+            image_id,
+            region_id,
+            ssh_key_ids=ssh_key_ids,
+            virtio=virtio,
+            private_networking=private_networking_lower,
+            backups_enabled=backups_enabled_lower,
+            user_data=user_data,
+            ipv6=ipv6_lower,
+        )
         droplet = cls(json)
         return droplet
 
@@ -319,6 +340,7 @@ class SSH(JsonfyMixIn):
 
     def __init__(self, ssh_key_json):
         self.__dict__.update(ssh_key_json)
+
     update_attr = __init__
 
     def destroy(self):
@@ -354,82 +376,84 @@ def core(module):
     def getkeyordie(k):
         v = module.params[k]
         if v is None:
-            module.fail_json(msg='Unable to load %s' % k)
+            module.fail_json(msg="Unable to load %s" % k)
         return v
 
-    api_token = module.params['api_token']
+    api_token = module.params["api_token"]
     changed = True
-    command = module.params['command']
-    state = module.params['state']
+    command = module.params["command"]
+    state = module.params["state"]
 
-    if command == 'droplet':
+    if command == "droplet":
         Droplet.setup(api_token)
-        if state in ('active', 'present'):
+        if state in ("active", "present"):
 
             # First, try to find a droplet by id.
-            droplet = Droplet.find(id=module.params['id'])
+            droplet = Droplet.find(id=module.params["id"])
 
             # If we couldn't find the droplet and the user is allowing unique
             # hostnames, then check to see if a droplet with the specified
             # hostname already exists.
-            if not droplet and module.params['unique_name']:
-                droplet = Droplet.find(name=getkeyordie('name'))
+            if not droplet and module.params["unique_name"]:
+                droplet = Droplet.find(name=getkeyordie("name"))
 
             # If both of those attempts failed, then create a new droplet.
             if not droplet:
                 droplet = Droplet.add(
-                    name=getkeyordie('name'),
-                    size_id=getkeyordie('size_id'),
-                    image_id=getkeyordie('image_id'),
-                    region_id=getkeyordie('region_id'),
-                    ssh_key_ids=module.params['ssh_key_ids'],
-                    virtio=module.params['virtio'],
-                    private_networking=module.params['private_networking'],
-                    backups_enabled=module.params['backups_enabled'],
-                    user_data=module.params.get('user_data'),
-                    ipv6=module.params['ipv6'],
+                    name=getkeyordie("name"),
+                    size_id=getkeyordie("size_id"),
+                    image_id=getkeyordie("image_id"),
+                    region_id=getkeyordie("region_id"),
+                    ssh_key_ids=module.params["ssh_key_ids"],
+                    virtio=module.params["virtio"],
+                    private_networking=module.params["private_networking"],
+                    backups_enabled=module.params["backups_enabled"],
+                    user_data=module.params.get("user_data"),
+                    ipv6=module.params["ipv6"],
                 )
 
             if droplet.is_powered_on():
                 changed = False
 
             droplet.ensure_powered_on(
-                wait=getkeyordie('wait'),
-                wait_timeout=getkeyordie('wait_timeout')
+                wait=getkeyordie("wait"), wait_timeout=getkeyordie("wait_timeout")
             )
 
             module.exit_json(changed=changed, droplet=droplet.to_json())
 
-        elif state in ('absent', 'deleted'):
+        elif state in ("absent", "deleted"):
             # First, try to find a droplet by id.
-            droplet = Droplet.find(module.params['id'])
+            droplet = Droplet.find(module.params["id"])
 
             # If we couldn't find the droplet and the user is allowing unique
             # hostnames, then check to see if a droplet with the specified
             # hostname already exists.
-            if not droplet and module.params['unique_name']:
-                droplet = Droplet.find(name=getkeyordie('name'))
+            if not droplet and module.params["unique_name"]:
+                droplet = Droplet.find(name=getkeyordie("name"))
 
             if not droplet:
-                module.exit_json(changed=False, msg='The droplet is not found.')
+                module.exit_json(changed=False, msg="The droplet is not found.")
 
             droplet.destroy()
             module.exit_json(changed=True)
 
-    elif command == 'ssh':
+    elif command == "ssh":
         SSH.setup(api_token)
-        name = getkeyordie('name')
-        if state in ('active', 'present'):
+        name = getkeyordie("name")
+        if state in ("active", "present"):
             key = SSH.find(name)
             if key:
                 module.exit_json(changed=False, ssh_key=key.to_json())
-            key = SSH.add(name, getkeyordie('ssh_pub_key'))
+            key = SSH.add(name, getkeyordie("ssh_pub_key"))
             module.exit_json(changed=True, ssh_key=key.to_json())
 
-        elif state in ('absent', 'deleted'):
+        elif state in ("absent", "deleted"):
             key = SSH.find(name)
             if not key:
-                module.exit_json(changed=False, msg='SSH key with the name of %s is not found.' % name)
+                module.exit_json(
+                    changed=False,
+                    msg="SSH key with the name of %s is not found." % name,
+                )
             key.destroy()
             module.exit_json(changed=True)
 
@@ -437,46 +461,46 @@ def core(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            command=dict(choices=['droplet', 'ssh'], default='droplet'),
-            state=dict(choices=['active', 'present', 'absent', 'deleted'], default='present'),
-            api_token=dict(
-                aliases=['API_TOKEN'],
-                no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY'])
+            command=dict(choices=["droplet", "ssh"], default="droplet"),
+            state=dict(
+                choices=["active", "present", "absent", "deleted"], default="present"
             ),
-            name=dict(type='str'),
+            api_token=dict(
+                aliases=["API_TOKEN"],
+                no_log=True,
+                fallback=(env_fallback, ["DO_API_TOKEN", "DO_API_KEY"]),
+            ),
+            name=dict(type="str"),
             size_id=dict(),
             image_id=dict(),
             region_id=dict(),
-            ssh_key_ids=dict(type='list', elements='str', no_log=False),
-            virtio=dict(type='bool', default=True),
-            private_networking=dict(type='bool', default=False),
-            backups_enabled=dict(type='bool', default=False),
-            id=dict(aliases=['droplet_id'], type='int'),
-            unique_name=dict(type='bool', default=False),
+            ssh_key_ids=dict(type="list", elements="str", no_log=False),
+            virtio=dict(type="bool", default=True),
+            private_networking=dict(type="bool", default=False),
+            backups_enabled=dict(type="bool", default=False),
+            id=dict(aliases=["droplet_id"], type="int"),
+            unique_name=dict(type="bool", default=False),
             user_data=dict(default=None),
-            ipv6=dict(type='bool', default=False),
-            wait=dict(type='bool', default=True),
-            wait_timeout=dict(default=300, type='int'),
-            ssh_pub_key=dict(type='str'),
+            ipv6=dict(type="bool", default=False),
+            wait=dict(type="bool", default=True),
+            wait_timeout=dict(default=300, type="int"),
+            ssh_pub_key=dict(type="str"),
         ),
-        required_together=(
-            ['size_id', 'image_id', 'region_id'],
-        ),
+        required_together=(["size_id", "image_id", "region_id"],),
         mutually_exclusive=(
-            ['size_id', 'ssh_pub_key'],
-            ['image_id', 'ssh_pub_key'],
-            ['region_id', 'ssh_pub_key'],
+            ["size_id", "ssh_pub_key"],
+            ["image_id", "ssh_pub_key"],
+            ["region_id", "ssh_pub_key"],
         ),
-        required_one_of=(
-            ['id', 'name'],
-        ),
+        required_one_of=(["id", "name"],),
     )
     if not HAS_DOPY and not HAS_SIX:
-        module.fail_json(msg='dopy >= 0.3.2 is required for this module. dopy requires six but six is not installed. '
-                             'Make sure both dopy and six are installed.')
+        module.fail_json(
+            msg="dopy >= 0.3.2 is required for this module. dopy requires six but six is not installed. "
+            "Make sure both dopy and six are installed."
+        )
     if not HAS_DOPY:
-        module.fail_json(msg='dopy >= 0.3.2 required for this module')
+        module.fail_json(msg="dopy >= 0.3.2 required for this module")
 
     try:
         core(module)
@@ -486,5 +510,5 @@ def main():
         module.fail_json(msg=str(e), exception=traceback.format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
