@@ -1,0 +1,4 @@
+bugfixes:
+  - digitalocean inventory - respect the TRANSFORM_INVALID_GROUP_CHARS
+    configuration setting
+    (https://github.com/ansible-collections/community.digitalocean/pull/138).
