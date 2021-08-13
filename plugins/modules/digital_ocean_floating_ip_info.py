@@ -104,7 +104,8 @@ def core(module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(supports_check_mode=True)
+        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(),
+        supports_check_mode=True
     )
     if module._name in ('digital_ocean_floating_ip_facts', 'community.digitalocean.digital_ocean_floating_ip_facts'):
         module.deprecate("The 'digital_ocean_floating_ip_facts' module has been renamed to 'digital_ocean_floating_ip_info'",
