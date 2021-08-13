@@ -216,7 +216,8 @@ def main():
                 required=True,
             ),
             name=dict(type='str', required=True),
-            return_kubeconfig=dict(type='bool', default=False)
+            return_kubeconfig=dict(type='bool', default=False),
+            supports_check_mode=True
         ),
     )
 

@@ -102,7 +102,7 @@ def main():
     argument_spec.update(
         load_balancer_id=dict(type='str', required=False),
     )
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     if module._name in ('digital_ocean_load_balancer_facts', 'community.digitalocean.digital_ocean_load_balancer_facts'):
         module.deprecate("The 'digital_ocean_load_balancer_facts' module has been renamed to 'digital_ocean_load_balancer_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13

@@ -98,7 +98,7 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     module = AnsibleModule(
-        argument_spec=argument_spec,
+        argument_spec=argument_spec, supports_check_mode=True
     )
     if module._name in ('digital_ocean_size_facts', 'community.digitalocean.digital_ocean_size_facts'):
         module.deprecate("The 'digital_ocean_size_facts' module has been renamed to 'digital_ocean_size_info'",
