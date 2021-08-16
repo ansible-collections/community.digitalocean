@@ -255,7 +255,9 @@ def main():
         id=dict(type="str", required=False, default=None),
     )
     module = AnsibleModule(
-        argument_spec=argument_spec, mutually_exclusive=[("id", "name")]
+        argument_spec=argument_spec,
+        supports_check_mode=True,
+        mutually_exclusive=[("id", "name")],
     )
     run(module)
 

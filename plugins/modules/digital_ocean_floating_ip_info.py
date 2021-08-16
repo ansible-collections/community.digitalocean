@@ -113,7 +113,8 @@ def core(module):
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec()
+        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(),
+        supports_check_mode=True,
     )
     if module._name in (
         "digital_ocean_floating_ip_facts",

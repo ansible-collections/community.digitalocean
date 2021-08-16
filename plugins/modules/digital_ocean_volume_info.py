@@ -128,7 +128,7 @@ def main():
     argument_spec.update(
         region_name=dict(type="str", required=False),
     )
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     if module._name in (
         "digital_ocean_volume_facts",
         "community.digitalocean.digital_ocean_volume_facts",

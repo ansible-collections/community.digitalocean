@@ -64,7 +64,7 @@ def run(module):
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
     run(module)
 

@@ -105,7 +105,7 @@ def main():
     argument_spec.update(
         certificate_id=dict(type="str", required=False),
     )
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     if module._name in (
         "digital_ocean_certificate_facts",
         "community.digitalocean.digital_ocean_certificate_facts",
