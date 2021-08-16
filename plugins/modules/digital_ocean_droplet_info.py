@@ -241,10 +241,11 @@ def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
         name=dict(type='str', required=False, default=None),
-        id=dict(type='str', required=False, default=None)
+        id=dict(type='str', required=False, default=None),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
+        supports_check_mode=True,
         mutually_exclusive=[('id', 'name')])
     run(module)
 

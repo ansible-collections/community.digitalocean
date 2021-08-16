@@ -100,6 +100,7 @@ def main():
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
+        supports_check_mode=True,
         mutually_exclusive=[('id', 'name')])
     run(module)
 

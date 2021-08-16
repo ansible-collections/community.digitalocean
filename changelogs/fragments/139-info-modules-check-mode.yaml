@@ -1,0 +1,2 @@
+bugfixes:
+  - info modules - adding missing check mode support (https://github.com/ansible-collections/community.digitalocean/issues/139).

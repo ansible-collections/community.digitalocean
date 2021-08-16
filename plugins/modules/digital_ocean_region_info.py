@@ -101,7 +101,7 @@ def core(module):
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
-    module = AnsibleModule(argument_spec=argument_spec)
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     if module._name in ('digital_ocean_region_facts', 'community.digitalocean.digital_ocean_region_facts'):
         module.deprecate("The 'digital_ocean_region_facts' module has been renamed to 'digital_ocean_region_info'",
                          version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13

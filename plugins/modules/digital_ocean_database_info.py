@@ -195,7 +195,7 @@ def main():
             validate_certs=dict(type='bool', default=True),
             timeout=dict(type='int', default=30),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
     run(module)
 
