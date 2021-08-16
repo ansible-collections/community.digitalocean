@@ -153,6 +153,60 @@ def test_populate_hostvars(inventory, payload, mocker):
     assert 'size_slug' not in host_bar.vars
 
 
+@pytest.mark.parametrize('transform', ['never', 'ignore'])
+def test_populate_groups_no_sanitization(inventory, mocker, transform):
+    def get_option(opt):
+        return dict(
+            attributes=['id', 'tags'],
+            var_prefix='do_',
+            keyed_groups=[dict(key='do_tags', prefix='', separator='')],
+        ).get(opt)
+
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    mocker.patch('ansible.constants.TRANSFORM_INVALID_GROUP_CHARS', transform)
+
+    inventory._populate(
+        [
+            dict(
+                id=3164444,
+                name='test',
+                tags=['lower', 'UPPER', 'un_der', 'col:on', 'da-sh', 'with_123'],
+            ),
+        ]
+    )
+
+    assert set(
+        ('all', 'ungrouped', 'lower', 'UPPER', 'un_der', 'col:on', 'da-sh', 'with_123')
+    ) == set((inventory.inventory.groups.keys()))
+
+
+@pytest.mark.parametrize('transform', ['always', 'silently'])
+def test_populate_groups_sanitization(inventory, mocker, transform):
+    def get_option(opt):
+        return dict(
+            attributes=['id', 'tags'],
+            var_prefix='x_',
+            keyed_groups=[dict(key='x_tags', prefix='', separator='')],
+        ).get(opt)
+
+    inventory.get_option = mocker.MagicMock(side_effect=get_option)
+    mocker.patch('ansible.constants.TRANSFORM_INVALID_GROUP_CHARS', transform)
+
+    inventory._populate(
+        [
+            dict(
+                id=3164444,
+                name='test',
+                tags=['lower', 'UPPER', 'un_der', 'col:on', 'da-sh', 'with_123'],
+            ),
+        ]
+    )
+
+    assert set(
+        ('all', 'ungrouped', 'lower', 'UPPER', 'un_der', 'col_on', 'da_sh', 'with_123')
+    ) == set((inventory.inventory.groups.keys()))
+
+
 def get_option_with_templated_api_token(option):
     options = {
         # "random_choice" with just a single input always returns the same result.
