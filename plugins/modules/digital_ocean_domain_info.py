@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_domain_info
 short_description: Gather information about DigitalOcean Domains
@@ -27,10 +28,10 @@ requirements:
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about all domains
   community.digitalocean.digital_ocean_domain_info:
     oauth_token: "{{ oauth_token }}"
@@ -50,10 +51,10 @@ EXAMPLES = r'''
     name: "[?name=='example.com']"
 - debug:
     var: domain_ttl
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
     description: DigitalOcean Domain information
     returned: success
@@ -80,16 +81,18 @@ data:
             "zone_file": "myexample123.com. IN SOA ns1.digitalocean.com. hostmaster.myexample123.com. 1520702984 10800 3600 604800 1800\n",
         },
     ]
-'''
+"""
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 from ansible.module_utils._text import to_native
 
 
 def core(module):
-    domain_name = module.params.get('domain_name', None)
+    domain_name = module.params.get("domain_name", None)
     rest = DigitalOceanHelper(module)
     domain_results = []
 
@@ -101,21 +104,23 @@ def core(module):
             module.fail_json(msg="Failed to retrieve domain for DigitalOcean")
 
         resp_json = response.json
-        domains = [resp_json['domain']]
+        domains = [resp_json["domain"]]
     else:
-        domains = rest.get_paginated_data(base_url="domains?", data_key_name='domains')
+        domains = rest.get_paginated_data(base_url="domains?", data_key_name="domains")
 
     for temp_domain in domains:
         temp_domain_dict = {
-            "name": temp_domain['name'],
-            "ttl": temp_domain['ttl'],
-            "zone_file": temp_domain['zone_file'],
+            "name": temp_domain["name"],
+            "ttl": temp_domain["ttl"],
+            "zone_file": temp_domain["zone_file"],
             "domain_records": list(),
         }
 
-        base_url = "domains/%s/records?" % temp_domain['name']
+        base_url = "domains/%s/records?" % temp_domain["name"]
 
-        temp_domain_dict["domain_records"] = rest.get_paginated_data(base_url=base_url, data_key_name='domain_records')
+        temp_domain_dict["domain_records"] = rest.get_paginated_data(
+            base_url=base_url, data_key_name="domain_records"
+        )
         domain_results.append(temp_domain_dict)
 
     module.exit_json(changed=False, data=domain_results)
@@ -124,12 +129,18 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        domain_name=dict(type='str', required=False),
+        domain_name=dict(type="str", required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    if module._name in ('digital_ocean_domain_facts', 'community.digitalocean.digital_ocean_domain_facts'):
-        module.deprecate("The 'digital_ocean_domain_facts' module has been renamed to 'digital_ocean_domain_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    if module._name in (
+        "digital_ocean_domain_facts",
+        "community.digitalocean.digital_ocean_domain_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_domain_facts' module has been renamed to 'digital_ocean_domain_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
 
     try:
         core(module)
@@ -137,5 +148,5 @@ def main():
         module.fail_json(msg=to_native(e), exception=format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

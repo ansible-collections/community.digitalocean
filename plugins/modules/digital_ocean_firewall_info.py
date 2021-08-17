@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_firewall_info
 short_description: Gather information about DigitalOcean firewalls
@@ -27,10 +28,10 @@ requirements:
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about all firewalls
   community.digitalocean.digital_ocean_firewall_info:
     oauth_token: "{{ oauth_token }}"
@@ -50,10 +51,10 @@ EXAMPLES = r'''
 
 - debug:
     msg: "{{ firewall_id }}"
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
     description: DigitalOcean firewall information
     returned: success
@@ -84,29 +85,31 @@ data:
             "pending_changes": []
         },
     ]
-'''
+"""
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 from ansible.module_utils._text import to_native
 
 
 def core(module):
-    firewall_name = module.params.get('name', None)
+    firewall_name = module.params.get("name", None)
     rest = DigitalOceanHelper(module)
-    base_url = 'firewalls?'
+    base_url = "firewalls?"
 
     response = rest.get("%s" % base_url)
     status_code = response.status_code
     if status_code != 200:
         module.fail_json(msg="Failed to retrieve firewalls from Digital Ocean")
-    firewalls = rest.get_paginated_data(base_url=base_url, data_key_name='firewalls')
+    firewalls = rest.get_paginated_data(base_url=base_url, data_key_name="firewalls")
 
     if firewall_name is not None:
         rule = {}
         for firewall in firewalls:
-            if firewall['name'] == firewall_name:
+            if firewall["name"] == firewall_name:
                 rule.update(firewall)
         firewalls = [rule]
         module.exit_json(changed=False, data=firewalls)
@@ -117,12 +120,18 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        name=dict(type='str', required=False),
+        name=dict(type="str", required=False),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-    if module._name in ('digital_ocean_firewall_facts', 'community.digitalocean.digital_ocean_firewall_facts'):
-        module.deprecate("The 'digital_ocean_firewall_facts' module has been renamed to 'digital_ocean_firewall_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    if module._name in (
+        "digital_ocean_firewall_facts",
+        "community.digitalocean.digital_ocean_firewall_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_firewall_facts' module has been renamed to 'digital_ocean_firewall_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
 
     try:
         core(module)
@@ -130,5 +139,5 @@ def main():
         module.fail_json(msg=to_native(e), exception=format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

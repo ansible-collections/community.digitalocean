@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_sshkey
 short_description: Manage DigitalOcean SSH keys
@@ -55,10 +56,10 @@ notes:
   - Version 2 of DigitalOcean API is used.
 requirements:
   - "python >= 2.6"
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: "Create ssh key"
   community.digitalocean.digital_ocean_sshkey:
     oauth_token: "{{ oauth_token }}"
@@ -72,10 +73,10 @@ EXAMPLES = r'''
     oauth_token: "{{ oauth_token }}"
     state: "absent"
     fingerprint: "3b:16:bf:e4:8b:00:8b:b8:59:8c:a9:d3:f0:19:45:fa"
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
 data:
     description: This is only present when C(state=present)
@@ -89,7 +90,7 @@ data:
             "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAQQDDHr/jh2Jy4yALcK4JyWbVkPRaWmhck3IgCoeOO3z1e2dBowLh64QAM+Qb72pxekALga2oi4GvT+TlWNhzPH4V example"
         }
     }
-'''
+"""
 
 import json
 import hashlib
@@ -101,7 +102,6 @@ from ansible.module_utils.urls import fetch_url
 
 
 class Response(object):
-
     def __init__(self, resp, info):
         self.body = None
         if resp:
@@ -125,152 +125,177 @@ class Response(object):
 
 
 class Rest(object):
-
     def __init__(self, module, headers):
         self.module = module
         self.headers = headers
-        self.baseurl = 'https://api.digitalocean.com/v2'
+        self.baseurl = "https://api.digitalocean.com/v2"
 
     def _url_builder(self, path):
-        if path[0] == '/':
+        if path[0] == "/":
             path = path[1:]
-        return '%s/%s' % (self.baseurl, path)
+        return "%s/%s" % (self.baseurl, path)
 
     def send(self, method, path, data=None, headers=None):
         url = self._url_builder(path)
         data = self.module.jsonify(data)
-        timeout = self.module.params['timeout']
+        timeout = self.module.params["timeout"]
 
-        resp, info = fetch_url(self.module, url, data=data, headers=self.headers, method=method, timeout=timeout)
+        resp, info = fetch_url(
+            self.module,
+            url,
+            data=data,
+            headers=self.headers,
+            method=method,
+            timeout=timeout,
+        )
 
         # Exceptions in fetch_url may result in a status -1, the ensures a
-        if info['status'] == -1:
-            self.module.fail_json(msg=info['msg'])
+        if info["status"] == -1:
+            self.module.fail_json(msg=info["msg"])
 
         return Response(resp, info)
 
     def get(self, path, data=None, headers=None):
-        return self.send('GET', path, data, headers)
+        return self.send("GET", path, data, headers)
 
     def put(self, path, data=None, headers=None):
-        return self.send('PUT', path, data, headers)
+        return self.send("PUT", path, data, headers)
 
     def post(self, path, data=None, headers=None):
-        return self.send('POST', path, data, headers)
+        return self.send("POST", path, data, headers)
 
     def delete(self, path, data=None, headers=None):
-        return self.send('DELETE', path, data, headers)
+        return self.send("DELETE", path, data, headers)
 
 
 def core(module):
-    api_token = module.params['oauth_token']
-    state = module.params['state']
-    fingerprint = module.params['fingerprint']
-    name = module.params['name']
-    ssh_pub_key = module.params['ssh_pub_key']
+    api_token = module.params["oauth_token"]
+    state = module.params["state"]
+    fingerprint = module.params["fingerprint"]
+    name = module.params["name"]
+    ssh_pub_key = module.params["ssh_pub_key"]
 
-    rest = Rest(module, {'Authorization': 'Bearer {0}'.format(api_token),
-                         'Content-type': 'application/json'})
+    rest = Rest(
+        module,
+        {
+            "Authorization": "Bearer {0}".format(api_token),
+            "Content-type": "application/json",
+        },
+    )
 
     fingerprint = fingerprint or ssh_key_fingerprint(module, ssh_pub_key)
-    response = rest.get('account/keys/{0}'.format(fingerprint))
+    response = rest.get("account/keys/{0}".format(fingerprint))
     status_code = response.status_code
     json = response.json
 
     if status_code not in (200, 404):
-        module.fail_json(msg='Error getting ssh key [{0}: {1}]'.format(
-            status_code, response.json['message']), fingerprint=fingerprint)
+        module.fail_json(
+            msg="Error getting ssh key [{0}: {1}]".format(
+                status_code, response.json["message"]
+            ),
+            fingerprint=fingerprint,
+        )
 
-    if state in ('present'):
+    if state in ("present"):
         if status_code == 404:
             # IF key not found create it!
 
             if module.check_mode:
                 module.exit_json(changed=True)
 
-            payload = {
-                'name': name,
-                'public_key': ssh_pub_key
-            }
-            response = rest.post('account/keys', data=payload)
+            payload = {"name": name, "public_key": ssh_pub_key}
+            response = rest.post("account/keys", data=payload)
             status_code = response.status_code
             json = response.json
             if status_code == 201:
                 module.exit_json(changed=True, data=json)
 
-            module.fail_json(msg='Error creating ssh key [{0}: {1}]'.format(
-                status_code, response.json['message']))
+            module.fail_json(
+                msg="Error creating ssh key [{0}: {1}]".format(
+                    status_code, response.json["message"]
+                )
+            )
 
         elif status_code == 200:
             # If key found was found, check if name needs to be updated
-            if name is None or json['ssh_key']['name'] == name:
+            if name is None or json["ssh_key"]["name"] == name:
                 module.exit_json(changed=False, data=json)
 
             if module.check_mode:
                 module.exit_json(changed=True)
 
             payload = {
-                'name': name,
+                "name": name,
             }
-            response = rest.put('account/keys/{0}'.format(fingerprint), data=payload)
+            response = rest.put("account/keys/{0}".format(fingerprint), data=payload)
             status_code = response.status_code
             json = response.json
             if status_code == 200:
                 module.exit_json(changed=True, data=json)
 
-            module.fail_json(msg='Error updating ssh key name [{0}: {1}]'.format(
-                status_code, response.json['message']), fingerprint=fingerprint)
+            module.fail_json(
+                msg="Error updating ssh key name [{0}: {1}]".format(
+                    status_code, response.json["message"]
+                ),
+                fingerprint=fingerprint,
+            )
 
-    elif state in ('absent'):
+    elif state in ("absent"):
         if status_code == 404:
             module.exit_json(changed=False)
 
         if module.check_mode:
             module.exit_json(changed=True)
 
-        response = rest.delete('account/keys/{0}'.format(fingerprint))
+        response = rest.delete("account/keys/{0}".format(fingerprint))
         status_code = response.status_code
         json = response.json
         if status_code == 204:
             module.exit_json(changed=True)
 
-        module.fail_json(msg='Error creating ssh key [{0}: {1}]'.format(
-            status_code, response.json['message']))
+        module.fail_json(
+            msg="Error creating ssh key [{0}: {1}]".format(
+                status_code, response.json["message"]
+            )
+        )
 
 
 def ssh_key_fingerprint(module, ssh_pub_key):
     try:
         key = ssh_pub_key.split(None, 2)[1]
         fingerprint = hashlib.md5(base64.b64decode(key)).hexdigest()
-        return ':'.join(a + b for a, b in zip(fingerprint[::2], fingerprint[1::2]))
+        return ":".join(a + b for a, b in zip(fingerprint[::2], fingerprint[1::2]))
     except IndexError:
-        module.fail_json(msg="This does not appear to be a valid public key. Please verify the format and value provided in ssh_public_key.")
+        module.fail_json(
+            msg="This does not appear to be a valid public key. Please verify the format and value provided in ssh_public_key."
+        )
 
 
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=['present', 'absent'], default='present'),
-            fingerprint=dict(aliases=['id'], required=False),
+            state=dict(choices=["present", "absent"], default="present"),
+            fingerprint=dict(aliases=["id"], required=False),
             name=dict(required=False),
             ssh_pub_key=dict(required=False),
             oauth_token=dict(
                 no_log=True,
                 # Support environment variable for DigitalOcean OAuth Token
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                fallback=(
+                    env_fallback,
+                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
+                ),
                 required=True,
             ),
-            validate_certs=dict(type='bool', default=True),
-            timeout=dict(type='int', default=30),
+            validate_certs=dict(type="bool", default=True),
+            timeout=dict(type="int", default=30),
         ),
-        required_one_of=(
-            ('fingerprint', 'ssh_pub_key'),
-        ),
+        required_one_of=(("fingerprint", "ssh_pub_key"),),
         supports_check_mode=True,
     )
 
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

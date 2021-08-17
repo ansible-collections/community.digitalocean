@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_domain
 short_description: Create/delete a DNS domain in DigitalOcean
@@ -45,10 +46,10 @@ notes:
 
 requirements:
   - "python >= 2.6"
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Create a domain
   community.digitalocean.digital_ocean_domain:
     state: present
@@ -71,10 +72,12 @@ EXAMPLES = r'''
     name: "{{ test_droplet.droplet.name }}.my.domain"
     ip: "{{ test_droplet.droplet.ip_address }}"
 
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 import time
 
 ZONE_FILE_ATTEMPTS = 5
@@ -84,16 +87,16 @@ ZONE_FILE_SLEEP = 3
 class DoManager(DigitalOceanHelper, object):
     def __init__(self, module):
         super(DoManager, self).__init__(module)
-        self.domain_name = module.params.get('name', None)
-        self.domain_ip = module.params.get('ip', None)
-        self.domain_id = module.params.get('id', None)
+        self.domain_name = module.params.get("name", None)
+        self.domain_ip = module.params.get("ip", None)
+        self.domain_id = module.params.get("id", None)
 
     @staticmethod
     def jsonify(response):
         return response.status_code, response.json
 
     def all_domains(self):
-        resp = self.get('domains/')
+        resp = self.get("domains/")
         return resp
 
     def find(self):
@@ -102,32 +105,32 @@ class DoManager(DigitalOceanHelper, object):
 
         domains = self.all_domains()
         status, json = self.jsonify(domains)
-        for domain in json['domains']:
-            if domain['name'] == self.domain_name:
+        for domain in json["domains"]:
+            if domain["name"] == self.domain_name:
                 return True
         return False
 
     def add(self):
-        params = {'name': self.domain_name, 'ip_address': self.domain_ip}
-        resp = self.post('domains/', data=params)
+        params = {"name": self.domain_name, "ip_address": self.domain_ip}
+        resp = self.post("domains/", data=params)
         status = resp.status_code
         json = resp.json
         if status == 201:
-            return json['domain']
+            return json["domain"]
         else:
             return json
 
     def all_domain_records(self):
-        resp = self.get('domains/%s/records/' % self.domain_name)
+        resp = self.get("domains/%s/records/" % self.domain_name)
         return resp.json
 
     def domain_record(self):
-        resp = self.get('domains/%s' % self.domain_name)
+        resp = self.get("domains/%s" % self.domain_name)
         status, json = self.jsonify(resp)
         return json
 
     def destroy_domain(self):
-        resp = self.delete('domains/%s' % self.domain_name)
+        resp = self.delete("domains/%s" % self.domain_name)
         status, json = self.jsonify(resp)
         if status == 204:
             return True
@@ -135,34 +138,33 @@ class DoManager(DigitalOceanHelper, object):
             return json
 
     def edit_domain_record(self, record):
-        params = {'name': '@',
-                  'data': self.module.params.get('ip')}
-        resp = self.put('domains/%s/records/%s' % (self.domain_name, record['id']), data=params)
+        params = {"name": "@", "data": self.module.params.get("ip")}
+        resp = self.put(
+            "domains/%s/records/%s" % (self.domain_name, record["id"]), data=params
+        )
         status, json = self.jsonify(resp)
 
-        return json['domain_record']
+        return json["domain_record"]
 
     def create_domain_record(self):
-        params = {'name': '@',
-                  'type': 'A',
-                  'data': self.module.params.get('ip')}
+        params = {"name": "@", "type": "A", "data": self.module.params.get("ip")}
 
-        resp = self.post('domains/%s/records' % (self.domain_name), data=params)
+        resp = self.post("domains/%s/records" % (self.domain_name), data=params)
         status, json = self.jsonify(resp)
 
-        return json['domain_record']
+        return json["domain_record"]
 
 
 def run(module):
     do_manager = DoManager(module)
-    state = module.params.get('state')
+    state = module.params.get("state")
 
     domain = do_manager.find()
-    if state == 'present':
+    if state == "present":
         if not domain:
             domain = do_manager.add()
-            if 'message' in domain:
-                module.fail_json(changed=False, msg=domain['message'])
+            if "message" in domain:
+                module.fail_json(changed=False, msg=domain["message"])
             else:
                 # We're at the mercy of a backend process which we have no visibility into:
                 # https://developers.digitalocean.com/documentation/v2/#create-a-new-domain
@@ -175,35 +177,35 @@ def run(module):
                 # few times before giving up and returning null.
                 for i in range(ZONE_FILE_ATTEMPTS):
                     record = do_manager.domain_record()
-                    if record is not None and 'domain' in record:
-                        domain = record['domain']
-                        if domain is not None and 'zone_file' in domain:
+                    if record is not None and "domain" in record:
+                        domain = record["domain"]
+                        if domain is not None and "zone_file" in domain:
                             module.exit_json(changed=True, domain=domain)
                     time.sleep(ZONE_FILE_SLEEP)
                 module.exit_json(changed=True, domain=domain)
         else:
             records = do_manager.all_domain_records()
-            if module.params.get('ip'):
+            if module.params.get("ip"):
                 at_record = None
-                for record in records['domain_records']:
-                    if record['name'] == "@" and record['type'] == 'A':
+                for record in records["domain_records"]:
+                    if record["name"] == "@" and record["type"] == "A":
                         at_record = record
 
                 if not at_record:
                     do_manager.create_domain_record()
                     module.exit_json(changed=True, domain=do_manager.find())
-                elif not at_record['data'] == module.params.get('ip'):
+                elif not at_record["data"] == module.params.get("ip"):
                     do_manager.edit_domain_record(at_record)
                     module.exit_json(changed=True, domain=do_manager.find())
             module.exit_json(changed=False, domain=do_manager.domain_record())
 
-    elif state == 'absent':
+    elif state == "absent":
         if not domain:
             module.exit_json(changed=False, msg="Domain not found")
         else:
             delete_event = do_manager.destroy_domain()
             if not delete_event:
-                module.fail_json(changed=False, msg=delete_event['message'])
+                module.fail_json(changed=False, msg=delete_event["message"])
             else:
                 module.exit_json(changed=True, event=None)
         delete_event = do_manager.destroy_domain()
@@ -213,21 +215,19 @@ def run(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        state=dict(choices=['present', 'absent'], default='present'),
-        name=dict(type='str'),
-        id=dict(aliases=['droplet_id'], type='int'),
-        ip=dict(type='str')
+        state=dict(choices=["present", "absent"], default="present"),
+        name=dict(type="str"),
+        id=dict(aliases=["droplet_id"], type="int"),
+        ip=dict(type="str"),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
-        required_one_of=(
-            ['id', 'name'],
-        ),
+        required_one_of=(["id", "name"],),
     )
 
     run(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
