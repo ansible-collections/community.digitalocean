@@ -5,6 +5,23 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.9.0
+======
+
+Minor Changes
+-------------
+
+- digital_ocean - running and enforcing psf/black in the codebase (https://github.com/ansible-collections/community.digitalocean/issues/136).
+- digital_ocean_floating_ip_info - new integration test for the `digital_ocean_floating_ip_info` module (https://github.com/ansible-collections/community.digitalocean/issues/130).
+
+Bugfixes
+--------
+
+- digital_ocean_database - increase the database creation integration test timeout (https://github.com/ansible-collections/community.digitalocean).
+- digital_ocean_floating_ip - delete all Floating IPs initially during the integration test run (https://github.com/ansible-collections/community.digitalocean/issues/129).
+- digitalocean inventory - respect the TRANSFORM_INVALID_GROUP_CHARS configuration setting (https://github.com/ansible-collections/community.digitalocean/pull/138).
+- info modules - adding missing check mode support (https://github.com/ansible-collections/community.digitalocean/issues/139).
+
 v1.8.0
 ======
 
@@ -40,7 +57,6 @@ New Modules
 -----------
 
 - digital_ocean_snapshot - Create and delete DigitalOcean snapshots
-- digital_ocean_snapshot_info - Gather information about DigitalOcean snapshots
 - digital_ocean_vpc - Create and delete DigitalOcean VPCs
 - digital_ocean_vpc_info - Gather information about DigitalOcean VPCs
 

@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_database - increase the database creation integration test timeout (https://github.com/ansible-collections/community.digitalocean).

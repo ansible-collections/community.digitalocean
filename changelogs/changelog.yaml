@@ -218,3 +218,24 @@ releases:
     - 122-firewall-idempotence.yaml
     - 124-add-mongodb.yaml
     release_date: '2021-07-05'
+  1.9.0:
+    changes:
+      bugfixes:
+      - digital_ocean_database - increase the database creation integration test timeout
+        (https://github.com/ansible-collections/community.digitalocean).
+      - digital_ocean_floating_ip - delete all Floating IPs initially during the integration
+        test run (https://github.com/ansible-collections/community.digitalocean/issues/129).
+      - digitalocean inventory - respect the TRANSFORM_INVALID_GROUP_CHARS configuration
+        setting (https://github.com/ansible-collections/community.digitalocean/pull/138).
+      - info modules - adding missing check mode support (https://github.com/ansible-collections/community.digitalocean/issues/139).
+      minor_changes:
+      - digital_ocean - running and enforcing psf/black in the codebase (https://github.com/ansible-collections/community.digitalocean/issues/136).
+      - digital_ocean_floating_ip_info - new integration test for the `digital_ocean_floating_ip_info`
+        module (https://github.com/ansible-collections/community.digitalocean/issues/130).
+    fragments:
+    - 131-floating-ip-tests.yaml
+    - 134-database-tests.yaml
+    - 134-psf-black.yaml
+    - 138-group-name-transformations.yaml
+    - 139-info-modules-check-mode.yaml
+    release_date: '2021-08-17'

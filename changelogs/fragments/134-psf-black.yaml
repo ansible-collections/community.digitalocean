@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean - running and enforcing psf/black in the codebase (https://github.com/ansible-collections/community.digitalocean/issues/136).
