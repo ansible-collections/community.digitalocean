@@ -298,7 +298,7 @@ class DODroplet(object):
             json_data = self.get_by_name(self.module.params["name"])
         return json_data
 
-    def resize_droplet(self):
+    def resize_droplet(self, state):
         """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
         if self.status == "off":
             response = self.rest.post(
@@ -311,6 +311,8 @@ class DODroplet(object):
             )
             json_data = response.json
             if response.status_code == 201:
+                if state == "active":
+                    self.ensure_power_on(self.id)
                 self.module.exit_json(
                     changed=True,
                     msg="Resized Droplet {0} ({1}) from {2} to {3}".format(
@@ -340,7 +342,7 @@ class DODroplet(object):
                 droplet_size = droplet.get("size_slug", None)
                 if droplet_size is not None:
                     if droplet_size != self.module.params["size"]:
-                        self.resize_droplet()
+                        self.resize_droplet(state)
             droplet_data = self.get_addresses(json_data)
             # If state is active or inactive, ensure requested and desired power states match
             droplet = json_data.get("droplet", None)
