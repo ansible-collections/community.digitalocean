@@ -331,6 +331,7 @@ class DOLoadBalancer(object):
         self.module = module
         self.id = None
         self.name = self.module.params.get("name")
+        self.region = self.module.params.get("region")
         self.updates = []
         # Pop these values so we don't include them in the POST data
         self.module.params.pop("oauth_token")
@@ -350,7 +351,9 @@ class DOLoadBalancer(object):
                 self.lb = lb
                 return lb
             else:
-                self.module.fail_json(msg="Unexpected error, please file a bug: get_by_id")
+                self.module.fail_json(
+                    msg="Unexpected error, please file a bug: get_by_id"
+                )
         return None
 
     def get_by_name(self):
@@ -389,10 +392,10 @@ class DOLoadBalancer(object):
                 if lb["load_balancer"]["status"] == "active":
                     return lb
             else:
-                self.module.fail_json(msg="Load Balancer {} not found".format(self.id))
+                self.module.fail_json(msg="Load Balancer {0} in {1} not found".format(self.id, self.region))
             time.sleep(min(10, end_time - time.monotonic()))
         self.module.fail_json(
-            msg="Timed out waiting for Load Balancer {} to be active".format(self.id)
+            msg="Timed out waiting for Load Balancer {0} in {1} to be active".format(self.id, self.region)
         )
 
     def is_same(self, found_lb):
@@ -401,7 +404,9 @@ class DOLoadBalancer(object):
             self.updates.append("droplet_ids")
         found_lb_region = found_lb.get("region", None)
         if found_lb_region is not None:
-            if self.module.params.get("region", None) != found_lb_region.get("slug", None):
+            if self.module.params.get("region", None) != found_lb_region.get(
+                "slug", None
+            ):
                 self.updates.append("region")
         else:
             self.module.fail_json(msg="Unexpected error, please file a bug: is_same")
@@ -413,7 +418,7 @@ class DOLoadBalancer(object):
         if len(self.updates):
             return False
         else:
-          return True
+            return True
 
     def update(self):
         """Updates a DigitalOcean Load Balancer
@@ -423,12 +428,24 @@ class DOLoadBalancer(object):
         self.id = self.lb.get("id", None)
         self.name = self.lb.get("name", None)
         if self.id is not None and self.name is not None:
-            response = self.rest.put("load_balancers/{0}".format(self.id), data=request_params)
+            response = self.rest.put(
+                "load_balancers/{0}".format(self.id), data=request_params
+            )
             json_data = response.json
             if response.status_code == 200:
-                self.module.exit_json(changed=True, msg="Load Balancer {0} ({1}) updated: {2}".format(self.name, self.id, ", ".join(self.updates)))
+                self.module.exit_json(
+                    changed=True,
+                    msg="Load Balancer {0} ({1}) in {2} updated: {3}".format(
+                        self.name, self.id, self.region, ", ".join(self.updates)
+                    ),
+                )
             else:
-                self.module.fail_json(changed=False, msg="Error updating Load Balancer {0} ({1}): {2}".format(self.name, self.id, json_data["message"]))
+                self.module.fail_json(
+                    changed=False,
+                    msg="Error updating Load Balancer {0} ({1}) in {2}: {3}".format(
+                        self.name, self.id, self.region, json_data["message"]
+                    ),
+                )
         else:
             self.module.fail_json(msg="Unexpected error, please file a bug: update")
 
@@ -448,7 +465,9 @@ class DOLoadBalancer(object):
             else:
                 self.module.exit_json(
                     changed=False,
-                    msg="Load Balancer name {0} already exists (and needs no changes)".format(self.name)
+                    msg="Load Balancer {0} already exists in {1} (and needs no changes)".format(
+                        self.name, self.region
+                    ),
                 )
 
         # Create it.
@@ -457,8 +476,8 @@ class DOLoadBalancer(object):
         json_data = response.json
         if response.status_code != 202:
             self.module.fail_json(
-                msg="Failed creating Load Balancer {0}: {1}".format(
-                    self.name, response["message"]
+                msg="Failed creating Load Balancer {0} in {1}: {2}".format(
+                    self.name, self.region, json_data["message"]
                 )
             )
 
@@ -483,23 +502,25 @@ class DOLoadBalancer(object):
         lb = self.get_by_name()
         if lb is not None:
             id = lb["id"]
+            name = lb["name"]
+            region = lb["region"]["slug"]
             response = self.rest.delete("load_balancers/{0}".format(id))
             json_data = response.json
             if response.status_code == 204:
                 self.module.exit_json(
                     changed=True,
-                    msg="Load Balancer {0} ({1}) deleted".format(self.name, id),
+                    msg="Load Balancer {0} ({1}) in {2} deleted".format(name, id, region),
                 )
             else:
                 self.module.fail_json(
                     changed=False,
-                    msg="Failed to delete Load Balancer {0} ({1}) deleted: {2}".format(
-                        self.name, id, json_data["message"]
+                    msg="Failed to delete Load Balancer {0} ({1}) in {2}: {3}".format(
+                        name, id, region, json_data["message"]
                     ),
                 )
         else:
             self.module.fail_json(
-                changed=False, msg="Load Balancer {0} not found".format(self.name)
+                changed=False, msg="Load Balancer {0} not found in {1}".format(self.name, self.region)
             )
 
 
