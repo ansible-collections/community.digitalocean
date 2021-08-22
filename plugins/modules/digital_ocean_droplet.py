@@ -448,6 +448,9 @@ class DODroplet(object):
                     msg="Unexpected error, please file a bug (no action or status)",
                 )
 
+            if action_status == "errored":
+                self.module.fail_json(changed=False, msg="Error status on droplet power on action, please try again or contact DigitalOcean support")
+
             if action_status == "completed":
                 response = self.rest.get("droplets/{0}".format(droplet_id))
                 json_data = response.json
@@ -521,6 +524,9 @@ class DODroplet(object):
                     changed=False,
                     msg="Unexpected error, please file a bug (no action or status)",
                 )
+
+            if action_status == "errored":
+                self.module.fail_json(changed=False, msg="Error status on droplet power off action, please try again or contact DigitalOcean support")
 
             if action_status == "completed":
                 response = self.rest.get("droplets/{0}".format(droplet_id))
