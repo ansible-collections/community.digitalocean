@@ -49,7 +49,7 @@ options:
       - The load balancing algorithm used to determine which backend Droplet will be selected by a client.
       - It must be either C(round_robin) or C(least_connections).
     required: false
-    choices: ["round_robin", "least_connection"]
+    choices: ["round_robin", "least_connections"]
     default: round_robin
   droplet_ids:
     description:
@@ -331,6 +331,7 @@ class DOLoadBalancer(object):
         self.module = module
         self.id = None
         self.name = self.module.params.get("name")
+        self.updates = []
         # Pop these values so we don't include them in the POST data
         self.module.params.pop("oauth_token")
         self.wait = self.module.params.pop("wait", True)
@@ -343,7 +344,13 @@ class DOLoadBalancer(object):
         response = self.rest.get("load_balancers/{0}".format(self.id))
         json_data = response.json
         if response.status_code == 200:
-            return json_data
+            # Found one with the given id:
+            lb = json_data.get("load_balancer", None)
+            if lb is not None:
+                self.lb = lb
+                return lb
+            else:
+                self.module.fail_json(msg="Unexpected error, please file a bug: get_by_id")
         return None
 
     def get_by_name(self):
@@ -356,8 +363,13 @@ class DOLoadBalancer(object):
             json_data = response.json
             if response.status_code == 200:
                 for lb in json_data["load_balancers"]:
+                    # Found one with the same name:
                     if lb.get("name", None) == self.name:
-                        return lb
+                        if lb is not None:
+                            self.lb = lb
+                            return lb
+                        else:
+                            self.module.fail_json(msg="Unexpected error, please file a bug: get_by_name")
                 if (
                     "links" in json_data
                     and "pages" in json_data["links"]
@@ -383,22 +395,64 @@ class DOLoadBalancer(object):
             msg="Timed out waiting for Load Balancer {} to be active".format(self.id)
         )
 
+    def is_same(self, found_lb):
+        """Checks if exising Load Balancer is the same as requested"""
+        if self.module.params.get("droplet_ids", []) != found_lb.get("droplet_ids", []):
+            self.updates.append("droplet_ids")
+        found_lb_region = found_lb.get("region", None)
+        if found_lb_region is not None:
+            if self.module.params.get("region", None) != found_lb_region.get("slug", None):
+                self.updates.append("region")
+        else:
+            self.module.fail_json(msg="Unexpected error, please file a bug: is_same")
+        if self.module.params.get("size", None) != found_lb.get("size", None):
+            self.updates.append("size")
+        if self.module.params.get("algorithm", None) != found_lb.get("algorithm", None):
+            self.updates.append("algorithm")
+
+        if len(self.updates):
+            return False
+        else:
+          return True
+
+    def update(self):
+        """Updates a DigitalOcean Load Balancer
+        API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/update_load_balancer
+        """
+        request_params = dict(self.module.params)
+        self.id = self.lb.get("id", None)
+        self.name = self.lb.get("name", None)
+        if self.id is not None and self.name is not None:
+            response = self.rest.put("load_balancers/{0}".format(self.id), data=request_params)
+            json_data = response.json
+            if response.status_code == 200:
+                self.module.exit_json(changed=True, msg="Load Balancer {0} ({1}) updated: {2}".format(self.name, self.id, ", ".join(self.updates)))
+            else:
+                self.module.fail_json(changed=False, msg="Error updating Load Balancer {0} ({1}): {2}".format(self.name, self.id, json_data["message"]))
+        else:
+            self.module.fail_json(msg="Unexpected error, please file a bug: update")
+
     def create(self):
         """Creates a DigitalOcean Load Balancer
         API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/create_load_balancer
         """
 
-        request_params = dict(self.module.params)
-
         # Check if it exists already (the API docs aren't up-to-date right now,
         # "name" is required and must be unique across the account.
-        lb = self.get_by_name()
-        if lb is not None:
-            self.module.fail_json(
-                msg="Load Balancer name {0} is not unique".format(self.name)
-            )
+        found_lb = self.get_by_name()
+        if found_lb is not None:
+            self.lb = found_lb
+            # Do we need to update it?
+            if not self.is_same(found_lb):
+                self.update()
+            else:
+                self.module.exit_json(
+                    changed=False,
+                    msg="Load Balancer name {0} already exists (and needs no changes)".format(self.name)
+                )
 
         # Create it.
+        request_params = dict(self.module.params)
         response = self.rest.post("load_balancers", data=request_params)
         json_data = response.json
         if response.status_code != 202:
@@ -480,7 +534,7 @@ def main():
             ),
             algorithm=dict(
                 type="str",
-                choices=["round_robin", "least_connection"],
+                choices=["round_robin", "least_connections"],
                 required=False,
                 default="round_robin",
             ),
