@@ -449,7 +449,10 @@ class DODroplet(object):
                 )
 
             if action_status == "errored":
-                self.module.fail_json(changed=False, msg="Error status on droplet power on action, please try again or contact DigitalOcean support")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Error status on droplet power on action, please try again or contact DigitalOcean support",
+                )
 
             if action_status == "completed":
                 response = self.rest.get("droplets/{0}".format(droplet_id))
@@ -526,7 +529,10 @@ class DODroplet(object):
                 )
 
             if action_status == "errored":
-                self.module.fail_json(changed=False, msg="Error status on droplet power off action, please try again or contact DigitalOcean support")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Error status on droplet power off action, please try again or contact DigitalOcean support",
+                )
 
             if action_status == "completed":
                 response = self.rest.get("droplets/{0}".format(droplet_id))
