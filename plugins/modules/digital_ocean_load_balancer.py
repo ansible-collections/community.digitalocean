@@ -372,7 +372,9 @@ class DOLoadBalancer(object):
                             self.lb = lb
                             return lb
                         else:
-                            self.module.fail_json(msg="Unexpected error, please file a bug: get_by_name")
+                            self.module.fail_json(
+                                msg="Unexpected error, please file a bug: get_by_name"
+                            )
                 if (
                     "links" in json_data
                     and "pages" in json_data["links"]
@@ -392,10 +394,16 @@ class DOLoadBalancer(object):
                 if lb["load_balancer"]["status"] == "active":
                     return lb
             else:
-                self.module.fail_json(msg="Load Balancer {0} in {1} not found".format(self.id, self.region))
+                self.module.fail_json(
+                    msg="Load Balancer {0} in {1} not found".format(
+                        self.id, self.region
+                    )
+                )
             time.sleep(min(10, end_time - time.monotonic()))
         self.module.fail_json(
-            msg="Timed out waiting for Load Balancer {0} in {1} to be active".format(self.id, self.region)
+            msg="Timed out waiting for Load Balancer {0} in {1} to be active".format(
+                self.id, self.region
+            )
         )
 
     def is_same(self, found_lb):
@@ -509,7 +517,9 @@ class DOLoadBalancer(object):
             if response.status_code == 204:
                 self.module.exit_json(
                     changed=True,
-                    msg="Load Balancer {0} ({1}) in {2} deleted".format(name, id, region),
+                    msg="Load Balancer {0} ({1}) in {2} deleted".format(
+                        name, id, region
+                    ),
                 )
             else:
                 self.module.fail_json(
@@ -520,7 +530,8 @@ class DOLoadBalancer(object):
                 )
         else:
             self.module.fail_json(
-                changed=False, msg="Load Balancer {0} not found in {1}".format(self.name, self.region)
+                changed=False,
+                msg="Load Balancer {0} not found in {1}".format(self.name, self.region),
             )
 
 
