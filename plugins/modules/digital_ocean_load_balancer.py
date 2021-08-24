@@ -506,7 +506,6 @@ class DOLoadBalancer(object):
         # "name" is required and must be unique across the account.
         found_lb = self.get_by_name()
         if found_lb is not None:
-            self.lb = found_lb
             # Do we need to update it?
             if not self.is_same(found_lb):
                 self.update()
