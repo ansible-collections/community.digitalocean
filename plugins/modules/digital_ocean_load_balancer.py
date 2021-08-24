@@ -529,16 +529,21 @@ class DOLoadBalancer(object):
                 )
             )
 
+        # Store it.
         lb = json_data.get("load_balancer", None)
         if lb is None:
-            self.module.fail_json(msg="Unexpected error, please file a bug")
+            self.module.fail_json(
+                msg="Unexpected error, please file a bug: create empty lb"
+            )
 
         self.id = lb.get("id", None)
         if self.id is None:
-            self.module.fail_json(msg="Unexpected error, please file a bug")
+            self.module.fail_json(
+                msg="Unexpected error, please file a bug: create missing id"
+            )
 
         if self.wait:
-            json_data = self.ensure_active()
+            self.ensure_active()
 
         self.module.exit_json(changed=True, data=json_data)
 
