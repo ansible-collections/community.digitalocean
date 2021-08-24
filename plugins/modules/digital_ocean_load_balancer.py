@@ -56,12 +56,13 @@ options:
     description:
       - An array containing the IDs of the Droplets assigned to the load balancer.
       - Required when creating load balancers.
-    required: false
+    required: true
     type: list
     elements: int
   region:
     description:
       - The slug identifier for the region where the resource will initially be available.
+    required: true
     type: str
     aliases: ["region_id"]
     default: nyc1
@@ -76,21 +77,27 @@ options:
       entry_protocol:
         type: str
         description: Entry protocol
+        default: http
       entry_port:
         type: int
         description: Entry port
+        default: 8080
       target_protocol:
         type: str
         description: Target protocol
+        default: http
       target_port:
         type: int
         description: Target port
+        default: 8080
       certificate_id:
         type: str
         description: Certificate ID
+        default: ""
       tls_passthrough:
         type: bool
         description: TLS passthrough
+        default: false
   health_check:
     description:
       - An object specifying health check settings for the load balancer.
