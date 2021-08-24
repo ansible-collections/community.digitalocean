@@ -415,10 +415,15 @@ class DOLoadBalancer(object):
         """Wait for the existing Load Balancer to be active"""
         end_time = time.monotonic() + self.wait_timeout
         while time.monotonic() < end_time:
-            lb = self.get_by_id()
-            if lb is not None:
-                if lb["load_balancer"]["status"] == "active":
-                    return lb
+            if self.get_by_id():
+                status = self.lb.get("status", None)
+                if status is not None:
+                    if self.lb["status"] == "active":
+                        return True
+                else:
+                    self.module.fail_json(
+                        msg="Unexpected error, please file a bug: ensure_active"
+                    )
             else:
                 self.module.fail_json(
                     msg="Load Balancer {0} in {1} not found".format(
