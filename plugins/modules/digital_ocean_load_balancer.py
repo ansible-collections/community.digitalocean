@@ -11,6 +11,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: digital_ocean_load_balancer
+version_added: 1.10.0
 short_description: Manage DigitalOcean Load Balancers
 description:
     - Manage DigitalOcean Load Balancers
