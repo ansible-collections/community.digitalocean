@@ -617,9 +617,39 @@ def main():
             ),
             droplet_ids=dict(type="list", elements="int", required=False),
             region=dict(aliases=["region_id"], default="nyc1"),
-            forwarding_rules=dict(type="list", elements="dict", required=False),
-            health_check=dict(type="dict", required=False),
-            sticky_sessions=dict(type="dict", required=False),
+            forwarding_rules=dict(
+                type="list",
+                elements="dict",
+                required=False,
+                default=dict(
+                    {
+                        "entry_protocol": "http",
+                        "entry_port": 80,
+                        "target_protocol": "http",
+                        "target_port": 80,
+                        "certificate_id": "",
+                        "tls_passthough": False,
+                    }
+                ),
+            ),
+            health_check=dict(
+                type="dict",
+                required=False,
+                default=dict(
+                    {
+                        "protocol": "http",
+                        "port": 80,
+                        "path": "/",
+                        "check_interval_seconds": 10,
+                        "response_timeout_seconds": 5,
+                        "healthy_threshold": 5,
+                        "unhealthy_threshold": 3,
+                    }
+                ),
+            ),
+            sticky_sessions=dict(
+                type="dict", required=False, default=dict({"type": "none"})
+            ),
             redirect_http_to_https=dict(type="bool", required=False, default=False),
             enable_proxy_protocol=dict(type="bool", required=False, default=False),
             enable_backend_keepalive=dict(type="bool", required=False, default=False),
