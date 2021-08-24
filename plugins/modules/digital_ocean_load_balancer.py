@@ -375,10 +375,24 @@ class DOLoadBalancer(object):
             if response.status_code == 200:
                 for lb in json_data["load_balancers"]:
                     # Found one with the same name:
-                    if lb.get("name", None) == self.name:
-                        if lb is not None:
-                            self.lb = lb
-                            return lb
+                    name = lb.get("name", None)
+                    if name == self.name:
+                        # Make sure the region is the same!
+                        region = lb.get("region", None)
+                        if region is not None:
+                            region_slug = region.get("slug", None)
+                            if region_slug is not None:
+                                if region_slug == self.region:
+                                    self.lb = lb
+                                    return lb
+                                else:
+                                    self.module.fail_json(
+                                        msg="Cannot change load balancer region -- delete and re-create"
+                                    )
+                            else:
+                                self.module.fail_json(
+                                    msg="Unexpected error, please file a bug: get_by_name"
+                                )
                         else:
                             self.module.fail_json(
                                 msg="Unexpected error, please file a bug: get_by_name"
@@ -391,6 +405,10 @@ class DOLoadBalancer(object):
                     page += 1
                 else:
                     page = None
+            else:
+                self.module.fail_json(
+                    msg="Unexpected error, please file a bug: get_by_name"
+                )
         return None
 
     def ensure_active(self):
