@@ -439,20 +439,29 @@ class DOLoadBalancer(object):
 
     def is_same(self, found_lb):
         """Checks if exising Load Balancer is the same as requested"""
-        if self.module.params.get("droplet_ids", []) != found_lb.get("droplet_ids", []):
-            self.updates.append("droplet_ids")
-        found_lb_region = found_lb.get("region", None)
-        if found_lb_region is not None:
-            if self.module.params.get("region", None) != found_lb_region.get(
-                "slug", None
-            ):
-                self.updates.append("region")
-        else:
-            self.module.fail_json(msg="Unexpected error, please file a bug: is_same")
-        if self.module.params.get("size", None) != found_lb.get("size", None):
-            self.updates.append("size")
-        if self.module.params.get("algorithm", None) != found_lb.get("algorithm", None):
-            self.updates.append("algorithm")
+
+        check_attributes = [
+            "droplet_ids",
+            "size",
+            "algorithm",
+            "forwarding_rules",
+            "health_check",
+            "sticky_sessions",
+            "redirect_http_to_https",
+            "enable_proxy_protocol",
+            "enable_backend_keepalive",
+        ]
+
+        for attribute in check_attributes:
+            if self.module.params.get(attribute, None) != found_lb.get(attribute, None):
+                # raise Exception(str(self.module.params.get(attribute, None)), str(found_lb.get(attribute, None)))
+                self.updates.append(attribute)
+
+        # Check if the VPC needs changing.
+        vpc_uuid = self.lb.get("vpc_uuid", None)
+        if vpc_uuid is not None:
+            if vpc_uuid != found_lb.get("vpc_uuid", None):
+                self.updates.append("vpc_uuid")
 
         if len(self.updates):
             return False
