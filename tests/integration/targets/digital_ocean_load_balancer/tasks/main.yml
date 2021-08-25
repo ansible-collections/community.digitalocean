@@ -59,6 +59,12 @@
         name: "{{ droplet_name }}"
         unique_name: true
         region: "{{ do_region }}"
+      register: result
+
+    - name: Verify Droplet is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
 
     - name: Delete the Load Balancer
       community.digitalocean.digital_ocean_droplet:
@@ -66,3 +72,9 @@
         state: absent
         name: "{{ lb_name }}"
         region: "{{ do_region }}"
+      register: result
+
+    - name: Verify Droplet is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
