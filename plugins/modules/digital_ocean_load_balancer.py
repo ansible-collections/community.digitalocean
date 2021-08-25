@@ -380,7 +380,7 @@ class DOLoadBalancer(object):
                 return lb
             else:
                 self.module.fail_json(
-                    msg="Unexpected error, please file a bug: get_by_id"
+                    msg="Unexpected error; please file a bug: get_by_id"
                 )
         return None
 
@@ -411,11 +411,11 @@ class DOLoadBalancer(object):
                                     )
                             else:
                                 self.module.fail_json(
-                                    msg="Unexpected error, please file a bug: get_by_name"
+                                    msg="Unexpected error; please file a bug: get_by_name"
                                 )
                         else:
                             self.module.fail_json(
-                                msg="Unexpected error, please file a bug: get_by_name"
+                                msg="Unexpected error; please file a bug: get_by_name"
                             )
                 if (
                     "links" in json_data
@@ -427,7 +427,7 @@ class DOLoadBalancer(object):
                     page = None
             else:
                 self.module.fail_json(
-                    msg="Unexpected error, please file a bug: get_by_name"
+                    msg="Unexpected error; please file a bug: get_by_name"
                 )
         return None
 
@@ -442,7 +442,7 @@ class DOLoadBalancer(object):
                         return True
                 else:
                     self.module.fail_json(
-                        msg="Unexpected error, please file a bug: ensure_active"
+                        msg="Unexpected error; please file a bug: ensure_active"
                     )
             else:
                 self.module.fail_json(
@@ -515,7 +515,7 @@ class DOLoadBalancer(object):
                     ),
                 )
         else:
-            self.module.fail_json(msg="Unexpected error, please file a bug: update")
+            self.module.fail_json(msg="Unexpected error; please file a bug: update")
 
     def create(self):
         """Creates a DigitalOcean Load Balancer
@@ -552,13 +552,13 @@ class DOLoadBalancer(object):
         lb = json_data.get("load_balancer", None)
         if lb is None:
             self.module.fail_json(
-                msg="Unexpected error, please file a bug: create empty lb"
+                msg="Unexpected error; please file a bug: create empty lb"
             )
 
         self.id = lb.get("id", None)
         if self.id is None:
             self.module.fail_json(
-                msg="Unexpected error, please file a bug: create missing id"
+                msg="Unexpected error; please file a bug: create missing id"
             )
 
         if self.wait:
