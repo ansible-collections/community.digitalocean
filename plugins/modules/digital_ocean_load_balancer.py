@@ -392,8 +392,13 @@ class DOLoadBalancer(object):
         while page is not None:
             response = self.rest.get("load_balancers?page={0}".format(page))
             json_data = response.json
+            if json_data is None:
+                self.module.fail_json(
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds."
+                )
             if response.status_code == 200:
-                for lb in json_data["load_balancers"]:
+                lbs = json_data.get("load_balancers", [])
+                for lb in lbs:
                     # Found one with the same name:
                     name = lb.get("name", None)
                     if name == self.name:
@@ -438,7 +443,7 @@ class DOLoadBalancer(object):
             if self.get_by_id():
                 status = self.lb.get("status", None)
                 if status is not None:
-                    if self.lb["status"] == "active":
+                    if status == "active":
                         return True
                 else:
                     self.module.fail_json(
@@ -573,25 +578,37 @@ class DOLoadBalancer(object):
 
         lb = self.get_by_name()
         if lb is not None:
-            id = lb["id"]
-            name = lb["name"]
-            region = lb["region"]["slug"]
-            response = self.rest.delete("load_balancers/{0}".format(id))
-            json_data = response.json
-            if response.status_code == 204:
-                self.module.exit_json(
-                    changed=True,
-                    msg="Load Balancer {0} ({1}) in {2} deleted".format(
-                        name, id, region
-                    ),
-                )
+            id = lb.get("id", None)
+            name = lb.get("name", None)
+            if id is None or name is None:
+                self.module.fail_json(msg="Unexpected error; please file a bug: delete")
             else:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Failed to delete Load Balancer {0} ({1}) in {2}: {3}".format(
-                        name, id, region, json_data["message"]
-                    ),
-                )
+                lb_region = lb.get("region", None)
+                region = lb_region.get("slug", None)
+                if region is None:
+                    self.module.fail_json(
+                        msg="Unexpected error; please file a bug: delete"
+                    )
+                response = self.rest.delete("load_balancers/{0}".format(id))
+                json_data = response.json
+                if json_data is None:
+                    self.module.fail_json(
+                        msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds."
+                    )
+                if response.status_code == 204:
+                    self.module.exit_json(
+                        changed=True,
+                        msg="Load Balancer {0} ({1}) in {2} deleted".format(
+                            name, id, region
+                        ),
+                    )
+                else:
+                    self.module.fail_json(
+                        changed=False,
+                        msg="Failed to delete Load Balancer {0} ({1}) in {2}: {3}".format(
+                            name, id, region, json_data["message"]
+                        ),
+                    )
         else:
             self.module.fail_json(
                 changed=False,
