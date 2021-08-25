@@ -49,6 +49,7 @@ options:
     description:
       - The load balancing algorithm used to determine which backend Droplet will be selected by a client.
       - It must be either C(round_robin) or C(least_connections).
+    type: str
     required: false
     choices: ["round_robin", "least_connections"]
     default: round_robin
@@ -62,7 +63,7 @@ options:
   region:
     description:
       - The slug identifier for the region where the resource will initially be available.
-    required: true
+    required: false
     type: str
     aliases: ["region_id"]
     default: nyc1
@@ -98,6 +99,13 @@ options:
         type: bool
         description: TLS passthrough
         default: false
+    default:
+      - entry_protocol: http
+        entry_port: 8080
+        target_protocol: http
+        target_port: 8080
+        certificate_id: ""
+        tls_passthrough: false
   health_check:
     description:
       - An object specifying health check settings for the load balancer.
@@ -129,11 +137,24 @@ options:
         type: int
         required: false
         default: 5
+      healthy_threshold:
+        description: Healthy threshold
+        type: int
+        required: false
+        default: 5
       unhealthy_threshold:
         description: Unhealthy threshold
         type: int
         required: false
         default: 3
+    default:
+      protocol: http
+      port: 80
+      path: /
+      check_interval_seconds: 10
+      response_timeout_seconds: 5
+      healthy_threshold: 5
+      unhealthy_threshold: 3
   sticky_sessions:
     description:
       - An object specifying sticky sessions settings for the load balancer.
@@ -145,6 +166,8 @@ options:
         type: str
         required: false
         default: none
+    default:
+      type: none
   redirect_http_to_https:
     description:
       - A boolean value indicating whether HTTP requests to the load balancer on port 80 will be redirected to HTTPS on port 443.
@@ -180,8 +203,6 @@ options:
       - How long before wait gives up, in seconds, when creating a Load Balancer.
     type: int
     default: 600
-extends_documentation_fragment:
-- community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -206,10 +227,9 @@ EXAMPLES = r"""
 RETURN = r"""
 data:
   description: A DigitalOcean Load Balancer
-  return: changed
+  returned: changed
   type: dict
   sample:
-  data:
     load_balancer:
       algorithm: round_robin
       created_at: '2021-08-22T14:23:41Z'
@@ -614,22 +634,22 @@ def main():
                 required=False,
                 default="round_robin",
             ),
-            droplet_ids=dict(type="list", elements="int", required=False),
-            region=dict(aliases=["region_id"], default="nyc1"),
+            droplet_ids=dict(type="list", elements="int", required=True),
+            region=dict(aliases=["region_id"], default="nyc1", required=False),
             forwarding_rules=dict(
                 type="list",
                 elements="dict",
                 required=False,
-                default=dict(
+                default=[
                     {
                         "entry_protocol": "http",
-                        "entry_port": 80,
+                        "entry_port": 8080,
                         "target_protocol": "http",
-                        "target_port": 80,
+                        "target_port": 8080,
                         "certificate_id": "",
-                        "tls_passthough": False,
+                        "tls_passthrough": False,
                     }
-                ),
+                ],
             ),
             health_check=dict(
                 type="dict",
