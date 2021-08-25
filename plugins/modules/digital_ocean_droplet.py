@@ -239,15 +239,21 @@ class DODroplet(object):
             return None
         response = self.rest.get("droplets/{0}".format(droplet_id))
         json_data = response.json
-        if response.status_code == 200:
-            droplet = json_data.get("droplet", None)
-            if droplet is not None:
-                self.id = droplet.get("id", None)
-                self.name = droplet.get("name", None)
-                self.size = droplet.get("size_slug", None)
-                self.status = droplet.get("status", None)
-            return json_data
-        return None
+        if json_data is None:
+            self.module.fail_json(
+                changed=False,
+                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+            )
+        else:
+            if response.status_code == 200:
+                droplet = json_data.get("droplet", None)
+                if droplet is not None:
+                    self.id = droplet.get("id", None)
+                    self.name = droplet.get("name", None)
+                    self.size = droplet.get("size_slug", None)
+                    self.status = droplet.get("status", None)
+                return json_data
+            return None
 
     def get_by_name(self, droplet_name):
         if not droplet_name:
@@ -256,22 +262,29 @@ class DODroplet(object):
         while page is not None:
             response = self.rest.get("droplets?page={0}".format(page))
             json_data = response.json
-            if response.status_code == 200:
-                for droplet in json_data["droplets"]:
-                    if droplet.get("name", None) == droplet_name:
-                        self.id = droplet.get("id", None)
-                        self.name = droplet.get("name", None)
-                        self.size = droplet.get("size_slug", None)
-                        self.status = droplet.get("status", None)
-                        return {"droplet": droplet}
-                if (
-                    "links" in json_data
-                    and "pages" in json_data["links"]
-                    and "next" in json_data["links"]["pages"]
-                ):
-                    page += 1
-                else:
-                    page = None
+            if json_data is None:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                )
+            else:
+                if response.status_code == 200:
+                    droplets = json_data.get("droplets", [])
+                    for droplet in droplets:
+                        if droplet.get("name", None) == droplet_name:
+                            self.id = droplet.get("id", None)
+                            self.name = droplet.get("name", None)
+                            self.size = droplet.get("size_slug", None)
+                            self.status = droplet.get("status", None)
+                            return {"droplet": droplet}
+                    if (
+                        "links" in json_data
+                        and "pages" in json_data["links"]
+                        and "next" in json_data["links"]["pages"]
+                    ):
+                        page += 1
+                    else:
+                        page = None
         return None
 
     def get_addresses(self, data):
@@ -310,24 +323,30 @@ class DODroplet(object):
                 },
             )
             json_data = response.json
-            if response.status_code == 201:
-                if state == "active":
-                    self.ensure_power_on(self.id)
-                self.module.exit_json(
-                    changed=True,
-                    msg="Resized Droplet {0} ({1}) from {2} to {3}".format(
-                        self.name, self.id, self.size, self.module.params["size"]
-                    ),
+            if json_data is None:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
                 )
             else:
-                self.module.fail_json(
-                    msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
-                        self.name,
-                        self.id,
-                        response.status_code,
-                        response.json.get("message", None),
+                if response.status_code == 201:
+                    if state == "active":
+                        self.ensure_power_on(self.id)
+                    self.module.exit_json(
+                        changed=True,
+                        msg="Resized Droplet {0} ({1}) from {2} to {3}".format(
+                            self.name, self.id, self.size, self.module.params["size"]
+                        ),
                     )
-                )
+                else:
+                    self.module.fail_json(
+                        msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
+                            self.name,
+                            self.id,
+                            response.status_code,
+                            response.json.get("message", None),
+                        )
+                    )
         else:
             self.module.fail_json(
                 msg="Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)"
@@ -368,33 +387,42 @@ class DODroplet(object):
         del request_params["id"]
         response = self.rest.post("droplets", data=request_params)
         json_data = response.json
-        if response.status_code >= 400:
-            self.module.fail_json(changed=False, msg=json_data["message"])
-        droplet_data = json_data.get("droplet", None)
-        if droplet_data is not None:
-            droplet_id = droplet_data.get("id", None)
-            if droplet_id is not None:
-                if self.wait:
-                    if state == "present" or state == "active":
-                        json_data = self.ensure_power_on(droplet_id)
-                    if state == "inactive":
-                        json_data = self.ensure_power_off(droplet_id)
-                    droplet_data = self.get_addresses(json_data)
+        if json_data is None:
+            self.module.fail_json(
+                changed=False,
+                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+            )
+        else:
+            if response.status_code >= 400:
+                message = json_data.get(
+                    "message", "Empty failure message from the DigitalOcean API!"
+                )
+                self.module.fail_json(changed=False, msg=message)
+            droplet_data = json_data.get("droplet", None)
+            if droplet_data is not None:
+                droplet_id = droplet_data.get("id", None)
+                if droplet_id is not None:
+                    if self.wait:
+                        if state == "present" or state == "active":
+                            json_data = self.ensure_power_on(droplet_id)
+                        if state == "inactive":
+                            json_data = self.ensure_power_off(droplet_id)
+                        droplet_data = self.get_addresses(json_data)
+                    else:
+                        if state == "inactive":
+                            response = self.rest.post(
+                                "droplets/{0}/actions".format(droplet_id),
+                                data={"type": "power_off"},
+                            )
                 else:
-                    if state == "inactive":
-                        response = self.rest.post(
-                            "droplets/{0}/actions".format(droplet_id),
-                            data={"type": "power_off"},
-                        )
+                    self.module.fail_json(
+                        changed=False, msg="Unexpected error, please file a bug"
+                    )
             else:
                 self.module.fail_json(
                     changed=False, msg="Unexpected error, please file a bug"
                 )
-        else:
-            self.module.fail_json(
-                changed=False, msg="Unexpected error, please file a bug"
-            )
-        self.module.exit_json(changed=True, data=droplet_data)
+            self.module.exit_json(changed=True, data=droplet_data)
 
     def delete(self):
         json_data = self.get_droplet()
@@ -418,8 +446,17 @@ class DODroplet(object):
             "droplets/{0}/actions".format(droplet_id), data={"type": "power_on"}
         )
         json_data = response.json
-        if response.status_code >= 400:
-            self.module.fail_json(changed=False, msg=json_data["message"])
+        if json_data is not None:
+            if response.status_code >= 400:
+                message = json_data.get(
+                    "message", "Empty failure message from the DigitalOcean API!"
+                )
+                self.module.fail_json(changed=False, msg=message)
+        else:
+            self.module.fail_json(
+                changed=False,
+                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+            )
 
         # Save the power-on action
         action = json_data.get("action", None)
@@ -437,8 +474,17 @@ class DODroplet(object):
                 "droplets/{0}/actions/{1}".format(droplet_id, action_id)
             )
             json_data = response.json
-            if response.status_code >= 400:
-                self.module.fail_json(changed=False, msg=json_data["message"])
+            if json_data is not None:
+                if response.status_code >= 400:
+                    message = json_data.get(
+                        "message", "Empty failure message from the DigitalOcean API!"
+                    )
+                    self.module.fail_json(changed=False, msg=message)
+            else:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                )
 
             action = json_data.get("action", None)
             action_status = action.get("status", None)
@@ -457,8 +503,18 @@ class DODroplet(object):
             if action_status == "completed":
                 response = self.rest.get("droplets/{0}".format(droplet_id))
                 json_data = response.json
-                if response.status_code >= 400:
-                    self.module.fail_json(changed=False, msg=json_data["message"])
+                if json_data is not None:
+                    if response.status_code >= 400:
+                        message = json_data.get(
+                            "message",
+                            "Empty failure message from the DigitalOcean API!",
+                        )
+                        self.module.fail_json(changed=False, msg=message)
+                else:
+                    self.module.fail_json(
+                        changed=False,
+                        msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                    )
                 return json_data
 
             time.sleep(min(10, end_time - time.monotonic()))
@@ -472,8 +528,17 @@ class DODroplet(object):
         while time.monotonic() < end_time:
             response = self.rest.get("droplets/{0}".format(droplet_id))
             json_data = response.json
-            if response.status_code >= 400:
-                self.module.fail_json(changed=False, msg=json_data["message"])
+            if json_data is not None:
+                if response.status_code >= 400:
+                    message = json_data.get(
+                        "message", "Empty failure message from the DigitalOcean API!"
+                    )
+                    self.module.fail_json(changed=False, msg=message)
+            else:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                )
 
             droplet = json_data.get("droplet", None)
             if droplet is None:
@@ -498,8 +563,17 @@ class DODroplet(object):
             "droplets/{0}/actions".format(droplet_id), data={"type": "power_off"}
         )
         json_data = response.json
-        if response.status_code >= 400:
-            self.module.fail_json(changed=False, msg=json_data["message"])
+        if json_data is not None:
+            if response.status_code >= 400:
+                message = json_data.get(
+                    "message", "Empty failure message from the DigitalOcean API!"
+                )
+                self.module.fail_json(changed=False, msg=message)
+        else:
+            self.module.fail_json(
+                changed=False,
+                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+            )
 
         # Save the power-off action
         action = json_data.get("action", None)
@@ -517,8 +591,17 @@ class DODroplet(object):
                 "droplets/{0}/actions/{1}".format(droplet_id, action_id)
             )
             json_data = response.json
-            if response.status_code >= 400:
-                self.module.fail_json(changed=False, msg=json_data["message"])
+            if json_data is not None:
+                if response.status_code >= 400:
+                    message = json_data.get(
+                        "message", "Empty failure message from the DigitalOcean API!"
+                    )
+                    self.module.fail_json(changed=False, msg=message)
+            else:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                )
 
             action = json_data.get("action", None)
             action_status = action.get("status", None)
