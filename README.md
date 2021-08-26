@@ -38,6 +38,7 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_image_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_image_info_module.html) – Gather information about DigitalOcean images
 - [digital_ocean_kubernetes_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_kubernetes_info_module.html) – Gather information about DigitalOcean Kubernetes clusters
 - [digital_ocean_kubernetes](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_kubernetes_module.html) – Create and delete DigitalOcean Kubernetes clusters
+- [digital_ocean_load_balancer](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_module.html) – Create and delete DigitalOcean load balancers
 - [digital_ocean_load_balancer_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_facts_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_load_balancer_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_balancer_info_module.html) – Gather information about DigitalOcean load balancers
 - [digital_ocean_project_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_load_project_info_module.html) – Gather information about DigitalOcean projects

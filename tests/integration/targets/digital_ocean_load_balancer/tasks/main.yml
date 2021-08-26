@@ -1,0 +1,80 @@
+---
+- block:
+
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
+
+    - name: Create a Droplet (present)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+      register: droplet
+
+    - name: Verify Droplet is present (from present)
+      ansible.builtin.assert:
+        that:
+          - droplet.changed
+          - droplet.data is defined
+          - droplet.data.droplet is defined
+          - droplet.data.droplet.name is defined
+          - droplet.data.droplet.name == droplet_name
+          - droplet.data.droplet.status in ["new", "active", "available"]
+
+    - name: Create a Load Balancer (present)
+      community.digitalocean.digital_ocean_load_balancer:
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: round_robin
+        droplet_ids:
+          - "{{ droplet.data.droplet.id }}"
+        region: "{{ do_region }}"
+      register: lb
+
+    - name: Verify Load Balancer is present (from present)
+      ansible.builtin.assert:
+        that:
+          - lb.changed
+          - lb.data is defined
+          - lb.data.load_balancer is defined
+          - lb.data.load_balancer.name is defined
+          - lb.data.load_balancer.name == droplet_name
+          - lb.data.load_balancer.status in ["new", "active", "available"]
+
+  always:
+
+    - name: Delete the Droplet
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify Droplet is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Delete the Load Balancer
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ lb_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify Droplet is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
