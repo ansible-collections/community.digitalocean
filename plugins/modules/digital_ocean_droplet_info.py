@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_droplet_info
 short_description: Gather information about DigitalOcean Droplets
@@ -29,10 +30,10 @@ options:
 
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about all droplets
   community.digitalocean.digital_ocean_droplet_info:
     oauth_token: "{{ oauth_token }}"
@@ -55,9 +56,9 @@ EXAMPLES = r'''
 - name: Get number of droplets
   set_fact:
     droplet_count: "{{ droplets.data | length }}"
-'''
+"""
 
-RETURN = r'''
+RETURN = r"""
 data:
   description: "DigitalOcean droplet information"
   elements: dict
@@ -207,11 +208,13 @@ data:
       volume_ids: []
       vpc_uuid: 123-abc-567a
   type: list
-'''
+"""
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 
 
 def run(module):
@@ -221,16 +224,24 @@ def run(module):
         path = "droplets/" + module.params["id"]
         response = rest.get(path)
         if response.status_code != 200:
-            module.fail_json(msg="Failed to fetch 'droplets' information due to error: %s" % response.json["message"])
+            module.fail_json(
+                msg="Failed to fetch 'droplets' information due to error: %s"
+                % response.json["message"]
+            )
     else:
-        response = rest.get_paginated_data(base_url='droplets?', data_key_name='droplets')
+        response = rest.get_paginated_data(
+            base_url="droplets?", data_key_name="droplets"
+        )
 
     if module.params["id"]:
         data = [response.json["droplet"]]
     elif module.params["name"]:
         data = [d for d in response if d["name"] == module.params["name"]]
         if not data:
-            module.fail_json(msg="Failed to fetch 'droplets' information due to error: Unable to find droplet with name %s" % module.params["name"])
+            module.fail_json(
+                msg="Failed to fetch 'droplets' information due to error: Unable to find droplet with name %s"
+                % module.params["name"]
+            )
     else:
         data = response
 
@@ -240,14 +251,16 @@ def run(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        name=dict(type='str', required=False, default=None),
-        id=dict(type='str', required=False, default=None)
+        name=dict(type="str", required=False, default=None),
+        id=dict(type="str", required=False, default=None),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        mutually_exclusive=[('id', 'name')])
+        supports_check_mode=True,
+        mutually_exclusive=[("id", "name")],
+    )
     run(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

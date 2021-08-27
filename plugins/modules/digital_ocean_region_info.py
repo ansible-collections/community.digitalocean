@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_region_info
 short_description: Gather information about DigitalOcean regions
@@ -21,10 +22,10 @@ extends_documentation_fragment:
 
 requirements:
   - "python >= 2.6"
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about all regions
   community.digitalocean.digital_ocean_region_info:
     oauth_token: "{{ oauth_token }}"
@@ -41,10 +42,10 @@ EXAMPLES = r'''
     name: "[?slug==`nyc1`]"
 - debug:
     var: region_slug
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
     description: DigitalOcean regions information
     returned: success
@@ -82,29 +83,37 @@ data:
             "slug": "nyc1"
         },
     ]
-'''
+"""
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 from ansible.module_utils._text import to_native
 
 
 def core(module):
     rest = DigitalOceanHelper(module)
 
-    base_url = 'regions?'
-    regions = rest.get_paginated_data(base_url=base_url, data_key_name='regions')
+    base_url = "regions?"
+    regions = rest.get_paginated_data(base_url=base_url, data_key_name="regions")
 
     module.exit_json(changed=False, data=regions)
 
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
-    module = AnsibleModule(argument_spec=argument_spec)
-    if module._name in ('digital_ocean_region_facts', 'community.digitalocean.digital_ocean_region_facts'):
-        module.deprecate("The 'digital_ocean_region_facts' module has been renamed to 'digital_ocean_region_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    if module._name in (
+        "digital_ocean_region_facts",
+        "community.digitalocean.digital_ocean_region_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_region_facts' module has been renamed to 'digital_ocean_region_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
 
     try:
         core(module)
@@ -112,5 +121,5 @@ def main():
         module.fail_json(msg=to_native(e), exception=format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

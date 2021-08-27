@@ -298,9 +298,7 @@ def main():
             ["state", "present", ["droplet_id", "volume_id"], True],
             ["state", "absent", ["snapshot_id"]],
         ],
-        mutually_exclusive=[
-            ["droplet_id", "volume_id"]
-        ],
+        mutually_exclusive=[["droplet_id", "volume_id"]],
         supports_check_mode=True,
     )
 

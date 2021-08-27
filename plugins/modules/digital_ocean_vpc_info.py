@@ -91,7 +91,11 @@ class DOVPCInfo(object):
                 for vpc in json_data["vpcs"]:
                     if vpc.get("name", None) == self.name:
                         return vpc
-                if "links" in json_data and "pages" in json_data["links"] and "next" in json_data["links"]["pages"]:
+                if (
+                    "links" in json_data
+                    and "pages" in json_data["links"]
+                    and "next" in json_data["links"]["pages"]
+                ):
                     page += 1
                 else:
                     page = None
@@ -113,13 +117,22 @@ class DOVPCInfo(object):
                     response = self.rest.get("vpcs/{0}/members".format(vpc_id))
                     json = response.json
                     if response.status_code != 200:
-                        self.module.fail_json(msg="Failed to find VPC named {0}: {1}".format(self.name, json["message"]))
+                        self.module.fail_json(
+                            msg="Failed to find VPC named {0}: {1}".format(
+                                self.name, json["message"]
+                            )
+                        )
                     else:
                         self.module.exit_json(changed=False, data=json)
                 else:
-                    self.module.fail_json(changed=False, msg="Unexpected error, please file a bug")
+                    self.module.fail_json(
+                        changed=False, msg="Unexpected error, please file a bug"
+                    )
             else:
-                self.module.fail_json(changed=False, msg="Could not find a VPC named {0}".format(self.name))
+                self.module.fail_json(
+                    changed=False,
+                    msg="Could not find a VPC named {0}".format(self.name),
+                )
 
 
 def run(module):

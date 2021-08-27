@@ -6,10 +6,11 @@
 
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_sshkey_info
 short_description: Gather information about DigitalOcean SSH keys
@@ -24,10 +25,10 @@ notes:
   - Version 2 of DigitalOcean API is used.
 requirements:
   - "python >= 2.6"
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about DigitalOcean SSH keys
   community.digitalocean.digital_ocean_sshkey_info:
     oauth_token: "{{ my_do_key }}"
@@ -43,10 +44,10 @@ EXAMPLES = r'''
 - name: Print SSH public key
   debug:
     msg: "{{ pubkey }}"
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
 data:
     description: List of SSH keys on DigitalOcean
@@ -61,10 +62,12 @@ data:
         "name": "My SSH Public Key"
       }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 
 
 def core(module):
@@ -74,10 +77,13 @@ def core(module):
     status_code = response.status_code
     json = response.json
     if status_code == 200:
-        module.exit_json(changed=False, data=json['ssh_keys'])
+        module.exit_json(changed=False, data=json["ssh_keys"])
     else:
-        module.fail_json(msg='Error fetching SSH Key information [{0}: {1}]'.format(
-            status_code, response.json['message']))
+        module.fail_json(
+            msg="Error fetching SSH Key information [{0}: {1}]".format(
+                status_code, response.json["message"]
+            )
+        )
 
 
 def main():
@@ -85,11 +91,17 @@ def main():
         argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(),
         supports_check_mode=True,
     )
-    if module._name in ('digital_ocean_sshkey_facts', 'community.digitalocean.digital_ocean_sshkey_facts'):
-        module.deprecate("The 'digital_ocean_sshkey_facts' module has been renamed to 'digital_ocean_sshkey_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    if module._name in (
+        "digital_ocean_sshkey_facts",
+        "community.digitalocean.digital_ocean_sshkey_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_sshkey_facts' module has been renamed to 'digital_ocean_sshkey_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
     core(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

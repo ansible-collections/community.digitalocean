@@ -5,10 +5,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_size_info
 short_description: Gather information about DigitalOcean Droplet sizes
@@ -21,10 +22,10 @@ requirements:
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather information about all droplet sizes
   community.digitalocean.digital_ocean_size_info:
     oauth_token: "{{ oauth_token }}"
@@ -43,10 +44,10 @@ EXAMPLES = r'''
     var: size_slug
 
 
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
     description: DigitalOcean droplet size information
     returned: success
@@ -77,32 +78,41 @@ data:
             "vcpus": 1
         },
     ]
-'''
+"""
 
 from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 from ansible.module_utils._text import to_native
 
 
 def core(module):
     rest = DigitalOceanHelper(module)
 
-    response = rest.get('sizes')
+    response = rest.get("sizes")
     if response.status_code != 200:
-        module.fail_json(msg="Failed to fetch 'sizes' information due to error : %s" % response.json['message'])
+        module.fail_json(
+            msg="Failed to fetch 'sizes' information due to error : %s"
+            % response.json["message"]
+        )
 
-    module.exit_json(changed=False, data=response.json['sizes'])
+    module.exit_json(changed=False, data=response.json["sizes"])
 
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
-    module = AnsibleModule(
-        argument_spec=argument_spec,
-    )
-    if module._name in ('digital_ocean_size_facts', 'community.digitalocean.digital_ocean_size_facts'):
-        module.deprecate("The 'digital_ocean_size_facts' module has been renamed to 'digital_ocean_size_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+    if module._name in (
+        "digital_ocean_size_facts",
+        "community.digitalocean.digital_ocean_size_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_size_facts' module has been renamed to 'digital_ocean_size_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
 
     try:
         core(module)
@@ -110,5 +120,5 @@ def main():
         module.fail_json(msg=to_native(e), exception=format_exc())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

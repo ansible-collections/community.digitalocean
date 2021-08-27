@@ -6,9 +6,10 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_database_info
 short_description: Gather information about DigitalOcean databases
@@ -30,18 +31,18 @@ options:
     required: false
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Gather all DigitalOcean databases
   community.digitalocean.digital_ocean_database_info:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
   register: my_databases
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 data:
   description: List of DigitalOcean databases
   returned: success
@@ -89,11 +90,13 @@ data:
     },
     ...
   ]
-'''
+"""
 
 
 from ansible.module_utils.basic import AnsibleModule, env_fallback
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 
 
 class DODatabaseInfo(object):
@@ -101,20 +104,20 @@ class DODatabaseInfo(object):
         self.module = module
         self.rest = DigitalOceanHelper(module)
         # pop the oauth token so we don't include it in the POST data
-        self.module.params.pop('oauth_token')
+        self.module.params.pop("oauth_token")
         self.id = None
         self.name = None
 
     def get_by_id(self, database_id):
         if database_id is None:
             return None
-        response = self.rest.get('databases/{0}'.format(database_id))
+        response = self.rest.get("databases/{0}".format(database_id))
         json_data = response.json
         if response.status_code == 200:
-            database = json_data.get('database', None)
+            database = json_data.get("database", None)
             if database is not None:
-                self.id = database.get('id', None)
-                self.name = database.get('name', None)
+                self.id = database.get("id", None)
+                self.name = database.get("name", None)
             return json_data
         return None
 
@@ -123,46 +126,54 @@ class DODatabaseInfo(object):
             return None
         page = 1
         while page is not None:
-            response = self.rest.get('databases?page={0}'.format(page))
+            response = self.rest.get("databases?page={0}".format(page))
             json_data = response.json
             if response.status_code == 200:
-                for database in json_data['databases']:
-                    if database.get('name', None) == database_name:
-                        self.id = database.get('id', None)
-                        self.name = database.get('name', None)
-                        return {'database': database}
-                if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
+                for database in json_data["databases"]:
+                    if database.get("name", None) == database_name:
+                        self.id = database.get("id", None)
+                        self.name = database.get("name", None)
+                        return {"database": database}
+                if (
+                    "links" in json_data
+                    and "pages" in json_data["links"]
+                    and "next" in json_data["links"]["pages"]
+                ):
                     page += 1
                 else:
                     page = None
         return None
 
     def get_database(self):
-        json_data = self.get_by_id(self.module.params['id'])
+        json_data = self.get_by_id(self.module.params["id"])
         if not json_data:
-            json_data = self.get_by_name(self.module.params['name'])
+            json_data = self.get_by_name(self.module.params["name"])
         return json_data
 
     def get_databases(self):
         all_databases = []
         page = 1
         while page is not None:
-            response = self.rest.get('databases?page={0}'.format(page))
+            response = self.rest.get("databases?page={0}".format(page))
             json_data = response.json
             if response.status_code == 200:
-                databases = json_data.get('databases', None)
+                databases = json_data.get("databases", None)
                 if databases is not None and isinstance(databases, list):
                     all_databases.append(databases)
-                if 'links' in json_data and 'pages' in json_data['links'] and 'next' in json_data['links']['pages']:
+                if (
+                    "links" in json_data
+                    and "pages" in json_data["links"]
+                    and "next" in json_data["links"]["pages"]
+                ):
                     page += 1
                 else:
                     page = None
-        return {'databases': all_databases}
+        return {"databases": all_databases}
 
 
 def run(module):
-    id = module.params.get('id', None)
-    name = module.params.get('name', None)
+    id = module.params.get("id", None)
+    name = module.params.get("name", None)
 
     database = DODatabaseInfo(module)
 
@@ -172,11 +183,15 @@ def run(module):
             module.exit_json(changed=False, data=the_database)
         else:  # Didn't find it
             if id is not None and name is not None:
-                module.fail_json(change=False, msg='Database {0} ({1}) not found'.format(id, name))
+                module.fail_json(
+                    change=False, msg="Database {0} ({1}) not found".format(id, name)
+                )
             elif id is not None and name is None:
-                module.fail_json(change=False, msg='Database {0} not found'.format(id))
+                module.fail_json(change=False, msg="Database {0} not found".format(id))
             elif id is None and name is not None:
-                module.fail_json(change=False, msg='Database {0} not found'.format(name))
+                module.fail_json(
+                    change=False, msg="Database {0} not found".format(name)
+                )
     else:
         all_databases = database.get_databases()
         module.exit_json(changed=False, data=all_databases)
@@ -186,19 +201,22 @@ def main():
     module = AnsibleModule(
         argument_spec=dict(
             oauth_token=dict(
-                aliases=['api_token'],
+                aliases=["api_token"],
                 no_log=True,
-                fallback=(env_fallback, ['DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN']),
+                fallback=(
+                    env_fallback,
+                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
+                ),
             ),
-            id=dict(type='int', aliases=['database_id']),
-            name=dict(type='str'),
-            validate_certs=dict(type='bool', default=True),
-            timeout=dict(type='int', default=30),
+            id=dict(type="int", aliases=["database_id"]),
+            name=dict(type="str"),
+            validate_certs=dict(type="bool", default=True),
+            timeout=dict(type="int", default=30),
         ),
-        supports_check_mode=False,
+        supports_check_mode=True,
     )
     run(module)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

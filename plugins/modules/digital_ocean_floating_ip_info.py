@@ -4,10 +4,11 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_floating_ip_info
 short_description: DigitalOcean Floating IPs information
@@ -22,10 +23,10 @@ notes:
   - Version 2 of DigitalOcean API is used.
 requirements:
   - "python >= 2.6"
-'''
+"""
 
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: "Gather information about all Floating IPs"
   community.digitalocean.digital_ocean_floating_ip_info:
   register: result
@@ -33,10 +34,10 @@ EXAMPLES = r'''
 - name: "List of current floating ips"
   debug:
     var: result.floating_ips
-'''
+"""
 
 
-RETURN = r'''
+RETURN = r"""
 # Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#floating-ips
 floating_ips:
     description: a DigitalOcean Floating IP resource
@@ -71,10 +72,12 @@ floating_ips:
         "locked": false
       }
     ]
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import DigitalOceanHelper
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 from ansible.module_utils._text import to_native
 
 
@@ -93,22 +96,35 @@ def core(module):
             break
         page += 1
         floating_ips.extend(response.json["floating_ips"])
-        has_next = "pages" in response.json["links"] and "next" in response.json["links"]["pages"]
+        has_next = (
+            "pages" in response.json["links"]
+            and "next" in response.json["links"]["pages"]
+        )
 
     if status_code == 200:
         module.exit_json(changed=False, floating_ips=floating_ips)
     else:
-        module.fail_json(msg="Error fetching information [{0}: {1}]".format(
-            status_code, response.json["message"]))
+        module.fail_json(
+            msg="Error fetching information [{0}: {1}]".format(
+                status_code, response.json["message"]
+            )
+        )
 
 
 def main():
     module = AnsibleModule(
-        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec()
+        argument_spec=DigitalOceanHelper.digital_ocean_argument_spec(),
+        supports_check_mode=True,
     )
-    if module._name in ('digital_ocean_floating_ip_facts', 'community.digitalocean.digital_ocean_floating_ip_facts'):
-        module.deprecate("The 'digital_ocean_floating_ip_facts' module has been renamed to 'digital_ocean_floating_ip_info'",
-                         version='2.0.0', collection_name='community.digitalocean')  # was Ansible 2.13
+    if module._name in (
+        "digital_ocean_floating_ip_facts",
+        "community.digitalocean.digital_ocean_floating_ip_facts",
+    ):
+        module.deprecate(
+            "The 'digital_ocean_floating_ip_facts' module has been renamed to 'digital_ocean_floating_ip_info'",
+            version="2.0.0",
+            collection_name="community.digitalocean",
+        )  # was Ansible 2.13
 
     try:
         core(module)
@@ -116,5 +132,5 @@ def main():
         module.fail_json(msg=to_native(e))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
