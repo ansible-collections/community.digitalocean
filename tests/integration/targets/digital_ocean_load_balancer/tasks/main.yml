@@ -76,14 +76,14 @@
           - result.changed
 
     - name: Delete the Load Balancer
-      community.digitalocean.digital_ocean_droplet:
+      community.digitalocean.digital_ocean_load_balancer:
         oauth_token: "{{ do_api_key }}"
         state: absent
         name: "{{ lb_name }}"
         region: "{{ do_region }}"
       register: result
 
-    - name: Verify Droplet is deleted
+    - name: Verify Load Balancer is deleted
       ansible.builtin.assert:
         that:
           - result.changed
