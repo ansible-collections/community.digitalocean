@@ -600,7 +600,9 @@ class DOLoadBalancer(object):
                         ),
                     )
                 else:
-                    message = json_data.get("message", "Empty failure message from the DigitalOcean API!")
+                    message = json_data.get(
+                        "message", "Empty failure message from the DigitalOcean API!"
+                    )
                     self.module.fail_json(
                         changed=False,
                         msg="Failed to delete Load Balancer {0} ({1}) in {2}: {3}".format(
