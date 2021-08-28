@@ -57,7 +57,7 @@ options:
     description:
       - An array containing the IDs of the Droplets assigned to the load balancer.
       - Required when creating load balancers.
-    required: true
+    required: false
     type: list
     elements: int
   region:
@@ -591,11 +591,8 @@ class DOLoadBalancer(object):
                     )
                 response = self.rest.delete("load_balancers/{0}".format(id))
                 json_data = response.json
-                if json_data is None:
-                    self.module.fail_json(
-                        msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds."
-                    )
                 if response.status_code == 204:
+                    # Response body should be empty
                     self.module.exit_json(
                         changed=True,
                         msg="Load Balancer {0} ({1}) in {2} deleted".format(
@@ -603,10 +600,13 @@ class DOLoadBalancer(object):
                         ),
                     )
                 else:
+                    message = json_data.get(
+                        "message", "Empty failure message from the DigitalOcean API!"
+                    )
                     self.module.fail_json(
                         changed=False,
                         msg="Failed to delete Load Balancer {0} ({1}) in {2}: {3}".format(
-                            name, id, region, json_data["message"]
+                            name, id, region, message
                         ),
                     )
         else:
@@ -651,7 +651,7 @@ def main():
                 required=False,
                 default="round_robin",
             ),
-            droplet_ids=dict(type="list", elements="int", required=True),
+            droplet_ids=dict(type="list", elements="int", required=False),
             region=dict(aliases=["region_id"], default="nyc1", required=False),
             forwarding_rules=dict(
                 type="list",
