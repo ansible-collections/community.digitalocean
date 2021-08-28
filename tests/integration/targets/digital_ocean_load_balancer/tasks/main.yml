@@ -34,7 +34,7 @@
           - droplet.data.droplet.name == droplet_name
           - droplet.data.droplet.status in ["new", "active", "available"]
 
-    - name: Create a Load Balancer (present)
+    - name: Create the Load Balancer (present)
       community.digitalocean.digital_ocean_load_balancer:
         oauth_token: "{{ do_api_key }}"
         state: present
