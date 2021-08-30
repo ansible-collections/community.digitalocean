@@ -81,10 +81,6 @@
         region: "{{ do_region }}"
       register: lb
 
-    - name: debug
-      ansible.builtin.debug:
-        var: lb
-
     - name: Verify Load Balancer is changed
       ansible.builtin.assert:
         that:
