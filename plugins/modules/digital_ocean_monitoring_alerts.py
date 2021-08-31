@@ -219,8 +219,8 @@ class DOMonitoringAlerts(object):
                 )
         else:
             self.module.fail_json(
-                msg="Create Monitoring Alert {0} failed [HTTP {2}: {3}]".format(
-                    self.description,
+                msg="Create Monitoring Alert '{0}' failed [HTTP {1}: {2}]".format(
+                    self.module.params.get("description"),
                     response.status_code,
                     response.json.get("message", None),
                 )
