@@ -8,6 +8,25 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
+    - name: Ensure Droplet is absent (leftover)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      ignore_errors: true  # In case one was left from previous run
+
+    - name: Ensure Load Balancer is absent (leftover)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ lb_name }}"
+        region: "{{ do_region }}"
+      ignore_errors: true  # In case one was left from previous run
+
     - name: Create the Droplet (active)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
@@ -19,10 +38,6 @@
         size: "{{ droplet_size }}"
         wait_timeout: 500
       register: droplet
-
-    - name: Give the cloud a minute to settle
-      ansible.builtin.pause:
-        minutes: 1
 
     - name: Verify Droplet is present (from active)
       ansible.builtin.assert:
@@ -58,6 +73,24 @@
           - lb.data.load_balancer.name is defined
           - lb.data.load_balancer.name == lb_name
           - lb.data.load_balancer.status in ["new", "active", "available"]
+
+    - name: Change the Load Balancer (algorithm)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: least_connections
+        droplet_ids:
+          - "{{ droplet.data.droplet.id }}"
+        region: "{{ do_region }}"
+      register: lb
+
+    - name: Verify Load Balancer is changed
+      ansible.builtin.assert:
+        that:
+          - lb.changed is true
+          - lb.failed is false
+          - "'updated: algorithm' in lb.msg"
 
   always:
 
