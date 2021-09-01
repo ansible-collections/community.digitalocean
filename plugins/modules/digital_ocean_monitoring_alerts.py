@@ -52,12 +52,12 @@ options:
   entities:
     description: Alert entities, required for C(state=present)
     type: list
-    subelements: str
+    elements: str
     required: false
   tags:
     description: Alert tags, required for C(state=present)
     type: list
-    subelements: str
+    elements: str
     required: false
   type:
     description:
@@ -65,6 +65,19 @@ options:
       - See U(https://docs.digitalocean.com/reference/api/api-reference/#operation/create_alert_policy) for valid types
     type: str
     required: false
+    choices:
+      - v1/insights/droplet/load_1
+      - v1/insights/droplet/load_5
+      - v1/insights/droplet/load_15
+      - v1/insights/droplet/memory_utilization_percent
+      - v1/insights/droplet/disk_utilization_percent
+      - v1/insights/droplet/cpu
+      - v1/insights/droplet/disk_read
+      - v1/insights/droplet/disk_write
+      - v1/insights/droplet/public_outbound_bandwidth
+      - v1/insights/droplet/public_inbound_bandwidth
+      - v1/insights/droplet/private_outbound_bandwidth
+      - v1/insights/droplet/private_inbound_bandwidth
   value:
     description: Alert threshold, required for C(state=present)
     type: float
