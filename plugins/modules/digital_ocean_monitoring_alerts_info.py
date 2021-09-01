@@ -18,6 +18,12 @@ description:
     - The Monitoring API can help you gain insight into how your apps are performing and consuming resources.
 author: "Mark Mercado (@mamercad)"
 options:
+  state:
+    description:
+      - C(present) to return alerts
+    type: str
+    choices: ["present"]
+    default: present
   oauth_token:
     description:
       - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
@@ -128,7 +134,7 @@ def run(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
+            state=dict(choices=["present"], default="present"),
             oauth_token=dict(
                 aliases=["API_TOKEN"],
                 no_log=True,
