@@ -203,7 +203,7 @@ class DOMonitoringAlerts(object):
                 if alert.get(alert_key, None) != self.module.params.get(
                     alert_key, None
                 ):
-                    continue
+                    break
             else:
                 return alert
         return None
