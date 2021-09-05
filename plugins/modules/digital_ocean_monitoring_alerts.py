@@ -203,9 +203,9 @@ class DOMonitoringAlerts(object):
                 if alert.get(alert_key, None) != self.module.params.get(
                     alert_key, None
                 ):
-                    break
+                    break  # This key doesn't match, try the next alert.
             else:
-                return alert
+                return alert  # Didn't hit break, this alert matches.
         return None
 
     def create(self):
