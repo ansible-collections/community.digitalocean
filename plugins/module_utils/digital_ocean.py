@@ -70,7 +70,7 @@ class DigitalOceanHelper:
 
         if method == "DELETE":
             if data == "null":
-                data=None
+                data = None
 
         resp, info = fetch_url(
             self.module,
