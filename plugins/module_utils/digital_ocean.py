@@ -68,6 +68,10 @@ class DigitalOceanHelper:
         url = self._url_builder(path)
         data = self.module.jsonify(data)
 
+        if method == "DELETE":
+            if data == "null":
+                data=None
+
         resp, info = fetch_url(
             self.module,
             url,
@@ -141,10 +145,14 @@ class DigitalOceanHelper:
                 break
             page += 1
             ret_data.extend(response.json[data_key_name])
-            has_next = (
-                "pages" in response.json["links"]
-                and "next" in response.json["links"]["pages"]
-            )
+            try:
+                has_next = (
+                    "pages" in response.json["links"]
+                    and "next" in response.json["links"]["pages"]
+                )
+            except KeyError:
+                # There's a bug in the API docs: GET v2/cdn/endpoints doesn't return a "links" key
+                has_next = False
 
         if status_code != expected_status_code:
             msg = "Failed to fetch %s from %s" % (data_key_name, base_url)
