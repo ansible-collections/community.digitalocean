@@ -17,6 +17,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_account_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_account_info_module.html) – Gather information about DigitalOcean User account
 - [digital_ocean_balance_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_balance_info_module.html) – Display DigitalOcean customer balance
 - [digital_ocean_block_storage](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_block_storage_module.html) – Create/destroy or attach/detach Block Storage volumes in DigitalOcean
+- [digital_ocean_cdn_endpoints_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_cdn_endpoints_info_module.html) – Gather information about DigitalOcean CDN Endpoints
+- [digital_ocean_cdn_endpoints](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_cdn_endpoints_module.html) – Create and delete DigitalOcean CDN Endpoints
 - [digital_ocean_certificate](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_module.html) – Manage certificates in DigitalOcean.
 - [digital_ocean_certificate_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_facts_module.html) – Gather information about DigitalOcean certificates
 - [digital_ocean_certificate_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_certificate_info_module.html) – Gather information about DigitalOcean certificates
