@@ -216,6 +216,11 @@ class DOMonitoringAlerts(object):
                 changed=False,
                 data=alert,
             )
+
+        # Check mode
+        if self.module.check_mode:
+            self.module.exit_json(changed=True)
+
         # Create it.
         request_params = dict(self.module.params)
         response = self.rest.post("monitoring/alerts", data=request_params)
@@ -242,6 +247,12 @@ class DOMonitoringAlerts(object):
     def delete(self):
         uuid = self.module.params.get("uuid", None)
         if uuid is not None:
+
+            # Check mode
+            if self.module.check_mode:
+                self.module.exit_json(changed=True)
+
+            # Delete it
             response = self.rest.delete("monitoring/alerts/{0}".format(uuid))
             if response.status_code == 204:
                 self.module.exit_json(
