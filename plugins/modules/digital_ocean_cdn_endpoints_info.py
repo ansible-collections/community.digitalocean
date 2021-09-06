@@ -82,7 +82,7 @@ def run(module):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
+            state=dict(choices=["present"], default="present"),
             oauth_token=dict(
                 aliases=["api_token"],
                 no_log=True,
