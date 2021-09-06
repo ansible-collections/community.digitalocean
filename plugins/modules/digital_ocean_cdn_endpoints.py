@@ -132,6 +132,10 @@ class DOCDNEndpoint(object):
                 # Have it already
                 self.module.exit_json(changed=False, msg=cdn)
             if needs_update:
+                # Check mode
+                if self.module.check_mode:
+                    self.module.exit_json(changed=True)
+
                 # Update it
                 request_params = dict(self.module.params)
 
@@ -155,6 +159,10 @@ class DOCDNEndpoint(object):
 
                 self.module.exit_json(changed=True, data=json_data)
         else:
+            # Check mode
+            if self.module.check_mode:
+                self.module.exit_json(changed=True)
+
             # Create it
             request_params = dict(self.module.params)
 
@@ -178,6 +186,11 @@ class DOCDNEndpoint(object):
     def delete(self):
         cdn, needs_update = self.get_cdn_endpoint()
         if cdn is not None:
+            # Check mode
+            if self.module.check_mode:
+                self.module.exit_json(changed=True)
+
+            # Delete it
             endpoint = "cdn/endpoints/{0}".format(cdn.get("id"))
             response = self.rest.delete(endpoint)
             status_code = response.status_code
