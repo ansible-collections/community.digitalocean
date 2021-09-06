@@ -24,12 +24,6 @@ options:
     type: str
     choices: ["present", "absent"]
     default: present
-  oauth_token:
-    description:
-      - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    type: str
-    aliases: ["API_TOKEN"]
-    required: true
   origin:
     description:
       - The fully qualified domain name (FQDN) for the origin server which provides the content for the CDN.
@@ -55,6 +49,8 @@ options:
       - The fully qualified domain name (FQDN) of the custom subdomain used with the CDN endpoint.
     type: str
     required: false
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -180,7 +176,7 @@ class DOCDNEndpoint(object):
             self.module.exit_json(changed=True, data=json_data)
 
     def delete(self):
-        cdn, _ = self.get_cdn_endpoint()
+        cdn, needs_update = self.get_cdn_endpoint()
         if cdn is not None:
             endpoint = "cdn/endpoints/{0}".format(cdn.get("id"))
             response = self.rest.delete(endpoint)
@@ -237,6 +233,8 @@ def main():
             ),
             certificate_id=dict(type="str", required=False),
             custom_domain=dict(type="str", required=False),
+            validate_certs=dict(type="bool", default=True),
+            timeout=dict(type="int", default=30),
         ),
         supports_check_mode=True,
     )

@@ -24,12 +24,8 @@ options:
     type: str
     choices: ["present", "absent"]
     default: present
-  oauth_token:
-    description:
-      - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    type: str
-    aliases: ["API_TOKEN"]
-    required: true
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -95,6 +91,8 @@ def main():
                     ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
                 ),
             ),
+            validate_certs=dict(type="bool", default=True),
+            timeout=dict(type="int", default=30),
         ),
         supports_check_mode=True,
     )
