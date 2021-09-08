@@ -94,12 +94,36 @@ options:
       labels:
         type: dict
         description: An object containing a set of Kubernetes labels. The keys are user-defined.
+      taints:
+        type: list
+        description:
+          - An array of taints to apply to all nodes in a pool.
+          - Taints will automatically be applied to all existing nodes and any subsequent nodes added to the pool.
+          - When a taint is removed, it is removed from all nodes in the pool.
+      auto_scale:
+        type: bool
+        description:
+          - A boolean value indicating whether auto-scaling is enabled for this node pool.
+      min_nodes:
+        type: int
+        description:
+          - The minimum number of nodes that this node pool can be auto-scaled to.
+          - The value will be C(0) if C(auto_scale) is set to C(false).
+      max_nodes:
+        type: int
+        description:
+          - The maximum number of nodes that this node pool can be auto-scaled to.
+          - The value will be C(0) if C(auto_scale) is set to C(false).
     default:
       - name: worker-pool
         size: s-1vcpu-2gb
         count: 1
         tags: []
         labels: {}
+        taints: []
+        auto_scale: false
+        min_nodes: 0
+        max_nodes: 0
   vpc_uuid:
     description:
       - A string specifying the UUID of the VPC to which the Kubernetes cluster will be assigned.
@@ -429,6 +453,10 @@ def main():
                         "count": 1,
                         "tags": [],
                         "labels": {},
+                        "taints": [],
+                        "auto_scale": False,
+                        "min_nodes": 0,
+                        "max_nodes": 0,
                     }
                 ],
             ),
