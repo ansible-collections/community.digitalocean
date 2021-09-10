@@ -5,6 +5,32 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.10.0
+=======
+
+Minor Changes
+-------------
+
+- digital_ocean_kubernetes - adding the C(taints), C(auto_scale), C(min_nodes) and C(max_nodes) parameters to the C(node_pools) definition (https://github.com/ansible-collections/community.digitalocean/issues/157).
+
+Bugfixes
+--------
+
+- digital_ocean_block_storage - fix block volumes detach idempotency (https://github.com/ansible-collections/community.digitalocean/issues/149).
+- digital_ocean_droplet - ensure "active" state before issuing "power on" action (https://github.com/ansible-collections/community.digitalocean/issues/150)
+- digital_ocean_droplet - power on should poll/wait, resize should support "active" state (https://github.com/ansible-collections/community.digitalocean/pull/143).
+- digital_ocean_load_balancer - C(droplet_ids) are not required when C(state=absent) is chosen (https://github.com/ansible-collections/community.digitalocean/pull/147).
+- digital_ocean_load_balancer - when C(state=absent) is chosen the API returns an empty response (https://github.com/ansible-collections/community.digitalocean/pull/147).
+
+New Modules
+-----------
+
+- digital_ocean_cdn_endpoints_info - Gather information about DigitalOcean CDN Endpoints
+- digital_ocean_cdn_endpoints - Create and delete DigitalOcean CDN Endpoints
+- digital_ocean_load_balancer - Manage DigitalOcean Load Balancers
+- digital_ocean_monitoring_alerts_info - Gather information about DigitalOcean Monitoring alerts
+- digital_ocean_monitoring_alerts - Create and delete DigitalOcean Monitoring alerts
+
 v1.9.0
 ======
 
