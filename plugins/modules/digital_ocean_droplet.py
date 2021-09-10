@@ -441,6 +441,41 @@ class DODroplet(object):
 
     def ensure_power_on(self, droplet_id):
 
+        # Make sure Droplet is active first
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
+            response = self.rest.get("droplets/{0}".format(droplet_id))
+            json_data = response.json
+            if json_data is not None:
+                if response.status_code >= 400:
+                    message = json_data.get(
+                        "message", "Empty failure message from the DigitalOcean API!"
+                    )
+                    self.module.fail_json(changed=False, msg=message)
+            else:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                )
+
+            droplet = json_data.get("droplet", None)
+            if droplet is None:
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error, please file a bug (no droplet)",
+                )
+
+            droplet_status = droplet.get("status", None)
+            if droplet_status is None:
+                self.module.fail_json(
+                    changed=False, msg="Unexpected error, please file a bug (no status)"
+                )
+
+            if droplet_status == "active":
+                break
+
+            time.sleep(min(10, end_time - time.monotonic()))
+
         # Trigger power-on
         response = self.rest.post(
             "droplets/{0}/actions".format(droplet_id), data={"type": "power_on"}
