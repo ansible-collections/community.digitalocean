@@ -25,11 +25,11 @@ Bugfixes
 New Modules
 -----------
 
-- digital_ocean_cdn_endpoints_info - Gather information about DigitalOcean CDN Endpoints
 - digital_ocean_cdn_endpoints - Create and delete DigitalOcean CDN Endpoints
+- digital_ocean_cdn_endpoints_info - Gather information about DigitalOcean CDN Endpoints
 - digital_ocean_load_balancer - Manage DigitalOcean Load Balancers
-- digital_ocean_monitoring_alerts_info - Gather information about DigitalOcean Monitoring alerts
 - digital_ocean_monitoring_alerts - Create and delete DigitalOcean Monitoring alerts
+- digital_ocean_monitoring_alerts_info - Gather information about DigitalOcean Monitoring alerts
 
 v1.9.0
 ======

@@ -71,22 +71,22 @@ releases:
     - 150-droplet-active-power-on.yaml
     - 157-doks-auto-scale.yaml
     modules:
-    - description: Gather information about DigitalOcean CDN Endpoints
-      name: digital_ocean_cdn_endpoints_info
-      namespace: ''
     - description: Create and delete DigitalOcean CDN Endpoints
       name: digital_ocean_cdn_endpoints
+      namespace: ''
+    - description: Gather information about DigitalOcean CDN Endpoints
+      name: digital_ocean_cdn_endpoints_info
       namespace: ''
     - description: Manage DigitalOcean Load Balancers
       name: digital_ocean_load_balancer
       namespace: ''
-    - description: Gather information about DigitalOcean Monitoring alerts
-      name: digital_ocean_monitoring_alerts_info
-      namespace: ''
     - description: Create and delete DigitalOcean Monitoring alerts
       name: digital_ocean_monitoring_alerts
       namespace: ''
-    release_date: '2021-09-10'
+    - description: Gather information about DigitalOcean Monitoring alerts
+      name: digital_ocean_monitoring_alerts_info
+      namespace: ''
+    release_date: '2021-09-11'
   1.2.0:
     changes:
       bugfixes:
