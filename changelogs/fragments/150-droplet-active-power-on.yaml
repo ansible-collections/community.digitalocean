@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_droplet - ensure "active" state before issuing "power on" action (https://github.com/ansible-collections/community.digitalocean/issues/150)
