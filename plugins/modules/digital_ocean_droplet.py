@@ -249,6 +249,7 @@ class DODroplet(object):
         if not droplet_id:
             return None
         response = self.rest.get("droplets/{0}".format(droplet_id))
+        status_code = response.status_code
         json_data = response.json
         if json_data is None:
             self.module.fail_json(
@@ -256,7 +257,7 @@ class DODroplet(object):
                 msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
             )
         else:
-            if response.status_code == 200:
+            if status_code == 200:
                 droplet = json_data.get("droplet", None)
                 if droplet is not None:
                     self.id = droplet.get("id", None)
@@ -273,13 +274,14 @@ class DODroplet(object):
         while page is not None:
             response = self.rest.get("droplets?page={0}".format(page))
             json_data = response.json
+            status_code = response.status_code
             if json_data is None:
                 self.module.fail_json(
                     changed=False,
                     msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
                 )
             else:
-                if response.status_code == 200:
+                if status_code == 200:
                     droplets = json_data.get("droplets", [])
                     for droplet in droplets:
                         if droplet.get("name", None) == droplet_name:
