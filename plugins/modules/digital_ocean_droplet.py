@@ -346,11 +346,21 @@ class DODroplet(object):
         if state == "active":
             self.ensure_power_on(droplet_id)
 
+        # Get updated Droplet data
+        json_data = self.get_droplet()
+        droplet = json_data.get("droplet", None)
+        if droplet is None:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["unexpected"].format("no Droplet"),
+            )
+
         self.module.exit_json(
             changed=True,
             msg="Resized Droplet {0} ({1}) from {2} to {3}".format(
                 self.name, self.id, self.size, self.module.params["size"]
             ),
+            data={"droplet": droplet},
         )
 
     def wait_status(self, droplet_id, desired_statuses):
