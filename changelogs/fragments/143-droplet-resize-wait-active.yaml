@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_droplet - power on should poll/wait, resize should support "active" state (https://github.com/ansible-collections/community.digitalocean/pull/143).

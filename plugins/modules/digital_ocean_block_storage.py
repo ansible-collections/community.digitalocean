@@ -197,6 +197,8 @@ class DOBlockStorage(object):
             return self.poll_action_for_complete_status(json["action"]["id"])
         elif status == 200:
             return True
+        elif status == 404 and method == "detach":
+            return False  # Already detached
         elif status == 422:
             return False
         else:

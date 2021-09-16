@@ -49,6 +49,44 @@ releases:
     fragments:
     - 63-readme-version.yml
     release_date: '2021-04-18'
+  1.10.0:
+    changes:
+      bugfixes:
+      - digital_ocean_block_storage - fix block volumes detach idempotency (https://github.com/ansible-collections/community.digitalocean/issues/149).
+      - digital_ocean_droplet - ensure "active" state before issuing "power on" action
+        (https://github.com/ansible-collections/community.digitalocean/issues/150)
+      - digital_ocean_droplet - power on should poll/wait, resize should support "active"
+        state (https://github.com/ansible-collections/community.digitalocean/pull/143).
+      - digital_ocean_load_balancer - C(droplet_ids) are not required when C(state=absent)
+        is chosen (https://github.com/ansible-collections/community.digitalocean/pull/147).
+      - digital_ocean_load_balancer - when C(state=absent) is chosen the API returns
+        an empty response (https://github.com/ansible-collections/community.digitalocean/pull/147).
+      minor_changes:
+      - digital_ocean_kubernetes - adding the C(taints), C(auto_scale), C(min_nodes)
+        and C(max_nodes) parameters to the C(node_pools) definition (https://github.com/ansible-collections/community.digitalocean/issues/157).
+    fragments:
+    - 143-droplet-resize-wait-active.yaml
+    - 147-load-balancer-fixes.yaml
+    - 149-block-detach-not-idempotent.yaml
+    - 150-droplet-active-power-on.yaml
+    - 157-doks-auto-scale.yaml
+    modules:
+    - description: Create and delete DigitalOcean CDN Endpoints
+      name: digital_ocean_cdn_endpoints
+      namespace: ''
+    - description: Gather information about DigitalOcean CDN Endpoints
+      name: digital_ocean_cdn_endpoints_info
+      namespace: ''
+    - description: Manage DigitalOcean Load Balancers
+      name: digital_ocean_load_balancer
+      namespace: ''
+    - description: Create and delete DigitalOcean Monitoring alerts
+      name: digital_ocean_monitoring_alerts
+      namespace: ''
+    - description: Gather information about DigitalOcean Monitoring alerts
+      name: digital_ocean_monitoring_alerts_info
+      namespace: ''
+    release_date: '2021-09-11'
   1.2.0:
     changes:
       bugfixes:
