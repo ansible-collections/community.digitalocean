@@ -127,13 +127,6 @@ options:
     required: False
     type: list
     elements: str
-  oauth_token:
-    description:
-      - DigitalOcean OAuth token.
-      - Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables.
-    aliases: ["API_TOKEN"]
-    type: str
-    required: true
   resize_disk:
     description:
       - Whether to increase disk size on resize.
