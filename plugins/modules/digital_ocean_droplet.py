@@ -232,6 +232,14 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 
 
 class DODroplet(object):
+
+    failure_message = {
+        "empty_reponse":  "Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+        "resizing_off":   "Droplet must be off prior to resizing: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "unexpected":     "Unexpected error [{0}]; please file a bug: https://github.com/ansible-collections/community.digitalocean/issues",
+        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: https://docs.digitalocean.com/support/",
+    }
+
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
@@ -254,7 +262,7 @@ class DODroplet(object):
         if json_data is None:
             self.module.fail_json(
                 changed=False,
-                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                msg=DODroplet.failure_message["empty_response"],
             )
         else:
             if status_code == 200:
@@ -278,7 +286,7 @@ class DODroplet(object):
             if json_data is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                    msg=DODroplet.failure_message["empty_response"],
                 )
             else:
                 if status_code == 200:
@@ -328,7 +336,7 @@ class DODroplet(object):
         if self.status != "off":
             self.module.fail_json(
                 changed=False,
-                msg="Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)",
+                msg=DODroplet.failure_message["resizing_off"],
             )
 
         self.wait_action(
@@ -364,13 +372,13 @@ class DODroplet(object):
             if droplet is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Unexpected error, please file a bug (no Droplet)",
+                    msg=DODroplet.failure_message["unexpected"].format("no Droplet"),
                 )
 
             if droplet_status is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Unexpected error, please file a bug (no Droplet status)",
+                    msg=DODroplet.failure_message["unexpected"].format("no Droplet status"),
                 )
 
             if status_code >= 400:
@@ -407,19 +415,20 @@ class DODroplet(object):
 
             if action is None:
                 self.module.fail_json(
-                    changed=False, msg="Unexpected error, please file a bug (no action)"
+                    changed=False,
+                    msg=DODroplet.failure_message["unexpected"].format("no action"),
                 )
 
             if action_id is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Unexpected error, please file a bug (no action ID)",
+                    msg=DODroplet.failure_message["unexpected"].format("no action ID"),
                 )
 
             if action_status is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Unexpected error, please file a bug (no action status)",
+                    msg=DODroplet.failure_message["unexpected"].format("no action status"),
                 )
 
             if status_code >= 400:
@@ -434,7 +443,7 @@ class DODroplet(object):
             if action_status == "errored":
                 self.module.fail_json(
                     changed=True,
-                    msg="Error status on Droplet action, please try again or contact DigitalOcean support",
+                    msg=DODroplet.failure_message["support_action"].format(action_id),
                 )
 
             if action_status == "completed":
@@ -458,18 +467,20 @@ class DODroplet(object):
 
         if action is None:
             self.module.fail_json(
-                changed=False, msg="Unexpected error, please file a bug (no action)"
+                changed=False,
+                msg=DODroplet.failure_message["unexpected"].format("no action"),
             )
 
         if action_id is None:
             self.module.fail_json(
-                changed=False, msg="Unexpected error, please file a bug (no action ID)"
+                changed=False,
+                msg=DODroplet.failure_message["unexpected"].format("no action ID"),
             )
 
         if action_status is None:
             self.module.fail_json(
                 changed=False,
-                msg="Unexpected error, please file a bug (no action status)",
+                msg=DODroplet.failure_message["unexpected"].format("no action status"),
             )
 
         if status_code >= 400:
@@ -508,7 +519,7 @@ class DODroplet(object):
             if droplet_id is None or droplet_size is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Unexpected error, please file a bug (no Droplet ID or size)",
+                    msg=DODroplet.failure_message["unexpected"].format("no Droplet ID or size"),
                 )
 
             # Check mode
@@ -557,12 +568,12 @@ class DODroplet(object):
 
         if droplet is None:
             self.module.fail_json(
-                changed=False, msg="Unexpected error, please file a bug (no Droplet)"
+                changed=False, msg=DODroplet.failure_message["unexpected"].format("no Droplet"),
             )
 
         if droplet_id is None:
             self.module.fail_json(
-                changed=False, msg="Unexpected error, please file a bug (no Droplet ID)"
+                changed=False, msg=DODroplet.failure_message["unexpected"].format("no Droplet ID"),
             )
 
         if status_code >= 400:
@@ -607,7 +618,7 @@ class DODroplet(object):
         if droplet is None or droplet_id is None:
             self.module.fail_json(
                 changed=False,
-                msg="Unexpected error, please file a bug (no Droplet, name, or ID)",
+                msg=DODroplet.failure_message["unexpected"].format("no Droplet, name, or ID"),
             )
 
         response = self.rest.delete("droplets/{0}".format(droplet_id))
