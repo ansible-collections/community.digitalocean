@@ -13,123 +13,134 @@ DOCUMENTATION = r"""
 module: digital_ocean_droplet
 short_description: Create and delete a DigitalOcean droplet
 description:
-     - Create and delete a droplet in DigitalOcean and optionally wait for it to be active.
-author: "Gurchet Rai (@gurch101)"
+  - Create and delete a droplet in DigitalOcean and optionally wait for it to be active.
+author:
+  - Gurchet Rai (@gurch101)
+  - Mark Mercado (@mamercad)
 options:
   state:
     description:
-     - Indicate desired state of the target.
-     - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
-     - C(absent) will delete the named droplet, if it exists.
-     - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
-     - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
+      - Indicate desired state of the target.
+      - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
+      - C(absent) will delete the named droplet, if it exists.
+      - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
+      - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
     default: present
-    choices: ['present', 'absent', 'active', 'inactive']
+    choices: ["present", "absent", "active", "inactive"]
     type: str
   id:
     description:
-     - Numeric, the droplet id you want to operate on.
-    aliases: ['droplet_id']
+      - The Droplet ID you want to operate on.
+    aliases: ["droplet_id"]
     type: int
   name:
     description:
-     - String, this is the name of the droplet - must be formatted by hostname rules.
+      - This is the name of the Droplet.
+      - Must be formatted by hostname rules.
     type: str
   unique_name:
     description:
-     - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
-       per name.  Useful for idempotence.
-    default: False
+      - Require unique hostnames.
+      - By default, DigitalOcean allows multiple hosts with the same name.
+      - Setting this to C(true) allows only one host per name.
+      - Useful for idempotence.
+    default: false
     type: bool
   size:
     description:
-     - This is the slug of the size you would like the droplet created with.
-    aliases: ['size_id']
+      - This is the slug of the size you would like the Droplet created with.
+      - Please see U(https://slugs.do-api.dev/) for current slugs.
+    aliases: ["size_id"]
     type: str
   image:
     description:
-     - This is the slug of the image you would like the droplet created with.
-    aliases: ['image_id']
+      - This is the slug of the image you would like the Droplet created with.
+    aliases: ["image_id"]
     type: str
   region:
     description:
-     - This is the slug of the region you would like your server to be created in.
-    aliases: ['region_id']
+      - This is the slug of the region you would like your Droplet to be created in.
+    aliases: ["region_id"]
     type: str
   ssh_keys:
     description:
-     - array of SSH key Fingerprint that you would like to be added to the server.
-    required: False
+      - Array of SSH key fingerprints that you would like to be added to the Droplet.
+    required: false
     type: list
     elements: str
   private_networking:
     description:
-     - add an additional, private network interface to droplet for inter-droplet communication.
-    default: False
+      - Add an additional, private network interface to the Droplet (for inter-Droplet communication).
+    default: false
     type: bool
   vpc_uuid:
     description:
-     - A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, Droplet will be
-       assigned to the account's default VPC for the region.
+      - A string specifying the UUID of the VPC to which the Droplet will be assigned.
+      - If excluded, the Droplet will be assigned to the account's default VPC for the region.
     type: str
     version_added: 0.1.0
   user_data:
     description:
-      - opaque blob of data which is made available to the droplet
+      - Opaque blob of data which is made available to the Droplet.
     required: False
     type: str
   ipv6:
     description:
-      - enable IPv6 for your droplet.
-    required: False
-    default: False
+      - Enable IPv6 for the Droplet.
+    required: false
+    default: false
     type: bool
   wait:
     description:
-     - Wait for the droplet to be active before returning.  If wait is "no" an ip_address may not be returned.
-    required: False
-    default: True
+      - Wait for the Droplet to be active before returning.
+      - If wait is C(false) an IP address may not be returned.
+    required: false
+    default: true
     type: bool
   wait_timeout:
     description:
-     - How long before wait gives up, in seconds, when creating a droplet.
+      - How long before C(wait) gives up, in seconds, when creating a Droplet.
     default: 120
     type: int
   backups:
     description:
-     - indicates whether automated backups should be enabled.
-    required: False
-    default: False
+      - Indicates whether automated backups should be enabled.
+    required: false
+    default: false
     type: bool
   monitoring:
     description:
-     - indicates whether to install the DigitalOcean agent for monitoring.
-    required: False
-    default: False
+      - Indicates whether to install the DigitalOcean agent for monitoring.
+    required: false
+    default: false
     type: bool
   tags:
     description:
-     - List, A list of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.
-    required: False
+      - A list of tag names as strings to apply to the Droplet after it is created.
+      - Tag names can either be existing or new tags.
+    required: false
     type: list
     elements: str
   volumes:
     description:
-     - List, A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
+      - A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
     required: False
     type: list
     elements: str
   oauth_token:
     description:
-     - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    aliases: ['API_TOKEN']
+      - DigitalOcean OAuth token.
+      - Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables.
+    aliases: ["API_TOKEN"]
     type: str
     required: true
   resize_disk:
     description:
-    - Whether to increase disk size (only consulted if the C(unique_name) is C(True) and C(size) dictates an increase)
-    required: False
-    default: False
+      - Whether to increase disk size on resize.
+      - Only consulted if the C(unique_name) is C(true).
+      - Droplet C(size) must dictate an increase.
+    required: false
+    default: false
     type: bool
 """
 
