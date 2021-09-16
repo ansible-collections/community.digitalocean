@@ -232,6 +232,7 @@ class DODroplet(object):
         "resizing_off": "Droplet must be off prior to resizing: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
         "unexpected": "Unexpected error [{0}]; please file a bug: https://github.com/ansible-collections/community.digitalocean/issues",
         "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: https://docs.digitalocean.com/support/",
+        "failed_to": "Failed to {0} {1} [HTTP {2}: {3}]",
     }
 
     def __init__(self, module):
@@ -372,10 +373,7 @@ class DODroplet(object):
             if status_code >= 400:
                 self.module.fail_json(
                     changed=False,
-                    msg="Failed to get Droplet information due to error [HTTP {1}: {2}]".format(
-                        status_code,
-                        message,
-                    ),
+                    msg=DODroplet.failure_message["failed_to"].format("get", "Droplet", status_code, message),
                 )
 
             if droplet_status in desired_statuses:
@@ -411,10 +409,7 @@ class DODroplet(object):
             if status_code >= 400:
                 self.module.fail_json(
                     changed=False,
-                    msg="Failed to get action due to error [HTTP {0}: {1}]".format(
-                        status_code,
-                        message,
-                    ),
+                    msg=DODroplet.failure_message["failed_to"].format("get", "action", status_code, message),
                 )
 
             if action_status == "errored":
@@ -452,10 +447,7 @@ class DODroplet(object):
         if status_code >= 400:
             self.module.fail_json(
                 changed=False,
-                msg="Failed to post action due to error [HTTP {0}: {1}]".format(
-                    status_code,
-                    message,
-                ),
+                msg=DODroplet.failure_message["failed_to"].format("post", "action", status_code, message),
             )
 
         # Keep checking till it is done or times out
@@ -540,9 +532,7 @@ class DODroplet(object):
         if status_code >= 400:
             self.module.fail_json(
                 changed=False,
-                msg="Failed to create Droplet due to error [HTTP {0}: {1}]".format(
-                    status_code, message
-                ),
+                msg=DODroplet.failure_message["failed_to"].format("create", "Droplet", status_code, message),
             )
 
         if self.wait:
