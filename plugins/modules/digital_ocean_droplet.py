@@ -515,7 +515,6 @@ class DODroplet(object):
 
             # Ensure Droplet size
             if droplet_size != self.module.params.get("size", None):
-                raise Exception("got here 1")
                 self.resize_droplet(state, droplet_id)
 
             # Ensure Droplet power state
