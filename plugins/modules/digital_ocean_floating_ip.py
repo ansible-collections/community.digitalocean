@@ -329,7 +329,7 @@ def create_floating_ips(module, rest):
                             ip = floating_ip.get("ip", None)
                             if ip is not None:
                                 module.exit_json(
-                                    changed=False, data={"floating_ip": ip}
+                                    changed=False, data={"floating_ip": floating_ip}
                                 )
                             else:
                                 module.fail_json(
