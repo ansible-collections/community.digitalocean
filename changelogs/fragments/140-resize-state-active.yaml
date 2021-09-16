@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - fix resizing with C(state: active) does not actually turn Droplet on (https://github.com/ansible-collections/community.digitalocean/issues/140).
