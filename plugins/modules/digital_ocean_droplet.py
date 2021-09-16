@@ -326,8 +326,6 @@ class DODroplet(object):
         if self.status != "off":
             self.module.fail_json(changed=False, msg="Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)")
 
-        f = open("/tmp/debug.log", "w+")
-
         self.wait_action(droplet_id, {
             "type": "resize",
             "disk": self.module.params["resize_disk"],
@@ -376,7 +374,6 @@ class DODroplet(object):
         self.module.fail_json(msg="Wait for Droplet [{0}] status timeout".format(",".join(desired_statuses)))
 
     def wait_check_action(self, droplet_id, action_id):
-        f = open("/tmp/debug.log", "w+")
         end_time = time.monotonic() + self.wait_timeout
         while time.monotonic() < end_time:
             response = self.rest.get("droplets/{0}/actions/{1}".format(droplet_id, action_id))
@@ -403,11 +400,6 @@ class DODroplet(object):
                         status_code, message,
                     )
                 )
-
-            f.write(str(action) + '\n')
-            f.write(action_status + '\n')
-            f.write('\n')
-            f.flush()
 
             if action_status == "errored":
                 self.module.fail_json(changed=True, msg="Error status on Droplet action, please try again or contact DigitalOcean support")
