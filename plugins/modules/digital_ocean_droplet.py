@@ -566,7 +566,7 @@ class DODroplet(object):
             json_data = self.get_droplet()
             droplet = json_data.get("droplet", droplet)
 
-        self.module.exit_json(changed=True, data=droplet)
+        self.module.exit_json(changed=True, data={"droplet": droplet})
 
     def delete(self):
         json_data = self.get_droplet()
