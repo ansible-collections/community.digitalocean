@@ -199,6 +199,4 @@
         name: "{{ droplet_name }}"
         unique_name: true
         region: "{{ do_region }}"
-        image: "{{ droplet_image }}"
-        size: "{{ droplet_size }}"
       ignore_errors: true  # Should this fail, we'll clean it up next run
