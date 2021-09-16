@@ -381,7 +381,8 @@ class DODroplet(object):
             if droplet_status in desired_statuses:
                 return
 
-            time.sleep(min(10, end_time - time.monotonic()))
+            time.sleep(10)
+
         self.module.fail_json(
             msg="Wait for Droplet [{0}] status timeout".format(
                 ",".join(desired_statuses)
@@ -425,7 +426,8 @@ class DODroplet(object):
             if action_status == "completed":
                 return
 
-            time.sleep(min(10, end_time - time.monotonic()))
+            time.sleep(10)
+
         self.module.fail_json(msg="Wait for Droplet action timeout")
 
     def wait_action(self, droplet_id, desired_action_data):
