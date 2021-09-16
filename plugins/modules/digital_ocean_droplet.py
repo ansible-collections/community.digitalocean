@@ -142,6 +142,8 @@ options:
     required: false
     default: false
     type: bool
+extends_documentation_fragment:
+- community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -647,39 +649,30 @@ def core(module):
 
 
 def main():
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present", "absent", "active", "inactive"], default="present"),
+        name=dict(type="str"),
+        size=dict(aliases=["size_id"]),
+        image=dict(aliases=["image_id"]),
+        region=dict(aliases=["region_id"]),
+        ssh_keys=dict(type="list", elements="str", no_log=False),
+        private_networking=dict(type="bool", default=False),
+        vpc_uuid=dict(type="str"),
+        backups=dict(type="bool", default=False),
+        monitoring=dict(type="bool", default=False),
+        id=dict(aliases=["droplet_id"], type="int"),
+        user_data=dict(default=None),
+        ipv6=dict(type="bool", default=False),
+        volumes=dict(type="list", elements="str"),
+        tags=dict(type="list", elements="str"),
+        wait=dict(type="bool", default=True),
+        wait_timeout=dict(default=120, type="int"),
+        unique_name=dict(type="bool", default=False),
+        resize_disk=dict(type="bool", default=False),
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(
-                choices=["present", "absent", "active", "inactive"], default="present"
-            ),
-            oauth_token=dict(
-                aliases=["API_TOKEN"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-                required=True,
-            ),
-            name=dict(type="str"),
-            size=dict(aliases=["size_id"]),
-            image=dict(aliases=["image_id"]),
-            region=dict(aliases=["region_id"]),
-            ssh_keys=dict(type="list", elements="str", no_log=False),
-            private_networking=dict(type="bool", default=False),
-            vpc_uuid=dict(type="str"),
-            backups=dict(type="bool", default=False),
-            monitoring=dict(type="bool", default=False),
-            id=dict(aliases=["droplet_id"], type="int"),
-            user_data=dict(default=None),
-            ipv6=dict(type="bool", default=False),
-            volumes=dict(type="list", elements="str"),
-            tags=dict(type="list", elements="str"),
-            wait=dict(type="bool", default=True),
-            wait_timeout=dict(default=120, type="int"),
-            unique_name=dict(type="bool", default=False),
-            resize_disk=dict(type="bool", default=False),
-        ),
+        argument_spec=argument_spec,
         required_one_of=(["id", "name"],),
         required_if=(
             [
