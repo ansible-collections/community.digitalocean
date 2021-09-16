@@ -367,13 +367,17 @@ class DODroplet(object):
             if droplet is None or droplet_status is None:
                 self.module.fail_json(
                     changed=False,
-                    msg=DODroplet.failure_message["unexpected"].format("no Droplet or status"),
+                    msg=DODroplet.failure_message["unexpected"].format(
+                        "no Droplet or status"
+                    ),
                 )
 
             if status_code >= 400:
                 self.module.fail_json(
                     changed=False,
-                    msg=DODroplet.failure_message["failed_to"].format("get", "Droplet", status_code, message),
+                    msg=DODroplet.failure_message["failed_to"].format(
+                        "get", "Droplet", status_code, message
+                    ),
                 )
 
             if droplet_status in desired_statuses:
@@ -403,13 +407,17 @@ class DODroplet(object):
             if action is None or action_id is None or action_status is None:
                 self.module.fail_json(
                     changed=False,
-                    msg=DODroplet.failure_message["unexpected"].format("no action, ID, or status"),
+                    msg=DODroplet.failure_message["unexpected"].format(
+                        "no action, ID, or status"
+                    ),
                 )
 
             if status_code >= 400:
                 self.module.fail_json(
                     changed=False,
-                    msg=DODroplet.failure_message["failed_to"].format("get", "action", status_code, message),
+                    msg=DODroplet.failure_message["failed_to"].format(
+                        "get", "action", status_code, message
+                    ),
                 )
 
             if action_status == "errored":
@@ -441,13 +449,17 @@ class DODroplet(object):
         if action is None or action_id is None or action_status is None:
             self.module.fail_json(
                 changed=False,
-                msg=DODroplet.failure_message["unexpected"].format("no action, ID, or status"),
+                msg=DODroplet.failure_message["unexpected"].format(
+                    "no action, ID, or status"
+                ),
             )
 
         if status_code >= 400:
             self.module.fail_json(
                 changed=False,
-                msg=DODroplet.failure_message["failed_to"].format("post", "action", status_code, message),
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "post", "action", status_code, message
+                ),
             )
 
         # Keep checking till it is done or times out
@@ -477,7 +489,9 @@ class DODroplet(object):
             if droplet_id is None or droplet_size is None:
                 self.module.fail_json(
                     changed=False,
-                    msg=DODroplet.failure_message["unexpected"].format("no Droplet ID or size"),
+                    msg=DODroplet.failure_message["unexpected"].format(
+                        "no Droplet ID or size"
+                    ),
                 )
 
             # Check mode
@@ -526,13 +540,16 @@ class DODroplet(object):
 
         if droplet is None or droplet_id is None:
             self.module.fail_json(
-                changed=False, msg=DODroplet.failure_message["unexpected"].format("no Droplet or ID"),
+                changed=False,
+                msg=DODroplet.failure_message["unexpected"].format("no Droplet or ID"),
             )
 
         if status_code >= 400:
             self.module.fail_json(
                 changed=False,
-                msg=DODroplet.failure_message["failed_to"].format("create", "Droplet", status_code, message),
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "create", "Droplet", status_code, message
+                ),
             )
 
         if self.wait:
@@ -569,7 +586,9 @@ class DODroplet(object):
         if droplet is None or droplet_id is None:
             self.module.fail_json(
                 changed=False,
-                msg=DODroplet.failure_message["unexpected"].format("no Droplet, name, or ID"),
+                msg=DODroplet.failure_message["unexpected"].format(
+                    "no Droplet, name, or ID"
+                ),
             )
 
         response = self.rest.delete("droplets/{0}".format(droplet_id))
@@ -601,7 +620,9 @@ def core(module):
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        state=dict(choices=["present", "absent", "active", "inactive"], default="present"),
+        state=dict(
+            choices=["present", "absent", "active", "inactive"], default="present"
+        ),
         name=dict(type="str"),
         size=dict(aliases=["size_id"]),
         image=dict(aliases=["image_id"]),
