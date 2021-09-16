@@ -324,13 +324,19 @@ class DODroplet(object):
 
     def resize_droplet(self, state, droplet_id):
         if self.status != "off":
-            self.module.fail_json(changed=False, msg="Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)")
+            self.module.fail_json(
+                changed=False,
+                msg="Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)",
+            )
 
-        self.wait_action(droplet_id, {
-            "type": "resize",
-            "disk": self.module.params["resize_disk"],
-            "size": self.module.params["size"],
-        })
+        self.wait_action(
+            droplet_id,
+            {
+                "type": "resize",
+                "disk": self.module.params["resize_disk"],
+                "size": self.module.params["size"],
+            },
+        )
 
         if state == "active":
             self.ensure_power_on(droplet_id)
@@ -354,29 +360,42 @@ class DODroplet(object):
             droplet_status = droplet.get("status", None)
 
             if droplet is None:
-                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no Droplet)")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error, please file a bug (no Droplet)",
+                )
 
             if droplet_status is None:
-                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no Droplet status)")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error, please file a bug (no Droplet status)",
+                )
 
             if status_code >= 400:
                 self.module.fail_json(
                     changed=False,
                     msg="Failed to get Droplet information due to error [HTTP {1}: {2}]".format(
-                        status_code, message,
-                    )
+                        status_code,
+                        message,
+                    ),
                 )
 
             if droplet_status in desired_statuses:
                 return
 
             time.sleep(min(10, end_time - time.monotonic()))
-        self.module.fail_json(msg="Wait for Droplet [{0}] status timeout".format(",".join(desired_statuses)))
+        self.module.fail_json(
+            msg="Wait for Droplet [{0}] status timeout".format(
+                ",".join(desired_statuses)
+            )
+        )
 
     def wait_check_action(self, droplet_id, action_id):
         end_time = time.monotonic() + self.wait_timeout
         while time.monotonic() < end_time:
-            response = self.rest.get("droplets/{0}/actions/{1}".format(droplet_id, action_id))
+            response = self.rest.get(
+                "droplets/{0}/actions/{1}".format(droplet_id, action_id)
+            )
             json_data = response.json
             status_code = response.status_code
             message = json_data.get("message", "no error message")
@@ -385,24 +404,36 @@ class DODroplet(object):
             action_status = action.get("status", None)
 
             if action is None:
-                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action)")
+                self.module.fail_json(
+                    changed=False, msg="Unexpected error, please file a bug (no action)"
+                )
 
             if action_id is None:
-                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action ID)")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error, please file a bug (no action ID)",
+                )
 
             if action_status is None:
-                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action status)")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error, please file a bug (no action status)",
+                )
 
             if status_code >= 400:
                 self.module.fail_json(
                     changed=False,
                     msg="Failed to get action due to error [HTTP {0}: {1}]".format(
-                        status_code, message,
-                    )
+                        status_code,
+                        message,
+                    ),
                 )
 
             if action_status == "errored":
-                self.module.fail_json(changed=True, msg="Error status on Droplet action, please try again or contact DigitalOcean support")
+                self.module.fail_json(
+                    changed=True,
+                    msg="Error status on Droplet action, please try again or contact DigitalOcean support",
+                )
 
             if action_status == "completed":
                 return
@@ -410,11 +441,12 @@ class DODroplet(object):
             time.sleep(min(10, end_time - time.monotonic()))
         self.module.fail_json(msg="Wait for Droplet action timeout")
 
-
     def wait_action(self, droplet_id, desired_action_data):
         action_type = desired_action_data.get("type", "undefined")
 
-        response = self.rest.post("droplets/{0}/actions".format(droplet_id), data=desired_action_data)
+        response = self.rest.post(
+            "droplets/{0}/actions".format(droplet_id), data=desired_action_data
+        )
         json_data = response.json
         status_code = response.status_code
         message = json_data.get("message", "no error message")
@@ -423,37 +455,44 @@ class DODroplet(object):
         action_status = action.get("status", None)
 
         if action is None:
-            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action)")
+            self.module.fail_json(
+                changed=False, msg="Unexpected error, please file a bug (no action)"
+            )
 
         if action_id is None:
-            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action ID)")
+            self.module.fail_json(
+                changed=False, msg="Unexpected error, please file a bug (no action ID)"
+            )
 
         if action_status is None:
-            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no action status)")
+            self.module.fail_json(
+                changed=False,
+                msg="Unexpected error, please file a bug (no action status)",
+            )
 
         if status_code >= 400:
             self.module.fail_json(
                 changed=False,
                 msg="Failed to post action due to error [HTTP {0}: {1}]".format(
-                    status_code, message,
-                )
+                    status_code,
+                    message,
+                ),
             )
 
         # Keep checking till it is done or times out
         self.wait_check_action(droplet_id, action_id)
 
-
     def ensure_power_on(self, droplet_id):
         # Make sure Droplet is active or off first
         self.wait_status(droplet_id, ["active", "off"])
         # Trigger power-on
-        self.wait_action(droplet_id, {"type":"power_on"})
+        self.wait_action(droplet_id, {"type": "power_on"})
 
     def ensure_power_off(self, droplet_id):
         # Make sure Droplet is active first
         self.wait_status(droplet_id, ["active"])
         # Trigger power-off
-        self.wait_action(droplet_id, {"type":"power_off"})
+        self.wait_action(droplet_id, {"type": "power_off"})
 
     def create(self, state):
         json_data = self.get_droplet()
@@ -465,7 +504,10 @@ class DODroplet(object):
             droplet_size = droplet.get("size_slug", None)
 
             if droplet_id is None or droplet_size is None:
-                self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no Droplet ID or size)")
+                self.module.fail_json(
+                    changed=False,
+                    msg="Unexpected error, please file a bug (no Droplet ID or size)",
+                )
 
             # Check mode
             if self.module.check_mode:
@@ -513,13 +555,22 @@ class DODroplet(object):
         droplet_id = droplet.get("id", None)
 
         if droplet is None:
-            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no Droplet)")
+            self.module.fail_json(
+                changed=False, msg="Unexpected error, please file a bug (no Droplet)"
+            )
 
         if droplet_id is None:
-            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no Droplet ID)")
+            self.module.fail_json(
+                changed=False, msg="Unexpected error, please file a bug (no Droplet ID)"
+            )
 
         if status_code >= 400:
-            self.module.fail_json(changed=False, msg="Failed to create Droplet due to error [HTTP {0}: {1}]".format(status_code, message))
+            self.module.fail_json(
+                changed=False,
+                msg="Failed to create Droplet due to error [HTTP {0}: {1}]".format(
+                    status_code, message
+                ),
+            )
 
         if self.wait:
             if state == "present" or state == "active":
@@ -537,7 +588,6 @@ class DODroplet(object):
 
         self.module.exit_json(changed=True, data=droplet)
 
-
     def delete(self):
         json_data = self.get_droplet()
 
@@ -554,15 +604,26 @@ class DODroplet(object):
         droplet_name = droplet.get("name", None)
 
         if droplet is None or droplet_id is None:
-            self.module.fail_json(changed=False, msg="Unexpected error, please file a bug (no Droplet, name, or ID)")
+            self.module.fail_json(
+                changed=False,
+                msg="Unexpected error, please file a bug (no Droplet, name, or ID)",
+            )
 
         response = self.rest.delete("droplets/{0}".format(droplet_id))
         json_data = response.json
         status_code = response.status_code
         if status_code == 204:
-            self.module.exit_json(changed=True, msg="Droplet {0} ({1}) deleted".format(droplet_name, droplet_id))
+            self.module.exit_json(
+                changed=True,
+                msg="Droplet {0} ({1}) deleted".format(droplet_name, droplet_id),
+            )
         else:
-            self.module.fail_json(changed=False, msg="Failed to delete Droplet {0} ({1})".format(droplet_name, droplet_id))
+            self.module.fail_json(
+                changed=False,
+                msg="Failed to delete Droplet {0} ({1})".format(
+                    droplet_name, droplet_id
+                ),
+            )
 
 
 def core(module):
