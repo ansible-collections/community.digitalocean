@@ -13,124 +13,130 @@ DOCUMENTATION = r"""
 module: digital_ocean_droplet
 short_description: Create and delete a DigitalOcean droplet
 description:
-     - Create and delete a droplet in DigitalOcean and optionally wait for it to be active.
-author: "Gurchet Rai (@gurch101)"
+  - Create and delete a droplet in DigitalOcean and optionally wait for it to be active.
+author:
+  - Gurchet Rai (@gurch101)
+  - Mark Mercado (@mamercad)
 options:
   state:
     description:
-     - Indicate desired state of the target.
-     - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
-     - C(absent) will delete the named droplet, if it exists.
-     - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
-     - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
+      - Indicate desired state of the target.
+      - C(present) will create the named droplet; be mindful of the C(unique_name) parameter.
+      - C(absent) will delete the named droplet, if it exists.
+      - C(active) will create the named droplet (unless it exists) and ensure that it is powered on.
+      - C(inactive) will create the named droplet (unless it exists) and ensure that it is powered off.
     default: present
-    choices: ['present', 'absent', 'active', 'inactive']
+    choices: ["present", "absent", "active", "inactive"]
     type: str
   id:
     description:
-     - Numeric, the droplet id you want to operate on.
-    aliases: ['droplet_id']
+      - The Droplet ID you want to operate on.
+    aliases: ["droplet_id"]
     type: int
   name:
     description:
-     - String, this is the name of the droplet - must be formatted by hostname rules.
+      - This is the name of the Droplet.
+      - Must be formatted by hostname rules.
     type: str
   unique_name:
     description:
-     - require unique hostnames.  By default, DigitalOcean allows multiple hosts with the same name.  Setting this to "yes" allows only one host
-       per name.  Useful for idempotence.
-    default: False
+      - Require unique hostnames.
+      - By default, DigitalOcean allows multiple hosts with the same name.
+      - Setting this to C(true) allows only one host per name.
+      - Useful for idempotence.
+    default: false
     type: bool
   size:
     description:
-     - This is the slug of the size you would like the droplet created with.
-    aliases: ['size_id']
+      - This is the slug of the size you would like the Droplet created with.
+      - Please see U(https://slugs.do-api.dev/) for current slugs.
+    aliases: ["size_id"]
     type: str
   image:
     description:
-     - This is the slug of the image you would like the droplet created with.
-    aliases: ['image_id']
+      - This is the slug of the image you would like the Droplet created with.
+    aliases: ["image_id"]
     type: str
   region:
     description:
-     - This is the slug of the region you would like your server to be created in.
-    aliases: ['region_id']
+      - This is the slug of the region you would like your Droplet to be created in.
+    aliases: ["region_id"]
     type: str
   ssh_keys:
     description:
-     - array of SSH key Fingerprint that you would like to be added to the server.
-    required: False
+      - Array of SSH key fingerprints that you would like to be added to the Droplet.
+    required: false
     type: list
     elements: str
   private_networking:
     description:
-     - add an additional, private network interface to droplet for inter-droplet communication.
-    default: False
+      - Add an additional, private network interface to the Droplet (for inter-Droplet communication).
+    default: false
     type: bool
   vpc_uuid:
     description:
-     - A string specifying the UUID of the VPC to which the Droplet will be assigned. If excluded, Droplet will be
-       assigned to the account's default VPC for the region.
+      - A string specifying the UUID of the VPC to which the Droplet will be assigned.
+      - If excluded, the Droplet will be assigned to the account's default VPC for the region.
     type: str
     version_added: 0.1.0
   user_data:
     description:
-      - opaque blob of data which is made available to the droplet
+      - Opaque blob of data which is made available to the Droplet.
     required: False
     type: str
   ipv6:
     description:
-      - enable IPv6 for your droplet.
-    required: False
-    default: False
+      - Enable IPv6 for the Droplet.
+    required: false
+    default: false
     type: bool
   wait:
     description:
-     - Wait for the droplet to be active before returning.  If wait is "no" an ip_address may not be returned.
-    required: False
-    default: True
+      - Wait for the Droplet to be active before returning.
+      - If wait is C(false) an IP address may not be returned.
+    required: false
+    default: true
     type: bool
   wait_timeout:
     description:
-     - How long before wait gives up, in seconds, when creating a droplet.
+      - How long before C(wait) gives up, in seconds, when creating a Droplet.
     default: 120
     type: int
   backups:
     description:
-     - indicates whether automated backups should be enabled.
-    required: False
-    default: False
+      - Indicates whether automated backups should be enabled.
+    required: false
+    default: false
     type: bool
   monitoring:
     description:
-     - indicates whether to install the DigitalOcean agent for monitoring.
-    required: False
-    default: False
+      - Indicates whether to install the DigitalOcean agent for monitoring.
+    required: false
+    default: false
     type: bool
   tags:
     description:
-     - List, A list of tag names as strings to apply to the Droplet after it is created. Tag names can either be existing or new tags.
-    required: False
+      - A list of tag names as strings to apply to the Droplet after it is created.
+      - Tag names can either be existing or new tags.
+    required: false
     type: list
     elements: str
   volumes:
     description:
-     - List, A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
+      - A list including the unique string identifier for each Block Storage volume to be attached to the Droplet.
     required: False
     type: list
     elements: str
-  oauth_token:
-    description:
-     - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    aliases: ['API_TOKEN']
-    type: str
-    required: true
   resize_disk:
     description:
-    - Whether to increase disk size (only consulted if the C(unique_name) is C(True) and C(size) dictates an increase)
-    required: False
-    default: False
+      - Whether to increase disk size on resize.
+      - Only consulted if the C(unique_name) is C(true).
+      - Droplet C(size) must dictate an increase.
+    required: false
+    default: false
     type: bool
+extends_documentation_fragment:
+- community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -213,7 +219,6 @@ data:
 """
 
 import time
-import json
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
@@ -221,6 +226,15 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 
 
 class DODroplet(object):
+
+    failure_message = {
+        "empty_reponse": "Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+        "resizing_off": "Droplet must be off prior to resizing: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "unexpected": "Unexpected error [{0}]; please file a bug: https://github.com/ansible-collections/community.digitalocean/issues",
+        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: https://docs.digitalocean.com/support/",
+        "failed_to": "Failed to {0} {1} [HTTP {2}: {3}]",
+    }
+
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
@@ -238,14 +252,15 @@ class DODroplet(object):
         if not droplet_id:
             return None
         response = self.rest.get("droplets/{0}".format(droplet_id))
+        status_code = response.status_code
         json_data = response.json
         if json_data is None:
             self.module.fail_json(
                 changed=False,
-                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                msg=DODroplet.failure_message["empty_response"],
             )
         else:
-            if response.status_code == 200:
+            if status_code == 200:
                 droplet = json_data.get("droplet", None)
                 if droplet is not None:
                     self.id = droplet.get("id", None)
@@ -262,13 +277,14 @@ class DODroplet(object):
         while page is not None:
             response = self.rest.get("droplets?page={0}".format(page))
             json_data = response.json
+            status_code = response.status_code
             if json_data is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                    msg=DODroplet.failure_message["empty_response"],
                 )
             else:
-                if response.status_code == 200:
+                if status_code == 200:
                     droplets = json_data.get("droplets", [])
                     for droplet in droplets:
                         if droplet.get("name", None) == droplet_name:
@@ -311,402 +327,323 @@ class DODroplet(object):
             json_data = self.get_by_name(self.module.params["name"])
         return json_data
 
-    def resize_droplet(self, state):
-        """API reference: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet (Must be powered off)"""
-        if self.status == "off":
-            response = self.rest.post(
-                "droplets/{0}/actions".format(self.id),
-                data={
-                    "type": "resize",
-                    "disk": self.module.params["resize_disk"],
-                    "size": self.module.params["size"],
-                },
+    def resize_droplet(self, state, droplet_id):
+        if self.status != "off":
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["resizing_off"],
             )
+
+        self.wait_action(
+            droplet_id,
+            {
+                "type": "resize",
+                "disk": self.module.params["resize_disk"],
+                "size": self.module.params["size"],
+            },
+        )
+
+        if state == "active":
+            self.ensure_power_on(droplet_id)
+
+        self.module.exit_json(
+            changed=True,
+            msg="Resized Droplet {0} ({1}) from {2} to {3}".format(
+                self.name, self.id, self.size, self.module.params["size"]
+            ),
+        )
+
+    def wait_status(self, droplet_id, desired_statuses):
+        # Make sure Droplet is active first
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
+            response = self.rest.get("droplets/{0}".format(droplet_id))
             json_data = response.json
-            if json_data is None:
+            status_code = response.status_code
+            message = json_data.get("message", "no error message")
+            droplet = json_data.get("droplet", None)
+            droplet_status = droplet.get("status", None)
+
+            if droplet is None or droplet_status is None:
                 self.module.fail_json(
                     changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                    msg=DODroplet.failure_message["unexpected"].format(
+                        "no Droplet or status"
+                    ),
                 )
-            else:
-                if response.status_code == 201:
-                    if state == "active":
-                        self.ensure_power_on(self.id)
-                    self.module.exit_json(
-                        changed=True,
-                        msg="Resized Droplet {0} ({1}) from {2} to {3}".format(
-                            self.name, self.id, self.size, self.module.params["size"]
-                        ),
-                    )
-                else:
-                    self.module.fail_json(
-                        msg="Resizing Droplet {0} ({1}) failed [HTTP {2}: {3}]".format(
-                            self.name,
-                            self.id,
-                            response.status_code,
-                            response.json.get("message", None),
-                        )
-                    )
-        else:
-            self.module.fail_json(
-                msg="Droplet must be off prior to resizing (https://developers.digitalocean.com/documentation/v2/#resize-a-droplet)"
+
+            if status_code >= 400:
+                self.module.fail_json(
+                    changed=False,
+                    msg=DODroplet.failure_message["failed_to"].format(
+                        "get", "Droplet", status_code, message
+                    ),
+                )
+
+            if droplet_status in desired_statuses:
+                return
+
+            time.sleep(10)
+
+        self.module.fail_json(
+            msg="Wait for Droplet [{0}] status timeout".format(
+                ",".join(desired_statuses)
             )
+        )
+
+    def wait_check_action(self, droplet_id, action_id):
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
+            response = self.rest.get(
+                "droplets/{0}/actions/{1}".format(droplet_id, action_id)
+            )
+            json_data = response.json
+            status_code = response.status_code
+            message = json_data.get("message", "no error message")
+            action = json_data.get("action", None)
+            action_id = action.get("id", None)
+            action_status = action.get("status", None)
+
+            if action is None or action_id is None or action_status is None:
+                self.module.fail_json(
+                    changed=False,
+                    msg=DODroplet.failure_message["unexpected"].format(
+                        "no action, ID, or status"
+                    ),
+                )
+
+            if status_code >= 400:
+                self.module.fail_json(
+                    changed=False,
+                    msg=DODroplet.failure_message["failed_to"].format(
+                        "get", "action", status_code, message
+                    ),
+                )
+
+            if action_status == "errored":
+                self.module.fail_json(
+                    changed=True,
+                    msg=DODroplet.failure_message["support_action"].format(action_id),
+                )
+
+            if action_status == "completed":
+                return
+
+            time.sleep(10)
+
+        self.module.fail_json(msg="Wait for Droplet action timeout")
+
+    def wait_action(self, droplet_id, desired_action_data):
+        action_type = desired_action_data.get("type", "undefined")
+
+        response = self.rest.post(
+            "droplets/{0}/actions".format(droplet_id), data=desired_action_data
+        )
+        json_data = response.json
+        status_code = response.status_code
+        message = json_data.get("message", "no error message")
+        action = json_data.get("action", None)
+        action_id = action.get("id", None)
+        action_status = action.get("status", None)
+
+        if action is None or action_id is None or action_status is None:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["unexpected"].format(
+                    "no action, ID, or status"
+                ),
+            )
+
+        if status_code >= 400:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "post", "action", status_code, message
+                ),
+            )
+
+        # Keep checking till it is done or times out
+        self.wait_check_action(droplet_id, action_id)
+
+    def ensure_power_on(self, droplet_id):
+        # Make sure Droplet is active or off first
+        self.wait_status(droplet_id, ["active", "off"])
+        # Trigger power-on
+        self.wait_action(droplet_id, {"type": "power_on"})
+
+    def ensure_power_off(self, droplet_id):
+        # Make sure Droplet is active first
+        self.wait_status(droplet_id, ["active"])
+        # Trigger power-off
+        self.wait_action(droplet_id, {"type": "power_off"})
 
     def create(self, state):
         json_data = self.get_droplet()
-        droplet_data = None
+
+        # We have the Droplet
         if json_data is not None:
             droplet = json_data.get("droplet", None)
-            if droplet is not None:
-                droplet_size = droplet.get("size_slug", None)
-                if droplet_size is not None:
-                    if droplet_size != self.module.params["size"]:
-                        self.resize_droplet(state)
+            droplet_id = droplet.get("id", None)
+            droplet_size = droplet.get("size_slug", None)
+
+            if droplet_id is None or droplet_size is None:
+                self.module.fail_json(
+                    changed=False,
+                    msg=DODroplet.failure_message["unexpected"].format(
+                        "no Droplet ID or size"
+                    ),
+                )
+
+            # Check mode
+            if self.module.check_mode:
+                self.module.exit_json(changed=False)
+
+            # Ensure Droplet size
+            if droplet_size != self.module.params.get("size", None):
+                self.resize_droplet(state, droplet_id)
+
+            # Ensure Droplet power state
             droplet_data = self.get_addresses(json_data)
-            # If state is active or inactive, ensure requested and desired power states match
-            droplet = json_data.get("droplet", None)
-            if droplet is not None:
-                droplet_id = droplet.get("id", None)
-                droplet_status = droplet.get("status", None)
-                if droplet_id is not None and droplet_status is not None:
-                    if state == "active" and droplet_status != "active":
-                        power_on_json_data = self.ensure_power_on(droplet_id)
-                        self.module.exit_json(
-                            changed=True, data=self.get_addresses(power_on_json_data)
-                        )
-                    elif state == "inactive" and droplet_status != "off":
-                        power_off_json_data = self.ensure_power_off(droplet_id)
-                        self.module.exit_json(
-                            changed=True, data=self.get_addresses(power_off_json_data)
-                        )
-                    else:
-                        self.module.exit_json(changed=False, data=droplet_data)
+            droplet_id = droplet.get("id", None)
+            droplet_status = droplet.get("status", None)
+            if droplet_id is not None and droplet_status is not None:
+                if state == "active" and droplet_status != "active":
+                    self.ensure_power_on(droplet_id)
+                    # Get updated Droplet data (fallback to current data)
+                    json_data = self.get_droplet()
+                    droplet = json_data.get("droplet", droplet)
+                    self.module.exit_json(changed=True, data=droplet)
+                elif state == "inactive" and droplet_status != "off":
+                    self.ensure_power_off(droplet_id)
+                    # Get updated Droplet data (fallback to current data)
+                    json_data = self.get_droplet()
+                    droplet = json_data.get("droplet", droplet)
+                    self.module.exit_json(changed=True, data=droplet)
+                else:
+                    self.module.exit_json(changed=False, data=droplet)
+
+        # We don't have the Droplet, create it
+
+        # Check mode
         if self.module.check_mode:
             self.module.exit_json(changed=True)
+
         request_params = dict(self.module.params)
         del request_params["id"]
+
         response = self.rest.post("droplets", data=request_params)
         json_data = response.json
-        if json_data is None:
+        status_code = response.status_code
+        message = json_data.get("message", "no error message")
+        droplet = json_data.get("droplet", None)
+        droplet_id = droplet.get("id", None)
+
+        if droplet is None or droplet_id is None:
             self.module.fail_json(
                 changed=False,
-                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                msg=DODroplet.failure_message["unexpected"].format("no Droplet or ID"),
             )
+
+        if status_code >= 400:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "create", "Droplet", status_code, message
+                ),
+            )
+
+        if self.wait:
+            if state == "present" or state == "active":
+                self.ensure_power_on(droplet_id)
+            if state == "inactive":
+                self.ensure_power_off(droplet_id)
         else:
-            if response.status_code >= 400:
-                message = json_data.get(
-                    "message", "Empty failure message from the DigitalOcean API!"
-                )
-                self.module.fail_json(changed=False, msg=message)
-            droplet_data = json_data.get("droplet", None)
-            if droplet_data is not None:
-                droplet_id = droplet_data.get("id", None)
-                if droplet_id is not None:
-                    if self.wait:
-                        if state == "present" or state == "active":
-                            json_data = self.ensure_power_on(droplet_id)
-                        if state == "inactive":
-                            json_data = self.ensure_power_off(droplet_id)
-                        droplet_data = self.get_addresses(json_data)
-                    else:
-                        if state == "inactive":
-                            response = self.rest.post(
-                                "droplets/{0}/actions".format(droplet_id),
-                                data={"type": "power_off"},
-                            )
-                else:
-                    self.module.fail_json(
-                        changed=False, msg="Unexpected error, please file a bug"
-                    )
-            else:
-                self.module.fail_json(
-                    changed=False, msg="Unexpected error, please file a bug"
-                )
-            self.module.exit_json(changed=True, data=droplet_data)
+            if state == "inactive":
+                self.ensure_power_off(droplet_id)
+
+        # Get updated Droplet data (fallback to current data)
+        if self.wait:
+            json_data = self.get_droplet()
+            droplet = json_data.get("droplet", droplet)
+
+        self.module.exit_json(changed=True, data=droplet)
 
     def delete(self):
         json_data = self.get_droplet()
-        if json_data:
-            if self.module.check_mode:
-                self.module.exit_json(changed=True)
-            response = self.rest.delete(
-                "droplets/{0}".format(json_data["droplet"]["id"])
-            )
-            json_data = response.json
-            if response.status_code == 204:
-                self.module.exit_json(changed=True, msg="Droplet deleted")
-            self.module.fail_json(changed=False, msg="Failed to delete droplet")
-        else:
+
+        if json_data is None:
             self.module.exit_json(changed=False, msg="Droplet not found")
 
-    def ensure_power_on(self, droplet_id):
+        # Check mode
+        if self.module.check_mode:
+            self.module.exit_json(changed=True)
 
-        # Make sure Droplet is active first
-        end_time = time.monotonic() + self.wait_timeout
-        while time.monotonic() < end_time:
-            response = self.rest.get("droplets/{0}".format(droplet_id))
-            json_data = response.json
-            if json_data is not None:
-                if response.status_code >= 400:
-                    message = json_data.get(
-                        "message", "Empty failure message from the DigitalOcean API!"
-                    )
-                    self.module.fail_json(changed=False, msg=message)
-            else:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-                )
+        # Delete it
+        droplet = json_data.get("droplet", None)
+        droplet_id = droplet.get("id", None)
+        droplet_name = droplet.get("name", None)
 
-            droplet = json_data.get("droplet", None)
-            if droplet is None:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unexpected error, please file a bug (no droplet)",
-                )
+        if droplet is None or droplet_id is None:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["unexpected"].format(
+                    "no Droplet, name, or ID"
+                ),
+            )
 
-            droplet_status = droplet.get("status", None)
-            if droplet_status is None:
-                self.module.fail_json(
-                    changed=False, msg="Unexpected error, please file a bug (no status)"
-                )
-
-            if droplet_status == "active":
-                break
-
-            time.sleep(min(10, end_time - time.monotonic()))
-
-        # Trigger power-on
-        response = self.rest.post(
-            "droplets/{0}/actions".format(droplet_id), data={"type": "power_on"}
-        )
+        response = self.rest.delete("droplets/{0}".format(droplet_id))
         json_data = response.json
-        if json_data is not None:
-            if response.status_code >= 400:
-                message = json_data.get(
-                    "message", "Empty failure message from the DigitalOcean API!"
-                )
-                self.module.fail_json(changed=False, msg=message)
+        status_code = response.status_code
+        if status_code == 204:
+            self.module.exit_json(
+                changed=True,
+                msg="Droplet {0} ({1}) deleted".format(droplet_name, droplet_id),
+            )
         else:
             self.module.fail_json(
                 changed=False,
-                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
+                msg="Failed to delete Droplet {0} ({1})".format(
+                    droplet_name, droplet_id
+                ),
             )
-
-        # Save the power-on action
-        action = json_data.get("action", None)
-        action_id = action.get("id", None)
-        if action is None or action_id is None:
-            self.module.fail_json(
-                changed=False,
-                msg="Unexpected error, please file a bug (no power-on action or id)",
-            )
-
-        # Keep checking till it is done or times out
-        end_time = time.monotonic() + self.wait_timeout
-        while time.monotonic() < end_time:
-            response = self.rest.get(
-                "droplets/{0}/actions/{1}".format(droplet_id, action_id)
-            )
-            json_data = response.json
-            if json_data is not None:
-                if response.status_code >= 400:
-                    message = json_data.get(
-                        "message", "Empty failure message from the DigitalOcean API!"
-                    )
-                    self.module.fail_json(changed=False, msg=message)
-            else:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-                )
-
-            action = json_data.get("action", None)
-            action_status = action.get("status", None)
-            if action is None or action_status is None:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unexpected error, please file a bug (no action or status)",
-                )
-
-            if action_status == "errored":
-                self.module.fail_json(
-                    changed=False,
-                    msg="Error status on droplet power on action, please try again or contact DigitalOcean support",
-                )
-
-            if action_status == "completed":
-                response = self.rest.get("droplets/{0}".format(droplet_id))
-                json_data = response.json
-                if json_data is not None:
-                    if response.status_code >= 400:
-                        message = json_data.get(
-                            "message",
-                            "Empty failure message from the DigitalOcean API!",
-                        )
-                        self.module.fail_json(changed=False, msg=message)
-                else:
-                    self.module.fail_json(
-                        changed=False,
-                        msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-                    )
-                return json_data
-
-            time.sleep(min(10, end_time - time.monotonic()))
-
-        self.module.fail_json(msg="Wait for droplet powering on timeout")
-
-    def ensure_power_off(self, droplet_id):
-
-        # Make sure Droplet is active first
-        end_time = time.monotonic() + self.wait_timeout
-        while time.monotonic() < end_time:
-            response = self.rest.get("droplets/{0}".format(droplet_id))
-            json_data = response.json
-            if json_data is not None:
-                if response.status_code >= 400:
-                    message = json_data.get(
-                        "message", "Empty failure message from the DigitalOcean API!"
-                    )
-                    self.module.fail_json(changed=False, msg=message)
-            else:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-                )
-
-            droplet = json_data.get("droplet", None)
-            if droplet is None:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unexpected error, please file a bug (no droplet)",
-                )
-
-            droplet_status = droplet.get("status", None)
-            if droplet_status is None:
-                self.module.fail_json(
-                    changed=False, msg="Unexpected error, please file a bug (no status)"
-                )
-
-            if droplet_status == "active":
-                break
-
-            time.sleep(min(10, end_time - time.monotonic()))
-
-        # Trigger power-off
-        response = self.rest.post(
-            "droplets/{0}/actions".format(droplet_id), data={"type": "power_off"}
-        )
-        json_data = response.json
-        if json_data is not None:
-            if response.status_code >= 400:
-                message = json_data.get(
-                    "message", "Empty failure message from the DigitalOcean API!"
-                )
-                self.module.fail_json(changed=False, msg=message)
-        else:
-            self.module.fail_json(
-                changed=False,
-                msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-            )
-
-        # Save the power-off action
-        action = json_data.get("action", None)
-        action_id = action.get("id", None)
-        if action is None or action_id is None:
-            self.module.fail_json(
-                changed=False,
-                msg="Unexpected error, please file a bug (no power-off action or id)",
-            )
-
-        # Keep checking till it is done or times out
-        end_time = time.monotonic() + self.wait_timeout
-        while time.monotonic() < end_time:
-            response = self.rest.get(
-                "droplets/{0}/actions/{1}".format(droplet_id, action_id)
-            )
-            json_data = response.json
-            if json_data is not None:
-                if response.status_code >= 400:
-                    message = json_data.get(
-                        "message", "Empty failure message from the DigitalOcean API!"
-                    )
-                    self.module.fail_json(changed=False, msg=message)
-            else:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-                )
-
-            action = json_data.get("action", None)
-            action_status = action.get("status", None)
-            if action is None or action_status is None:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unexpected error, please file a bug (no action or status)",
-                )
-
-            if action_status == "errored":
-                self.module.fail_json(
-                    changed=False,
-                    msg="Error status on droplet power off action, please try again or contact DigitalOcean support",
-                )
-
-            if action_status == "completed":
-                response = self.rest.get("droplets/{0}".format(droplet_id))
-                json_data = response.json
-                if response.status_code >= 400:
-                    self.module.fail_json(changed=False, msg=json_data["message"])
-                return json_data
-
-            time.sleep(min(10, end_time - time.monotonic()))
-
-        self.module.fail_json(msg="Wait for droplet powering off timeout")
 
 
 def core(module):
     state = module.params.pop("state")
     droplet = DODroplet(module)
-    if state == "present" or state == "active" or state == "inactive":
+    if state in ["present", "active", "inactive"]:
         droplet.create(state)
     elif state == "absent":
         droplet.delete()
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(
-                choices=["present", "absent", "active", "inactive"], default="present"
-            ),
-            oauth_token=dict(
-                aliases=["API_TOKEN"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-                required=True,
-            ),
-            name=dict(type="str"),
-            size=dict(aliases=["size_id"]),
-            image=dict(aliases=["image_id"]),
-            region=dict(aliases=["region_id"]),
-            ssh_keys=dict(type="list", elements="str", no_log=False),
-            private_networking=dict(type="bool", default=False),
-            vpc_uuid=dict(type="str"),
-            backups=dict(type="bool", default=False),
-            monitoring=dict(type="bool", default=False),
-            id=dict(aliases=["droplet_id"], type="int"),
-            user_data=dict(default=None),
-            ipv6=dict(type="bool", default=False),
-            volumes=dict(type="list", elements="str"),
-            tags=dict(type="list", elements="str"),
-            wait=dict(type="bool", default=True),
-            wait_timeout=dict(default=120, type="int"),
-            unique_name=dict(type="bool", default=False),
-            resize_disk=dict(type="bool", default=False),
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(
+            choices=["present", "absent", "active", "inactive"], default="present"
         ),
+        name=dict(type="str"),
+        size=dict(aliases=["size_id"]),
+        image=dict(aliases=["image_id"]),
+        region=dict(aliases=["region_id"]),
+        ssh_keys=dict(type="list", elements="str", no_log=False),
+        private_networking=dict(type="bool", default=False),
+        vpc_uuid=dict(type="str"),
+        backups=dict(type="bool", default=False),
+        monitoring=dict(type="bool", default=False),
+        id=dict(aliases=["droplet_id"], type="int"),
+        user_data=dict(default=None),
+        ipv6=dict(type="bool", default=False),
+        volumes=dict(type="list", elements="str"),
+        tags=dict(type="list", elements="str"),
+        wait=dict(type="bool", default=True),
+        wait_timeout=dict(default=120, type="int"),
+        unique_name=dict(type="bool", default=False),
+        resize_disk=dict(type="bool", default=False),
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         required_one_of=(["id", "name"],),
         required_if=(
             [
