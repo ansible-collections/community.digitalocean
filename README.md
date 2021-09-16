@@ -1,8 +1,10 @@
 # DigitalOcean Community Collection
 
 [![coverage](https://img.shields.io/codecov/c/github/ansible-collections/community.digitalocean)](https://codecov.io/gh/ansible-collections/community.digitalocean)
+[![black](https://github.com/ansible-collections/community.digitalocean/actions/workflows/black.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/black.yml)
 [![integration](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-integration.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-integration.yml)
 [![sanity](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml)
+[![unit](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-unit.yml)
 
 This collection contains modules and plugins to assist in automating [DigitalOcean](https://www.digitalocean.com) infrastructure and API interactions with Ansible.
 
@@ -27,9 +29,9 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_domain](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_module.html) – Create/delete a DNS domain in DigitalOcean
 - [digital_ocean_domain_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_facts_module.html) – Gather information about DigitalOcean Domains
 - [digital_ocean_domain_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_info_module.html) – Gather information about DigitalOcean Domains
-- [digital_ocean_domain_record](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_record.html) – Create and delete DigitalOcean Domain Records
+- [digital_ocean_domain_record](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_record_module.html) – Create and delete DigitalOcean Domain Records
 - [digital_ocean_droplet](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) – Create and delete a DigitalOcean droplet
-- [digital_ocean_droplet_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_info.html) - Gather information about DigitalOcean Droplets
+- [digital_ocean_droplet_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_info_module.html) - Gather information about DigitalOcean Droplets
 - [digital_ocean_firewall](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_firewall_module.html) – Create and delete DigitalOcean firewalls
 - [digital_ocean_firewall_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_firewall_facts_module.html) – Gather information about DigitalOcean firewalls
 - [digital_ocean_firewall_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_firewall_info_module.html) – Gather information about DigitalOcean firewalls
