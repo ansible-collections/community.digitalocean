@@ -14,7 +14,7 @@ env:
   COLLECTION_NAME: digitalocean
 
 concurrency:
-  group: cloud_integration_tests
+  group: cloud-integration-tests
   cancel-in-progress: false
 
 jobs:
