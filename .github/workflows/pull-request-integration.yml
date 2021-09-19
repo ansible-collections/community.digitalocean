@@ -14,35 +14,9 @@ concurrency:
 
 jobs:
 
-  approve:
-    name: approve
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: approve
-        run: echo All pull requests need to be approved before running the integration tests.
-
-  secret:
-    name: secret
-    needs: [ approve ]
-    environment: integration
-    runs-on: ubuntu-latest
-
-    steps:
-
-      - name: Write secret
-        shell: bash
-        run: echo "export DO_API_KEY='${{ secrets.DO_API_KEY }}'" >secret
-
-      - name: Upload secret
-        uses: actions/upload-artifact@v2
-        with:
-          name: secret
-          path: secret
-          retention-days: 0
-
   integration:
+    # Require reviewers for this environment
+    environment: integration
 
     runs-on: ubuntu-latest
 
@@ -52,16 +26,13 @@ jobs:
 
     steps:
 
-      - name: Download secret
-        uses: actions/download-artifact@v2
-        with:
-          name: secret
-
+      # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
       - name: Check out code
         uses: actions/checkout@v2
         with:
           path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
           ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
+          persist-credentials: false
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
@@ -75,8 +46,9 @@ jobs:
         run: ansible-galaxy collection install community.general -p ../../
 
       - name: Configure integration test run secrets
+        env:
+          DO_API_KEY: ${{ secrets.DO_API_KEY }}
         run: |
-          source ../../../secret
           ./tests/utils/render.sh \
             ./tests/integration/integration_config.yml.template \
               > ./tests/integration/integration_config.yml
@@ -85,7 +57,7 @@ jobs:
       - name: Run integration test
         run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python ${{ matrix.python }} --docker --coverage
 
-        # ansible-test support producing code coverage date
+      # ansible-test support producing code coverage date
       - name: Generate coverage report
         run: ansible-test coverage xml -v --requirements --group-by command --group-by version
 
