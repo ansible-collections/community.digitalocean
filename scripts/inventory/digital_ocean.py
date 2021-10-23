@@ -190,9 +190,12 @@ class DoManager:
             sys.exit("Unable to parse result from %s: %s" % (url, e))
         return resp_data
 
-    def all_active_droplets(self, tag_name):
-        params = {"tag_name": tag_name}
-        resp = self.send("droplets/", params=params)
+    def all_active_droplets(self, tag_name=None):
+        if tag_name is not None:
+            params = {"tag_name": tag_name}
+            resp = self.send("droplets/", params=params)
+        else:
+            resp = self.send("droplets/")
         return resp["droplets"]
 
     def all_regions(self):
