@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_floating_ip - make floating ip return data idempotent (https://github.com/ansible-collections/community.digitalocean/pull/162).

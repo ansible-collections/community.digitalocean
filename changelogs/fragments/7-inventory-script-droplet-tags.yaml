@@ -1,2 +1,0 @@
-minor_changes:
-  - digitalocean inventory script - add support for Droplet tag filtering (https://github.com/ansible-collections/community.digitalocean/issues/7).
