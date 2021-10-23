@@ -39,12 +39,12 @@ EXAMPLES = r"""
     oauth_token: "{{ oauth_token }}"
 
 - name: Gather information about a specific droplet by name
-  community.digitalocean.digital_ocean_account_info:
+  community.digitalocean.digital_ocean_droplet_info:
     oauth_token: "{{ oauth_token }}"
     name: my-droplet-name
 
 - name: Gather information about a specific droplet by id
-  community.digitalocean.digital_ocean_account_info:
+  community.digitalocean.digital_ocean_droplet_info:
     oauth_token: "{{ oauth_token }}"
     id: abc-123-d45
 
