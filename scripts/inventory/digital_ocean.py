@@ -158,7 +158,7 @@ class DoManager:
             path = path[1:]
         return "%s/%s" % (self.api_endpoint, path)
 
-    def send(self, url, method="GET", data=None):
+    def send(self, url, method="GET", data=None, params=None):
         url = self._url_builder(url)
         data = json.dumps(data)
         try:
@@ -167,7 +167,11 @@ class DoManager:
                 incomplete = True
                 while incomplete:
                     resp = requests.get(
-                        url, data=data, headers=self.headers, timeout=self.timeout
+                        url,
+                        data=data,
+                        params=params,
+                        headers=self.headers,
+                        timeout=self.timeout,
                     )
                     json_resp = resp.json()
 
@@ -186,8 +190,12 @@ class DoManager:
             sys.exit("Unable to parse result from %s: %s" % (url, e))
         return resp_data
 
-    def all_active_droplets(self):
-        resp = self.send("droplets/")
+    def all_active_droplets(self, tag_name=None):
+        if tag_name is not None:
+            params = {"tag_name": tag_name}
+            resp = self.send("droplets/", params=params)
+        else:
+            resp = self.send("droplets/")
         return resp["droplets"]
 
     def all_regions(self):
@@ -238,6 +246,7 @@ class DigitalOceanInventory(object):
         self.cache_max_age = 0
         self.use_private_network = False
         self.group_variables = {}
+        self.droplets_tag_name = None
 
         # Read settings, environment variables, and CLI arguments
         self.read_settings()
@@ -344,6 +353,10 @@ class DigitalOceanInventory(object):
             self.group_variables = ast.literal_eval(
                 config.get("digital_ocean", "group_variables")
             )
+
+        # Droplet tag_name
+        if config.has_option("droplets", "tag_name"):
+            self.droplets_tag_name = config.get("droplets", "tag_name")
 
     def read_environment(self):
         """Reads the settings from environment variables"""
@@ -459,7 +472,9 @@ class DigitalOceanInventory(object):
             resource = None
 
         if resource == "droplets" or resource is None:
-            self.data["droplets"] = self.manager.all_active_droplets()
+            self.data["droplets"] = self.manager.all_active_droplets(
+                tag_name=self.droplets_tag_name
+            )
             self.cache_refreshed = True
         if resource == "regions" or resource is None:
             self.data["regions"] = self.manager.all_regions()
