@@ -171,7 +171,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         url = "https://api.digitalocean.com/v2/droplets?per_page=" + str(pagination)
 
         # send request(s)
-        self.req = Request(headers=headers)
+        self.req = Request(headers=headers, timeout=self.get_option("timeout"))
         payload = []
         try:
             while url:
