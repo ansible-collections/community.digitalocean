@@ -167,7 +167,11 @@ class DoManager:
                 incomplete = True
                 while incomplete:
                     resp = requests.get(
-                        url, data=data, params=params, headers=self.headers, timeout=self.timeout
+                        url,
+                        data=data,
+                        params=params,
+                        headers=self.headers,
+                        timeout=self.timeout,
                     )
                     json_resp = resp.json()
 
@@ -465,7 +469,9 @@ class DigitalOceanInventory(object):
             resource = None
 
         if resource == "droplets" or resource is None:
-            self.data["droplets"] = self.manager.all_active_droplets(tag_name=self.droplets_tag_name)
+            self.data["droplets"] = self.manager.all_active_droplets(
+                tag_name=self.droplets_tag_name
+            )
             self.cache_refreshed = True
         if resource == "regions" or resource is None:
             self.data["regions"] = self.manager.all_regions()
