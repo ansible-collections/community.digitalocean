@@ -1,2 +1,0 @@
-bugfixes:
-  - digitalocean inventory - enforce the C(timeout) parameter (https://github.com/ansible-collections/community.digitalocean/issues/168).

@@ -87,6 +87,25 @@ releases:
       name: digital_ocean_monitoring_alerts_info
       namespace: ''
     release_date: '2021-09-11'
+  1.11.0:
+    changes:
+      bugfixes:
+      - Adding missing status badges for black and unit tests (https://github.com/ansible-collections/community.digitalocean/pull/164).
+      - Documentation URLs are fixed for the C(digital_ocean_domain_record) and C(digital_ocean_droplet_info)
+        modules (https://github.com/ansible-collections/community.digitalocean/pull/163).
+      - Serializing the cloud integration tests (https://github.com/ansible-collections/community.digitalocean/pull/165).
+      - digital_ocean_floating_ip - make floating ip return data idempotent (https://github.com/ansible-collections/community.digitalocean/pull/162).
+      - digitalocean inventory - enforce the C(timeout) parameter (https://github.com/ansible-collections/community.digitalocean/issues/168).
+      minor_changes:
+      - digitalocean inventory script - add support for Droplet tag filtering (https://github.com/ansible-collections/community.digitalocean/issues/7).
+    fragments:
+    - 162-floating-ip-data-idempotency.yaml
+    - 163-documentation-broken-links.yaml
+    - 164-add-badges.yaml
+    - 165-serialize-integration-tests.yml
+    - 168-inventory-timeout.yaml
+    - 7-inventory-script-droplet-tags.yaml
+    release_date: '2021-10-23'
   1.2.0:
     changes:
       bugfixes:

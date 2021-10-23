@@ -1,2 +1,0 @@
-bugfixes:
-  - Adding missing status badges for black and unit tests (https://github.com/ansible-collections/community.digitalocean/pull/164).
