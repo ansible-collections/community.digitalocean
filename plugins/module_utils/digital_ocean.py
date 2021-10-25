@@ -161,3 +161,59 @@ class DigitalOceanHelper:
             self.module.fail_json(msg=msg)
 
         return ret_data
+
+
+class DigitalOceanProjects:
+
+    def __init__(self, module, rest):
+        self.module = module
+        self.rest = rest
+        self.get_all_projects()
+        # self.projects = self.rest.get_paginated_data(base_url="projects?", data_key_name="projects")
+        # [{'id': 'c296b5ec-fb4d-423a-bcb2-20362a3e64f5', 'owner_uuid': '6559a5d2646ac0956dec5379d04fec698b6ea13a', 'owner_id': 3097135, 'name': 'mamercad', 'description': 'Update your project information under Settings', 'purpose': '', 'environment': '', 'is_default': True, 'created_at': '2019-07-28T20:43:15Z', 'updated_at': '2019-07-28T20:43:15Z'}]
+        # raise Exception("got here")
+
+    def get_all_projects(self):
+        self.projects = self.rest.get_paginated_data(base_url="projects?", data_key_name="projects")
+
+    def get_default(self):
+        project = [project for project in self.projects if project.get("is_default", False)]
+        if len(project) == 0:
+            self.module.fail_json(msg="Unexpected error; no default project found")
+        if len(project) > 1:
+            self.module.fail_json(msg="Unexpected error; more than one default project")
+        return project[0]
+
+    def get_by_id(self, id):
+        project = [project for project in self.projects if project.get("id") == id]
+        if len(project) == 0:
+            self.module.fail_json(msg="No project with id {0} found".format(id))
+        elif len(project) > 1:
+            self.module.fail_json(msg="Unexpected error; more than one project with the same id")
+        return project[0]
+
+    def get_by_name(self, name):
+        project = [project for project in self.projects if project.get("name") == name]
+        if len(project) == 0:
+            self.module.fail_json(msg="No project with name {0} found".format(name))
+        elif len(project) > 1:
+            self.module.fail_json(msg="Unexpected error; more than one project with the same name")
+        return project[0]
+
+    def assign_to_project(self, project_name, urn):
+        # urn e.g. do:volume:volume-id
+
+        project = self.get_by_name(project_name)
+        if project == {}:
+            self.module.fail_json(msg="No project named {0} found".format(project_name))
+
+        project_id = project.get("id", None)
+        if project_id is None:
+            self.module.fail_json(msg="Unexpected error; missing project id for {0}".format(project_name))
+
+        data = { "resources": [urn] }
+        response = self.rest.post("projects/{0}/resources".format(project_id), data=data)
+        status = response.status_code
+        json = response.json
+        if status != 200:
+            self.module.fail_json(msg="Unable to assign resource to project: {0}".format(json["message"]))

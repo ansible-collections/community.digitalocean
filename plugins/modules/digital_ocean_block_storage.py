@@ -59,6 +59,13 @@ options:
     - The droplet id you want to operate on.
     - Required when I(command=attach).
     type: int
+  project:
+    description:
+    - Project (name) to assign the resource to.
+    - Defaults to the default project.
+    type: str
+    required: false
+    default: ""
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
@@ -130,7 +137,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper,
+    DigitalOceanHelper, DigitalOceanProjects
 )
 
 
@@ -142,6 +149,7 @@ class DOBlockStorage(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
+        self.projects = DigitalOceanProjects(module, self.rest)
 
     def get_key_or_fail(self, k):
         v = self.module.params[k]
@@ -249,6 +257,9 @@ class DOBlockStorage(object):
         status = response.status_code
         json = response.json
         if status == 201:
+            project = self.module.params.get("project")
+            if project != "":
+                self.projects.assign_to_project(project, "do:volume:{0}".format(json["volume"]["id"]))
             self.module.exit_json(changed=True, id=json["volume"]["id"])
         elif status == 409 and json["id"] == "conflict":
             # The volume exists already, but it might not have the desired size
@@ -330,6 +341,7 @@ def main():
         region=dict(type="str", required=False),
         snapshot_id=dict(type="str", required=False),
         droplet_id=dict(type="int"),
+        project=dict(type="str", required=False, default=""),
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
