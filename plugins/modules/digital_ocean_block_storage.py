@@ -181,7 +181,9 @@ class DOBlockStorage(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
-        self.projects = DigitalOceanProjects(module, self.rest)
+        if self.module.params.get("project"):
+            # only load for non-default project assignments
+            self.projects = DigitalOceanProjects(module, self.rest)
 
     def get_key_or_fail(self, k):
         v = self.module.params[k]

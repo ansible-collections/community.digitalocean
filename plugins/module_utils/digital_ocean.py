@@ -239,7 +239,7 @@ class DigitalOceanProjects:
         if not project_id:
             return "", "Unexpected error; cannot find project id for {0}".format(project_name), []
 
-        data = { "resources": [urn] }
+        data = {"resources": [urn]}
         response = self.rest.post("projects/{0}/resources".format(project_id), data=data)
         status_code = response.status_code
         json = response.json
