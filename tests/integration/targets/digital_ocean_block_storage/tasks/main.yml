@@ -84,6 +84,43 @@
         that:
           - result.changed
 
+    - name: Remove the volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: absent
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify the volume is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Create a volume (and associate with Project)
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: present
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_size }}"
+        project: "{{ project_name }}"
+      register: result
+
+    - name: Verify volume is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.assign_status is defined
+          - result.assign_status == "assigned"
+          - result.msg is defined
+          - "'Assigned do:volume' in result.msg"
+          - result.resources is defined
+          - result.resources.status is defined
+          - result.resources.status == "assigned"
+
   always:
 
     - name: Remove the volume
