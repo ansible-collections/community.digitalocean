@@ -59,10 +59,12 @@ options:
     - The droplet id you want to operate on.
     - Required when I(command=attach).
     type: int
-  project:
+  project_name:
+    aliases: ["project"]
     description:
-    - Project (name) to assign the resource to.
-    - Defaults to the default project.
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when C(command=create).
     type: str
     required: false
     default: ""
@@ -87,6 +89,16 @@ EXAMPLES = r"""
     region: nyc1
     block_size: 10
     volume_name: nyc1-block-storage
+
+- name: Create new Block Storage (and assign to Project "test")
+  community.digitalocean.digital_ocean_block_storage:
+    state: present
+    command: create
+    api_token: <TOKEN>
+    region: nyc1
+    block_size: 10
+    volume_name: nyc1-block-storage
+    project_name: test
 
 - name: Resize an existing Block Storage
   community.digitalocean.digital_ocean_block_storage:
@@ -130,6 +142,26 @@ id:
     returned: changed
     type: str
     sample: "69b25d9a-494c-12e6-a5af-001f53126b44"
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/volumes/8691c49e-35ba-11ec-9406-0a58ac1472b9
+        status: assigned
+        urn: do:volume:8691c49e-35ba-11ec-9406-0a58ac1472b9
 """
 
 import time
@@ -257,10 +289,13 @@ class DOBlockStorage(object):
         status = response.status_code
         json = response.json
         if status == 201:
-            project = self.module.params.get("project")
-            if project != "":
-                self.projects.assign_to_project(project, "do:volume:{0}".format(json["volume"]["id"]))
-            self.module.exit_json(changed=True, id=json["volume"]["id"])
+            project_name = self.module.params.get("project")
+            if project_name:  # empty string is the default project, skip project assignment
+                urn = "do:volume:{0}".format(json["volume"]["id"])
+                assign_status, error_message, resources = self.projects.assign_to_project(project_name, urn)
+                self.module.exit_json(changed=True, id=json["volume"]["id"], msg=error_message, assign_status=assign_status, resources=resources)
+            else:
+                self.module.exit_json(changed=True, id=json["volume"]["id"])
         elif status == 409 and json["id"] == "conflict":
             # The volume exists already, but it might not have the desired size
             resized = self.resize_block_storage(volume_name, region, block_size)
@@ -341,7 +376,7 @@ def main():
         region=dict(type="str", required=False),
         snapshot_id=dict(type="str", required=False),
         droplet_id=dict(type="int"),
-        project=dict(type="str", required=False, default=""),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
 
     module = AnsibleModule(argument_spec=argument_spec)
