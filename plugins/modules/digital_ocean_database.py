@@ -116,6 +116,18 @@ EXAMPLES = r"""
     region: nyc1
     num_nodes: 1
   register: my_database
+
+- name: Create a Redis database (and assign to Project "test")
+  community.digitalocean.digital_ocean_database:
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
+    state: present
+    name: testdatabase1
+    engine: redis
+    size: db-s-1vcpu-1gb
+    region: nyc1
+    num_nodes: 1
+    project_name: test
+  register: my_database
 """
 
 
@@ -124,48 +136,63 @@ data:
   description: A DigitalOcean database
   returned: success
   type: dict
-  sample: {
-    "database": {
-      "connection": {
-         "database": "",
-         "host": "testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com",
-         "password": "REDACTED",
-         "port": 25061,
-         "protocol": "rediss",
-         "ssl": true,
-         "uri": "rediss://default:REDACTED@testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061",
-         "user": "default"
-      },
-      "created_at": "2021-04-21T15:41:14Z",
-      "db_names": null,
-      "engine": "redis",
-      "id": "37de10e4-808b-4f4b-b25f-7b5b3fd194ac",
-      "maintenance_window": {
-         "day": "monday",
-         "hour": "11:33:47",
-         "pending": false
-      },
-      "name": "testdatabase1",
-      "num_nodes": 1,
-      "private_connection": {
-         "database": "",
-         "host": "private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com",
-         "password": "REDIS",
-         "port": 25061,
-         "protocol": "rediss",
-         "ssl": true,
-         "uri": "rediss://default:REDACTED@private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061",
-         "user": "default"
-      },
-      "private_network_uuid": "0db3519b-9efc-414a-8868-8f2e6934688c",
-      "region": "nyc1",
-      "size": "db-s-1vcpu-1gb",
-      "status": "online",
-      "tags": null,
-      "users": null,
-      "version": "6"
-    }
-  }
+  sample:
+    database:
+      connection:
+         database: ""
+         host: testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com
+         password: REDACTED
+         port: 25061
+         protocol: rediss
+         ssl: true
+         uri: rediss://default:REDACTED@testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061
+         user: default
+      created_at: 2021-04-21T15:41:14Z
+      db_names: null
+      engine: redis
+      id: 37de10e4-808b-4f4b-b25f-7b5b3fd194ac
+      maintenance_window:
+         day: monday
+         hour: 11:33:47
+         pending: false
+      name: testdatabase1
+      num_nodes: 1
+      private_connection:
+         database: ""
+         host: private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com
+         password: REDIS
+         port: 25061
+         protocol: rediss
+         ssl: true
+         uri: rediss://default:REDACTED@private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061
+         user: default
+      private_network_uuid: 0db3519b-9efc-414a-8868-8f2e6934688c,
+      region: nyc1
+      size: db-s-1vcpu-1gb
+      status: online
+      tags: null
+      users: null
+      version: 6
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/databases/126355fa-b147-40a6-850a-c44f5d2ad418
+        status: assigned
+        urn: do:dbaas:126355fa-b147-40a6-850a-c44f5d2ad418
 """
 
 
