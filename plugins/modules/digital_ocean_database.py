@@ -91,6 +91,15 @@ options:
       - How long before wait gives up, in seconds, when creating a database.
     default: 600
     type: int
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when C(command=create).
+    type: str
+    required: false
+    default: ""
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
 """
@@ -164,7 +173,7 @@ import json
 import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper,
+    DigitalOceanHelper, DigitalOceanProjects
 )
 
 
@@ -172,6 +181,9 @@ class DODatabase(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
+        if self.module.params.get("project"):
+            # only load for non-default project assignments
+            self.projects = DigitalOceanProjects(module, self.rest)
         # pop wait and wait_timeout so we don't include it in the POST data
         self.wait = self.module.params.pop("wait", True)
         self.wait_timeout = self.module.params.pop("wait_timeout", 600)
@@ -285,15 +297,24 @@ class DODatabase(object):
                 changed=False,
                 msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
             )
+
+        database_id = database.get("id", None)
+        if database_id is None:
+            self.module.fail_json(
+                changed=False,
+                msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
+            )
+
         if self.wait:
-            database_id = database.get("id", None)
-            if database_id is None:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
-                )
-            json_data = self.ensure_online(database_id)
-        self.module.exit_json(changed=True, data=json_data)
+           json_data = self.ensure_online(database_id)
+
+        project_name = self.module.params.get("project")
+        if project_name:  # empty string is the default project, skip project assignment
+            urn = "do:dbaas:{0}".format(database_id)
+            assign_status, error_message, resources = self.projects.assign_to_project(project_name, urn)
+            self.module.exit_json(changed=True, data=json_data, msg=error_message, assign_status=assign_status, resources=resources)
+        else:
+            self.module.exit_json(changed=True, data=json_data)
 
     def delete(self):
         json_data = self.get_database()
@@ -370,6 +391,7 @@ def main():
             timeout=dict(type="int", default=30),
             wait=dict(type="bool", default=True),
             wait_timeout=dict(default=600, type="int"),
+            project_name=dict(type="str", aliases=["project"], required=False, default=""),
         ),
         required_one_of=(["id", "name"],),
         required_if=(
