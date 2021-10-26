@@ -135,6 +135,15 @@ options:
     required: false
     default: false
     type: bool
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when creating.
+    type: str
+    required: false
+    default: ""
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 """
@@ -155,6 +164,19 @@ EXAMPLES = r"""
 
 - debug:
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+
+- name: Create a new droplet (and assign to Project "test")
+  community.digitalocean.digital_ocean_droplet:
+    state: present
+    name: mydroplet
+    oauth_token: XXX
+    size: 2gb
+    region: sfo1
+    image: ubuntu-16-04-x64
+    wait_timeout: 500
+    ssh_keys: [ .... ]
+    project: test
+  register: my_droplet
 
 - name: Ensure a droplet is present
   community.digitalocean.digital_ocean_droplet:
@@ -186,42 +208,59 @@ data:
     description: a DigitalOcean Droplet
     returned: changed
     type: dict
-    sample: {
-        "ip_address": "104.248.118.172",
-        "ipv6_address": "2604:a880:400:d1::90a:6001",
-        "private_ipv4_address": "10.136.122.141",
-        "droplet": {
-            "id": 3164494,
-            "name": "example.com",
-            "memory": 512,
-            "vcpus": 1,
-            "disk": 20,
-            "locked": true,
-            "status": "new",
-            "kernel": {
-                "id": 2233,
-                "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic",
-                "version": "3.13.0-37-generic"
-            },
-            "created_at": "2014-11-14T16:36:31Z",
-            "features": ["virtio"],
-            "backup_ids": [],
-            "snapshot_ids": [],
-            "image": {},
-            "volume_ids": [],
-            "size": {},
-            "size_slug": "512mb",
-            "networks": {},
-            "region": {},
-            "tags": ["web"]
-        }
-    }
+    sample:
+        ip_address: 104.248.118.172
+        ipv6_address: 2604:a880:400:d1::90a:6001
+        private_ipv4_address: 10.136.122.141
+        droplet:
+            id: 3164494
+            name: example.com
+            memory: 512
+            vcpus: 1
+            disk: 20
+            locked: true
+            status: new
+            kernel:
+                id: 2233
+                name: Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic
+                version: 3.13.0-37-generic
+            created_at: 2014-11-14T16:36:31Z
+            features: ["virtio"]
+            backup_ids: []
+            snapshot_ids: []
+            image: {}
+            volume_ids: []
+            size: {}
+            size_slug: 512mb
+            networks: {}
+            region: {}
+            tags: ["web"]
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/volumes/8691c49e-35ba-11ec-9406-0a58ac1472b9
+        status: assigned
+        urn: do:volume:8691c49e-35ba-11ec-9406-0a58ac1472b9
 """
 
 import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper,
+    DigitalOceanHelper, DigitalOceanProjects
 )
 
 
@@ -247,6 +286,9 @@ class DODroplet(object):
         self.name = None
         self.size = None
         self.status = None
+        if self.module.params.get("project"):
+            # only load for non-default project assignments
+            self.projects = DigitalOceanProjects(module, self.rest)
 
     def get_by_id(self, droplet_id):
         if not droplet_id:
@@ -576,6 +618,12 @@ class DODroplet(object):
             json_data = self.get_droplet()
             droplet = json_data.get("droplet", droplet)
 
+        project_name = self.module.params.get("project")
+        if project_name:  # empty string is the default project, skip project assignment
+            urn = "do:droplet:{0}".format(droplet_id)
+            assign_status, error_message, resources = self.projects.assign_to_project(project_name, urn)
+            self.module.exit_json(changed=True, data={"droplet": droplet}, msg=error_message, assign_status=assign_status, resources=resources)
+
         self.module.exit_json(changed=True, data={"droplet": droplet})
 
     def delete(self):
@@ -651,6 +699,7 @@ def main():
         wait_timeout=dict(default=120, type="int"),
         unique_name=dict(type="bool", default=False),
         resize_disk=dict(type="bool", default=False),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,

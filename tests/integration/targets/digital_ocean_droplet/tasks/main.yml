@@ -190,6 +190,40 @@
       ansible.builtin.pause:
         minutes: 1
 
+    - name: Create the Droplet (and assign to Project)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: active
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+        project: "{{ project_name }}"
+      register: result
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Verify Droplet is present (from active)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data.droplet is defined
+          - result.data.droplet.name is defined
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status in ["new", "active", "available"]
+          - result.assign_status is defined
+          - result.assign_status == "assigned"
+          - result.msg is defined
+          - "'Assigned do:droplet' in result.msg"
+          - result.resources is defined
+          - result.resources.status is defined
+          - result.resources.status == "assigned"
+
   always:
 
     - name: Delete the Droplet (always)
