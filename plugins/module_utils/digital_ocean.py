@@ -230,6 +230,19 @@ class DigitalOceanProjects:
 
         Notes:
         For URN examples, see https://docs.digitalocean.com/reference/api/api-reference/#tag/Project-Resources
+
+        Projects resources are identified by uniform resource names or URNs.
+        A valid URN has the following format: do:resource_type:resource_id.
+
+        The following resource types are supported:
+        Resource Type  | Example URN
+        Database       | do:dbaas:83c7a55f-0d84-4760-9245-aba076ec2fb2
+        Domain         | do:domain:example.com
+        Droplet        | do:droplet:4126873
+        Floating IP    | do:floatingip:192.168.99.100
+        Load Balancer  | do:loadbalancer:39052d89-8dd4-4d49-8d5a-3c3b6b365b5b
+        Space          | do:space:my-website-assets
+        Volume         | do:volume:6fc4c277-ea5c-448a-93cd-dd496cfef71f
         """
         error_message, project = self.get_by_name(project_name)
         if not project:
