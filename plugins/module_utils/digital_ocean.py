@@ -226,7 +226,7 @@ class DigitalOceanProjects:
         Returns:
         assign_status -- ok, not_found, assigned, already_assigned, service_down
         error_message -- assignment error message (empty on success)
-        resources -- resources assigned (or [] if error)
+        resources -- resources assigned (or {} if error)
 
         Notes:
         For URN examples, see https://docs.digitalocean.com/reference/api/api-reference/#tag/Project-Resources
@@ -246,11 +246,11 @@ class DigitalOceanProjects:
         """
         error_message, project = self.get_by_name(project_name)
         if not project:
-            return "", error_message, []
+            return "", error_message, {}
 
         project_id = project.get("id", None)
         if not project_id:
-            return "", "Unexpected error; cannot find project id for {0}".format(project_name), []
+            return "", "Unexpected error; cannot find project id for {0}".format(project_name), {}
 
         data = {"resources": [urn]}
         response = self.rest.post("projects/{0}/resources".format(project_id), data=data)
@@ -258,13 +258,13 @@ class DigitalOceanProjects:
         json = response.json
         if status_code != 200:
             message = json.get("message", "No error message returned")
-            return "", "Unable to assign resource {0} to project {1} [HTTP {2}: {3}]".format(urn, project_name, status_code, message), []
+            return "", "Unable to assign resource {0} to project {1} [HTTP {2}: {3}]".format(urn, project_name, status_code, message), {}
 
         resources = json.get("resources", [])
         if len(resources) == 0:
-            return "", "Unexpected error; no resources returned (but assignment was successful)", []
+            return "", "Unexpected error; no resources returned (but assignment was successful)", {}
         if len(resources) > 1:
-            return "", "Unexpected error; more than one resource returned (but assignment was successful)", []
+            return "", "Unexpected error; more than one resource returned (but assignment was successful)", {}
 
         status = resources[0].get("status", "Unexpected error; no status returned (but assignment was successful)")
         return status, "Assigned {0} to project {1}".format(urn, project_name), resources[0]
