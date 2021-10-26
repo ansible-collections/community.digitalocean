@@ -15,7 +15,9 @@ module: digital_ocean_floating_ip
 short_description: Manage DigitalOcean Floating IPs
 description:
      - Create/delete/assign a floating IP.
-author: "Patrick Marques (@pmarques)"
+author:
+    - "Patrick Marques (@pmarques)"
+    - "Daniel George (@danxg87)"
 options:
   state:
     description:
@@ -80,7 +82,7 @@ EXAMPLES = r"""
     ip: "1.2.3.4"
     droplet_id: 123456
 
-- name: "Detach an existing Floating IP of 1.2.3.4 from its droplet"
+- name: "Detach an existing Floating IP of 1.2.3.4 from its Droplet"
   community.digitalocean.digital_ocean_floating_ip:
     state: detached
     ip: "1.2.3.4"
@@ -211,8 +213,8 @@ class Rest(object):
 
 
 def wait_action(module, rest, ip, action_id, timeout=60):
-    end_time = time.time() + timeout
-    while time.time() < end_time:
+    end_time = time.monotonic() + timeout
+    while time.monotonic() < end_time:
         response = rest.get("floating_ips/{0}/actions/{1}".format(ip, action_id))
         json_data = response.json
         status_code = response.status_code
@@ -227,7 +229,7 @@ def wait_action(module, rest, ip, action_id, timeout=60):
                     ),
                     data=json,
                 )
-        time.sleep(5)
+        time.sleep(10)
     module.fail_json(
         msg="Floating ip action timeout [ip: {0}: action: {1}]".format(ip, action_id),
         data=json,
@@ -324,6 +326,16 @@ def detach_floating_ips(module, rest, ip):
 
     if status_code == 201:
         json_data = wait_action(module, rest, ip, json_data["action"]["id"])
+        action = json_data.get("action", None)
+        action_id = action.get("id", None)
+        if action is None:
+            module.fail_json(
+                changed=False, msg="Error retrieving detach action. Got: {0}".format(action)
+            )
+        if action_id is None:
+            module.fail_json(
+                changed=False, msg="Error retrieving detach action ID. Got: {0}".format(action_id)
+            )
         module.exit_json(
             changed=True, msg="Detached floating ip {0}".format(ip), data=json_data
         )
