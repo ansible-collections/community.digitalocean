@@ -4,3 +4,4 @@ droplet_image: ubuntu-18-04-x64
 droplet_size: s-1vcpu-1gb
 lb_name: gh-ci-loadbalancer
 lb_size: lb-small
+project_name: gh-ci-project

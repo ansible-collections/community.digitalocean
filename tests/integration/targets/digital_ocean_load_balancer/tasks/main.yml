@@ -88,6 +88,48 @@
           - lb.failed is false
           - "'updated: algorithm' in lb.msg"
 
+    - name: Delete the Load Balancer
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ lb_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify Load Balancer is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Create the Load Balancer (and assign to Project)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: round_robin
+        droplet_ids:
+          - "{{ droplet.data.droplet.id }}"
+        region: "{{ do_region }}"
+        project: "{{ project_name }}"
+      register: lb
+
+    - name: Verify Load Balancer is present (from present)
+      ansible.builtin.assert:
+        that:
+          - lb.changed
+          - lb.data is defined
+          - lb.data.load_balancer is defined
+          - lb.data.load_balancer.name is defined
+          - lb.data.load_balancer.name == lb_name
+          - lb.data.load_balancer.status in ["new", "active", "available"]
+          - lb.assign_status is defined
+          - lb.assign_status == "assigned"
+          - lb.msg is defined
+          - "'Assigned do:loadbalancer' in lb.msg"
+          - lb.resources is defined
+          - lb.resources.status is defined
+          - lb.resources.status == "assigned"
+
   always:
 
     - name: Delete the Droplet
