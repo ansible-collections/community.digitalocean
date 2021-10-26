@@ -258,7 +258,7 @@ class DigitalOceanProjects:
         json = response.json
         if status_code != 200:
             message = json.get("message", "No error message returned")
-            return "", "Unable to assign resource {0} to project {1} [HTTP {3}: {4}]".format(urn, project_name, status_code, message), []
+            return "", "Unable to assign resource {0} to project {1} [HTTP {2}: {3}]".format(urn, project_name, status_code, message), []
 
         resources = json.get("resources", [])
         if len(resources) == 0:
