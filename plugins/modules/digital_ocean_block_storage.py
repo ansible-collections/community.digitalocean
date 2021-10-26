@@ -169,7 +169,8 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper, DigitalOceanProjects
+    DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -292,10 +293,22 @@ class DOBlockStorage(object):
         json = response.json
         if status == 201:
             project_name = self.module.params.get("project")
-            if project_name:  # empty string is the default project, skip project assignment
+            if (
+                project_name
+            ):  # empty string is the default project, skip project assignment
                 urn = "do:volume:{0}".format(json["volume"]["id"])
-                assign_status, error_message, resources = self.projects.assign_to_project(project_name, urn)
-                self.module.exit_json(changed=True, id=json["volume"]["id"], msg=error_message, assign_status=assign_status, resources=resources)
+                (
+                    assign_status,
+                    error_message,
+                    resources,
+                ) = self.projects.assign_to_project(project_name, urn)
+                self.module.exit_json(
+                    changed=True,
+                    id=json["volume"]["id"],
+                    msg=error_message,
+                    assign_status=assign_status,
+                    resources=resources,
+                )
             else:
                 self.module.exit_json(changed=True, id=json["volume"]["id"])
         elif status == 409 and json["id"] == "conflict":

@@ -164,7 +164,6 @@ class DigitalOceanHelper:
 
 
 class DigitalOceanProjects:
-
     def __init__(self, module, rest):
         self.module = module
         self.rest = rest
@@ -172,7 +171,9 @@ class DigitalOceanProjects:
 
     def get_all_projects(self):
         """Fetches all projects."""
-        self.projects = self.rest.get_paginated_data(base_url="projects?", data_key_name="projects")
+        self.projects = self.rest.get_paginated_data(
+            base_url="projects?", data_key_name="projects"
+        )
 
     def get_default(self):
         """Fetches the default project.
@@ -181,7 +182,9 @@ class DigitalOceanProjects:
         error_message -- project fetch error message (or "" if no error)
         project -- project dictionary representation (or {} if error)
         """
-        project = [project for project in self.projects if project.get("is_default", False)]
+        project = [
+            project for project in self.projects if project.get("is_default", False)
+        ]
         if len(project) == 0:
             return "Unexpected error; no default project found", {}
         if len(project) > 1:
@@ -250,21 +253,48 @@ class DigitalOceanProjects:
 
         project_id = project.get("id", None)
         if not project_id:
-            return "", "Unexpected error; cannot find project id for {0}".format(project_name), {}
+            return (
+                "",
+                "Unexpected error; cannot find project id for {0}".format(project_name),
+                {},
+            )
 
         data = {"resources": [urn]}
-        response = self.rest.post("projects/{0}/resources".format(project_id), data=data)
+        response = self.rest.post(
+            "projects/{0}/resources".format(project_id), data=data
+        )
         status_code = response.status_code
         json = response.json
         if status_code != 200:
             message = json.get("message", "No error message returned")
-            return "", "Unable to assign resource {0} to project {1} [HTTP {2}: {3}]".format(urn, project_name, status_code, message), {}
+            return (
+                "",
+                "Unable to assign resource {0} to project {1} [HTTP {2}: {3}]".format(
+                    urn, project_name, status_code, message
+                ),
+                {},
+            )
 
         resources = json.get("resources", [])
         if len(resources) == 0:
-            return "", "Unexpected error; no resources returned (but assignment was successful)", {}
+            return (
+                "",
+                "Unexpected error; no resources returned (but assignment was successful)",
+                {},
+            )
         if len(resources) > 1:
-            return "", "Unexpected error; more than one resource returned (but assignment was successful)", {}
+            return (
+                "",
+                "Unexpected error; more than one resource returned (but assignment was successful)",
+                {},
+            )
 
-        status = resources[0].get("status", "Unexpected error; no status returned (but assignment was successful)")
-        return status, "Assigned {0} to project {1}".format(urn, project_name), resources[0]
+        status = resources[0].get(
+            "status",
+            "Unexpected error; no status returned (but assignment was successful)",
+        )
+        return (
+            status,
+            "Assigned {0} to project {1}".format(urn, project_name),
+            resources[0],
+        )

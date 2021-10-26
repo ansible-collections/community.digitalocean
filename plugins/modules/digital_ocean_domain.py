@@ -92,7 +92,8 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper, DigitalOceanProjects
+    DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 import time
 
@@ -205,15 +206,39 @@ def run(module):
                     if record is not None and "domain" in record:
                         domain = record.get("domain", None)
                         if domain is not None and "zone_file" in domain:
-                            if project_name:  # empty string is the default project, skip project assignment
-                                assign_status, error_message, resources = projects.assign_to_project(project_name, urn)
-                                module.exit_json(changed=True, domain=domain, msg=error_message, assign_status=assign_status, resources=resources)
+                            if (
+                                project_name
+                            ):  # empty string is the default project, skip project assignment
+                                (
+                                    assign_status,
+                                    error_message,
+                                    resources,
+                                ) = projects.assign_to_project(project_name, urn)
+                                module.exit_json(
+                                    changed=True,
+                                    domain=domain,
+                                    msg=error_message,
+                                    assign_status=assign_status,
+                                    resources=resources,
+                                )
                             else:
                                 module.exit_json(changed=True, domain=domain)
                     time.sleep(ZONE_FILE_SLEEP)
-                if project_name:  # empty string is the default project, skip project assignment
-                    assign_status, error_message, resources = projects.assign_to_project(project_name, urn)
-                    module.exit_json(changed=True, domain=domain, msg=error_message, assign_status=assign_status, resources=resources)
+                if (
+                    project_name
+                ):  # empty string is the default project, skip project assignment
+                    (
+                        assign_status,
+                        error_message,
+                        resources,
+                    ) = projects.assign_to_project(project_name, urn)
+                    module.exit_json(
+                        changed=True,
+                        domain=domain,
+                        msg=error_message,
+                        assign_status=assign_status,
+                        resources=resources,
+                    )
                 else:
                     module.exit_json(changed=True, domain=domain)
         else:

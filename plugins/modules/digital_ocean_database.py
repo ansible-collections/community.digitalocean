@@ -200,7 +200,8 @@ import json
 import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper, DigitalOceanProjects
+    DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -333,13 +334,21 @@ class DODatabase(object):
             )
 
         if self.wait:
-           json_data = self.ensure_online(database_id)
+            json_data = self.ensure_online(database_id)
 
         project_name = self.module.params.get("project")
         if project_name:  # empty string is the default project, skip project assignment
             urn = "do:dbaas:{0}".format(database_id)
-            assign_status, error_message, resources = self.projects.assign_to_project(project_name, urn)
-            self.module.exit_json(changed=True, data=json_data, msg=error_message, assign_status=assign_status, resources=resources)
+            assign_status, error_message, resources = self.projects.assign_to_project(
+                project_name, urn
+            )
+            self.module.exit_json(
+                changed=True,
+                data=json_data,
+                msg=error_message,
+                assign_status=assign_status,
+                resources=resources,
+            )
         else:
             self.module.exit_json(changed=True, data=json_data)
 
@@ -418,7 +427,9 @@ def main():
             timeout=dict(type="int", default=30),
             wait=dict(type="bool", default=True),
             wait_timeout=dict(default=600, type="int"),
-            project_name=dict(type="str", aliases=["project"], required=False, default=""),
+            project_name=dict(
+                type="str", aliases=["project"], required=False, default=""
+            ),
         ),
         required_one_of=(["id", "name"],),
         required_if=(
