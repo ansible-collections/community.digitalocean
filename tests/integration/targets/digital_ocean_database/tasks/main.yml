@@ -100,6 +100,49 @@
       ansible.builtin.pause:
         minutes: 1
 
+    - name: Delete the database
+      community.digitalocean.digital_ocean_database:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ database_name }}"
+        region: "{{ do_region }}"
+        engine: "{{ database_engine }}"
+        size: "{{ database_size }}"
+      register: result
+
+    - name: Verify the database is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Create the database (and associate with Project)
+      community.digitalocean.digital_ocean_database:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ database_name }}"
+        region: "{{ do_region }}"
+        engine: "{{ database_engine }}"
+        size: "{{ database_size }}"
+        wait_timeout: "{{ database_wait_timeout }}"
+        project: "{{ project_name }}"
+      register: result
+
+    - name: Verify database is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data.database is defined
+          - result.data.database.name is defined
+          - result.data.database.name == database_name
+          - result.assign_status is defined
+          - result.assign_status == "assigned"
+          - result.msg is defined
+          - "'Assigned do:dbaas' in result.msg"
+          - result.resources is defined
+          - result.resources.status is defined
+          - result.resources.status == "assigned"
+
   always:
 
     - name: Delete the database
