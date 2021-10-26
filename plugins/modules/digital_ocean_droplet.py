@@ -252,9 +252,9 @@ resources:
     sample:
         assigned_at: '2021-10-25T17:39:38Z'
         links:
-            self: https://api.digitalocean.com/v2/volumes/8691c49e-35ba-11ec-9406-0a58ac1472b9
+            self: https://api.digitalocean.com/v2/droplets/3164494
         status: assigned
-        urn: do:volume:8691c49e-35ba-11ec-9406-0a58ac1472b9
+        urn: do:droplet:3164494
 """
 
 import time
