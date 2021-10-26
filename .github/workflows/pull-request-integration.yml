@@ -1,13 +1,8 @@
-name: integration
+name: pull-request-integration
+
 on:
-  # ! Don't enable pwn requests !
-  # pull_request:
-  push:
-    branches:
-      - ci*
-      - main
-  schedule:
-    - cron: '10 6 * * *'
+  pull_request_target:
+    branches: [ main ]
 
 env:
   NAMESPACE: community
@@ -20,6 +15,8 @@ concurrency:
 jobs:
 
   integration:
+    # Require reviewers for this environment
+    environment: integration
 
     runs-on: ubuntu-latest
 
@@ -28,10 +25,14 @@ jobs:
         working-directory: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
 
     steps:
-      - name: Clone the repo
+
+      # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+      - name: Check out code
         uses: actions/checkout@v2
         with:
           path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
+          ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
+          persist-credentials: false
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
@@ -44,16 +45,17 @@ jobs:
       - name: Install ansible_collections.community.general
         run: ansible-galaxy collection install community.general -p ../../
 
-      - name: Configure integration test run
+      - name: Configure integration test run secrets
         env:
           DO_API_KEY: ${{ secrets.DO_API_KEY }}
         run: |
           ./tests/utils/render.sh \
-            tests/integration/integration_config.yml.template \
-            > tests/integration/integration_config.yml
+            ./tests/integration/integration_config.yml.template \
+              > ./tests/integration/integration_config.yml
 
-      - name: Run the integration tests
-        run: ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python 3.8 --diff --coverage
+      # Run the integration tests
+      - name: Run integration test
+        run: ansible-test integration -v --color --retry-on-error --continue-on-error --diff --python 3.8 --docker --coverage
 
       # ansible-test support producing code coverage date
       - name: Generate coverage report
