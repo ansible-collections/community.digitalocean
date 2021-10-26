@@ -20,8 +20,12 @@ options:
   state:
     description:
      - Indicate desired state of the target.
+     - If C(state=present) Create (and optionally attach) floating IP
+     - If C(state=absent) Delete floating IP
+     - If C(state=attached) attach floating IP to a droplet
+     - If C(state=detached) detach floating IP from a droplet
     default: present
-    choices: ['present', 'absent']
+    choices: ['present', 'absent', 'attached', 'detached']
     type: str
   ip:
     description:
@@ -69,6 +73,17 @@ EXAMPLES = r"""
   community.digitalocean.digital_ocean_floating_ip:
     state: present
     droplet_id: 123456
+
+- name: "Attach an existing Floating IP of 1.2.3.4 to Droplet ID 123456"
+  community.digitalocean.digital_ocean_floating_ip:
+    state: attached
+    ip: "1.2.3.4"
+    droplet_id: 123456
+
+- name: "Detach an existing Floating IP of 1.2.3.4 from its droplet"
+  community.digitalocean.digital_ocean_floating_ip:
+    state: detached
+    ip: "1.2.3.4"
 
 - name: "Delete a Floating IP with ip 1.2.3.4"
   community.digitalocean.digital_ocean_floating_ip:
@@ -195,23 +210,24 @@ class Rest(object):
         return self.send("DELETE", path, data, headers)
 
 
-def wait_action(module, rest, ip, action_id, timeout=10):
-    end_time = time.time() + 10
+def wait_action(module, rest, ip, action_id, timeout=60):
+    end_time = time.time() + timeout
     while time.time() < end_time:
         response = rest.get("floating_ips/{0}/actions/{1}".format(ip, action_id))
+        json_data = response.json
         status_code = response.status_code
         status = response.json["action"]["status"]
-        # TODO: check status_code == 200?
-        if status == "completed":
-            return True
-        elif status == "errored":
-            module.fail_json(
-                msg="Floating ip action error [ip: {0}: action: {1}]".format(
-                    ip, action_id
-                ),
-                data=json,
-            )
-
+        if status_code == 200:
+            if status == "completed":
+                return json_data
+            elif status == "errored":
+                module.fail_json(
+                    msg="Floating ip action error [ip: {0}: action: {1}]".format(
+                        ip, action_id
+                    ),
+                    data=json,
+                )
+        time.sleep(5)
     module.fail_json(
         msg="Floating ip action timeout [ip: {0}: action: {1}]".format(ip, action_id),
         data=json,
@@ -238,6 +254,14 @@ def core(module):
             associate_floating_ips(module, rest)
         else:
             create_floating_ips(module, rest)
+
+    elif state in ("attached"):
+        if droplet_id is not None and module.params["ip"] is not None:
+            associate_floating_ips(module, rest)
+
+    elif state in ("detached"):
+        if module.params["ip"] is not None:
+            detach_floating_ips(module, rest, module.params["ip"])
 
     elif state in ("absent"):
         response = rest.delete("floating_ips/{0}".format(ip))
@@ -280,7 +304,7 @@ def assign_floating_id_to_droplet(module, rest):
     status_code = response.status_code
     json_data = response.json
     if status_code == 201:
-        wait_action(module, rest, ip, json_data["action"]["id"])
+        json_data = wait_action(module, rest, ip, json_data["action"]["id"])
 
         module.exit_json(changed=True, data=json_data)
     else:
@@ -289,6 +313,26 @@ def assign_floating_id_to_droplet(module, rest):
                 status_code, json_data["message"]
             ),
             region=module.params["region"],
+        )
+
+
+def detach_floating_ips(module, rest, ip):
+    payload = {"type": "unassign"}
+    response = rest.post("floating_ips/{0}/actions".format(ip), data=payload)
+    status_code = response.status_code
+    json_data = response.json
+
+    if status_code == 201:
+        json_data = wait_action(module, rest, ip, json_data["action"]["id"])
+        module.exit_json(
+            changed=True, msg="Detached floating ip {0}".format(ip), data=json_data
+        )
+    else:
+        module.fail_json(
+            changed=False,
+            msg="Error detaching floating ip [{0}: {1}]".format(
+                status_code, json_data["message"]
+            ),
         )
 
 
@@ -354,7 +398,9 @@ def create_floating_ips(module, rest):
 def main():
     module = AnsibleModule(
         argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
+            state=dict(
+                choices=["present", "absent", "attached", "detached"], default="present"
+            ),
             ip=dict(aliases=["id"], required=False),
             region=dict(required=False),
             droplet_id=dict(required=False),
@@ -370,7 +416,11 @@ def main():
             validate_certs=dict(type="bool", default=True),
             timeout=dict(type="int", default=30),
         ),
-        required_if=[("state", "delete", ["ip"])],
+        required_if=[
+            ("state", "delete", ["ip"]),
+            ("state", "attached", ["ip", "droplet_id"]),
+            ("state", "detached", ["ip"]),
+        ],
         mutually_exclusive=[["region", "droplet_id"]],
     )
 
