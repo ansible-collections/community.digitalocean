@@ -41,7 +41,7 @@ options:
     description:
     - Project to assign the resource to (project name, not UUID).
     - Defaults to the default project of the account (empty string).
-    - Currently only supported when C(command=create).
+    - Currently only supported when creating domains.
     type: str
     required: false
     default: ""
