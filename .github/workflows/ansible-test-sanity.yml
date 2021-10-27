@@ -4,9 +4,6 @@ on:
   push:
   schedule:
     - cron: '0 6 * * *'
-env:
-  NAMESPACE: community
-  COLLECTION_NAME: digitalocean 
 
 jobs:
   sanity:
@@ -21,19 +18,12 @@ jobs:
         - devel
     runs-on: ubuntu-latest
     steps:
-
-      - name: Check out code
-        uses: actions/checkout@v1
+      - name: Perform testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ansible_collections/${{env.NAMESPACE}}/${{env.COLLECTION_NAME}}
-
-      - name: Set up Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: Install ansible-base (${{ matrix.ansible }})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
-
-      - name: Run sanity tests
-        run: ansible-test sanity --docker -v --color
+          ansible-core-version: ${{ matrix.ansible }}
+          # pre-test-cmd:
+          python-version: 3.9
+          # target-python-version:
+          testing-type: sanity
+          # test-deps:
