@@ -326,19 +326,21 @@ def detach_floating_ips(module, rest, ip):
 
     if status_code == 201:
         json_data = wait_action(module, rest, ip, json_data["action"]["id"])
+        module.exit_json(
+            changed=True, msg="Detached floating ip {0}".format(ip), data=json_data
+        )
         action = json_data.get("action", None)
         action_id = action.get("id", None)
         if action is None:
             module.fail_json(
-                changed=False, msg="Error retrieving detach action. Got: {0}".format(action)
+                changed=False,
+                msg="Error retrieving detach action. Got: {0}".format(action),
             )
         if action_id is None:
             module.fail_json(
-                changed=False, msg="Error retrieving detach action ID. Got: {0}".format(action_id)
+                changed=False,
+                msg="Error retrieving detach action ID. Got: {0}".format(action_id),
             )
-        module.exit_json(
-            changed=True, msg="Detached floating ip {0}".format(ip), data=json_data
-        )
     else:
         module.fail_json(
             changed=False,
