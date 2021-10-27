@@ -463,7 +463,7 @@ def create_floating_ips(module, rest):
                     module.exit_json(
                         changed=True,
                         msg="Floating IP created but not assigned to the {0} Project (missing information from the API response)".format(
-                            ip
+                            project_name
                         ),
                         data=json_data,
                     )
