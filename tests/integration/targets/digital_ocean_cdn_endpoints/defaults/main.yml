@@ -1,0 +1,2 @@
+endpoint: ansible-community-digitalocean.nyc3.cdn.digitaloceanspaces.com
+origin: ansible-community-digitalocean.nyc3.digitaloceanspaces.com
