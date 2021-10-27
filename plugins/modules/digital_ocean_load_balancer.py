@@ -394,7 +394,8 @@ import time
 from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
-    DigitalOceanHelper, DigitalOceanProjects
+    DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -618,9 +619,7 @@ class DOLoadBalancer(object):
             self.ensure_active()
 
         project_name = self.module.params.get("project")
-        if (
-            project_name
-        ):  # empty string is the default project, skip project assignment
+        if project_name:  # empty string is the default project, skip project assignment
             urn = "do:loadbalancer:{0}".format(self.id)
             (
                 assign_status,
@@ -758,7 +757,9 @@ def main():
             vpc_uuid=dict(type="str", required=False),
             wait=dict(type="bool", default=True),
             wait_timeout=dict(type="int", default=600),
-            project_name=dict(type="str", aliases=["project"], required=False, default=""),
+            project_name=dict(
+                type="str", aliases=["project"], required=False, default=""
+            ),
         ),
         required_if=(
             [
