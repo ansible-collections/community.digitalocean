@@ -147,7 +147,7 @@ data:
          ssl: true
          uri: rediss://default:REDACTED@testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061
          user: default
-      created_at: 2021-04-21T15:41:14Z
+      created_at: "2021-04-21T15:41:14Z"
       db_names: null
       engine: redis
       id: 37de10e4-808b-4f4b-b25f-7b5b3fd194ac

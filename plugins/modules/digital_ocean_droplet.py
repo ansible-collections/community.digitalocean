@@ -224,7 +224,7 @@ data:
                 id: 2233
                 name: Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic
                 version: 3.13.0-37-generic
-            created_at: 2014-11-14T16:36:31Z
+            created_at: "2014-11-14T16:36:31Z"
             features: ["virtio"]
             backup_ids: []
             snapshot_ids: []
