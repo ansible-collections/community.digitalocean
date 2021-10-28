@@ -1,2 +1,0 @@
-bugfixes:
-  - Documentation URLs are fixed for the C(digital_ocean_domain_record) and C(digital_ocean_droplet_info) modules (https://github.com/ansible-collections/community.digitalocean/pull/163).

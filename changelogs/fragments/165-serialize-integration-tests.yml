@@ -1,2 +1,0 @@
-bugfixes:
-  - Serializing the cloud integration tests (https://github.com/ansible-collections/community.digitalocean/pull/165).

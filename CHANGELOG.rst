@@ -5,6 +5,23 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.11.0
+=======
+
+Minor Changes
+-------------
+
+- digitalocean inventory script - add support for Droplet tag filtering (https://github.com/ansible-collections/community.digitalocean/issues/7).
+
+Bugfixes
+--------
+
+- Adding missing status badges for black and unit tests (https://github.com/ansible-collections/community.digitalocean/pull/164).
+- Documentation URLs are fixed for the C(digital_ocean_domain_record) and C(digital_ocean_droplet_info) modules (https://github.com/ansible-collections/community.digitalocean/pull/163).
+- Serializing the cloud integration tests (https://github.com/ansible-collections/community.digitalocean/pull/165).
+- digital_ocean_floating_ip - make floating ip return data idempotent (https://github.com/ansible-collections/community.digitalocean/pull/162).
+- digitalocean inventory - enforce the C(timeout) parameter (https://github.com/ansible-collections/community.digitalocean/issues/168).
+
 v1.10.0
 =======
 

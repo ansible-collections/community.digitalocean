@@ -1,13 +1,8 @@
-name: integration
+name: pull-request-integration
+
 on:
-  # ! Don't enable pwn requests !
-  # pull_request:
-  push:
-    branches:
-      - ci*
-      - main
-  schedule:
-    - cron: '10 6 * * *'
+  pull_request_target:
+    branches: [ main ]
 
 concurrency:
   group: cloud-integration-tests
@@ -16,6 +11,9 @@ concurrency:
 jobs:
 
   integration:
+    # Require reviewers for this environment
+    # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+    environment: integration
 
     runs-on: ubuntu-latest
 
@@ -24,6 +22,7 @@ jobs:
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           # ansible-core-version:
+          git-checkout-ref: ${{ github.event.pull_request.head.sha }} # Check out the pull request
           pre-test-cmd: >-  # Configure integration test run
             DO_API_KEY=${{ secrets.DO_API_KEY }}
             ./tests/utils/render.sh
