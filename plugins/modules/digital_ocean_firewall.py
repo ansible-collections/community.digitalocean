@@ -538,13 +538,16 @@ def main():
         droplet_ids=dict(type="list", elements="str", required=False),
         tags=dict(type="list", elements="str", required=False),
         inbound_rules=dict(
-            type="list", elements="dict", options=inbound_spec, required=True
+            type="list", elements="dict", options=inbound_spec, required=False
         ),
         outbound_rules=dict(
-            type="list", elements="dict", options=outbound_spec, required=True
+            type="list", elements="dict", options=outbound_spec, required=False
         ),
+    ),
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        required_if=[("state", "present", ["inbound_rules", "outbound_rules"])],
     )
-    module = AnsibleModule(argument_spec=argument_spec)
 
     try:
         core(module)
