@@ -236,8 +236,115 @@
           - result.resources is defined
           - result.resources.status is defined
           - result.resources.status == "assigned"
+    # Droplet plus firewall tests
+    - name: Create a test firewall
+      community.digitalocean.digital_ocean_firewall:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ firewall_name }}"
+        state: present
+        inbound_rules:
+          - protocol: "tcp"
+            ports: "80"
+            sources:
+              addresses: ["0.0.0.0/0", "::/0"]
+          - protocol: "tcp"
+            ports: "443"
+            sources:
+              addresses: ["0.0.0.0/0", "::/0"]
+        outbound_rules:
+          - protocol: "tcp"
+            ports: "1-65535"
+            destinations:
+              addresses: ["0.0.0.0/0", "::/0"]
+          - protocol: "udp"
+            ports: "1-65535"
+            destinations:
+              addresses: ["0.0.0.0/0", "::/0"]
+          - protocol: "icmp"
+            ports: "1-65535"
+            destinations:
+              addresses: ["0.0.0.0/0", "::/0"]
+        droplet_ids: []
+        tags: ["testing"]
+      register: testing_firewall
+
+    - name: Verify firewall was created
+      ansible.builtin.assert:
+        that:
+          - testing_firewall is defined
+          - testing_firewall.changed is true
+
+    - name: Create a new droplet and add to the above firewall
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        firewall: ["{{ firewall_name }}"]
+        size: "{{ droplet_size }}"
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        wait_timeout: 500
+      register: firewall_droplet
+
+    - name: Verify the droplet has created and has firewall applied
+      ansible.builtin.assert:
+        that:
+          - firewall_droplet is defined
+          - firewall_droplet.changed is true
+
+    - name: Check our firewall for the new droplet
+      community.digitalocean.digital_ocean_firewall_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ firewall_name }}"
+      register: firewall_settings
+
+    - name: Verify details of firewall with droplet
+      ansible.builtin.assert:
+        that:
+          - firewall_settings is defined
+          - "{{ (firewall_settings.data | map(attribute='droplet_ids'))[0] | length > 0 }}"
+          - "{{ firewall_droplet.data.droplet.id }} in {{ (firewall_settings.data | map(attribute='droplet_ids'))[0] }}"
+
+    - name: Rerun on above droplet and remove firewall
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        firewall: []
+        size: "{{ droplet_size }}"
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        wait_timeout: 500
+      register: firewall_droplet_removal
+
+    - name: Verify things were changed for firewall removal
+      ansible.builtin.assert:
+        that:
+          - firewall_droplet_removal is defined
+          - firewall_droplet_removal.changed is true
+
+    - name: Check our firewall for the droplet being removed
+      community.digitalocean.digital_ocean_firewall_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ firewall_name }}"
+      register: firewall_settings_removal
+
+    - name: Verify details of firewall with droplet
+      ansible.builtin.assert:
+        that:
+          - firewall_settings_removal is defined
+          - "{{ (firewall_settings_removal.data | map(attribute='droplet_ids'))[0] | length == 0 }}"
+          - "{{ firewall_droplet.data.droplet.id }} not in {{ firewall_settings_removal.data | map(attribute='droplet_ids') }}"
 
   always:
+
+    - name: Delete the Firewall (always)
+      community.digitalocean.digital_ocean_firewall:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ firewall_name }}"
+        state: absent
 
     - name: Delete the Droplet (always)
       community.digitalocean.digital_ocean_droplet:
