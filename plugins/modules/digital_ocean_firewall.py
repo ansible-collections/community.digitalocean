@@ -48,7 +48,7 @@ options:
     elements: dict
     description:
       - Firewall rules specifically targeting inbound network traffic into DigitalOcean
-    required: true
+    required: false
     suboptions:
       protocol:
         type: str
@@ -99,7 +99,7 @@ options:
     elements: dict
     description:
       - Firewall rules specifically targeting outbound network traffic from DigitalOcean
-    required: true
+    required: false
     suboptions:
       protocol:
         type: str
