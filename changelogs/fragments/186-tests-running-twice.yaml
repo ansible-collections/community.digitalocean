@@ -1,0 +1,2 @@
+bugfixes:
+  - Update the tests so that they only run once (https://github.com/ansible-collections/community.digitalocean/issues/186).
