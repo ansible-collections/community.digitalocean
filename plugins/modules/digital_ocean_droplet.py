@@ -70,7 +70,7 @@ options:
     elements: str
   firewall:
     description:
-      - Array of firewall names to apply to the droplet.
+      - Array of firewall names to apply to the Droplet.
       - Omitting a firewall name that is currently applied to a droplet will remove it.
     required: false
     type: list
