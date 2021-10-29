@@ -44,8 +44,6 @@
         oauth_token: "{{ do_api_key }}"
         state: absent
         name: "{{ firewall_name }}"
-        inbound_rules: "{{ firewall_inbound_rules }}"
-        outbound_rules: "{{ firewall_outbound_rules }}"
       register: result
 
     - name: Verify Firewall deleted
