@@ -1,13 +1,14 @@
 name: sanity
 on:
   pull_request:
+    types: [ opened, reopened ]
   push:
   schedule:
     - cron: '0 6 * * *'
 
 jobs:
   sanity:
-    name: Sanity (${{ matrix.ansible }})
+    name: Sanity (Ⓐ$${{ matrix.ansible }})
     strategy:
       matrix:
         ansible:

@@ -1,6 +1,7 @@
 name: unit
 on:
   pull_request:
+    types: [ opened, reopened ]
   push:
   schedule:
     - cron: '10 6 * * *'
@@ -11,16 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
-      # As soon as the first unit test fails, cancel the others to free up the CI queue
       fail-fast: true
       matrix:
         ansible:
-#           - stable-2.9 # Only if your collection supports Ansible 2.9
-#          - stable-2.10
-#          - stable-2.11
+          - stable-2.9
+          - stable-2.10
+          - stable-2.11
           - stable-2.12
           - devel
-
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
