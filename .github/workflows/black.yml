@@ -1,7 +1,10 @@
 # https://black.readthedocs.io/en/stable/integrations/github_actions.html
 name: black
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    types: [ opened, reopened ]
 
 jobs:
   lint:

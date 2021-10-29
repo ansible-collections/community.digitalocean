@@ -7,7 +7,7 @@ on:
 
 jobs:
   sanity:
-    name: Sanity (${{ matrix.ansible }})
+    name: Sanity (Ⓐ$${{ matrix.ansible }})
     strategy:
       matrix:
         ansible:
