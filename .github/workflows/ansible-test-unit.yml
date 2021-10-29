@@ -1,8 +1,9 @@
 name: unit
 on:
   pull_request:
-    types: [ opened, reopened ]
+    types: [ opened, synchronize, reopened ]
   push:
+    branches: [ main ]
   schedule:
     - cron: '10 6 * * *'
 
