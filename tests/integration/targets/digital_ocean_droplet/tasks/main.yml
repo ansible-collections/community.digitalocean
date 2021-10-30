@@ -190,6 +190,19 @@
       ansible.builtin.pause:
         minutes: 1
 
+    - name: Delete the Droplet (always)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+      ignore_errors: true  # Should this fail, we'll clean it up next run
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
     - name: Create the Droplet (and assign to Project)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
