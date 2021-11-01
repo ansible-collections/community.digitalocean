@@ -242,30 +242,9 @@
         oauth_token: "{{ do_api_key }}"
         name: "{{ firewall_name }}"
         state: present
-        inbound_rules:
-          - protocol: "tcp"
-            ports: "80"
-            sources:
-              addresses: ["0.0.0.0/0", "::/0"]
-          - protocol: "tcp"
-            ports: "443"
-            sources:
-              addresses: ["0.0.0.0/0", "::/0"]
-        outbound_rules:
-          - protocol: "tcp"
-            ports: "1-65535"
-            destinations:
-              addresses: ["0.0.0.0/0", "::/0"]
-          - protocol: "udp"
-            ports: "1-65535"
-            destinations:
-              addresses: ["0.0.0.0/0", "::/0"]
-          - protocol: "icmp"
-            ports: "1-65535"
-            destinations:
-              addresses: ["0.0.0.0/0", "::/0"]
+        inbound_rules: "{{ firewall_inbound_rules }}"
+        outbound_rules: "{{ firewall_outbound_rules }}"
         droplet_ids: []
-        tags: ["testing"]
       register: testing_firewall
 
     - name: Verify firewall was created
