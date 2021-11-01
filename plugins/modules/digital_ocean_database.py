@@ -91,6 +91,15 @@ options:
       - How long before wait gives up, in seconds, when creating a database.
     default: 600
     type: int
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when creating databases.
+    type: str
+    required: false
+    default: ""
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
 """
@@ -107,6 +116,18 @@ EXAMPLES = r"""
     region: nyc1
     num_nodes: 1
   register: my_database
+
+- name: Create a Redis database (and assign to Project "test")
+  community.digitalocean.digital_ocean_database:
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_KEY') }}"
+    state: present
+    name: testdatabase1
+    engine: redis
+    size: db-s-1vcpu-1gb
+    region: nyc1
+    num_nodes: 1
+    project_name: test
+  register: my_database
 """
 
 
@@ -115,48 +136,63 @@ data:
   description: A DigitalOcean database
   returned: success
   type: dict
-  sample: {
-    "database": {
-      "connection": {
-         "database": "",
-         "host": "testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com",
-         "password": "REDACTED",
-         "port": 25061,
-         "protocol": "rediss",
-         "ssl": true,
-         "uri": "rediss://default:REDACTED@testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061",
-         "user": "default"
-      },
-      "created_at": "2021-04-21T15:41:14Z",
-      "db_names": null,
-      "engine": "redis",
-      "id": "37de10e4-808b-4f4b-b25f-7b5b3fd194ac",
-      "maintenance_window": {
-         "day": "monday",
-         "hour": "11:33:47",
-         "pending": false
-      },
-      "name": "testdatabase1",
-      "num_nodes": 1,
-      "private_connection": {
-         "database": "",
-         "host": "private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com",
-         "password": "REDIS",
-         "port": 25061,
-         "protocol": "rediss",
-         "ssl": true,
-         "uri": "rediss://default:REDACTED@private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061",
-         "user": "default"
-      },
-      "private_network_uuid": "0db3519b-9efc-414a-8868-8f2e6934688c",
-      "region": "nyc1",
-      "size": "db-s-1vcpu-1gb",
-      "status": "online",
-      "tags": null,
-      "users": null,
-      "version": "6"
-    }
-  }
+  sample:
+    database:
+      connection:
+         database: ""
+         host: testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com
+         password: REDACTED
+         port: 25061
+         protocol: rediss
+         ssl: true
+         uri: rediss://default:REDACTED@testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061
+         user: default
+      created_at: "2021-04-21T15:41:14Z"
+      db_names: null
+      engine: redis
+      id: 37de10e4-808b-4f4b-b25f-7b5b3fd194ac
+      maintenance_window:
+         day: monday
+         hour: 11:33:47
+         pending: false
+      name: testdatabase1
+      num_nodes: 1
+      private_connection:
+         database: ""
+         host: private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com
+         password: REDIS
+         port: 25061
+         protocol: rediss
+         ssl: true
+         uri: rediss://default:REDACTED@private-testdatabase1-do-user-3097135-0.b.db.ondigitalocean.com:25061
+         user: default
+      private_network_uuid: 0db3519b-9efc-414a-8868-8f2e6934688c,
+      region: nyc1
+      size: db-s-1vcpu-1gb
+      status: online
+      tags: null
+      users: null
+      version: 6
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/databases/126355fa-b147-40a6-850a-c44f5d2ad418
+        status: assigned
+        urn: do:dbaas:126355fa-b147-40a6-850a-c44f5d2ad418
 """
 
 
@@ -165,6 +201,7 @@ import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -172,6 +209,9 @@ class DODatabase(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
+        if self.module.params.get("project"):
+            # only load for non-default project assignments
+            self.projects = DigitalOceanProjects(module, self.rest)
         # pop wait and wait_timeout so we don't include it in the POST data
         self.wait = self.module.params.pop("wait", True)
         self.wait_timeout = self.module.params.pop("wait_timeout", 600)
@@ -285,15 +325,32 @@ class DODatabase(object):
                 changed=False,
                 msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
             )
+
+        database_id = database.get("id", None)
+        if database_id is None:
+            self.module.fail_json(
+                changed=False,
+                msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
+            )
+
         if self.wait:
-            database_id = database.get("id", None)
-            if database_id is None:
-                self.module.fail_json(
-                    changed=False,
-                    msg="Unexpected error; please file a bug https://github.com/ansible-collections/community.digitalocean/issues",
-                )
             json_data = self.ensure_online(database_id)
-        self.module.exit_json(changed=True, data=json_data)
+
+        project_name = self.module.params.get("project")
+        if project_name:  # empty string is the default project, skip project assignment
+            urn = "do:dbaas:{0}".format(database_id)
+            assign_status, error_message, resources = self.projects.assign_to_project(
+                project_name, urn
+            )
+            self.module.exit_json(
+                changed=True,
+                data=json_data,
+                msg=error_message,
+                assign_status=assign_status,
+                resources=resources,
+            )
+        else:
+            self.module.exit_json(changed=True, data=json_data)
 
     def delete(self):
         json_data = self.get_database()
@@ -370,6 +427,9 @@ def main():
             timeout=dict(type="int", default=30),
             wait=dict(type="bool", default=True),
             wait_timeout=dict(default=600, type="int"),
+            project_name=dict(
+                type="str", aliases=["project"], required=False, default=""
+            ),
         ),
         required_one_of=(["id", "name"],),
         required_if=(

@@ -26,10 +26,10 @@
         oauth_token: "{{ do_api_key }}"
       loop: "{{ result.floating_ips }}"
 
-    - name: Create the testing Droplet (present)
+    - name: Create the testing Droplet (active)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
-        state: present
+        state: active
         name: "{{ droplet_name }}"
         unique_name: true
         region: "{{ do_region }}"
@@ -38,11 +38,7 @@
         wait_timeout: 500
       register: droplet_result
 
-    - name: Give the cloud a minute to settle
-      ansible.builtin.pause:
-        minutes: 1
-
-    - name: Verify Droplet is present (from present)
+    - name: Verify Droplet is active
       ansible.builtin.assert:
         that:
           - droplet_result.changed
@@ -50,7 +46,52 @@
           - droplet_result.data.droplet is defined
           - droplet_result.data.droplet.name is defined
           - droplet_result.data.droplet.name == droplet_name
-          - droplet_result.data.droplet.status in ["new", "active", "available"]
+          - droplet_result.data.droplet.status == "active"
+
+    - name: Create a Floating IP and assign to Project
+      community.digitalocean.digital_ocean_floating_ip:
+        state: present
+        region: "{{ do_region }}"
+        oauth_token: "{{ do_api_key }}"
+        project: "{{ project_name }}"
+      register: floating_ip
+
+    - name: Verify that a Floating IP was created (and assigned to Project)
+      ansible.builtin.assert:
+        that:
+          - floating_ip.changed
+          - floating_ip.assign_status is defined
+          - floating_ip.assign_status == "assigned"
+          - floating_ip.msg is defined
+          - "'Assigned do:floatingip' in floating_ip.msg"
+          - floating_ip.resources is defined
+          - floating_ip.resources.status is defined
+          - floating_ip.resources.status == "assigned"
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Delete the Floating IP
+      community.digitalocean.digital_ocean_floating_ip:
+        state: absent
+        ip: "{{ floating_ip.data.floating_ip.ip }}"
+        region: "{{ do_region }}"
+        oauth_token: "{{ do_api_key }}"
+      register: result
+      when:
+        - floating_ip.data.floating_ip.ip is defined
+
+    - name: Verify that a Floating IP was deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+      when:
+        - floating_ip.data.floating_ip.ip is defined
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
 
     - name: "Create a Floating IP"
       community.digitalocean.digital_ocean_floating_ip:

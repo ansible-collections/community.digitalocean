@@ -55,6 +55,42 @@
           - result.result.name == "www"
           - result.result.data == "127.0.0.1"
 
+    - name: Delete the domain
+      community.digitalocean.digital_ocean_domain:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ domain_name }}"
+      register: result
+
+    - name: Ensure domain was deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Create the domain (and assign to Project)
+      community.digitalocean.digital_ocean_domain:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ domain_name }}"
+        ip: 127.0.0.1
+        project: "{{ project_name }}"
+      register: result
+
+    - name: Ensure domain was created
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.domain is defined
+          - result.domain.name is defined
+          - result.domain.name == domain_name
+          - result.assign_status is defined
+          - result.assign_status == "assigned"
+          - result.msg is defined
+          - "'Assigned do:domain' in result.msg"
+          - result.resources is defined
+          - result.resources.status is defined
+          - result.resources.status == "assigned"
+
   always:
 
     - name: Delete the domain
