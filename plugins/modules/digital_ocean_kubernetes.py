@@ -391,7 +391,7 @@ class DOKubernetes(object):
         # Add the kubeconfig to the return
         if self.return_kubeconfig:
             json_data["kubeconfig"] = self.get_kubernetes_kubeconfig()
-        self.module.exit_json(changed=True, data=json_data)
+        self.module.exit_json(changed=True, data=json_data["kubernetes_cluster"])
 
     def delete(self):
         """Deletes a DigitalOcean Kubernetes cluster
@@ -404,12 +404,12 @@ class DOKubernetes(object):
             response = self.rest.delete(
                 "kubernetes/clusters/{0}".format(json_data["id"])
             )
-            json_data = response.json
             if response.status_code == 204:
-                self.module.exit_json(changed=True, msg="Kubernetes cluster deleted")
+                self.module.exit_json(changed=True, data=json_data, msg="Kubernetes cluster deleted")
             self.module.fail_json(
                 changed=False, msg="Failed to delete Kubernetes cluster"
             )
+            json_data = response.json
         else:
             self.module.exit_json(changed=False, msg="Kubernetes cluster not found")
 
