@@ -405,7 +405,9 @@ class DOKubernetes(object):
                 "kubernetes/clusters/{0}".format(json_data["id"])
             )
             if response.status_code == 204:
-                self.module.exit_json(changed=True, data=json_data, msg="Kubernetes cluster deleted")
+                self.module.exit_json(
+                    changed=True, data=json_data, msg="Kubernetes cluster deleted"
+                )
             self.module.fail_json(
                 changed=False, msg="Failed to delete Kubernetes cluster"
             )
