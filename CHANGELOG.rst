@@ -5,6 +5,31 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.12.0
+=======
+
+Minor Changes
+-------------
+
+- digital_ocean_block_storage - adding Project support (https://github.com/ansible-collections/community.digitalocean/issues/171).
+- digital_ocean_database - adding Project support (https://github.com/ansible-collections/community.digitalocean/issues/171).
+- digital_ocean_domain - adding Project support (https://github.com/ansible-collections/community.digitalocean/issues/171).
+- digital_ocean_droplet - adding Project support (https://github.com/ansible-collections/community.digitalocean/issues/171).
+- digital_ocean_droplet - adding ability to apply and remove firewall by using droplet module (https://github.com/ansible-collections/community.digitalocean/issues/159).
+- digital_ocean_droplet - require unique_name for state=absent to avoid unintentional droplet deletions.
+- digital_ocean_firewall - inbound_rules and outbound_rules are no longer required for firewall removal (https://github.com/ansible-collections/community.digitalocean/issues/181).
+- digital_ocean_floating_ip - adding Project support (https://github.com/ansible-collections/community.digitalocean/issues/171).
+- digital_ocean_floating_ip - adding attach and detach states to floating ip module (https://github.com/ansible-collections/community.digitalocean/issues/170).
+- digital_ocean_load_balancer - adding Project support (https://github.com/ansible-collections/community.digitalocean/issues/171).
+- digitalocean integration tests - adding integration tests for CDN Endpoints (https://github.com/ansible-collections/community.digitalocean/issues/179).
+
+Bugfixes
+--------
+
+- Update the tests so that they only run once (https://github.com/ansible-collections/community.digitalocean/issues/186).
+- digital_ocean_droplet - fix resizing with C(state: active) does not actually turn Droplet on (https://github.com/ansible-collections/community.digitalocean/issues/140).
+- digital_ocean_kubernetes - fix return value consistency (https://github.com/ansible-collections/community.digitalocean/issues/174).
+
 v1.11.0
 =======
 

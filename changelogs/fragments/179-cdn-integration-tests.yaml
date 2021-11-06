@@ -1,2 +1,0 @@
-minor_changes:
-  - digitalocean integration tests - adding integration tests for CDN Endpoints (https://github.com/ansible-collections/community.digitalocean/issues/179).
