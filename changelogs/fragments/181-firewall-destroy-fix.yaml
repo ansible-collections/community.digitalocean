@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_firewall - inbound_rules and outbound_rules are no longer required for firewall removal (https://github.com/ansible-collections/community.digitalocean/issues/181).

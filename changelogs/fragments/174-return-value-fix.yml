@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_kubernetes - fix return value consistency (https://github.com/ansible-collections/community.digitalocean/issues/174).
