@@ -203,6 +203,15 @@ options:
       - How long before wait gives up, in seconds, when creating a Load Balancer.
     type: int
     default: 600
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when creating.
+    type: str
+    required: false
+    default: ""
 """
 
 
@@ -221,6 +230,22 @@ EXAMPLES = r"""
         target_port: 8080
         certificate_id: ""
         tls_passthrough: false
+
+- name: Create a Load Balancer (and assign to Project "test")
+  community.digitalocean.digital_ocean_load_balancer:
+    state: present
+    name: test-loadbalancer-1
+    droplet_ids:
+      - 12345678
+    region: nyc1
+    forwarding_rules:
+      - entry_protocol: http
+        entry_port: 8080
+        target_protocol: http
+        target_port: 8080
+        certificate_id: ""
+        tls_passthrough: false
+    project: test
 """
 
 
@@ -342,6 +367,26 @@ data:
         type: none
       tag: ''
       vpc_uuid: b8fd9a58-d93d-4329-b54a-78a397d64855
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/load_balancers/17d171d0-8a8b-4251-9c18-c96cc515d36d
+        status: assigned
+        urn: do:loadbalancer:17d171d0-8a8b-4251-9c18-c96cc515d36d
 """
 
 
@@ -350,6 +395,7 @@ from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -365,6 +411,9 @@ class DOLoadBalancer(object):
         self.module.params.pop("oauth_token")
         self.wait = self.module.params.pop("wait", True)
         self.wait_timeout = self.module.params.pop("wait_timeout", 600)
+        if self.module.params.get("project"):
+            # only load for non-default project assignments
+            self.projects = DigitalOceanProjects(module, self.rest)
 
     def get_by_id(self):
         """Fetch an existing DigitalOcean Load Balancer (by id)
@@ -569,7 +618,23 @@ class DOLoadBalancer(object):
         if self.wait:
             self.ensure_active()
 
-        self.module.exit_json(changed=True, data=json_data)
+        project_name = self.module.params.get("project")
+        if project_name:  # empty string is the default project, skip project assignment
+            urn = "do:loadbalancer:{0}".format(self.id)
+            (
+                assign_status,
+                error_message,
+                resources,
+            ) = self.projects.assign_to_project(project_name, urn)
+            self.module.exit_json(
+                changed=True,
+                data=json_data,
+                msg=error_message,
+                assign_status=assign_status,
+                resources=resources,
+            )
+        else:
+            self.module.exit_json(changed=True, data=json_data)
 
     def delete(self):
         """Deletes a DigitalOcean Load Balancer
@@ -692,6 +757,9 @@ def main():
             vpc_uuid=dict(type="str", required=False),
             wait=dict(type="bool", default=True),
             wait_timeout=dict(type="int", default=600),
+            project_name=dict(
+                type="str", aliases=["project"], required=False, default=""
+            ),
         ),
         required_if=(
             [

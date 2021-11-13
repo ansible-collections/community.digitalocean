@@ -68,6 +68,13 @@ options:
     required: false
     type: list
     elements: str
+  firewall:
+    description:
+      - Array of firewall names to apply to the Droplet.
+      - Omitting a firewall name that is currently applied to a droplet will remove it.
+    required: false
+    type: list
+    elements: str
   private_networking:
     description:
       - Add an additional, private network interface to the Droplet (for inter-Droplet communication).
@@ -135,6 +142,15 @@ options:
     required: false
     default: false
     type: bool
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when creating.
+    type: str
+    required: false
+    default: ""
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 """
@@ -148,13 +164,26 @@ EXAMPLES = r"""
     oauth_token: XXX
     size: 2gb
     region: sfo1
-    image: ubuntu-16-04-x64
+    image: ubuntu-18-04-x64
     wait_timeout: 500
     ssh_keys: [ .... ]
   register: my_droplet
 
 - debug:
     msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+
+- name: Create a new droplet (and assign to Project "test")
+  community.digitalocean.digital_ocean_droplet:
+    state: present
+    name: mydroplet
+    oauth_token: XXX
+    size: 2gb
+    region: sfo1
+    image: ubuntu-16-04-x64
+    wait_timeout: 500
+    ssh_keys: [ .... ]
+    project: test
+  register: my_droplet
 
 - name: Ensure a droplet is present
   community.digitalocean.digital_ocean_droplet:
@@ -164,7 +193,19 @@ EXAMPLES = r"""
     oauth_token: XXX
     size: 2gb
     region: sfo1
-    image: ubuntu-16-04-x64
+    image: ubuntu-18-04-x64
+    wait_timeout: 500
+
+- name: Ensure a droplet is present and has firewall rules applied
+  community.digitalocean.digital_ocean_droplet:
+    state: present
+    id: 123
+    name: mydroplet
+    oauth_token: XXX
+    size: 2gb
+    region: sfo1
+    image: ubuntu-18-04-x64
+    firewall: ['myfirewall', 'anotherfirewall']
     wait_timeout: 500
 
 - name: Ensure a droplet is present with SSH keys installed
@@ -176,7 +217,7 @@ EXAMPLES = r"""
     size: 2gb
     region: sfo1
     ssh_keys: ['1534404', '1784768']
-    image: ubuntu-16-04-x64
+    image: ubuntu-18-04-x64
     wait_timeout: 500
 """
 
@@ -186,42 +227,60 @@ data:
     description: a DigitalOcean Droplet
     returned: changed
     type: dict
-    sample: {
-        "ip_address": "104.248.118.172",
-        "ipv6_address": "2604:a880:400:d1::90a:6001",
-        "private_ipv4_address": "10.136.122.141",
-        "droplet": {
-            "id": 3164494,
-            "name": "example.com",
-            "memory": 512,
-            "vcpus": 1,
-            "disk": 20,
-            "locked": true,
-            "status": "new",
-            "kernel": {
-                "id": 2233,
-                "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic",
-                "version": "3.13.0-37-generic"
-            },
-            "created_at": "2014-11-14T16:36:31Z",
-            "features": ["virtio"],
-            "backup_ids": [],
-            "snapshot_ids": [],
-            "image": {},
-            "volume_ids": [],
-            "size": {},
-            "size_slug": "512mb",
-            "networks": {},
-            "region": {},
-            "tags": ["web"]
-        }
-    }
+    sample:
+        ip_address: 104.248.118.172
+        ipv6_address: 2604:a880:400:d1::90a:6001
+        private_ipv4_address: 10.136.122.141
+        droplet:
+            id: 3164494
+            name: example.com
+            memory: 512
+            vcpus: 1
+            disk: 20
+            locked: true
+            status: new
+            kernel:
+                id: 2233
+                name: Ubuntu 14.04 x64 vmlinuz-3.13.0-37-generic
+                version: 3.13.0-37-generic
+            created_at: "2014-11-14T16:36:31Z"
+            features: ["virtio"]
+            backup_ids: []
+            snapshot_ids: []
+            image: {}
+            volume_ids: []
+            size: {}
+            size_slug: 512mb
+            networks: {}
+            region: {}
+            tags: ["web"]
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/droplets/3164494
+        status: assigned
+        urn: do:droplet:3164494
 """
 
 import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -247,6 +306,85 @@ class DODroplet(object):
         self.name = None
         self.size = None
         self.status = None
+        if self.module.params.get("project"):
+            # only load for non-default project assignments
+            self.projects = DigitalOceanProjects(module, self.rest)
+        self.firewalls = self.get_firewalls()
+
+    def get_firewalls(self):
+        response = self.rest.get("firewalls")
+        status_code = response.status_code
+        json_data = response.json
+        if status_code != 200:
+            self.module.fail_json(msg="Failed to get firewalls", data=json_data)
+
+        return self.rest.get_paginated_data(
+            base_url="firewalls?", data_key_name="firewalls"
+        )
+
+    def get_firewall_by_name(self):
+        rule = {}
+        item = 0
+        for firewall in self.firewalls:
+            for firewall_name in self.module.params["firewall"]:
+                if firewall_name in firewall["name"]:
+                    rule[item] = {}
+                    rule[item].update(firewall)
+                    item += 1
+        if len(rule) > 0:
+            return rule
+        return None
+
+    def add_droplet_to_firewalls(self):
+        rule = self.get_firewall_by_name()
+        if rule is None:
+            err = "Failed to find firewalls: {0}".format(self.module.params["firewall"])
+            return err
+        json_data = self.get_droplet()
+        if json_data is not None:
+            request_params = {}
+            droplet = json_data.get("droplet", None)
+            droplet_id = droplet.get("id", None)
+            request_params["droplet_ids"] = [droplet_id]
+            for firewall in rule:
+                if droplet_id not in rule[firewall]["droplet_ids"]:
+                    response = self.rest.post(
+                        "firewalls/{0}/droplets".format(rule[firewall]["id"]),
+                        data=request_params,
+                    )
+                    json_data = response.json
+                    status_code = response.status_code
+                    if status_code != 204:
+                        err = "Failed to add droplet {0} to firewall {1}".format(
+                            droplet_id, rule[firewall]["id"]
+                        )
+                        return err
+        return None
+
+    def remove_droplet_from_firewalls(self):
+        json_data = self.get_droplet()
+        if json_data is not None:
+            request_params = {}
+            droplet = json_data.get("droplet", None)
+            droplet_id = droplet.get("id", None)
+            request_params["droplet_ids"] = [droplet_id]
+            for firewall in self.firewalls:
+                if (
+                    firewall["name"] not in self.module.params["firewall"]
+                    and droplet_id in firewall["droplet_ids"]
+                ):
+                    response = self.rest.delete(
+                        "firewalls/{0}/droplets".format(firewall["id"]),
+                        data=request_params,
+                    )
+                    json_data = response.json
+                    status_code = response.status_code
+                    if status_code != 204:
+                        err = "Failed to add droplet {0} to firewall {1}".format(
+                            droplet_id, firewall["id"]
+                        )
+                        return err
+        return None
 
     def get_by_id(self, droplet_id):
         if not droplet_id:
@@ -489,7 +627,6 @@ class DODroplet(object):
 
     def create(self, state):
         json_data = self.get_droplet()
-
         # We have the Droplet
         if json_data is not None:
             droplet = json_data.get("droplet", None)
@@ -502,6 +639,28 @@ class DODroplet(object):
                     msg=DODroplet.failure_message["unexpected"].format(
                         "no Droplet ID or size"
                     ),
+                )
+
+            # Add droplet to a firewall if specified
+            if self.module.params["firewall"] is not None:
+                if len(self.module.params["firewall"]) > 0:
+                    firewall_add = self.add_droplet_to_firewalls()
+                    if firewall_add is not None:
+                        self.module.fail_json(
+                            changed=False,
+                            msg=firewall_add,
+                            data={"droplet": droplet, "firewall": firewall_add},
+                        )
+                firewall_remove = self.remove_droplet_from_firewalls()
+                if firewall_remove is not None:
+                    self.module.fail_json(
+                        changed=False,
+                        msg=firewall_remove,
+                        data={"droplet": droplet, "firewall": firewall_remove},
+                    )
+                self.module.exit_json(
+                    changed=True,
+                    data={"droplet": droplet},
                 )
 
             # Check mode
@@ -576,11 +735,46 @@ class DODroplet(object):
             json_data = self.get_droplet()
             droplet = json_data.get("droplet", droplet)
 
+        project_name = self.module.params.get("project")
+        if project_name:  # empty string is the default project, skip project assignment
+            urn = "do:droplet:{0}".format(droplet_id)
+            assign_status, error_message, resources = self.projects.assign_to_project(
+                project_name, urn
+            )
+            self.module.exit_json(
+                changed=True,
+                data={"droplet": droplet},
+                msg=error_message,
+                assign_status=assign_status,
+                resources=resources,
+            )
+        # Add droplet to firewall if specified
+        if self.module.params["firewall"] is not None:
+            # raise Exception(self.module.params["firewall"])
+            firewall_add = self.add_droplet_to_firewalls()
+            if firewall_add is not None:
+                self.module.fail_json(
+                    changed=False,
+                    msg=firewall_add,
+                    data={"droplet": droplet, "firewall": firewall_add},
+                )
+            firewall_remove = self.remove_droplet_from_firewalls()
+            if firewall_remove is not None:
+                self.module.fail_json(
+                    changed=False,
+                    msg=firewall_remove,
+                    data={"droplet": droplet, "firewall": firewall_remove},
+                )
+            self.module.exit_json(changed=True, data={"droplet": droplet})
+
         self.module.exit_json(changed=True, data={"droplet": droplet})
 
     def delete(self):
+        if not self.unique_name:
+            self.module.fail_json(
+                changed=False, msg="unique_name must be set for deletes"
+            )
         json_data = self.get_droplet()
-
         if json_data is None:
             self.module.exit_json(changed=False, msg="Droplet not found")
 
@@ -651,6 +845,8 @@ def main():
         wait_timeout=dict(default=120, type="int"),
         unique_name=dict(type="bool", default=False),
         resize_disk=dict(type="bool", default=False),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
+        firewall=dict(type="list", elements="str", default=None),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -660,6 +856,7 @@ def main():
                 ("state", "present", ["name", "size", "image", "region"]),
                 ("state", "active", ["name", "size", "image", "region"]),
                 ("state", "inactive", ["name", "size", "image", "region"]),
+                ("state", "absent", ["name", "unique_name"]),
             ]
         ),
         supports_check_mode=True,

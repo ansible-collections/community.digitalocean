@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_floating_ip - adding attach and detach states to floating ip module (https://github.com/ansible-collections/community.digitalocean/issues/170).

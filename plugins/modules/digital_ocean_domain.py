@@ -36,6 +36,15 @@ options:
     description:
     - An 'A' record for '@' ($ORIGIN) will be created with the value 'ip'.  'ip' is an IP version 4 address.
     type: str
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when creating domains.
+    type: str
+    required: false
+    default: ""
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 
@@ -55,6 +64,13 @@ EXAMPLES = r"""
     state: present
     name: my.digitalocean.domain
     ip: 127.0.0.1
+
+- name: Create a domain (and associate to Project "test")
+  community.digitalocean.digital_ocean_domain:
+    state: present
+    name: my.digitalocean.domain
+    ip: 127.0.0.1
+    project: test
 
 # Create a droplet and corresponding domain
 - name: Create a droplet
@@ -77,6 +93,7 @@ EXAMPLES = r"""
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 import time
 
@@ -159,6 +176,10 @@ def run(module):
     do_manager = DoManager(module)
     state = module.params.get("state")
 
+    if module.params.get("project"):
+        # only load for non-default project assignments
+        projects = DigitalOceanProjects(module, do_manager)
+
     domain = do_manager.find()
     if state == "present":
         if not domain:
@@ -175,14 +196,51 @@ def run(module):
                 #
                 # Arguably, it's nice to see the records versus null, so, we'll just try a
                 # few times before giving up and returning null.
+
+                domain_name = module.params.get("name")
+                project_name = module.params.get("project")
+                urn = "do:domain:{0}".format(domain_name)
+
                 for i in range(ZONE_FILE_ATTEMPTS):
                     record = do_manager.domain_record()
                     if record is not None and "domain" in record:
-                        domain = record["domain"]
+                        domain = record.get("domain", None)
                         if domain is not None and "zone_file" in domain:
-                            module.exit_json(changed=True, domain=domain)
+                            if (
+                                project_name
+                            ):  # empty string is the default project, skip project assignment
+                                (
+                                    assign_status,
+                                    error_message,
+                                    resources,
+                                ) = projects.assign_to_project(project_name, urn)
+                                module.exit_json(
+                                    changed=True,
+                                    domain=domain,
+                                    msg=error_message,
+                                    assign_status=assign_status,
+                                    resources=resources,
+                                )
+                            else:
+                                module.exit_json(changed=True, domain=domain)
                     time.sleep(ZONE_FILE_SLEEP)
-                module.exit_json(changed=True, domain=domain)
+                if (
+                    project_name
+                ):  # empty string is the default project, skip project assignment
+                    (
+                        assign_status,
+                        error_message,
+                        resources,
+                    ) = projects.assign_to_project(project_name, urn)
+                    module.exit_json(
+                        changed=True,
+                        domain=domain,
+                        msg=error_message,
+                        assign_status=assign_status,
+                        resources=resources,
+                    )
+                else:
+                    module.exit_json(changed=True, domain=domain)
         else:
             records = do_manager.all_domain_records()
             if module.params.get("ip"):
@@ -219,6 +277,7 @@ def main():
         name=dict(type="str"),
         id=dict(aliases=["droplet_id"], type="int"),
         ip=dict(type="str"),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
 
     module = AnsibleModule(

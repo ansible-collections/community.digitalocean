@@ -2,9 +2,10 @@
 name: black
 
 on:
-  push:
   pull_request:
-    types: [ opened, reopened ]
+    types: [ opened, synchronize, reopened ]
+  push:
+    branches: [ main ]
 
 jobs:
   lint:

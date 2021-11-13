@@ -58,6 +58,15 @@ options:
       - This should only set to C(no) used on personally controlled sites using self-signed certificates.
     type: bool
     default: true
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    - Currently only supported when creating.
+    type: str
+    required: false
+    default: ""
 notes:
   - Version 2 of DigitalOcean API is used.
 requirements:
@@ -70,6 +79,12 @@ EXAMPLES = r"""
   community.digitalocean.digital_ocean_floating_ip:
     state: present
     region: lon1
+
+- name: Create a Floating IP in region lon1 (and assign to Project "test")
+  community.digitalocean.digital_ocean_floating_ip:
+    state: present
+    region: lon1
+    project: test
 
 - name: "Create a Floating IP assigned to Droplet ID 123456"
   community.digitalocean.digital_ocean_floating_ip:
@@ -101,40 +116,55 @@ data:
     description: a DigitalOcean Floating IP resource
     returned: success and no resource constraint
     type: dict
-    sample: {
-      "action": {
-        "id": 68212728,
-        "status": "in-progress",
-        "type": "assign_ip",
-        "started_at": "2015-10-15T17:45:44Z",
-        "completed_at": null,
-        "resource_id": 758603823,
-        "resource_type": "floating_ip",
-        "region": {
-          "name": "New York 3",
-          "slug": "nyc3",
-          "sizes": [
-            "512mb",
-            "1gb",
-            "2gb",
-            "4gb",
-            "8gb",
-            "16gb",
-            "32gb",
-            "48gb",
-            "64gb"
-          ],
-          "features": [
-            "private_networking",
-            "backups",
-            "ipv6",
-            "metadata"
-          ],
-          "available": true
-        },
-        "region_slug": "nyc3"
-      }
-    }
+    sample:
+      action:
+        id: 68212728
+        status: in-progress
+        type: assign_ip
+        started_at: '2015-10-15T17:45:44Z'
+        completed_at: null
+        resource_id: 758603823
+        resource_type: floating_ip
+        region:
+          name: New York 3
+          slug: nyc3
+          sizes:
+            - 512mb,
+            - 1gb,
+            - 2gb,
+            - 4gb,
+            - 8gb,
+            - 16gb,
+            - 32gb,
+            - 48gb,
+            - 64gb
+          features:
+            - private_networking
+            - backups
+            - ipv6
+            - metadata
+          available: true
+        region_slug: nyc3
+msg:
+    description: Informational or error message encountered during execution
+    returned: changed
+    type: str
+    sample: No project named test2 found
+assign_status:
+    description: Assignment status (ok, not_found, assigned, already_assigned, service_down)
+    returned: changed
+    type: str
+    sample: assigned
+resources:
+    description: Resource assignment involved in project assignment
+    returned: changed
+    type: dict
+    sample:
+        assigned_at: '2021-10-25T17:39:38Z'
+        links:
+            self: https://api.digitalocean.com/v2/floating_ips/157.230.64.107
+        status: assigned
+        urn: do:floatingip:157.230.64.107
 """
 
 import json
@@ -143,6 +173,11 @@ import time
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+    DigitalOceanProjects,
+)
 
 
 class Response(object):
@@ -399,7 +434,43 @@ def create_floating_ips(module, rest):
     status_code = response.status_code
     json_data = response.json
     if status_code == 202:
-        module.exit_json(changed=True, data=json_data)
+        if module.params.get(
+            "project"
+        ):  # only load for non-default project assignments
+            rest = DigitalOceanHelper(module)
+            projects = DigitalOceanProjects(module, rest)
+            project_name = module.params.get("project")
+            if (
+                project_name
+            ):  # empty string is the default project, skip project assignment
+                floating_ip = json_data.get("floating_ip")
+                ip = floating_ip.get("ip")
+                if ip:
+                    urn = "do:floatingip:{0}".format(ip)
+                    (
+                        assign_status,
+                        error_message,
+                        resources,
+                    ) = projects.assign_to_project(project_name, urn)
+                    module.exit_json(
+                        changed=True,
+                        data=json_data,
+                        msg=error_message,
+                        assign_status=assign_status,
+                        resources=resources,
+                    )
+                else:
+                    module.exit_json(
+                        changed=True,
+                        msg="Floating IP created but not assigned to the {0} Project (missing information from the API response)".format(
+                            project_name
+                        ),
+                        data=json_data,
+                    )
+            else:
+                module.exit_json(changed=True, data=json_data)
+        else:
+            module.exit_json(changed=True, data=json_data)
     else:
         module.fail_json(
             msg="Error creating floating ip [{0}: {1}]".format(
@@ -429,6 +500,9 @@ def main():
             ),
             validate_certs=dict(type="bool", default=True),
             timeout=dict(type="int", default=30),
+            project_name=dict(
+                type="str", aliases=["project"], required=False, default=""
+            ),
         ),
         required_if=[
             ("state", "delete", ["ip"]),

@@ -1,7 +1,9 @@
 name: sanity
 on:
   pull_request:
+    types: [ opened, synchronize, reopened ]
   push:
+    branches: [ main ]
   schedule:
     - cron: '0 6 * * *'
 

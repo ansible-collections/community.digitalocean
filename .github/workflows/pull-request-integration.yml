@@ -3,7 +3,7 @@ name: pull-request-integration
 on:
   pull_request_target:
     branches: [ main ]
-    types: [ opened, reopened ]
+    types: [ opened, synchronize, reopened ]
 
 concurrency:
   group: cloud-integration-tests
