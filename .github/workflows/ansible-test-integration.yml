@@ -21,9 +21,10 @@ jobs:
 
     steps:
       - name: Perform testing
-        uses: ansible-community/ansible-test-gh-action@release/v1
+        uses: ansible-community/ansible-test-gh-action@unstable/v1
         with:
           # ansible-core-version:
+          target: digital_ocean_account_info
           pre-test-cmd: >-  # Configure integration test run
             DO_API_KEY=${{ secrets.DO_API_KEY }}
             ./tests/utils/render.sh
@@ -33,3 +34,17 @@ jobs:
           target-python-version: 3.8
           testing-type: integration
           test-deps: community.general
+
+      # - name: Perform testing
+      #   uses: ansible-community/ansible-test-gh-action@release/v1
+      #   with:
+      #     # ansible-core-version:
+      #     pre-test-cmd: >-  # Configure integration test run
+      #       DO_API_KEY=${{ secrets.DO_API_KEY }}
+      #       ./tests/utils/render.sh
+      #       tests/integration/integration_config.yml.template
+      #       > tests/integration/integration_config.yml
+      #     python-version: 3.9
+      #     target-python-version: 3.8
+      #     testing-type: integration
+      #     test-deps: community.general
