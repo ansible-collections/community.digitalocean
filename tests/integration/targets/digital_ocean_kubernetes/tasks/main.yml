@@ -58,11 +58,27 @@
           - result.data.name is defined
           - result.data.name == cluster_name
 
+    - name: Gather information about the Kubernetes cluster (with kubeconfig)
+      community.digitalocean.digital_ocean_kubernetes_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ cluster_name }}"
+        return_kubeconfig: true
+      register: result
+
+    - name: Verify Kubernetes cluster information is found
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data is defined
+          - result.data.name is defined
+          - result.data.name == cluster_name
+          - result.data.kubeconfig is defined
+          - result.data.kubeconfig | length > 0
+
     - name: Give the cloud a minute to settle
       ansible.builtin.pause:
         minutes: 1
-
-  always:
 
     - name: Delete the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes:
@@ -80,3 +96,57 @@
       ansible.builtin.assert:
         that:
           - result.changed
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create the Kubernetes cluster (ha)
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ cluster_name }}"
+        version: "{{ cluster_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_ha_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 600
+        ha: true
+      register: result
+
+    - name: Verify Kubernetes cluster is present (ha)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Gather information about the Kubernetes cluster (ha)
+      community.digitalocean.digital_ocean_kubernetes_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ cluster_name }}"
+        return_kubeconfig: false
+      register: result
+
+    - name: Verify Kubernetes cluster information is found (ha)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data.name == cluster_name
+          - result.data.ha is true
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+  always:
+
+    - name: Delete the Kubernetes cluster
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ cluster_name }}"
+        version: "{{ cluster_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 600
+      ignore_errors: true  # Should this fail, we'll clean it up next run

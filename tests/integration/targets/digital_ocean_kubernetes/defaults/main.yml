@@ -5,3 +5,7 @@ cluster_node_pools:
   - name: gh-ci-k8s-workers
     size: s-1vcpu-2gb
     count: 1
+cluster_ha_node_pools:
+  - name: gh-ci-k8s-workers
+    size: s-1vcpu-2gb
+    count: 3
