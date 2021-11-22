@@ -42,6 +42,21 @@
         that:
           - not result.changed
 
+    - name: Gather information about nonexistent Kubernetes cluster
+      community.digitalocean.digital_ocean_kubernetes_info:
+        oauth_token: "{{ do_api_key }}"
+        name: nonexistent-cluster
+        return_kubeconfig: true
+      register: result
+      ignore_errors: true  # expected to fail
+
+    - name: Verify nonexistent Kubernetes cluster is failed
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.failed
+          - result.msg == "Kubernetes cluster not found"
+
     - name: Create the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes:
         oauth_token: "{{ do_api_key }}"
