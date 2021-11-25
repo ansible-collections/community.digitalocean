@@ -311,10 +311,11 @@ class DOKubernetes(object):
         response = self.rest.get(
             "kubernetes/clusters/{0}/kubeconfig".format(self.cluster_id)
         )
-        if response.status_code == 200:
-            return response.body
-        else:
-            self.module.fail_json(msg="Failed to retrieve kubeconfig")
+        return response.body
+        # if response.status_code == 200:
+        #     return response.body
+        # else:
+        #     self.module.fail_json(msg="Failed to retrieve kubeconfig")
 
     def get_kubernetes(self):
         """Returns an existing DigitalOcean Kubernetes cluster by name"""
