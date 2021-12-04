@@ -8,6 +8,7 @@ from ansible_collections.community.digitalocean.plugins.modules.digital_ocean_ku
     DOKubernetes,
 )
 
+
 class TestDOKubernetes(unittest.TestCase):
     def test_get_by_id_when_ok(self):
         module = MagicMock()
@@ -123,13 +124,7 @@ class TestDOKubernetes(unittest.TestCase):
         k.wait_timeout = 1
         k.get_by_id = MagicMock()
 
-        cluster = {
-            "kubernetes_cluster": {
-                "status": {
-                    "state": "running"
-                }
-            }
-        }
+        cluster = {"kubernetes_cluster": {"status": {"state": "running"}}}
 
         k.get_by_id.return_value = cluster
 
@@ -149,13 +144,7 @@ class TestDOKubernetes(unittest.TestCase):
         k.wait_timeout = 1
         k.get_by_id = MagicMock()
 
-        cluster = {
-            "kubernetes_cluster": {
-                "status": {
-                    "state": "stopped"
-                }
-            }
-        }
+        cluster = {"kubernetes_cluster": {"status": {"state": "stopped"}}}
 
         k.get_by_id.return_value = cluster
 
@@ -181,24 +170,9 @@ class TestDOKubernetes(unittest.TestCase):
 
         kubernetes_options = {
             "options": {
-                "regions": [
-                    {
-                        "name": "New York 1",
-                        "slug": "nyc1"
-                    }
-                ],
-                "versions": [
-                    {
-                        "kubernetes_version": "1.18.8",
-                        "slug": "1.18.8-do.0"
-                    }
-                ],
-                "sizes": [
-                    {
-                        "name": "s-1vcpu-2gb",
-                        "slug": "s-1vcpu-2gb"
-                    }
-                ]
+                "regions": [{"name": "New York 1", "slug": "nyc1"}],
+                "versions": [{"kubernetes_version": "1.18.8", "slug": "1.18.8-do.0"}],
+                "sizes": [{"name": "s-1vcpu-2gb", "slug": "s-1vcpu-2gb"}],
             }
         }
 
@@ -235,24 +209,9 @@ class TestDOKubernetes(unittest.TestCase):
 
         kubernetes_options = {
             "options": {
-                "regions": [
-                    {
-                        "name": "New York 1",
-                        "slug": "nyc1"
-                    }
-                ],
-                "versions": [
-                    {
-                        "kubernetes_version": "1.18.8",
-                        "slug": "1.18.8-do.0"
-                    }
-                ],
-                "sizes": [
-                    {
-                        "name": "s-1vcpu-2gb",
-                        "slug": "s-1vcpu-2gb"
-                    }
-                ]
+                "regions": [{"name": "New York 1", "slug": "nyc1"}],
+                "versions": [{"kubernetes_version": "1.18.8", "slug": "1.18.8-do.0"}],
+                "sizes": [{"name": "s-1vcpu-2gb", "slug": "s-1vcpu-2gb"}],
             }
         }
 
