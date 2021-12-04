@@ -33,3 +33,4 @@ jobs:
           test-deps: >-
             ansible.netcommon
             ansible.utils
+            community.general
