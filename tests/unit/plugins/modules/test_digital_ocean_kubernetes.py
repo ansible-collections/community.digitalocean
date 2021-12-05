@@ -141,7 +141,7 @@ class TestDOKubernetes(unittest.TestCase):
 
         k = DOKubernetes(module)
         k.end_time = 20
-        k.wait_timeout = 1
+        k.wait_timeout = -100
         k.get_by_id = MagicMock()
 
         cluster = {"kubernetes_cluster": {"status": {"state": "stopped"}}}
