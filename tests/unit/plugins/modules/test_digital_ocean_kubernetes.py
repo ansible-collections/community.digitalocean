@@ -150,7 +150,7 @@ class TestDOKubernetes(unittest.TestCase):
 
         time = MagicMock()
         time.time = MagicMock()
-        time.time.return_value = 10
+        time.time.return_value = 20
         time.sleep = MagicMock()
 
         module.fail_json.assert_called()
