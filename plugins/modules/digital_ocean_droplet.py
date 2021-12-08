@@ -151,6 +151,12 @@ options:
     type: str
     required: false
     default: ""
+  sleep_interval:
+    description:
+      - How long to C(sleep) in between action and status checks.
+      - Default is 10 seconds; this should be shorter than C(wait_timeout).
+    default: 10
+    type: int
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 """
@@ -310,6 +316,9 @@ class DODroplet(object):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
         self.firewalls = self.get_firewalls()
+        self.sleep_interval = self.module.params.pop("sleep_interval", 10)
+        if self.wait and (self.sleep_interval > self.wait_timeout):
+            self.module.fail_json(msg=f"Sleep interval {self.sleep_interval} should be less than {self.wait_timeout}")
 
     def get_firewalls(self):
         response = self.rest.get("firewalls")
@@ -531,7 +540,7 @@ class DODroplet(object):
             if droplet_status in desired_statuses:
                 return
 
-            time.sleep(10)
+            time.sleep(self.sleep_interval)
 
         self.module.fail_json(
             msg="Wait for Droplet [{0}] status timeout".format(
@@ -577,7 +586,7 @@ class DODroplet(object):
             if action_status == "completed":
                 return
 
-            time.sleep(10)
+            time.sleep(self.sleep_interval)
 
         self.module.fail_json(msg="Wait for Droplet action timeout")
 
@@ -847,6 +856,7 @@ def main():
         resize_disk=dict(type="bool", default=False),
         project_name=dict(type="str", aliases=["project"], required=False, default=""),
         firewall=dict(type="list", elements="str", default=None),
+        sleep_interval=dict(default=10, type="int"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
