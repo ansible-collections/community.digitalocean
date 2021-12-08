@@ -318,7 +318,9 @@ class DODroplet(object):
         self.firewalls = self.get_firewalls()
         self.sleep_interval = self.module.params.pop("sleep_interval", 10)
         if self.wait and (self.sleep_interval > self.wait_timeout):
-            self.module.fail_json(msg=f"Sleep interval {self.sleep_interval} should be less than {self.wait_timeout}")
+            self.module.fail_json(
+                msg=f"Sleep interval {self.sleep_interval} should be less than {self.wait_timeout}"
+            )
 
     def get_firewalls(self):
         response = self.rest.get("firewalls")
