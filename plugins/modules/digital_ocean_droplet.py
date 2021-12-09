@@ -154,7 +154,7 @@ options:
   sleep_interval:
     description:
       - How long to C(sleep) in between action and status checks.
-      - Default is 10 seconds; this should be shorter than C(wait_timeout).
+      - Default is 10 seconds; this should be less than C(wait_timeout) and nonzero.
     default: 10
     type: int
 extends_documentation_fragment:
@@ -321,12 +321,19 @@ class DODroplet(object):
             self.projects = DigitalOceanProjects(module, self.rest)
         self.firewalls = self.get_firewalls()
         self.sleep_interval = self.module.params.pop("sleep_interval", 10)
-        if self.wait and (self.sleep_interval > self.wait_timeout):
-            self.module.fail_json(
-                msg="Sleep interval {0} should be less than {1}".format(
-                    self.sleep_interval, self.wait_timeout
+        if self.wait:
+            if self.sleep_interval > self.wait_timeout:
+                self.module.fail_json(
+                    msg="Sleep interval {0} should be less than {1}".format(
+                        self.sleep_interval, self.wait_timeout
+                    )
                 )
-            )
+            if self.sleep_interval <= 0:
+                self.module.fail_json(
+                    msg="Sleep interval {0} should be greater than zero".format(
+                        self.sleep_interval
+                    )
+                )
 
     def get_firewalls(self):
         response = self.rest.get("firewalls")
