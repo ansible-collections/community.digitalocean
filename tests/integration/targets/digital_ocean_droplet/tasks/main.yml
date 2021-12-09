@@ -36,6 +36,26 @@
         that:
           - not result.changed
 
+    - name: Create the Droplet (invalid sleep_interval)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        sleep_interval: 1000
+        wait_timeout: 500
+      ignore_errors: true  # Expected to fail
+      register: result
+
+    - name: Verify invalid sleep_interval fails
+      ansible.builtin.assert:
+        that:
+          - result.msg is search("Sleep interval")
+          - result.msg is search("should be less")
+
     - name: Create the Droplet (present)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
