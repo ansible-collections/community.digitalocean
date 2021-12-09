@@ -293,10 +293,14 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 class DODroplet(object):
 
     failure_message = {
-        "empty_reponse": "Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-        "resizing_off": "Droplet must be off prior to resizing: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
-        "unexpected": "Unexpected error [{0}]; please file a bug: https://github.com/ansible-collections/community.digitalocean/issues",
-        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: https://docs.digitalocean.com/support/",
+        "empty_response": "Empty response from the DigitalOcean API; please try again or open a bug if it never "
+        "succeeds.",
+        "resizing_off": "Droplet must be off prior to resizing: "
+        "https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "unexpected": "Unexpected error [{0}]; please file a bug: "
+        "https://github.com/ansible-collections/community.digitalocean/issues",
+        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: "
+        "https://docs.digitalocean.com/support/",
         "failed_to": "Failed to {0} {1} [HTTP {2}: {3}]",
     }
 
