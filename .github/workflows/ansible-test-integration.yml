@@ -30,6 +30,6 @@ jobs:
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
           python-version: 3.9
-          target-python-version: 3.8
+          target-python-version: 3.9
           testing-type: integration
           test-deps: community.general

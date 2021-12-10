@@ -25,6 +25,38 @@
         that:
           - not result.changed
 
+    - name: Ensure Kubernetes cluster is absent (ha)
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ cluster_ha_name }}"
+        version: "{{ cluster_ha_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_ha_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 600
+      register: result
+
+    - name: Verify Kubernetes cluster is absent (ha)
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Gather information about nonexistent Kubernetes cluster
+      community.digitalocean.digital_ocean_kubernetes_info:
+        oauth_token: "{{ do_api_key }}"
+        name: nonexistent-cluster
+        return_kubeconfig: true
+      register: result
+      ignore_errors: true  # expected to fail
+
+    - name: Verify nonexistent Kubernetes cluster is failed
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.failed
+          - result.msg == "Kubernetes cluster not found"
+
     - name: Create the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes:
         oauth_token: "{{ do_api_key }}"
@@ -58,11 +90,27 @@
           - result.data.name is defined
           - result.data.name == cluster_name
 
+    - name: Gather information about the Kubernetes cluster (with kubeconfig)
+      community.digitalocean.digital_ocean_kubernetes_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ cluster_name }}"
+        return_kubeconfig: true
+      register: result
+
+    - name: Verify Kubernetes cluster information is found
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data is defined
+          - result.data.name is defined
+          - result.data.name == cluster_name
+          - result.data.kubeconfig is defined
+          - result.data.kubeconfig | length > 0
+
     - name: Give the cloud a minute to settle
       ansible.builtin.pause:
         minutes: 1
-
-  always:
 
     - name: Delete the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes:
@@ -80,3 +128,70 @@
       ansible.builtin.assert:
         that:
           - result.changed
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create the Kubernetes cluster (ha)
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ cluster_ha_name }}"
+        version: "{{ cluster_ha_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_ha_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 1200
+        ha: true
+      register: result
+
+    - name: Verify Kubernetes cluster is present (ha)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data.name == cluster_ha_name
+          - result.data.ha is true
+
+    - name: Gather information about the Kubernetes cluster (ha)
+      community.digitalocean.digital_ocean_kubernetes_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ cluster_ha_name }}"
+        return_kubeconfig: true
+      register: result
+
+    - name: Verify Kubernetes cluster information is found (ha)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data.kubeconfig | length > 0
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+  always:
+
+    - name: Delete the Kubernetes cluster
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ cluster_name }}"
+        version: "{{ cluster_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 600
+      ignore_errors: true  # Should this fail, we'll clean it up next run
+
+    - name: Delete the Kubernetes cluster (ha)
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ cluster_ha_name }}"
+        version: "{{ cluster_ha_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_ha_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 600
+      ignore_errors: true  # Should this fail, we'll clean it up next run
