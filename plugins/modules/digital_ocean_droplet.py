@@ -151,6 +151,12 @@ options:
     type: str
     required: false
     default: ""
+  sleep_interval:
+    description:
+      - How long to C(sleep) in between action and status checks.
+      - Default is 10 seconds; this should be less than C(wait_timeout) and nonzero.
+    default: 10
+    type: int
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 """
@@ -287,10 +293,14 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 class DODroplet(object):
 
     failure_message = {
-        "empty_reponse": "Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-        "resizing_off": "Droplet must be off prior to resizing: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
-        "unexpected": "Unexpected error [{0}]; please file a bug: https://github.com/ansible-collections/community.digitalocean/issues",
-        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: https://docs.digitalocean.com/support/",
+        "empty_response": "Empty response from the DigitalOcean API; please try again or open a bug if it never "
+        "succeeds.",
+        "resizing_off": "Droplet must be off prior to resizing: "
+        "https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "unexpected": "Unexpected error [{0}]; please file a bug: "
+        "https://github.com/ansible-collections/community.digitalocean/issues",
+        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: "
+        "https://docs.digitalocean.com/support/",
         "failed_to": "Failed to {0} {1} [HTTP {2}: {3}]",
     }
 
@@ -310,6 +320,20 @@ class DODroplet(object):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
         self.firewalls = self.get_firewalls()
+        self.sleep_interval = self.module.params.pop("sleep_interval", 10)
+        if self.wait:
+            if self.sleep_interval > self.wait_timeout:
+                self.module.fail_json(
+                    msg="Sleep interval {0} should be less than {1}".format(
+                        self.sleep_interval, self.wait_timeout
+                    )
+                )
+            if self.sleep_interval <= 0:
+                self.module.fail_json(
+                    msg="Sleep interval {0} should be greater than zero".format(
+                        self.sleep_interval
+                    )
+                )
 
     def get_firewalls(self):
         response = self.rest.get("firewalls")
@@ -531,7 +555,7 @@ class DODroplet(object):
             if droplet_status in desired_statuses:
                 return
 
-            time.sleep(10)
+            time.sleep(self.sleep_interval)
 
         self.module.fail_json(
             msg="Wait for Droplet [{0}] status timeout".format(
@@ -577,7 +601,7 @@ class DODroplet(object):
             if action_status == "completed":
                 return
 
-            time.sleep(10)
+            time.sleep(self.sleep_interval)
 
         self.module.fail_json(msg="Wait for Droplet action timeout")
 
@@ -847,6 +871,7 @@ def main():
         resize_disk=dict(type="bool", default=False),
         project_name=dict(type="str", aliases=["project"], required=False, default=""),
         firewall=dict(type="list", elements="str", default=None),
+        sleep_interval=dict(default=10, type="int"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
