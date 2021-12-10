@@ -140,6 +140,18 @@ releases:
     - 181-firewall-destroy-fix.yaml
     - 186-tests-running-twice.yaml
     release_date: '2021-11-06'
+  1.13.0:
+    changes:
+      minor_changes:
+      - Set Python 3.9 as the C(python-version) and C(target-python-version) in the
+        integration, sanity, and unit tests for Ansible > 2.9 (3.8 otherwise).
+      - digital_ocean_droplet - allow the user to override the Droplet action and
+        status polling interval (https://github.com/ansible-collections/community.digitalocean/issues/194).
+      - digital_ocean_kubernetes - adding support for HA control plane (https://github.com/ansible-collections/community.digitalocean/issues/190).
+    fragments:
+    - 190-kubernetes-ha.yaml
+    - 194-droplet-sleep-variable.yaml
+    release_date: '2021-12-10'
   1.2.0:
     changes:
       bugfixes:

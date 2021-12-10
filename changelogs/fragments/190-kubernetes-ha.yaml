@@ -1,3 +1,0 @@
-minor_changes:
-  - digital_ocean_kubernetes - Adding support for HA control plane (https://github.com/ansible-collections/community.digitalocean/issues/190).
-  - Set Python 3.9 as the C(python-version) and C(target-python-version) in the integration, sanity, and unit tests.
