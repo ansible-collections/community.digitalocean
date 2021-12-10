@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_droplet - allow the user to override the Droplet action and status polling interval (https://github.com/ansible-collections/community.digitalocean/issues/194).
