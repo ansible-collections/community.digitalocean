@@ -36,6 +36,23 @@
         that:
           - not result.changed
 
+    - name: Create the Droplet (invalid region)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: xyz1
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      ignore_errors: true  # Expected to fail
+      register: result
+
+    - name: Verify invalid region fails
+      ansible.builtin.assert:
+        that:
+          - result.msg is search("invalid region")
+
     - name: Create the Droplet (sleep_interval > wait_timeout)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
