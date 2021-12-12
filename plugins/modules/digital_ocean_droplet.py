@@ -729,8 +729,17 @@ class DODroplet(object):
         status_code = response.status_code
         message = json_data.get("message", "no error message")
         droplet = json_data.get("droplet", None)
-        droplet_id = droplet.get("id", None)
 
+        # Ensure that the Droplet is created
+        if status_code != 202:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "create", "Droplet", status_code, message
+                ),
+            )
+
+        droplet_id = droplet.get("id", None)
         if droplet is None or droplet_id is None:
             self.module.fail_json(
                 changed=False,
