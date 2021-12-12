@@ -1,0 +1,3 @@
+bugfixes:
+  - Update README.md with updated Droplet examples (https://github.com/ansible-collections/community.digitalocean/issues/199).
+  - digital_ocean_droplet - update Droplet examples (https://github.com/ansible-collections/community.digitalocean/issues/199).

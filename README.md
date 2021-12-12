@@ -94,33 +94,42 @@ It's preferable to use content in this collection using their Fully Qualified Co
   gather_facts: false
   connection: local
 
+  vars:
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+
   tasks:
-    - name: Create ssh key
+    - name: Create SSH key
       community.digitalocean.digital_ocean_sshkey:
         oauth_token: "{{ oauth_token }}"
         name: mykey
         ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAQQDDHr/jh2Jy4yALcK4JyWbVkPRaWmhck3IgCoeOO3z1e2dBowLh64QAM+Qb72pxekALga2oi4GvT+TlWNhzPH4V example"
         state: present
-      register: result
+      register: my_ssh_key
 
-    - name: Create a new droplet
+    - name: Create a new Droplet
       community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ oauth_token }}"
         state: present
         name: mydroplet
-        oauth_token: "{{ oauth_token }}"
-        size: 2gb
-        region: sfo1
+        unique_name: true
+        size: s-1vcpu-1gb
+        region: sfo3
         image: ubuntu-20-04-x64
         wait_timeout: 500
         ssh_keys:
-          - mykey
+          - "{{ my_ssh_key.data.ssh_key.id }}"
       register: my_droplet
 
-    - debug:
-        msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+    - name: Show Droplet info
+      ansible.builtin.debug:
+        msg: |
+          Droplet ID is {{ my_droplet.data.droplet.id }}
+          First Public IPv4 is {{ (my_droplet.data.droplet.networks.v4 | selectattr('type', 'equalto', 'public')).0.ip_address | default('<none>', true) }}
+          First Private IPv4 is {{ (my_droplet.data.droplet.networks.v4 | selectattr('type', 'equalto', 'private')).0.ip_address | default('<none>', true) }}
 
     - name: Tag a resource; creating the tag if it does not exist
-      digital_ocean_tag:
+      community.digitalocean.digital_ocean_tag:
+        oauth_token: "{{ oauth_token }}"
         name: "{{ item }}"
         resource_id: "{{ my_droplet.data.droplet.id }}"
         state: present
