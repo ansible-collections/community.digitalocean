@@ -212,7 +212,6 @@ EXAMPLES = r"""
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     id: 123
     name: mydroplet
-    oauth_token: XXX
     size: s-1vcpu-1gb
     region: sfo3
     image: ubuntu-20-04-x64
