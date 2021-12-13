@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_droplet - ensure that Droplet creation is successful (https://github.com/ansible-collections/community.digitalocean/issues/197).
