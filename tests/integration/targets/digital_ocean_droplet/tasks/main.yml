@@ -93,7 +93,85 @@
           - result.msg is search("Sleep interval")
           - result.msg is search("should be greater")
 
-    - name: Create the Droplet (present)
+    - name: Create the Droplet (present, not unique_name, and non-default project)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: false
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+        project: "{{ secondary_project_name }}"
+      register: result
+
+    - name: Verify Droplet is present (from present, not unique_name, and non-default project)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status in ["new", "active", "available"]
+          - result.assign_status == "assigned"
+          - result.msg is search("Assigned")
+          - result.msg is search("to project " ~ secondary_project_name)
+
+    - name: Destroy the Droplet (absent)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        id: "{{ result.data.droplet.id }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      register: result
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create the Droplet (present, unique_name, and non-default project)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+        project: "{{ secondary_project_name }}"
+      register: result
+
+    - name: Verify Droplet is present (from present)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status in ["new", "active", "available"]
+          - result.assign_status == "assigned"
+          - result.msg is search("Assigned")
+          - result.msg is search("to project " ~ secondary_project_name)
+
+    - name: Destroy the Droplet (absent)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      register: result
+
+    - name: Verify Droplet is absent (from absent)
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Create the Droplet (present, unique_name, default project)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: present
@@ -113,9 +191,6 @@
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.data is defined
-          - result.data.droplet is defined
-          - result.data.droplet.name is defined
           - result.data.droplet.name == droplet_name
           - result.data.droplet.status in ["new", "active", "available"]
 
