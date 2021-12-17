@@ -767,6 +767,13 @@ class DODroplet(object):
             if state == "inactive":
                 self.ensure_power_off(droplet_id)
 
+        # Get updated Droplet data (fallback to current data)
+        if self.wait:
+            json_data = self.get_droplet()
+            # Without unique_name json_data is None
+            if json_data:
+                droplet = json_data.get("droplet", droplet)
+
         project_name = self.module.params.get("project")
         if project_name:  # empty string is the default project, skip project assignment
             urn = "do:droplet:{0}".format(droplet_id)
