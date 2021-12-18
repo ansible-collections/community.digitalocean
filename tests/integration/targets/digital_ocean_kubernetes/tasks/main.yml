@@ -85,10 +85,7 @@
     - name: Verify Kubernetes cluster information is found
       ansible.builtin.assert:
         that:
-          - result.changed
-          - result.data is defined
-          - result.data is defined
-          - result.data.name is defined
+          - not result.changed
           - result.data.name == cluster_name
 
     - name: Gather information about the Kubernetes cluster (with kubeconfig)
