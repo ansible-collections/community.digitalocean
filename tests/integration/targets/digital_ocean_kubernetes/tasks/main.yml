@@ -73,6 +73,7 @@
       ansible.builtin.assert:
         that:
           - result.changed
+          - result.data.name == cluster_name
 
     - name: Gather information about the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes_info:
