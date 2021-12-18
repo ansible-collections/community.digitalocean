@@ -244,10 +244,8 @@ def main():
                 required=False,
                 default=3600,
             ),
-            certificate_id=dict(type="str", required=False),
-            custom_domain=dict(type="str", required=False),
-            validate_certs=dict(type="bool", default=True),
-            timeout=dict(type="int", default=30),
+            certificate_id=dict(type="str", default=""),
+            custom_domain=dict(type="str", default=""),
         ),
         supports_check_mode=True,
     )
