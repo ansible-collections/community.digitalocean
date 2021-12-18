@@ -246,6 +246,8 @@ def main():
             ),
             certificate_id=dict(type="str", default=""),
             custom_domain=dict(type="str", default=""),
+            validate_certs=dict(type="bool", default=True),
+            timeout=dict(type="int", default=30),
         ),
         supports_check_mode=True,
     )
