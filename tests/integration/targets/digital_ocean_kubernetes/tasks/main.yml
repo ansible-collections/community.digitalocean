@@ -173,6 +173,35 @@
       ansible.builtin.pause:
         minutes: 1
 
+    - name: Delete the Kubernetes cluster
+      community.digitalocean.digital_ocean_kubernetes:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ cluster_ha_name }}"
+        version: "{{ cluster_ha_version }}"
+        region: "{{ do_region }}"
+        node_pools: "{{ cluster_ha_node_pools }}"
+        return_kubeconfig: false
+        wait_timeout: 600
+      register: result
+
+    - name: Verify the Kubernetes cluster is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    # FIXME: https://github.com/ansible-collections/community.digitalocean/issues/204
+    # @mamercad: I'm asking internally why this isn't done automatically.
+    - name: Delete the Kubernetes cluster tag
+      community.digitalocean.digital_ocean_tag:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "k8s:{{ result.data.id }}"
+
   always:
 
     - name: Delete the Kubernetes cluster
