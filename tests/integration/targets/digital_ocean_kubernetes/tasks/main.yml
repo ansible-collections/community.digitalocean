@@ -128,6 +128,14 @@
       ansible.builtin.pause:
         minutes: 1
 
+    # FIXME: https://github.com/ansible-collections/community.digitalocean/issues/204
+    # @mamercad: I'm asking internally why this isn't done automatically.
+    - name: Delete the Kubernetes cluster tag
+      community.digitalocean.digital_ocean_tag:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "k8s:{{ result.data.id }}"
+
     - name: Create the Kubernetes cluster (ha)
       community.digitalocean.digital_ocean_kubernetes:
         oauth_token: "{{ do_api_key }}"
