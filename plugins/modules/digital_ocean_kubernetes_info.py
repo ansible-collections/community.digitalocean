@@ -200,7 +200,7 @@ class DOKubernetesInfo(object):
         if json_data:
             if self.return_kubeconfig:
                 json_data["kubeconfig"] = self.get_kubernetes_kubeconfig()
-            self.module.exit_json(changed=True, data=json_data)
+            self.module.exit_json(changed=False, data=json_data)
         self.module.fail_json(changed=False, msg="Kubernetes cluster not found")
 
 
