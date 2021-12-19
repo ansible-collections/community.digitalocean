@@ -166,7 +166,7 @@
     - name: Verify Kubernetes cluster information is found (ha)
       ansible.builtin.assert:
         that:
-          - result.changed
+          - not result.changed
           - result.data.kubeconfig | length > 0
 
     - name: Give the cloud a minute to settle
