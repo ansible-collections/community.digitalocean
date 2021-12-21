@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_droplet - fixing project assignment for the C(unique_name=False) case (https://github.com/ansible-collections/community.digitalocean/issues/201).
