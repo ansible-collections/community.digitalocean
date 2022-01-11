@@ -709,15 +709,15 @@ class DODroplet(object):
                     # Get updated Droplet data (fallback to current data)
                     json_data = self.get_droplet()
                     droplet = json_data.get("droplet", droplet)
-                    self.module.exit_json(changed=True, data={'droplet': droplet})
+                    self.module.exit_json(changed=True, data={"droplet": droplet})
                 elif state == "inactive" and droplet_status != "off":
                     self.ensure_power_off(droplet_id)
                     # Get updated Droplet data (fallback to current data)
                     json_data = self.get_droplet()
                     droplet = json_data.get("droplet", droplet)
-                    self.module.exit_json(changed=True, data={'droplet': droplet})
+                    self.module.exit_json(changed=True, data={"droplet": droplet})
                 else:
-                    self.module.exit_json(changed=False, data={'droplet': droplet})
+                    self.module.exit_json(changed=False, data={"droplet": droplet})
 
         # We don't have the Droplet, create it
 
