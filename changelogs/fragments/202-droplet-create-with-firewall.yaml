@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - fix droplets creating without specified firewall (https://github.com/ansible-collections/community.digitalocean/issues/202).
