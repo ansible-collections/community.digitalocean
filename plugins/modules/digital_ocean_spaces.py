@@ -151,26 +151,26 @@ def run(module):
             module.exit_json(changed=True, msg=f"Would create Space {name} in {region}")
 
         try:
-            bucket = client.create_bucket(Bucket=name)
+            response = client.create_bucket(Bucket=name)
         except Exception as e:
             module.fail_json(msg=to_native(e), exception=format_exc())
 
-        resp = bucket.get("ResponseMetadata")
-        if resp:
-            status_code = resp.get("HTTPStatusCode")
-            if status_code == 200:
-                module.exit_json(
-                    changed=True,
-                    msg=f"Created Space {name} in {region}",
-                    data={
-                        "space": {
-                            "name": name,
-                            "region": region,
-                            "endpoint_url": f"https://{region}.digitaloceanspaces.com",
-                            "space_url": f"https://{name}.{region}.digitaloceanspaces.com",
-                        }
-                    },
-                )
+        response_metadata = response.get("ResponseMetadata")
+        http_status_code = response_metadata.get("HTTPStatusCode")
+        if http_status_code == 200:
+            module.exit_json(
+                changed=True,
+                msg=f"Created Space {name} in {region}",
+                data={
+                    "space": {
+                        "name": name,
+                        "region": region,
+                        "endpoint_url": f"https://{region}.digitaloceanspaces.com",
+                        "space_url": f"https://{name}.{region}.digitaloceanspaces.com",
+                    }
+                },
+            )
+
         module.fail_json(changed=True, msg=f"Failed to create Space: {bucket}")
 
     elif state == "absent":
@@ -189,17 +189,15 @@ def run(module):
 
         if have_it:
             try:
-                bucket = client.delete_bucket(Bucket=name)
+                reponse = client.delete_bucket(Bucket=name)
             except Exception as e:
                 module.fail_json(msg=to_native(e), exception=format_exc())
 
-            resp = bucket.get("ResponseMetadata")
-            if resp:
-                status_code = resp.get("HTTPStatusCode")
-                if status_code == 204:
-                    module.exit_json(
-                        changed=True, msg=f"Deleted Space {name} in {region}"
-                    )
+            response_metadata = response.get("ResponseMetadata")
+            http_status_code = response_metadata.get("HTTPStatusCode")
+            if http_status_code == 204:
+                module.exit_json(changed=True, msg=f"Deleted Space {name} in {region}")
+
             module.fail_json(
                 changed=True, msg=f"Failed to delete Space {name} in {region}"
             )
