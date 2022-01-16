@@ -26,6 +26,8 @@ jobs:
           # ansible-core-version:
           pre-test-cmd: >-  # Configure integration test run
             DO_API_KEY=${{ secrets.DO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
