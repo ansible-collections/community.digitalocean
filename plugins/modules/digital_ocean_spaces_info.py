@@ -32,7 +32,7 @@ options:
     description:
       - The region from which to list Spaces.
     aliases: ["region_id"]
-    required: true 
+    required: true
     type: str
   aws_access_key_id:
     description:
@@ -47,7 +47,7 @@ options:
     type: str
     aliases: ["AWS_SECRET_ACCESS_KEY"]
 requirements:
-  - boto3    
+  - boto3
 """
 
 
@@ -64,7 +64,7 @@ data:
   description: List of DigitalOcean Spaces
   returned: always
   type: dict
-  sample: 
+  sample:
     spaces:
       - endpoint_url: https://nyc3.digitaloceanspaces.com
         name: gh-ci-space

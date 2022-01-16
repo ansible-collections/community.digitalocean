@@ -32,7 +32,7 @@ options:
     description:
       - The region to create or delete the Space in.
     aliases: ["region_id"]
-    required: true 
+    required: true
     type: str
   aws_access_key_id:
     description:
@@ -46,7 +46,7 @@ options:
     required: true
     type: str
     aliases: ["AWS_SECRET_ACCESS_KEY"]
-requirements:    
+requirements:
   - boto3
 """
 
@@ -57,7 +57,7 @@ EXAMPLES = r"""
     state: present
     name: my-space
     region: nyc3
-    
+
 - name: Delete a Space in nyc3
   community.digitalocean.digital_ocean_spaces:
     state: absent
@@ -77,11 +77,11 @@ data:
       name: gh-ci-space-1
       region: nyc3
       space_url: https://gh-ci-space-1.nyc3.digitaloceanspaces.com
-msg:      
+msg:
   description: Informational message
   returned: always
   type: str
-  sample: Created Space gh-ci-space-1 in nyc3 
+  sample: Created Space gh-ci-space-1 in nyc3
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
