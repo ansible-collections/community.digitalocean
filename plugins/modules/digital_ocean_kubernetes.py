@@ -147,6 +147,12 @@ options:
       - How long before wait gives up, in seconds, when creating a cluster.
     type: int
     default: 600
+  ha:
+    description:
+      - A boolean value indicating whether the control plane is run in a highly available configuration in the cluster.
+      - Highly available control planes incur less downtime.
+    type: bool
+    default: false
 """
 
 
@@ -305,8 +311,10 @@ class DOKubernetes(object):
         response = self.rest.get(
             "kubernetes/clusters/{0}/kubeconfig".format(self.cluster_id)
         )
-        text_data = response.text
-        return text_data
+        if response.status_code == 200:
+            return response.body
+        else:
+            self.module.fail_json(msg="Failed to retrieve kubeconfig")
 
     def get_kubernetes(self):
         """Returns an existing DigitalOcean Kubernetes cluster by name"""
@@ -466,6 +474,7 @@ def main():
             return_kubeconfig=dict(type="bool", default=False),
             wait=dict(type="bool", default=True),
             wait_timeout=dict(type="int", default=600),
+            ha=dict(type="bool", default=False),
         ),
         required_if=(
             [

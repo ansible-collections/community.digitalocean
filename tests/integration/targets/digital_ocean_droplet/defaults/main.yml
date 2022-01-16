@@ -11,3 +11,4 @@ firewall_inbound_rules:
     sources:
       addresses: ["0.0.0.0/0", "::/0"]
 firewall_outbound_rules: []
+secondary_project_name: test-project

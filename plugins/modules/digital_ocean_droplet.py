@@ -151,73 +151,83 @@ options:
     type: str
     required: false
     default: ""
+  sleep_interval:
+    description:
+      - How long to C(sleep) in between action and status checks.
+      - Default is 10 seconds; this should be less than C(wait_timeout) and nonzero.
+    default: 10
+    type: int
 extends_documentation_fragment:
 - community.digitalocean.digital_ocean.documentation
 """
 
 
 EXAMPLES = r"""
-- name: Create a new droplet
+- name: Create a new Droplet
   community.digitalocean.digital_ocean_droplet:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     name: mydroplet
-    oauth_token: XXX
-    size: 2gb
-    region: sfo1
-    image: ubuntu-18-04-x64
+    size: s-1vcpu-1gb
+    region: sfo3
+    image: ubuntu-20-04-x64
     wait_timeout: 500
     ssh_keys: [ .... ]
   register: my_droplet
 
-- debug:
-    msg: "ID is {{ my_droplet.data.droplet.id }}, IP is {{ my_droplet.data.ip_address }}"
+- name: Show Droplet info
+  ansible.builtin.debug:
+    msg: |
+      Droplet ID is {{ my_droplet.data.droplet.id }}
+      First Public IPv4 is {{ (my_droplet.data.droplet.networks.v4 | selectattr('type', 'equalto', 'public')).0.ip_address | default('<none>', true) }}
+      First Private IPv4 is {{ (my_droplet.data.droplet.networks.v4 | selectattr('type', 'equalto', 'private')).0.ip_address | default('<none>', true) }}
 
-- name: Create a new droplet (and assign to Project "test")
+- name: Create a new Droplet (and assign to Project "test")
   community.digitalocean.digital_ocean_droplet:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     name: mydroplet
-    oauth_token: XXX
-    size: 2gb
-    region: sfo1
-    image: ubuntu-16-04-x64
+    size: s-1vcpu-1gb
+    region: sfo3
+    image: ubuntu-20-04-x64
     wait_timeout: 500
     ssh_keys: [ .... ]
     project: test
   register: my_droplet
 
-- name: Ensure a droplet is present
+- name: Ensure a Droplet is present
   community.digitalocean.digital_ocean_droplet:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     id: 123
     name: mydroplet
-    oauth_token: XXX
-    size: 2gb
-    region: sfo1
-    image: ubuntu-18-04-x64
+    size: s-1vcpu-1gb
+    region: sfo3
+    image: ubuntu-20-04-x64
     wait_timeout: 500
 
-- name: Ensure a droplet is present and has firewall rules applied
+- name: Ensure a Droplet is present and has firewall rules applied
   community.digitalocean.digital_ocean_droplet:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     id: 123
     name: mydroplet
-    oauth_token: XXX
-    size: 2gb
-    region: sfo1
-    image: ubuntu-18-04-x64
+    size: s-1vcpu-1gb
+    region: sfo3
+    image: ubuntu-20-04-x64
     firewall: ['myfirewall', 'anotherfirewall']
     wait_timeout: 500
 
-- name: Ensure a droplet is present with SSH keys installed
+- name: Ensure a Droplet is present with SSH keys installed
   community.digitalocean.digital_ocean_droplet:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     id: 123
     name: mydroplet
-    oauth_token: XXX
-    size: 2gb
-    region: sfo1
+    size: s-1vcpu-1gb
+    region: sfo3
     ssh_keys: ['1534404', '1784768']
-    image: ubuntu-18-04-x64
+    image: ubuntu-20-04-x64
     wait_timeout: 500
 """
 
@@ -287,10 +297,14 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 class DODroplet(object):
 
     failure_message = {
-        "empty_reponse": "Empty response from the DigitalOcean API; please try again or open a bug if it never succeeds.",
-        "resizing_off": "Droplet must be off prior to resizing: https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
-        "unexpected": "Unexpected error [{0}]; please file a bug: https://github.com/ansible-collections/community.digitalocean/issues",
-        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: https://docs.digitalocean.com/support/",
+        "empty_response": "Empty response from the DigitalOcean API; please try again or open a bug if it never "
+        "succeeds.",
+        "resizing_off": "Droplet must be off prior to resizing: "
+        "https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "unexpected": "Unexpected error [{0}]; please file a bug: "
+        "https://github.com/ansible-collections/community.digitalocean/issues",
+        "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: "
+        "https://docs.digitalocean.com/support/",
         "failed_to": "Failed to {0} {1} [HTTP {2}: {3}]",
     }
 
@@ -310,6 +324,20 @@ class DODroplet(object):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
         self.firewalls = self.get_firewalls()
+        self.sleep_interval = self.module.params.pop("sleep_interval", 10)
+        if self.wait:
+            if self.sleep_interval > self.wait_timeout:
+                self.module.fail_json(
+                    msg="Sleep interval {0} should be less than {1}".format(
+                        self.sleep_interval, self.wait_timeout
+                    )
+                )
+            if self.sleep_interval <= 0:
+                self.module.fail_json(
+                    msg="Sleep interval {0} should be greater than zero".format(
+                        self.sleep_interval
+                    )
+                )
 
     def get_firewalls(self):
         response = self.rest.get("firewalls")
@@ -531,7 +559,7 @@ class DODroplet(object):
             if droplet_status in desired_statuses:
                 return
 
-            time.sleep(10)
+            time.sleep(self.sleep_interval)
 
         self.module.fail_json(
             msg="Wait for Droplet [{0}] status timeout".format(
@@ -577,7 +605,7 @@ class DODroplet(object):
             if action_status == "completed":
                 return
 
-            time.sleep(10)
+            time.sleep(self.sleep_interval)
 
         self.module.fail_json(msg="Wait for Droplet action timeout")
 
@@ -705,8 +733,17 @@ class DODroplet(object):
         status_code = response.status_code
         message = json_data.get("message", "no error message")
         droplet = json_data.get("droplet", None)
-        droplet_id = droplet.get("id", None)
 
+        # Ensure that the Droplet is created
+        if status_code != 202:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "create", "Droplet", status_code, message
+                ),
+            )
+
+        droplet_id = droplet.get("id", None)
         if droplet is None or droplet_id is None:
             self.module.fail_json(
                 changed=False,
@@ -733,7 +770,9 @@ class DODroplet(object):
         # Get updated Droplet data (fallback to current data)
         if self.wait:
             json_data = self.get_droplet()
-            droplet = json_data.get("droplet", droplet)
+            # Without unique_name json_data is None
+            if json_data:
+                droplet = json_data.get("droplet", droplet)
 
         project_name = self.module.params.get("project")
         if project_name:  # empty string is the default project, skip project assignment
@@ -847,6 +886,7 @@ def main():
         resize_disk=dict(type="bool", default=False),
         project_name=dict(type="str", aliases=["project"], required=False, default=""),
         firewall=dict(type="list", elements="str", default=None),
+        sleep_interval=dict(default=10, type="int"),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
