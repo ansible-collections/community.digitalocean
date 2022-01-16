@@ -87,10 +87,16 @@ msg:
   sample: Created Space gh-ci-space-1 in nyc3
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
+from ansible.module_utils.basic import (
+    AnsibleModule,
+    missing_required_lib,
+    env_fallback,
+    to_native,
+)
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
 )
+from traceback import format_exc
 
 try:
     import boto3
@@ -107,25 +113,34 @@ def run(module):
     aws_access_key_id = module.params.get("aws_access_key_id")
     aws_secret_access_key = module.params.get("aws_secret_access_key")
 
-    session = boto3.session.Session()
-    client = session.client(
-        "s3",
-        region_name=region,
-        endpoint_url=f"https://{region}.digitaloceanspaces.com",
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,
-    )
+    try:
+        session = boto3.session.Session()
+        client = session.client(
+            "s3",
+            region_name=region,
+            endpoint_url=f"https://{region}.digitaloceanspaces.com",
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
+        )
+        response = client.list_buckets()
+    except Exception as e:
+        module.fail_json(msg=to_native(e), exception=format_exc())
 
-    response = client.list_buckets()
-    spaces = [
-        {
-            "name": space["Name"],
-            "region": region,
-            "endpoint_url": f"https://{region}.digitaloceanspaces.com",
-            "space_url": f"https://{space['Name']}.{region}.digitaloceanspaces.com",
-        }
-        for space in response["Buckets"]
-    ]
+    response_metadata = response.get("ResponseMetadata")
+    http_status_code = response_metadata.get("HTTPStatusCode")
+
+    if http_status_code == 200:
+        spaces = [
+            {
+                "name": space["Name"],
+                "region": region,
+                "endpoint_url": f"https://{region}.digitaloceanspaces.com",
+                "space_url": f"https://{space['Name']}.{region}.digitaloceanspaces.com",
+            }
+            for space in response["Buckets"]
+        ]
+    else:
+        module.fail_json(changed=False, msg=f"Failed to list Spaces in {region}")
 
     if state == "present":
         for space in spaces:
