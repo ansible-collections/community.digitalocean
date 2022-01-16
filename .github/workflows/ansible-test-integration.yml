@@ -24,7 +24,7 @@ jobs:
         uses: ansible-community/ansible-test-gh-action@unstable/v1
         with:
           # ansible-core-version:
-          target: digital_ocean_account_info
+          target: digital_ocean_spaces_info
           pre-test-cmd: >-  # Configure integration test run
             DO_API_KEY=${{ secrets.DO_API_KEY }}
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
