@@ -24,11 +24,6 @@ options:
     default: present
     type: str
     choices: ["present"]
-  name:
-    description:
-      - The name of the Space to list.
-    required: true
-    type: str
   region:
     description:
       - The region from which to list Spaces.
@@ -90,7 +85,6 @@ except Exception:
 
 def run(module):
     state = module.params.get("state")
-    name = module.params.get("name")
     region = module.params.get("region")
     aws_access_key_id = module.params.get("aws_access_key_id")
     aws_secret_access_key = module.params.get("aws_secret_access_key")
@@ -122,7 +116,6 @@ def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
         state=dict(type="str", choices=["present"], default="present"),
-        name=dict(type="str", required=True),
         region=dict(type="str", aliases=["region_id"], required=True),
         aws_access_key_id=dict(
             type="str",
