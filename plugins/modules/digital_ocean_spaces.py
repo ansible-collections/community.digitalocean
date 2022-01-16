@@ -40,7 +40,7 @@ options:
     required: true
     type: str
     aliases: ["AWS_ACCESS_KEY_ID"]
-  aws_secret_acccess_key:
+  aws_secret_access_key:
     description:
       - The AWS_SECRET_ACCESS_KEY to use.
     required: true
@@ -48,6 +48,8 @@ options:
     aliases: ["AWS_SECRET_ACCESS_KEY"]
 requirements:
   - boto3
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -186,9 +188,9 @@ def main():
 
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
-        state=dict(choices=["present", "absent"], default="present"),
+        state=dict(type="str", choices=["present", "absent"], default="present"),
         name=dict(type="str", required=True),
-        region=dict(type="str", required=True),
+        region=dict(type="str", aliases=["region_id"], required=True),
         aws_access_key_id=dict(
             type="str",
             aliases=["AWS_ACCESS_KEY_ID"],
@@ -200,6 +202,7 @@ def main():
             aliases=["AWS_SECRET_ACCESS_KEY"],
             fallback=(env_fallback, ["AWS_SECRET_ACCESS_KEY"]),
             required=True,
+            no_log=True,
         ),
     )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
