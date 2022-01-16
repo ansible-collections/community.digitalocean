@@ -16,6 +16,7 @@ short_description: List DigitalOcean Spaces.
 description:
   - List DigitalOcean Spaces.
 author: Mark Mercado (@mamercad)
+version_added: 1.15.0
 options:
   state:
     description:

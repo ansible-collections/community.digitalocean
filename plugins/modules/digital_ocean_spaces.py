@@ -16,6 +16,7 @@ short_description: Create and remove DigitalOcean Spaces.
 description:
   - Create and remove DigitalOcean Spaces.
 author: Mark Mercado (@mamercad)
+version_added: 1.15.0
 options:
   state:
     description:
