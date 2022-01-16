@@ -150,7 +150,10 @@ def run(module):
         if module.check_mode:
             module.exit_json(changed=True, msg=f"Would create Space {name} in {region}")
 
-        bucket = client.create_bucket(Bucket=name)
+        try:
+            bucket = client.create_bucket(Bucket=name)
+        except Exception as e:
+            module.fail_json(msg=to_native(e), exception=format_exc())
 
         resp = bucket.get("ResponseMetadata")
         if resp:
@@ -185,7 +188,11 @@ def run(module):
                 module.exit_json(changed=False, msg=f"No Space {name} in {region}")
 
         if have_it:
-            bucket = client.delete_bucket(Bucket=name)
+            try:
+                bucket = client.delete_bucket(Bucket=name)
+            except Exception as e:
+                module.fail_json(msg=to_native(e), exception=format_exc())
+
             resp = bucket.get("ResponseMetadata")
             if resp:
                 status_code = resp.get("HTTPStatusCode")
