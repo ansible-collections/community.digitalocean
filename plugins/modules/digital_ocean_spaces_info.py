@@ -70,10 +70,16 @@ data:
         space_url: https://gh-ci-space.nyc3.digitaloceanspaces.com
 """
 
-from ansible.module_utils.basic import AnsibleModule, missing_required_lib, env_fallback
+from ansible.module_utils.basic import (
+    AnsibleModule,
+    missing_required_lib,
+    env_fallback,
+    to_native,
+)
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
 )
+from traceback import format_exc
 
 try:
     import boto3
@@ -90,25 +96,35 @@ def run(module):
     aws_secret_access_key = module.params.get("aws_secret_access_key")
 
     if state == "present":
-        session = boto3.session.Session()
-        client = session.client(
-            "s3",
-            region_name=region,
-            endpoint_url=f"https://{region}.digitaloceanspaces.com",
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
-        )
-        response = client.list_buckets()
-        spaces = [
-            {
-                "name": space["Name"],
-                "region": region,
-                "endpoint_url": f"https://{region}.digitaloceanspaces.com",
-                "space_url": f"https://{space['Name']}.{region}.digitaloceanspaces.com",
-            }
-            for space in response["Buckets"]
-        ]
-        module.exit_json(changed=False, data={"spaces": spaces})
+        try:
+            session = boto3.session.Session()
+            client = session.client(
+                "s3",
+                region_name=region,
+                endpoint_url=f"https://{region}.digitaloceanspaces.com",
+                aws_access_key_id=aws_access_key_id,
+                aws_secret_access_key=aws_secret_access_key,
+            )
+            response = client.list_buckets()
+        except Exception as e:
+            module.fail_json(msg=to_native(e), exception=format_exc())
+
+        response_metadata = response.get("ResponseMetadata")
+        http_status_code = response_metadata.get("HTTPStatusCode")
+
+        if http_status_code == 200:
+            spaces = [
+                {
+                    "name": space["Name"],
+                    "region": region,
+                    "endpoint_url": f"https://{region}.digitaloceanspaces.com",
+                    "space_url": f"https://{space['Name']}.{region}.digitaloceanspaces.com",
+                }
+                for space in response["Buckets"]
+            ]
+            module.exit_json(changed=False, data={"spaces": spaces})
+
+        module.fail_json(changed=False, msg=f"Failed to list Spaces in {region}")
 
 
 def main():
