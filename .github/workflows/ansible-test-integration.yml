@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Perform testing
+      - name: Perform testing (digital_ocean_spaces_info)
         uses: ansible-community/ansible-test-gh-action@unstable/v1
         with:
           # ansible-core-version:
@@ -37,7 +37,7 @@ jobs:
           testing-type: integration
           test-deps: community.general
 
-      - name: Perform testing
+      - name: Perform testing (digital_ocean_spaces)
         uses: ansible-community/ansible-test-gh-action@unstable/v1
         with:
           # ansible-core-version:
