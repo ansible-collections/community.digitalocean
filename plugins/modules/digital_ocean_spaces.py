@@ -171,7 +171,7 @@ def run(module):
                 },
             )
 
-        module.fail_json(changed=True, msg=f"Failed to create Space: {bucket}")
+        module.fail_json(changed=False, msg=f"Failed to create Space {name} in {region}")
 
     elif state == "absent":
         have_it = False
