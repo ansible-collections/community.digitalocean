@@ -78,3 +78,37 @@
         that:
           - not result.changed
           - result.msg is search("No Space")
+
+    - name: Create Space {{ space_name }} in xyz1 (test bad region)
+      community.digitalocean.digital_ocean_spaces:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: xyz1
+      register: result
+      ignore_errors: true  # Expected to fail
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.exception is defined
+          - result.failed
+
+    - name: Delete Space {{ space_name }} in xyz1 (test bad region)
+      community.digitalocean.digital_ocean_spaces:
+        state: absent
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: xyz1
+      register: result
+      ignore_errors: true  # Expected to fail
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.exception is defined
+          - result.failed
