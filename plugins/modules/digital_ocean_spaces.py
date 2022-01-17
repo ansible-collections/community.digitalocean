@@ -171,7 +171,7 @@ def run(module):
                 },
             )
 
-        module.fail_json(changed=True, msg=f"Failed to create Space: {bucket}")
+        module.fail_json(changed=False, msg=f"Failed to create Space {name} in {region}")
 
     elif state == "absent":
         have_it = False
@@ -195,7 +195,7 @@ def run(module):
 
             response_metadata = response.get("ResponseMetadata")
             http_status_code = response_metadata.get("HTTPStatusCode")
-            if http_status_code == 204:
+            if http_status_code == 200:
                 module.exit_json(changed=True, msg=f"Deleted Space {name} in {region}")
 
             module.fail_json(
