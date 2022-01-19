@@ -194,6 +194,25 @@
           - result.data.droplet.name == droplet_name
           - result.data.droplet.status in ["new", "active", "available"]
 
+    - name: Create the same Droplet again (present, unique_name, default project)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify Droplet is already present (from present, unique_name, default project)
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status in ["new", "active", "available"]
+
     - name: Destroy the Droplet (absent)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"

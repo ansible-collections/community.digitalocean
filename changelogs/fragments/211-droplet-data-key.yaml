@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - move Droplet data under "droplet" key in returned payload (https://github.com/ansible-collections/community.digitalocean/issues/211).
