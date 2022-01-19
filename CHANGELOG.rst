@@ -5,6 +5,20 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.15.0
+=======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - move Droplet data under "droplet" key in returned payload (https://github.com/ansible-collections/community.digitalocean/issues/211).
+
+New Modules
+-----------
+
+- digital_ocean_spaces - Create and remove DigitalOcean Spaces.
+- digital_ocean_spaces_info - List DigitalOcean Spaces.
+
 v1.14.0
 =======
 

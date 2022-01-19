@@ -173,6 +173,21 @@ releases:
     - 204-kubernetes-tags-and-info.yaml
     - 205-cdn-endpoints.yaml
     release_date: '2021-12-20'
+  1.15.0:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - move Droplet data under "droplet" key in returned
+        payload (https://github.com/ansible-collections/community.digitalocean/issues/211).
+    fragments:
+    - 211-droplet-data-key.yaml
+    modules:
+    - description: Create and remove DigitalOcean Spaces.
+      name: digital_ocean_spaces
+      namespace: ''
+    - description: List DigitalOcean Spaces.
+      name: digital_ocean_spaces_info
+      namespace: ''
+    release_date: '2022-01-19'
   1.2.0:
     changes:
       bugfixes:
