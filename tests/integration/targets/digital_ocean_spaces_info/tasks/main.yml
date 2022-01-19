@@ -1,0 +1,41 @@
+---
+- block:
+
+    - name: Ensure Spaces API keys are provided
+      ansible.builtin.fail:
+        msg: aws_access_key_id and aws_secret_access_key should be defined in tests/integration/integration_config.yml
+      when:
+        - aws_access_key_id is not defined
+        - aws_access_key_id | length == 0
+        - aws_secret_access_key is not defined
+        - aws_secret_access_key | length == 0
+
+    - name: Get Spaces in nyc3
+      community.digitalocean.digital_ocean_spaces_info:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        region: nyc3
+      register: result
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.data.spaces is defined
+
+    - name: Get Spaces in xyz1 (test bad region)
+      community.digitalocean.digital_ocean_spaces_info:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        region: xyz1
+      register: result
+      ignore_errors: true  # Expected to fail
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.exception is defined
+          - result.failed

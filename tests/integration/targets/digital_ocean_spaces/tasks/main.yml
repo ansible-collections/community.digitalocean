@@ -1,0 +1,114 @@
+---
+- block:
+
+    - name: Ensure Spaces API keys are provided
+      ansible.builtin.fail:
+        msg: aws_access_key_id and aws_secret_access_key should be defined in tests/integration/integration_config.yml
+      when:
+        - aws_access_key_id is not defined
+        - aws_access_key_id | length == 0
+        - aws_secret_access_key is not defined
+        - aws_secret_access_key | length == 0
+
+    - name: Create Space {{ space_name }} in {{ space_region }}
+      community.digitalocean.digital_ocean_spaces:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: "{{ space_region }}"
+      register: result
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data.space is defined
+          - result.data.space.name == "{{ space_name }}"
+          - result.data.space.region == "{{ space_region }}"
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create Space {{ space_name }} in {{ space_region }} (again, test idempotency)
+      community.digitalocean.digital_ocean_spaces:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: "{{ space_region }}"
+      register: result
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Delete Space {{ space_name }} in {{ space_region }}
+      community.digitalocean.digital_ocean_spaces:
+        state: absent
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: "{{ space_region }}"
+      register: result
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is search("Deleted Space")
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Delete Space {{ space_name }} in {{ space_region }} (again, test idempotency)
+      community.digitalocean.digital_ocean_spaces:
+        state: absent
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: "{{ space_region }}"
+      register: result
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is search("No Space")
+
+    - name: Create Space {{ space_name }} in xyz1 (test bad region)
+      community.digitalocean.digital_ocean_spaces:
+        state: present
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: xyz1
+      register: result
+      ignore_errors: true  # Expected to fail
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.exception is defined
+          - result.failed
+
+    - name: Delete Space {{ space_name }} in xyz1 (test bad region)
+      community.digitalocean.digital_ocean_spaces:
+        state: absent
+        aws_access_key_id: "{{ aws_access_key_id }}"
+        aws_secret_access_key: "{{ aws_secret_access_key }}"
+        name: "{{ space_name }}"
+        region: xyz1
+      register: result
+      ignore_errors: true  # Expected to fail
+
+    - name: Verify Spaces info
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.exception is defined
+          - result.failed
