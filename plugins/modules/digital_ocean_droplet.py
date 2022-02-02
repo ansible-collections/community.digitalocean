@@ -364,6 +364,7 @@ class DODroplet(object):
         return None
 
     def add_droplet_to_firewalls(self):
+        changed = False
         rule = self.get_firewall_by_name()
         if rule is None:
             err = "Failed to find firewalls: {0}".format(self.module.params["firewall"])
@@ -386,10 +387,12 @@ class DODroplet(object):
                         err = "Failed to add droplet {0} to firewall {1}".format(
                             droplet_id, rule[firewall]["id"]
                         )
-                        return err
-        return None
+                        return err, changed
+                    changed = True
+        return None, changed
 
     def remove_droplet_from_firewalls(self):
+        changed = False
         json_data = self.get_droplet()
         if json_data is not None:
             request_params = {}
@@ -408,11 +411,11 @@ class DODroplet(object):
                     json_data = response.json
                     status_code = response.status_code
                     if status_code != 204:
-                        err = "Failed to add droplet {0} to firewall {1}".format(
+                        err = "Failed to remove droplet {0} from firewall {1}".format(
                             droplet_id, firewall["id"]
                         )
-                        return err
-        return None
+                        return err, changed
+        return None, changed
 
     def get_by_id(self, droplet_id):
         if not droplet_id:
@@ -671,23 +674,26 @@ class DODroplet(object):
 
             # Add droplet to a firewall if specified
             if self.module.params["firewall"] is not None:
+                firewall_changed = False
                 if len(self.module.params["firewall"]) > 0:
-                    firewall_add = self.add_droplet_to_firewalls()
+                    firewall_add, add_changed = self.add_droplet_to_firewalls()
                     if firewall_add is not None:
                         self.module.fail_json(
                             changed=False,
                             msg=firewall_add,
                             data={"droplet": droplet, "firewall": firewall_add},
                         )
-                firewall_remove = self.remove_droplet_from_firewalls()
+                    firewall_changed = add_changed
+                firewall_remove, remove_changed = self.remove_droplet_from_firewalls()
                 if firewall_remove is not None:
                     self.module.fail_json(
                         changed=False,
                         msg=firewall_remove,
                         data={"droplet": droplet, "firewall": firewall_remove},
                     )
+                    firewall_changed = firewall_changed or add_changed
                 self.module.exit_json(
-                    changed=True,
+                    changed=firewall_changed,
                     data={"droplet": droplet},
                 )
 
