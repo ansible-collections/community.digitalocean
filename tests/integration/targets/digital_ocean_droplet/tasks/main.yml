@@ -436,6 +436,25 @@
           - "{{ (firewall_settings.data | map(attribute='droplet_ids'))[0] | length > 0 }}"
           - "{{ firewall_droplet.data.droplet.id }} in {{ (firewall_settings.data | map(attribute='droplet_ids'))[0] }}"
 
+    - name: Rerun on above droplet without removing firewall
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        firewall: ["{{ firewall_name }}"]
+        size: "{{ droplet_size }}"
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        wait_timeout: 500
+      register: firewall_droplet_unchanged
+
+    - name: Verify things were not changed when firewall was present but unchanged
+      ansible.builtin.assert:
+        that:
+          - firewall_droplet_unchanged is defined
+          - firewall_droplet_unchanged.changed is false
+
     - name: Rerun on above droplet and remove firewall
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
