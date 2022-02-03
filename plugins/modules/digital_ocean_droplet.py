@@ -692,7 +692,7 @@ class DODroplet(object):
                         msg=firewall_remove,
                         data={"droplet": droplet, "firewall": firewall_remove},
                     )
-                firewall_changed = firewall_changed or add_changed
+                firewall_changed = firewall_changed or remove_changed
                 self.module.exit_json(
                     changed=firewall_changed,
                     data={"droplet": droplet},
