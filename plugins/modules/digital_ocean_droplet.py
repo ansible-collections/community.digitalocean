@@ -415,6 +415,7 @@ class DODroplet(object):
                             droplet_id, firewall["id"]
                         )
                         return err, changed
+                    changed = True
         return None, changed
 
     def get_by_id(self, droplet_id):
@@ -683,7 +684,7 @@ class DODroplet(object):
                             msg=firewall_add,
                             data={"droplet": droplet, "firewall": firewall_add},
                         )
-                    firewall_changed = add_changed
+                    firewall_changed = firewall_changed or add_changed
                 firewall_remove, remove_changed = self.remove_droplet_from_firewalls()
                 if firewall_remove is not None:
                     self.module.fail_json(
@@ -691,7 +692,7 @@ class DODroplet(object):
                         msg=firewall_remove,
                         data={"droplet": droplet, "firewall": firewall_remove},
                     )
-                    firewall_changed = firewall_changed or add_changed
+                firewall_changed = firewall_changed or add_changed
                 self.module.exit_json(
                     changed=firewall_changed,
                     data={"droplet": droplet},
