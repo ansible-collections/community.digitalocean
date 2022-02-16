@@ -232,7 +232,7 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#droplets
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/Droplets
 data:
     description: a DigitalOcean Droplet
     returned: changed
@@ -300,7 +300,7 @@ class DODroplet(object):
         "empty_response": "Empty response from the DigitalOcean API; please try again or open a bug if it never "
         "succeeds.",
         "resizing_off": "Droplet must be off prior to resizing: "
-        "https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "https://docs.digitalocean.com/reference/api/api-reference/#operation/post_droplet_action",
         "unexpected": "Unexpected error [{0}]; please file a bug: "
         "https://github.com/ansible-collections/community.digitalocean/issues",
         "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: "

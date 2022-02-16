@@ -43,7 +43,7 @@ options:
     description: >-
       Droplet attributes to add as host vars to each inventory host.
       Check out the DO API docs for full list of attributes at
-      U(https://developers.digitalocean.com/documentation/v2/#list-all-droplets).
+      U(https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_droplets).
     type: list
     elements: str
     default:

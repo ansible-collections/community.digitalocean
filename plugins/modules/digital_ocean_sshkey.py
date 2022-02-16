@@ -77,7 +77,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/SSH-Keys
 data:
     description: This is only present when C(state=present)
     returned: when C(state=present)

@@ -53,7 +53,7 @@ EXAMPLES = r"""
 """
 
 
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_kubernetes_clusters
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
 RETURN = r"""
 data:
@@ -194,7 +194,7 @@ class DOKubernetesInfo(object):
 
     def get(self):
         """Fetches an existing DigitalOcean Kubernetes cluster
-        API reference: https://developers.digitalocean.com/documentation/v2/#retrieve-an-existing-kubernetes-cluster
+        API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_kubernetes_clusters
         """
         json_data = self.get_kubernetes()
         if json_data:
