@@ -1,0 +1,2 @@
+minor_changes:
+  - Updates DigitalOcean API documentation links to current domain with working URL anchors (https://github.com/ansible-collections/community.digitalocean/issues/223).
