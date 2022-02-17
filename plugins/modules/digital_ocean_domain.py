@@ -188,7 +188,7 @@ def run(module):
                 module.fail_json(changed=False, msg=domain["message"])
             else:
                 # We're at the mercy of a backend process which we have no visibility into:
-                # https://developers.digitalocean.com/documentation/v2/#create-a-new-domain
+                # https://docs.digitalocean.com/reference/api/api-reference/#operation/create_domain
                 #
                 # In particular: "Keep in mind that, upon creation, the zone_file field will
                 # have a value of null until a zone file is generated and propagated through
