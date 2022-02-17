@@ -5,6 +5,19 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.15.1
+=======
+
+Minor Changes
+-------------
+
+- Updates DigitalOcean API documentation links to current domain with working URL anchors (https://github.com/ansible-collections/community.digitalocean/issues/223).
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - fix reporting of changed state when ``firewall`` argument is present (https://github.com/ansible-collections/community.digitalocean/pull/219).
+
 v1.15.0
 =======
 

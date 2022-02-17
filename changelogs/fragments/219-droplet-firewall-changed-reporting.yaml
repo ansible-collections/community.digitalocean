@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_droplet - fix reporting of changed state when ``firewall`` argument is present (https://github.com/ansible-collections/community.digitalocean/pull/219).
