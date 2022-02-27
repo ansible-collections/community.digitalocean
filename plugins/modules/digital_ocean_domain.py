@@ -36,6 +36,12 @@ options:
     description:
     - An 'A' record for '@' ($ORIGIN) will be created with the value 'ip'.  'ip' is an IP version 4 address.
     type: str
+    aliases: ['ip4', 'ipv4']
+  ip6:
+    description:
+    - An 'AAAA' record for '@' ($ORIGIN) will be created with the value 'ip6'.  'ip6' is an IP version 6 address.
+    type: str
+    aliases: ['ipv4', 'ipv6']
   project_name:
     aliases: ["project"]
     description:
@@ -118,14 +124,14 @@ class DoManager(DigitalOceanHelper, object):
 
     def find(self):
         if self.domain_name is None and self.domain_id is None:
-            return False
+            return None
 
         domains = self.all_domains()
         status, json = self.jsonify(domains)
         for domain in json["domains"]:
             if domain["name"] == self.domain_name:
-                return True
-        return False
+                return domain
+        return None
 
     def add(self):
         params = {"name": self.domain_name, "ip_address": self.domain_ip}
@@ -155,7 +161,11 @@ class DoManager(DigitalOceanHelper, object):
             return json
 
     def edit_domain_record(self, record):
-        params = {"name": "@", "data": self.module.params.get("ip")}
+        if self.module.params.get("ip"):
+            params = {"name": "@", "data": self.module.params.get("ip")}
+        if self.module.params.get("ip6"):
+            params = {"name": "@", "data": self.module.params.get("ip6")}
+
         resp = self.put(
             "domains/%s/records/%s" % (self.domain_name, record["id"]), data=params
         )
@@ -164,7 +174,14 @@ class DoManager(DigitalOceanHelper, object):
         return json["domain_record"]
 
     def create_domain_record(self):
-        params = {"name": "@", "type": "A", "data": self.module.params.get("ip")}
+        if self.module.params.get("ip"):
+            params = {"name": "@", "type": "A", "data": self.module.params.get("ip")}
+        if self.module.params.get("ip6"):
+            params = {
+                "name": "@",
+                "type": "AAAA",
+                "data": self.module.params.get("ip6"),
+            }
 
         resp = self.post("domains/%s/records" % (self.domain_name), data=params)
         status, json = self.jsonify(resp)
@@ -255,6 +272,20 @@ def run(module):
                 elif not at_record["data"] == module.params.get("ip"):
                     do_manager.edit_domain_record(at_record)
                     module.exit_json(changed=True, domain=do_manager.find())
+
+            if module.params.get("ip6"):
+                at_record = None
+                for record in records["domain_records"]:
+                    if record["name"] == "@" and record["type"] == "AAAA":
+                        at_record = record
+
+                if not at_record:
+                    do_manager.create_domain_record()
+                    module.exit_json(changed=True, domain=do_manager.find())
+                elif not at_record["data"] == module.params.get("ip6"):
+                    do_manager.edit_domain_record(at_record)
+                    module.exit_json(changed=True, domain=do_manager.find())
+
             module.exit_json(changed=False, domain=do_manager.domain_record())
 
     elif state == "absent":
@@ -277,12 +308,14 @@ def main():
         name=dict(type="str"),
         id=dict(aliases=["droplet_id"], type="int"),
         ip=dict(type="str"),
+        ip6=dict(type="str"),
         project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_one_of=(["id", "name"],),
+        mutually_exclusive=[("ip", "ip6")],
     )
 
     run(module)
