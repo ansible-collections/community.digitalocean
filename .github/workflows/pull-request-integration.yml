@@ -18,6 +18,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    timeout-minutes: 120
+
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
