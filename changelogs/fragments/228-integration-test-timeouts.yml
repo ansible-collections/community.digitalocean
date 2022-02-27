@@ -1,0 +1,2 @@
+minor_changes:
+  - integration tests - added a 120 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
