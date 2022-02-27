@@ -307,8 +307,8 @@ def main():
         state=dict(choices=["present", "absent"], default="present"),
         name=dict(type="str"),
         id=dict(aliases=["droplet_id"], type="int"),
-        ip=dict(type="str"),
-        ip6=dict(type="str"),
+        ip=dict(type="str", aliases=["ip4", "ipv4"]),
+        ip6=dict(type="str", aliases=["ip6", "ipv6"]),
         project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
 
