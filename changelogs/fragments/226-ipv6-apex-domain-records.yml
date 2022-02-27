@@ -1,0 +1,2 @@
+minor_changes:
+  - digital_ocean_domain - add support for IPv6 apex domain records (https://github.com/ansible-collections/community.digitalocean/issues/226).
