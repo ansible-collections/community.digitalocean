@@ -8,50 +8,46 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-DOCUMENTATION = """
+DOCUMENTATION = r"""
 ---
 module: digital_ocean_domain_record_info
-author:
-  "Adam Papai (@woohgit)"
-  - Mark Mercado (@mamercad)
-version_added: 1.16.0
 short_description: Gather information about DigitalOcean domain records
 description:
-  - Gather information about DigitalOcean domain records
+  - Gather information about DigitalOcean domain records.
+version_added: 1.16.0
+author:
+  - "Adam Papai (@woohgit)"
+  - Mark Mercado (@mamercad)
 options:
   state:
     description:
-     - Indicate desired state of the target.
+      - Indicate desired state of the target.
     default: present
-    choices: [ present ]
+    choices: ["present"]
     type: str
-  record_id:
-    description:
-      - Used to retrieve a specific record.
-    type: int
-  domain:
+  name:
     description:
      - Name of the domain.
     required: true
     type: str
-    aliases: [ name, domain_name ]
+    aliases: ["domain", "domain_name"]
+  record_id:
+    description:
+      - Used to retrieve a specific record.
+    type: int
   type:
     description:
      - The type of record you would like to retrieve.
-    choices: [ A, AAAA, CNAME, MX, TXT, SRV, NS, CAA ]
+    choices: ["A", "AAAA", "CNAME", "MX", "TXT", "SRV", "NS", "CAA"]
     type: str
-  oauth_token:
-    description:
-     - DigitalOcean OAuth token. Can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    aliases: ['API_TOKEN']
-    type: str
-
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 notes:
   - Version 2 of DigitalOcean API is used.
   - The number of requests that can be made through the API is currently limited to 5,000 per hour per OAuth token.
 """
 
-EXAMPLES = """
+EXAMPLES = r"""
 - name: Retrieve all domain records for example.com
   community.digitalocean.digital_ocean_domain_record_info:
     state: present
@@ -104,7 +100,7 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
     def __init__(self, module):
         super(DigitalOceanDomainRecordManager, self).__init__(module)
         self.module = module
-        self.domain = module.params.get("domain").lower()
+        self.domain = module.params.get("name").lower()
         self.records = self.__get_all_records()
         self.payload = self.__build_payload()
         self.force_update = module.params.get("force_update", False)
@@ -196,24 +192,19 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(choices=["present"], default="present"),
-            oauth_token=dict(
-                aliases=["API_TOKEN"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-            ),
-            record_id=dict(type="int"),
-            domain=dict(type="str", aliases=["name", "domain_name"], required=True),
-            type=dict(
-                type="str",
-                choices=["A", "AAAA", "CNAME", "MX", "TXT", "SRV", "NS", "CAA"],
-            ),
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present"], default="present"),
+        name=dict(type="str", aliases=["domain", "domain_name"], required=True),
+        record_id=dict(type="int"),
+        type=dict(
+            type="str",
+            choices=["A", "AAAA", "CNAME", "MX", "TXT", "SRV", "NS", "CAA"],
         ),
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
+        supports_check_mode=True,
     )
 
     manager = DigitalOceanDomainRecordManager(module)
@@ -229,10 +220,7 @@ def main():
             changed, result = manager.get_records_by_id()
         else:
             changed, result = manager.get_records()
-    elif state == "absent":
-        changed, result = manager.delete_record()
-
-    module.exit_json(changed=changed, data={"records": result})
+        module.exit_json(changed=changed, data={"records": result})
 
 
 if __name__ == "__main__":
