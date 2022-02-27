@@ -41,7 +41,7 @@ options:
     description:
     - An 'AAAA' record for '@' ($ORIGIN) will be created with the value 'ip6'.  'ip6' is an IP version 6 address.
     type: str
-    aliases: ['ipv4', 'ipv6']
+    aliases: ['ipv6']
   project_name:
     aliases: ["project"]
     description:
@@ -308,7 +308,7 @@ def main():
         name=dict(type="str"),
         id=dict(aliases=["droplet_id"], type="int"),
         ip=dict(type="str", aliases=["ip4", "ipv4"]),
-        ip6=dict(type="str", aliases=["ip6", "ipv6"]),
+        ip6=dict(type="str", aliases=["ipv6"]),
         project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
 
