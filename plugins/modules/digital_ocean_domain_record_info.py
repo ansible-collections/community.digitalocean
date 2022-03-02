@@ -141,11 +141,20 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
                     % {"status_code": status_code, "json": json}
                 )
 
-            for record in json["domain_records"]:
+            domain_records = json.get("domain_records", [])
+            for record in domain_records:
                 records.append(dict([(str(k), v) for k, v in record.items()]))
 
-            if "pages" in json["links"] and "next" in json["links"]["pages"]:
-                page += 1
+            links = json.get("links")
+            if links:
+                pages = links.get("pages")
+                if pages:
+                    if "next" in pages:
+                        page += 1
+                    else:
+                        break
+                else:
+                    break
             else:
                 break
 
