@@ -11,6 +11,7 @@ jobs:
 
   units_29:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
       fail-fast: true
@@ -33,6 +34,7 @@ jobs:
 
   units:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
       fail-fast: true

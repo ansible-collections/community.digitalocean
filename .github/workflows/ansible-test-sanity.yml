@@ -10,6 +10,7 @@ on:
 jobs:
 
   sanity_29:
+    timeout-minutes: 30
     name: Sanity (Ⓐ$${{ matrix.ansible }})
     strategy:
       matrix:
@@ -28,6 +29,7 @@ jobs:
           # test-deps:
 
   sanity:
+    timeout-minutes: 30
     name: Sanity (Ⓐ$${{ matrix.ansible }})
     strategy:
       matrix:
