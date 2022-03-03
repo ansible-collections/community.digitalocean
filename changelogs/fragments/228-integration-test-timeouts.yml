@@ -1,2 +1,4 @@
 minor_changes:
   - integration tests - added a 120 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+  - sanity and unit tests - added a 30 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+  - black test - added a 15 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
