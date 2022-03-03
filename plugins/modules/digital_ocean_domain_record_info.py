@@ -178,24 +178,15 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
     def __build_payload(self):
 
         payload = dict(
-            data=self.module.params.get("data"),
-            flags=self.module.params.get("flags"),
             name=self.module.params.get("name"),
-            port=self.module.params.get("port"),
-            priority=self.module.params.get("priority"),
             type=self.module.params.get("type"),
-            tag=self.module.params.get("tag"),
-            ttl=self.module.params.get("ttl"),
-            weight=self.module.params.get("weight"),
         )
 
-        # DigitalOcean stores every data in lowercase except TXT
-        if payload["type"] != "TXT" and payload["data"]:
-            payload["data"] = payload["data"].lower()
-
-        # digitalocean stores data: '@' if the data=domain
-        if payload["data"] == self.domain:
-            payload["data"] = "@"
+        payload_data = payload.get("data")
+        if payload_data:
+            # digitalocean stores data: '@' if the data=domain
+            if payload["data"] == self.domain:
+                payload["data"] = "@"
 
         return payload
 
