@@ -86,3 +86,22 @@
           - result.data is defined
           - result.data.records is defined
           - result.data.records | length == 0
+
+    - name: Get specific domain record by ID (CNAME)
+      community.digitalocean.digital_ocean_domain_record_info:
+        oauth_token: "{{ do_api_key }}"
+        domain: "{{ domain }}"
+        record_id: "{{ cname_record_id }}"
+      register: result
+
+    - name: Verify domain information fetched (CNAME)
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - not result.failed
+          - result.data is defined
+          - result.data.records is defined
+          - result.data.records | length == 1
+          - result.data.records.0.id == cname_record_id
+          - result.data.records.0.data == cname_record_data
+          - result.data.records.0.type == cname_record_type
