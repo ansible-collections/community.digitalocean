@@ -41,7 +41,7 @@ tags:
   - digitalocean
   - cloud
   - droplet
-version: 1.15.1
+version: 1.16.0
 build_ignore:
   - .DS_Store
   - '*.tar.gz'

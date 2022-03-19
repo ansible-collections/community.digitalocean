@@ -5,6 +5,27 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.16.0
+=======
+
+Minor Changes
+-------------
+
+- black test - added a 15 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+- digital_ocean_domain - add support for IPv6 apex domain records (https://github.com/ansible-collections/community.digitalocean/issues/226).
+- integration tests - added a 120 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+- sanity and unit tests - added a 30 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+
+Bugfixes
+--------
+
+- digital_ocean_kubernetes - add missing elements type to C(node_pools.tags) and C(node_pools.taints) options (https://github.com/ansible-collections/community.digitalocean/issues/232).
+
+New Modules
+-----------
+
+- digital_ocean_domain_record_info - Gather information about DigitalOcean domain records
+
 v1.15.1
 =======
 
