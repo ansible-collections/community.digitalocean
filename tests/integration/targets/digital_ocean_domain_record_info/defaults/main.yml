@@ -1,0 +1,8 @@
+domain: a692934f7a1ffbe552dd.net
+record_id: 296972271
+record_data: ns3.digitalocean.com
+non_existent_domain: a692934f7a1ffbe552ddxxxxxxxxxx.net
+non_existent_record_id: 29697227101010101010
+cname_record_id: 297696356  # cname foo
+cname_record_data: bar.a692934f7a1ffbe552dd.net
+cname_record_type: CNAME
