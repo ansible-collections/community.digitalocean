@@ -88,6 +88,7 @@ options:
         description: The number of Droplet instances in the node pool.
       tags:
         type: list
+        elements: str
         description:
           - An array containing the tags applied to the node pool.
           - All node pools are automatically tagged C("k8s"), C("k8s-worker"), and C("k8s:$K8S_CLUSTER_ID").
@@ -96,6 +97,7 @@ options:
         description: An object containing a set of Kubernetes labels. The keys are user-defined.
       taints:
         type: list
+        elements: dict
         description:
           - An array of taints to apply to all nodes in a pool.
           - Taints will automatically be applied to all existing nodes and any subsequent nodes added to the pool.
