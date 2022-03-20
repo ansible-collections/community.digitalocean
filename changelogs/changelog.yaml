@@ -200,6 +200,25 @@ releases:
     - 219-droplet-firewall-changed-reporting.yaml
     - 223-fix-digitalocean-api-documentation-links.yaml
     release_date: '2022-02-17'
+  1.16.0:
+    changes:
+      bugfixes:
+      - digital_ocean_kubernetes - add missing elements type to C(node_pools.tags)
+        and C(node_pools.taints) options (https://github.com/ansible-collections/community.digitalocean/issues/232).
+      minor_changes:
+      - black test - added a 15 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+      - digital_ocean_domain - add support for IPv6 apex domain records (https://github.com/ansible-collections/community.digitalocean/issues/226).
+      - integration tests - added a 120 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+      - sanity and unit tests - added a 30 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+    fragments:
+    - 226-ipv6-apex-domain-records.yml
+    - 228-integration-test-timeouts.yml
+    - 232-kubernetes-documentation-elements.yml
+    modules:
+    - description: Gather information about DigitalOcean domain records
+      name: digital_ocean_domain_record_info
+      namespace: ''
+    release_date: '2022-03-19'
   1.2.0:
     changes:
       bugfixes:
