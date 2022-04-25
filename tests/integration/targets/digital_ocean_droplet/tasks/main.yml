@@ -449,12 +449,6 @@
           - "{{ (firewall_settings_removal.data | map(attribute='droplet_ids'))[0] | length == 0 }}"
           - "{{ firewall_droplet.data.droplet.id }} not in {{ firewall_settings_removal.data | map(attribute='droplet_ids') }}"
 
-    - name: Delete the Firewall (always)
-      community.digitalocean.digital_ocean_firewall:
-        oauth_token: "{{ do_api_key }}"
-        name: "{{ firewall_name }}"
-        state: absent
-
     - name: Delete the Droplet (always)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
