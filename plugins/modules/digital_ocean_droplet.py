@@ -232,7 +232,7 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#droplets
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/Droplets
 data:
     description: a DigitalOcean Droplet
     returned: changed
@@ -300,7 +300,7 @@ class DODroplet(object):
         "empty_response": "Empty response from the DigitalOcean API; please try again or open a bug if it never "
         "succeeds.",
         "resizing_off": "Droplet must be off prior to resizing: "
-        "https://developers.digitalocean.com/documentation/v2/#resize-a-droplet",
+        "https://docs.digitalocean.com/reference/api/api-reference/#operation/post_droplet_action",
         "unexpected": "Unexpected error [{0}]; please file a bug: "
         "https://github.com/ansible-collections/community.digitalocean/issues",
         "support_action": "Error status on Droplet action [{0}], please try again or contact DigitalOcean support: "
@@ -364,6 +364,7 @@ class DODroplet(object):
         return None
 
     def add_droplet_to_firewalls(self):
+        changed = False
         rule = self.get_firewall_by_name()
         if rule is None:
             err = "Failed to find firewalls: {0}".format(self.module.params["firewall"])
@@ -417,11 +418,12 @@ class DODroplet(object):
                     json_data = response.json
                     status_code = response.status_code
                     if status_code != 204:
-                        err = "Failed to add droplet {0} to firewall {1}".format(
+                        err = "Failed to remove droplet {0} from firewall {1}".format(
                             droplet_id, firewall["id"]
                         )
-                        return err
-        return None
+                        return err, changed
+                    changed = True
+        return None, changed
 
     def get_by_id(self, droplet_id):
         if not droplet_id:
@@ -686,23 +688,26 @@ class DODroplet(object):
 
             # Add droplet to a firewall if specified
             if self.module.params["firewall"] is not None:
+                firewall_changed = False
                 if len(self.module.params["firewall"]) > 0:
-                    firewall_add = self.add_droplet_to_firewalls()
+                    firewall_add, add_changed = self.add_droplet_to_firewalls()
                     if firewall_add is not None:
                         self.module.fail_json(
                             changed=False,
                             msg=firewall_add,
                             data={"droplet": droplet, "firewall": firewall_add},
                         )
-                firewall_remove = self.remove_droplet_from_firewalls()
+                    firewall_changed = firewall_changed or add_changed
+                firewall_remove, remove_changed = self.remove_droplet_from_firewalls()
                 if firewall_remove is not None:
                     self.module.fail_json(
                         changed=False,
                         msg=firewall_remove,
                         data={"droplet": droplet, "firewall": firewall_remove},
                     )
+                firewall_changed = firewall_changed or remove_changed
                 self.module.exit_json(
-                    changed=True,
+                    changed=firewall_changed,
                     data={"droplet": droplet},
                 )
 
@@ -724,15 +729,15 @@ class DODroplet(object):
                     # Get updated Droplet data (fallback to current data)
                     json_data = self.get_droplet()
                     droplet = json_data.get("droplet", droplet)
-                    self.module.exit_json(changed=True, data=droplet)
+                    self.module.exit_json(changed=True, data={"droplet": droplet})
                 elif state == "inactive" and droplet_status != "off":
                     self.ensure_power_off(droplet_id)
                     # Get updated Droplet data (fallback to current data)
                     json_data = self.get_droplet()
                     droplet = json_data.get("droplet", droplet)
-                    self.module.exit_json(changed=True, data=droplet)
+                    self.module.exit_json(changed=True, data={"droplet": droplet})
                 else:
-                    self.module.exit_json(changed=False, data=droplet)
+                    self.module.exit_json(changed=False, data={"droplet": droplet})
 
         # We don't have the Droplet, create it
 

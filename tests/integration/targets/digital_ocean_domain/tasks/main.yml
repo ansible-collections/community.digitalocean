@@ -55,6 +55,24 @@
           - result.result.name == "www"
           - result.result.data == "127.0.0.1"
 
+    - name: Create AAAA record for domain
+      community.digitalocean.digital_ocean_domain_record:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        domain: "{{ domain_name }}"
+        type: AAAA
+        name: www2
+        data: 0000:0000:0000:0000:0000:0000:0000:0001
+      register: result
+
+    - name: Ensure domain record was created
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - not result.failed
+          - result.result.name == "www2"
+          - result.result.data == "0000:0000:0000:0000:0000:0000:0000:0001"
+
     - name: Delete the domain
       community.digitalocean.digital_ocean_domain:
         oauth_token: "{{ do_api_key }}"

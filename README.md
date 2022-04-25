@@ -29,6 +29,7 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_domain](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_module.html) – Create/delete a DNS domain in DigitalOcean
 - [digital_ocean_domain_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_facts_module.html) – Gather information about DigitalOcean Domains
 - [digital_ocean_domain_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_info_module.html) – Gather information about DigitalOcean Domains
+- [digital_ocean_domain_record_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_record_info_module.html) – Gather information about DigitalOcean domain records
 - [digital_ocean_domain_record](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_domain_record_module.html) – Create and delete DigitalOcean Domain Records
 - [digital_ocean_droplet](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) – Create and delete a DigitalOcean droplet
 - [digital_ocean_droplet_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_info_module.html) - Gather information about DigitalOcean Droplets
@@ -56,6 +57,8 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digital_ocean_snapshot_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_snapshot_facts_module.html) – Gather information about DigitalOcean Snapshot
 - [digital_ocean_snapshot_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_snapshot_info_module.html) – Gather information about DigitalOcean Snapshot
 - [digital_ocean_snapshot](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_snapshot_module.html) – Manage DigitalOcean Snapshots
+- [digital_ocean_spaces_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_spaces_info_module.html) – Gather information about DigitalOcean Spaces
+- [digital_ocean_spaces](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_spaces_module.html) – Manage DigitalOcean Spaces
 - [digital_ocean_sshkey](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_sshkey_module.html) – Manage DigitalOcean SSH keys
 - [digital_ocean_sshkey_facts](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_sshkey_facts_module.html) – DigitalOcean SSH keys facts
 - [digital_ocean_sshkey_info](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_sshkey_info_module.html) – Gather information about DigitalOcean SSH keys

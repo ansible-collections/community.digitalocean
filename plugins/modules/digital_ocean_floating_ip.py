@@ -111,7 +111,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#floating-ips
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/Floating-IPs
 data:
     description: a DigitalOcean Floating IP resource
     returned: success and no resource constraint

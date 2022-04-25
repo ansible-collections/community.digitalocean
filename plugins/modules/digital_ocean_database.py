@@ -54,7 +54,7 @@ options:
   size:
     description:
       - The slug identifier representing the size of the nodes in the database cluster.
-      - See U(https://developers.digitalocean.com/documentation/v2/#create-a-new-database-cluster) for supported sizes.
+      - See U(https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster) for supported sizes.
     type: str
     required: true
     aliases: ['size_id']

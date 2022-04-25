@@ -114,7 +114,7 @@ EXAMPLES = r"""
 """
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#projects
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/Projects
 data:
     description: a DigitalOcean Project
     returned: changed

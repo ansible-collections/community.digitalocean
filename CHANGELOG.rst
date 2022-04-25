@@ -5,6 +5,54 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.16.0
+=======
+
+Minor Changes
+-------------
+
+- black test - added a 15 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+- digital_ocean_domain - add support for IPv6 apex domain records (https://github.com/ansible-collections/community.digitalocean/issues/226).
+- integration tests - added a 120 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+- sanity and unit tests - added a 30 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+
+Bugfixes
+--------
+
+- digital_ocean_kubernetes - add missing elements type to C(node_pools.tags) and C(node_pools.taints) options (https://github.com/ansible-collections/community.digitalocean/issues/232).
+
+New Modules
+-----------
+
+- digital_ocean_domain_record_info - Gather information about DigitalOcean domain records
+
+v1.15.1
+=======
+
+Minor Changes
+-------------
+
+- Updates DigitalOcean API documentation links to current domain with working URL anchors (https://github.com/ansible-collections/community.digitalocean/issues/223).
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - fix reporting of changed state when ``firewall`` argument is present (https://github.com/ansible-collections/community.digitalocean/pull/219).
+
+v1.15.0
+=======
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - move Droplet data under "droplet" key in returned payload (https://github.com/ansible-collections/community.digitalocean/issues/211).
+
+New Modules
+-----------
+
+- digital_ocean_spaces - Create and remove DigitalOcean Spaces.
+- digital_ocean_spaces_info - List DigitalOcean Spaces.
+
 v1.14.0
 =======
 

@@ -30,7 +30,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-# DigitalOcean API info https://developers.digitalocean.com/documentation/v2/#balance
+# DigitalOcean API info https://docs.digitalocean.com/reference/api/api-reference/#operation/get_customer_balance
 data:
     description: DigitalOcean customer balance
     returned: success
