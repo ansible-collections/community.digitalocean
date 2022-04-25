@@ -385,7 +385,7 @@
           - testing_firewall is defined
           - testing_firewall.changed is true
 
-    - name: Create a new droplet and add to the above firewall
+    - name: Create a new droplet and add to the above firewall (unique_name)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: present
@@ -448,6 +448,85 @@
           - firewall_settings_removal is defined
           - "{{ (firewall_settings_removal.data | map(attribute='droplet_ids'))[0] | length == 0 }}"
           - "{{ firewall_droplet.data.droplet.id }} not in {{ firewall_settings_removal.data | map(attribute='droplet_ids') }}"
+
+    - name: Delete the Firewall (always)
+      community.digitalocean.digital_ocean_firewall:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ firewall_name }}"
+        state: absent
+
+    - name: Delete the Droplet (always)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+      ignore_errors: true  # Should this fail, we'll clean it up next run
+
+    - name: non-unique droplet firewall tests
+      block:
+        - name: Create a new droplet and add to the above firewall (non-unique name)
+          community.digitalocean.digital_ocean_droplet:
+            oauth_token: "{{ do_api_key }}"
+            state: present
+            name: "{{ droplet_name }}"
+            firewall: ["{{ firewall_name }}"]
+            size: "{{ droplet_size }}"
+            region: "{{ do_region }}"
+            image: "{{ droplet_image }}"
+            wait_timeout: 500
+          register: firewall_droplet_non_unique
+
+        - name: Verify the droplet has created and has firewall applied
+          ansible.builtin.assert:
+            that:
+              - firewall_droplet_non_unique is defined
+              - firewall_droplet_non_unique.changed is true
+
+        - name: Check our firewall for the new droplet
+          community.digitalocean.digital_ocean_firewall_info:
+            oauth_token: "{{ do_api_key }}"
+            name: "{{ firewall_name }}"
+          register: firewall_settings_non_unique
+
+        - name: Verify details of firewall with droplet
+          ansible.builtin.assert:
+            that:
+              - firewall_settings_non_unique is defined
+              - "{{ (firewall_settings_non_unique.data | map(attribute='droplet_ids'))[0] | length > 0 }}"
+              - "{{ firewall_droplet_non_unique.data.droplet.id }} in {{ (firewall_settings_non_unique.data | map(attribute='droplet_ids'))[0] }}"
+
+        - name: Rerun on above droplet and remove firewall (non-unique name)
+          community.digitalocean.digital_ocean_droplet:
+            oauth_token: "{{ do_api_key }}"
+            state: present
+            name: "{{ droplet_name }}"
+            firewall: []
+            size: "{{ droplet_size }}"
+            region: "{{ do_region }}"
+            image: "{{ droplet_image }}"
+            wait_timeout: 500
+          register: firewall_droplet_removal_non_unique
+
+        - name: Verify things were changed for firewall removal
+          ansible.builtin.assert:
+            that:
+              - firewall_droplet_removal_non_unique is defined
+              - firewall_droplet_removal_non_unique.changed is true
+
+        - name: Check our firewall for the droplet being removed
+          community.digitalocean.digital_ocean_firewall_info:
+            oauth_token: "{{ do_api_key }}"
+            name: "{{ firewall_name }}"
+          register: firewall_settings_removal_non_unique
+
+        - name: Verify details of firewall with droplet
+          ansible.builtin.assert:
+            that:
+              - firewall_settings_removal_non_unique is defined
+              - "{{ (firewall_settings_removal_non_unique.data | map(attribute='droplet_ids'))[0] | length == 0 }}"
+              - "{{ firewall_droplet_non_unique.data.droplet.id }} not in {{ firewall_settings_removal_non_unique.data | map(attribute='droplet_ids') }}"
 
   always:
 

@@ -368,7 +368,10 @@ class DODroplet(object):
         if rule is None:
             err = "Failed to find firewalls: {0}".format(self.module.params["firewall"])
             return err
-        json_data = self.get_droplet_by_name()
+        if not self.unique_name:
+            json_data = self.get_droplet_by_name()
+        else:
+            json_data = self.get_droplet()
         if json_data is not None:
             request_params = {}
             droplet = json_data.get("droplet", None)
@@ -393,7 +396,10 @@ class DODroplet(object):
         return None
 
     def remove_droplet_from_firewalls(self):
-        json_data = self.get_droplet()
+        if self.unique_name:
+            json_data = self.get_droplet()
+        else:
+            json_data = self.get_droplet_by_name()
         if json_data is not None:
             request_params = {}
             droplet = json_data.get("droplet", None)
