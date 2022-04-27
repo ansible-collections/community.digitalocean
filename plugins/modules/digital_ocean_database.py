@@ -417,9 +417,7 @@ def main():
         private_network_uuid=dict(type="str"),
         wait=dict(type="bool", default=True),
         wait_timeout=dict(default=600, type="int"),
-        project_name=dict(
-            type="str", aliases=["project"], required=False, default=""
-        ),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
