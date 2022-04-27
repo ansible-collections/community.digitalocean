@@ -226,29 +226,21 @@ def run(module):
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
-            oauth_token=dict(
-                aliases=["api_token"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-            ),
-            origin=dict(type="str", required=True),
-            ttl=dict(
-                type="int",
-                choices=[60, 600, 3600, 86400, 604800],
-                required=False,
-                default=3600,
-            ),
-            certificate_id=dict(type="str", default=""),
-            custom_domain=dict(type="str", default=""),
-            validate_certs=dict(type="bool", default=True),
-            timeout=dict(type="int", default=30),
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present", "absent"], default="present"),
+        origin=dict(type="str", required=True),
+        ttl=dict(
+            type="int",
+            choices=[60, 600, 3600, 86400, 604800],
+            required=False,
+            default=3600,
         ),
+        certificate_id=dict(type="str", default=""),
+        custom_domain=dict(type="str", default=""),
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         supports_check_mode=True,
     )
     run(module)
