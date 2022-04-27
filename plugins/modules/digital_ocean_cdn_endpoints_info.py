@@ -81,9 +81,7 @@ def run(module):
 
 def main():
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
-    argument_spec.update(
-        state=dict(choices=["present", "absent"], default="present")
-    )
+    argument_spec.update(state=dict(choices=["present", "absent"], default="present"))
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
