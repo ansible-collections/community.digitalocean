@@ -98,7 +98,9 @@ class DigitalOceanHelper:
     @staticmethod
     def digital_ocean_argument_spec():
         return dict(
-            baseurl=dict(type="str", required=False, default="https://api.digitalocean.com/v2"),
+            baseurl=dict(
+                type="str", required=False, default="https://api.digitalocean.com/v2"
+            ),
             validate_certs=dict(type="bool", required=False, default=True),
             oauth_token=dict(
                 no_log=True,
