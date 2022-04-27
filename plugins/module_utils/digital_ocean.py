@@ -44,7 +44,7 @@ class Response(object):
 class DigitalOceanHelper:
     def __init__(self, module):
         self.module = module
-        self.baseurl = "https://api.digitalocean.com/v2"
+        self.baseurl = module.params.get("baseurl")
         self.timeout = module.params.get("timeout", 30)
         self.oauth_token = module.params.get("oauth_token")
         self.headers = {
@@ -98,6 +98,7 @@ class DigitalOceanHelper:
     @staticmethod
     def digital_ocean_argument_spec():
         return dict(
+            baseurl=dict(type="str", required=False, default="https://api.digitalocean.com/v2"),
             validate_certs=dict(type="bool", required=False, default=True),
             oauth_token=dict(
                 no_log=True,
