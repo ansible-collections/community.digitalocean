@@ -42,9 +42,11 @@ class Response(object):
 
 
 class DigitalOceanHelper:
+    baseurl = "https://api.digitalocean.com/v2"
+
     def __init__(self, module):
         self.module = module
-        self.baseurl = module.params.get("baseurl")
+        self.baseurl = module.params.get("baseurl", DigitalOceanHelper.baseurl)
         self.timeout = module.params.get("timeout", 30)
         self.oauth_token = module.params.get("oauth_token")
         self.headers = {
