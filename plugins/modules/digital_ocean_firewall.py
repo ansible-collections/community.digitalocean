@@ -145,7 +145,8 @@ options:
               - List of strings containing the names of Tags corresponding to groups of Droplets to
                 which the Firewall will allow traffic
             required: false
-extends_documentation_fragment: digital_ocean.documentation
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 """
 
 EXAMPLES = """

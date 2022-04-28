@@ -1,0 +1,2 @@
+minor_changes:
+  - digital_ocean - parameterize the DigitalOcean API base url (https://github.com/ansible-collections/community.digitalocean/issues/237).

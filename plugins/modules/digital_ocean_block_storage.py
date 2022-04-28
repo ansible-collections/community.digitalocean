@@ -205,7 +205,10 @@ class DOBlockStorage(object):
                     return True
                 elif json["action"]["status"] == "errored":
                     raise DOBlockStorageException(json["message"])
-        raise DOBlockStorageException("Unable to reach api.digitalocean.com")
+        raise DOBlockStorageException(
+            "Unable to reach the DigitalOcean API at %s"
+            % self.module.params.get("baseurl")
+        )
 
     def get_block_storage_by_name(self, volume_name, region):
         url = "volumes?name={0}&region={1}".format(volume_name, region)

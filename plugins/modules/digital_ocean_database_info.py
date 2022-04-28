@@ -198,21 +198,13 @@ def run(module):
 
 
 def main():
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        id=dict(type="int", aliases=["database_id"]),
+        name=dict(type="str"),
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            oauth_token=dict(
-                aliases=["api_token"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-            ),
-            id=dict(type="int", aliases=["database_id"]),
-            name=dict(type="str"),
-            validate_certs=dict(type="bool", default=True),
-            timeout=dict(type="int", default=30),
-        ),
+        argument_spec=argument_spec,
         supports_check_mode=True,
     )
     run(module)
