@@ -5,6 +5,16 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.18.0
+=======
+
+Minor Changes
+-------------
+
+- ci - adding stable-2.13 to sanity and unit testing (https://github.com/ansible-collections/community.digitalocean/issues/239).
+- digital_ocean_spaces - set C(no_log=True) for C(aws_access_key_id) parameter (https://github.com/ansible-collections/community.digitalocean/issues/243).
+- digital_ocean_spaces_info - set C(no_log=True) for C(aws_access_key_id) parameter (https://github.com/ansible-collections/community.digitalocean/issues/243).
+
 v1.17.0
 =======
 
