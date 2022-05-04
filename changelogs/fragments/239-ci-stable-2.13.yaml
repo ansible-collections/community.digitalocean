@@ -1,2 +1,0 @@
-minor_changes:
-  - ci - adding stable-2.13 to sanity and unit testing (https://github.com/ansible-collections/community.digitalocean/issues/239).

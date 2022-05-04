@@ -226,6 +226,18 @@ releases:
     fragments:
     - 237-parameterize-do-api-baseurl.yaml
     release_date: '2022-04-28'
+  1.18.0:
+    changes:
+      minor_changes:
+      - ci - adding stable-2.13 to sanity and unit testing (https://github.com/ansible-collections/community.digitalocean/issues/239).
+      - digital_ocean_spaces - set C(no_log=True) for C(aws_access_key_id) parameter
+        (https://github.com/ansible-collections/community.digitalocean/issues/243).
+      - digital_ocean_spaces_info - set C(no_log=True) for C(aws_access_key_id) parameter
+        (https://github.com/ansible-collections/community.digitalocean/issues/243).
+    fragments:
+    - 239-ci-stable-2.13.yaml
+    - 243-no-log-spaces-access-key-id.yaml
+    release_date: '2022-05-03'
   1.2.0:
     changes:
       bugfixes:
