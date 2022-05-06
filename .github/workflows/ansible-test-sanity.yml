@@ -39,6 +39,7 @@ jobs:
         - stable-2.12
         - stable-2.13
         - devel
+        - stable-2.13.0rc1
     runs-on: ubuntu-latest
     steps:
       - name: Perform testing
