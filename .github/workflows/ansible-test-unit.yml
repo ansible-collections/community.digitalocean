@@ -45,6 +45,7 @@ jobs:
           - stable-2.12
           - stable-2.13
           - devel
+          - stable-2.13.0rc1
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
