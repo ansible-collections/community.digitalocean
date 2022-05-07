@@ -101,7 +101,7 @@ def run(module):
             client = session.client(
                 "s3",
                 region_name=region,
-                endpoint_url=f"https://{region}.digitaloceanspaces.com",
+                endpoint_url="https://{0}.digitaloceanspaces.com".format(region),
                 aws_access_key_id=aws_access_key_id,
                 aws_secret_access_key=aws_secret_access_key,
             )
@@ -117,14 +117,14 @@ def run(module):
                 {
                     "name": space["Name"],
                     "region": region,
-                    "endpoint_url": f"https://{region}.digitaloceanspaces.com",
-                    "space_url": f"https://{space['Name']}.{region}.digitaloceanspaces.com",
+                    "endpoint_url": "https://{0}.digitaloceanspaces.com".format(region),
+                    "space_url": "https://{0}.{1}.digitaloceanspaces.com".format(space['Name'], region),
                 }
                 for space in response["Buckets"]
             ]
             module.exit_json(changed=False, data={"spaces": spaces})
 
-        module.fail_json(changed=False, msg=f"Failed to list Spaces in {region}")
+        module.fail_json(changed=False, msg="Failed to list Spaces in {0}".format(region))
 
 
 def main():

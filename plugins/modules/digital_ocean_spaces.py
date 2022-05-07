@@ -118,7 +118,7 @@ def run(module):
         client = session.client(
             "s3",
             region_name=region,
-            endpoint_url=f"https://{region}.digitaloceanspaces.com",
+            endpoint_url="https://{0}.digitaloceanspaces.com".format(region),
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
         )
@@ -134,13 +134,13 @@ def run(module):
             {
                 "name": space["Name"],
                 "region": region,
-                "endpoint_url": f"https://{region}.digitaloceanspaces.com",
-                "space_url": f"https://{space['Name']}.{region}.digitaloceanspaces.com",
+                "endpoint_url": "https://{0}.digitaloceanspaces.com".format(region),
+                "space_url": "https://{0}.{1}.digitaloceanspaces.com".format(space['Name'], region),
             }
             for space in response["Buckets"]
         ]
     else:
-        module.fail_json(changed=False, msg=f"Failed to list Spaces in {region}")
+        module.fail_json(changed=False, msg="Failed to list Spaces in {0}".format(region))
 
     if state == "present":
         for space in spaces:
@@ -148,7 +148,7 @@ def run(module):
                 module.exit_json(changed=False, data={"space": space})
 
         if module.check_mode:
-            module.exit_json(changed=True, msg=f"Would create Space {name} in {region}")
+            module.exit_json(changed=True, msg="Would create Space {0} in {1}".format(name, region))
 
         try:
             response = client.create_bucket(Bucket=name)
@@ -160,19 +160,19 @@ def run(module):
         if http_status_code == 200:
             module.exit_json(
                 changed=True,
-                msg=f"Created Space {name} in {region}",
+                msg="Created Space {0} in {1}".format(name, region),
                 data={
                     "space": {
                         "name": name,
                         "region": region,
-                        "endpoint_url": f"https://{region}.digitaloceanspaces.com",
-                        "space_url": f"https://{name}.{region}.digitaloceanspaces.com",
+                        "endpoint_url": "https://{0}.digitaloceanspaces.com".format(region),
+                        "space_url": "https://{0}.{1}.digitaloceanspaces.com".format(name, region),
                     }
                 },
             )
 
         module.fail_json(
-            changed=False, msg=f"Failed to create Space {name} in {region}"
+            changed=False, msg="Failed to create Space {0} in {1}".format(name, region)
         )
 
     elif state == "absent":
@@ -184,10 +184,10 @@ def run(module):
         if module.check_mode:
             if have_it:
                 module.exit_json(
-                    changed=True, msg=f"Would delete Space {name} in {region}"
+                    changed=True, msg="Would delete Space {0} in {1}".format(name, region)
                 )
             else:
-                module.exit_json(changed=False, msg=f"No Space {name} in {region}")
+                module.exit_json(changed=False, msg="No Space {0} in {1}".format(name, region))
 
         if have_it:
             try:
@@ -198,13 +198,13 @@ def run(module):
             response_metadata = response.get("ResponseMetadata")
             http_status_code = response_metadata.get("HTTPStatusCode")
             if http_status_code == 200:
-                module.exit_json(changed=True, msg=f"Deleted Space {name} in {region}")
+                module.exit_json(changed=True, msg="Deleted Space {0} in {1}".format(name, region))
 
             module.fail_json(
-                changed=True, msg=f"Failed to delete Space {name} in {region}"
+                changed=True, msg="Failed to delete Space {0} in {1}".format(name, region)
             )
 
-        module.exit_json(changed=False, msg=f"No Space {name} in {region}")
+        module.exit_json(changed=False, msg="No Space {0} in {1}".format(name, region))
 
 
 def main():
