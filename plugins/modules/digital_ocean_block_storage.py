@@ -84,8 +84,8 @@ EXAMPLES = r"""
 - name: Create new Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     block_size: 10
     volume_name: nyc1-block-storage
@@ -93,8 +93,8 @@ EXAMPLES = r"""
 - name: Create new Block Storage (and assign to Project "test")
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     block_size: 10
     volume_name: nyc1-block-storage
@@ -103,8 +103,8 @@ EXAMPLES = r"""
 - name: Resize an existing Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     block_size: 20
     volume_name: nyc1-block-storage
@@ -112,16 +112,16 @@ EXAMPLES = r"""
 - name: Delete Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: absent
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     volume_name: nyc1-block-storage
 
 - name: Attach Block Storage to a Droplet
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: attach
-    api_token: <TOKEN>
     volume_name: nyc1-block-storage
     region: nyc1
     droplet_id: <ID>
@@ -129,8 +129,8 @@ EXAMPLES = r"""
 - name: Detach Block Storage from a Droplet
   community.digitalocean.digital_ocean_block_storage:
     state: absent
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: attach
-    api_token: <TOKEN>
     volume_name: nyc1-block-storage
     region: nyc1
     droplet_id: <ID>

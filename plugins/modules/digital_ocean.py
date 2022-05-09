@@ -129,18 +129,18 @@ EXAMPLES = r"""
 - name: Ensure a SSH key is present
   community.digitalocean.digital_ocean:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: ssh
     name: my_ssh_key
     ssh_pub_key: 'ssh-rsa AAAA...'
-    api_token: XXX
 
 # Will return the droplet details including the droplet id (used for idempotence)
 - name: Create a new Droplet
   community.digitalocean.digital_ocean:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: droplet
     name: mydroplet
-    api_token: XXX
     size_id: 2gb
     region_id: ams2
     image_id: fedora-19-x64
@@ -160,10 +160,10 @@ EXAMPLES = r"""
 - name: Ensure a droplet is present
   community.digitalocean.digital_ocean:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: droplet
     id: 123
     name: mydroplet
-    api_token: XXX
     size_id: 2gb
     region_id: ams2
     image_id: fedora-19-x64
@@ -177,9 +177,9 @@ EXAMPLES = r"""
 - name: Create a droplet with ssh key
   community.digitalocean.digital_ocean:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     ssh_key_ids: 123,456
     name: mydroplet
-    api_token: XXX
     size_id: 2gb
     region_id: ams2
     image_id: fedora-19-x64
