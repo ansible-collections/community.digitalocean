@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_cdn_endpoints - remove non-API parameters before posting to the API (https://github.com/ansible-collections/community.digitalocean/issues/252).
