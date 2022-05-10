@@ -194,9 +194,9 @@ class DOBlockStorage(object):
 
     def poll_action_for_complete_status(self, action_id):
         url = "actions/{0}".format(action_id)
-        end_time = time.time() + self.module.params["timeout"]
-        while time.time() < end_time:
-            time.sleep(2)
+        end_time = time.monotonic() + self.module.params["timeout"]
+        while time.monotonic() < end_time:
+            time.sleep(10)
             response = self.rest.get(url)
             status = response.status_code
             json = response.json

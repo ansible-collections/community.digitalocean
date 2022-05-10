@@ -261,9 +261,9 @@ class Droplet(JsonfyMixIn):
             self.power_on()
 
         if wait:
-            end_time = time.time() + wait_timeout
-            while time.time() < end_time:
-                time.sleep(min(20, end_time - time.time()))
+            end_time = time.monotonic() + wait_timeout
+            while time.monotonic() < end_time:
+                time.sleep(10)
                 self.update_attr()
                 if self.is_powered_on():
                     if not self.ip_address:
