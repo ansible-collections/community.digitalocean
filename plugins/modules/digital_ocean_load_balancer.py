@@ -504,7 +504,7 @@ class DOLoadBalancer(object):
                         self.id, self.region
                     )
                 )
-            time.sleep(min(10, end_time - time.monotonic()))
+            time.sleep(10)
         self.module.fail_json(
             msg="Timed out waiting for Load Balancer {0} in {1} to be active".format(
                 self.id, self.region

@@ -339,12 +339,12 @@ class DOKubernetes(object):
 
     def ensure_running(self):
         """Waits for the newly created DigitalOcean Kubernetes cluster to be running"""
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
             cluster = self.get_by_id()
             if cluster["kubernetes_cluster"]["status"]["state"] == "running":
                 return cluster
-            time.sleep(min(2, end_time - time.time()))
+            time.sleep(10)
         self.module.fail_json(msg="Wait for Kubernetes cluster to be running")
 
     def create(self):

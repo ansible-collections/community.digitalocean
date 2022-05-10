@@ -1,2 +1,4 @@
-endpoint: gh-ci-space.nyc3.cdn.digitaloceanspaces.com
-origin: gh-ci-space.nyc3.digitaloceanspaces.com
+# endpoint: gh-ci-space.nyc3.cdn.digitaloceanspaces.com
+# origin: gh-ci-space.nyc3.digitaloceanspaces.com
+endpoint: ansible-gh-ci-space.nyc3.cdn.digitaloceanspaces.com
+origin: ansible-gh-ci-space.nyc3.digitaloceanspaces.com
