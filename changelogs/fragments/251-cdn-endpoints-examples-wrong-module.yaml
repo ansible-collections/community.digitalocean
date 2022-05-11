@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_cdn_endpoints - use the correct module name in the C(EXAMPLES) (https://github.com/ansible-collections/community.digitalocean/issues/251).
