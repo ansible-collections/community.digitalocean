@@ -5,6 +5,20 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.19.0
+=======
+
+Minor Changes
+-------------
+
+- digital_ocean - reference C(DO_API_TOKEN) consistently in module documentation and examples (https://github.com/ansible-collections/community.digitalocean/issues/248).
+
+Bugfixes
+--------
+
+- digital_ocean_cdn_endpoints - remove non-API parameters before posting to the API (https://github.com/ansible-collections/community.digitalocean/issues/252).
+- digital_ocean_cdn_endpoints - use the correct module name in the C(EXAMPLES) (https://github.com/ansible-collections/community.digitalocean/issues/251).
+
 v1.18.0
 =======
 

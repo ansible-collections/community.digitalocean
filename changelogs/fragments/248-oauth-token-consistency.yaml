@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean - reference C(DO_API_TOKEN) consistently in module documentation and examples (https://github.com/ansible-collections/community.digitalocean/issues/248).
