@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - Fix the C(project_name) parameter for assigning Droplets to Projects upon creation (https://github.com/ansible-collections/community.digitalocean/issues/255).

@@ -320,7 +320,7 @@ class DODroplet(object):
         self.name = None
         self.size = None
         self.status = None
-        if self.module.params.get("project"):
+        if self.module.params.get("project_name"):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
         self.firewalls = self.get_firewalls()
@@ -781,7 +781,7 @@ class DODroplet(object):
             if json_data:
                 droplet = json_data.get("droplet", droplet)
 
-        project_name = self.module.params.get("project")
+        project_name = self.module.params.get("project_name")
         if project_name:  # empty string is the default project, skip project assignment
             urn = "do:droplet:{0}".format(droplet_id)
             assign_status, error_message, resources = self.projects.assign_to_project(
