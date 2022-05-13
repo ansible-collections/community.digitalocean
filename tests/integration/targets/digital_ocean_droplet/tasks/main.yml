@@ -442,6 +442,10 @@
         unique_name: true
         region: "{{ do_region }}"
 
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
     # Droplet plus firewall tests
     - name: Create a test firewall
       community.digitalocean.digital_ocean_firewall:
