@@ -8,10 +8,6 @@
 
 This collection contains modules and plugins to assist in automating [DigitalOcean](https://www.digitalocean.com) infrastructure and API interactions with Ansible.
 
-## Tested with Ansible
-
-Tested with the current Ansible 2.9 and 2.10 releases and the current development version of Ansible. Ansible versions before 2.9.10 are not supported.
-
 ## Included content
 
 - [digital_ocean](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_module.html) – Create/delete a droplet/SSH_key in DigitalOcean
@@ -72,6 +68,13 @@ Tested with the current Ansible 2.9 and 2.10 releases and the current developmen
 - [digitalocean](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digitalocean_inventory.html) – DigitalOcean Inventory Plugin
 
 ## Installation and Usage
+
+### Requirements
+
+The collection is tested and supported with:
+
+- ansible >= 2.9.10 or ansible-core >= 2.11 (as well as the [devel branch](https://github.com/ansible/ansible))
+- python >= 3.6
 
 ### Installing the Collection from Ansible Galaxy
 
