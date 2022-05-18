@@ -57,6 +57,15 @@ options:
     description:
       - An array containing the IDs of the Droplets assigned to the load balancer.
       - Required when creating load balancers.
+      - Mutually exclusive with tag, you can either define tag or droplet_ids but not both.
+    required: false
+    type: list
+    elements: int
+  tag:
+    description:
+      - A tag associated with the droplets that you want to dynamically assign to the load balancer.
+      - Required when creating load balancers.
+      - Mutually exclusive with droplet_ids, you can either define tag or droplet_ids but not both.
     required: false
     type: list
     elements: int
@@ -246,6 +255,13 @@ EXAMPLES = r"""
         certificate_id: ""
         tls_passthrough: false
     project: test
+
+- name: Create a Load Balancer and associate it with a tag
+  community.digitalocean.digital_ocean_load_balancer:
+    state: present
+    name: test-loadbalancer-1
+    tag: test-tag
+    region: tor1
 """
 
 
@@ -591,6 +607,13 @@ class DOLoadBalancer(object):
                     ),
                 )
 
+        # Droplet ID and tag are mutually exclusive, check that both have not been defined
+        if self.module.params.get('droplet_ids') is not None and self.module.params.get('tag') is not None:
+          self.module.fail_json(
+                msg="droplet_ids and tag are mutually exclusive, please only define one of them"
+            )
+          
+
         # Create it.
         request_params = dict(self.module.params)
         response = self.rest.post("load_balancers", data=request_params)
@@ -717,6 +740,7 @@ def main():
                 default="round_robin",
             ),
             droplet_ids=dict(type="list", elements="int", required=False),
+            tag=dict(type=str, required=False),
             region=dict(aliases=["region_id"], default="nyc1", required=False),
             forwarding_rules=dict(
                 type="list",
@@ -763,7 +787,7 @@ def main():
         ),
         required_if=(
             [
-                ("state", "present", ["droplet_ids", "forwarding_rules"]),
+                ("state", "present", ["droplet_ids", "forwarding_rules"], "tag"),
             ]
         ),
         supports_check_mode=True,
