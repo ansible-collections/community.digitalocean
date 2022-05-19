@@ -738,7 +738,7 @@ def main():
                 default="round_robin",
             ),
             droplet_ids=dict(type="list", elements="int", required=False),
-            tag=dict(type=str, required=False),
+            tag=dict(type="str", required=False),
             region=dict(aliases=["region_id"], default="nyc1", required=False),
             forwarding_rules=dict(
                 type="list",
@@ -785,7 +785,7 @@ def main():
         ),
         required_if=(
             [
-                ("state", "present", ["droplet_ids", "forwarding_rules"], "tag"),
+                ("state", "present", ["forwarding_rules"]),
             ]
         ),
         supports_check_mode=True,
