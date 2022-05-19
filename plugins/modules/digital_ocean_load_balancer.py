@@ -67,8 +67,7 @@ options:
       - Required when creating load balancers.
       - Mutually exclusive with droplet_ids, you can either define tag or droplet_ids but not both.
     required: false
-    type: list
-    elements: int
+    type: str
   region:
     description:
       - The slug identifier for the region where the resource will initially be available.
@@ -609,10 +608,9 @@ class DOLoadBalancer(object):
 
         # Droplet ID and tag are mutually exclusive, check that both have not been defined
         if self.module.params.get('droplet_ids') is not None and self.module.params.get('tag') is not None:
-          self.module.fail_json(
+            self.module.fail_json(
                 msg="droplet_ids and tag are mutually exclusive, please only define one of them"
             )
-          
 
         # Create it.
         request_params = dict(self.module.params)
