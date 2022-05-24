@@ -788,6 +788,7 @@ def main():
                 ("tag", "droplet_ids"),
             ]
         ),
+        required_one_of=[("tag", "droplet_ids")],
         supports_check_mode=True,
     )
 

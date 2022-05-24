@@ -160,6 +160,21 @@
       ansible.builtin.assert:
         that:
           - result.msg is search("mutually exclusive: tag|droplet_ids")
+  
+    - name: Create the Load Balancer (missing tag + droplet_ids)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: round_robin
+        region: "{{ do_region }}"
+      ignore_errors: true  # Expected to fail
+      register: result
+
+    - name: Verify missing tag + droplet_ids fails
+      ansible.builtin.assert:
+        that:
+          - result.msg is search("required: tag, droplet_ids")
 
     - name: Create the Load Balancer (using tag)
       community.digitalocean.digital_ocean_load_balancer:
