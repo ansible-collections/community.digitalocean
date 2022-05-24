@@ -606,12 +606,6 @@ class DOLoadBalancer(object):
                     ),
                 )
 
-        # Droplet ID and tag are mutually exclusive, check that both have not been defined
-        if self.module.params.get('droplet_ids') is not None and self.module.params.get('tag') is not None:
-            self.module.fail_json(
-                msg="droplet_ids and tag are mutually exclusive, please only define one of them"
-            )
-
         # Create it.
         request_params = dict(self.module.params)
         response = self.rest.post("load_balancers", data=request_params)
@@ -786,6 +780,12 @@ def main():
         required_if=(
             [
                 ("state", "present", ["forwarding_rules"]),
+            ]
+        ),
+        # Droplet ID and tag are mutually exclusive, check that both have not been defined
+        mutually_exclusive=(
+            [
+                ("tag", "droplet_ids"),
             ]
         ),
         supports_check_mode=True,
