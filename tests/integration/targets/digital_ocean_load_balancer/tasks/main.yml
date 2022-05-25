@@ -174,7 +174,7 @@
     - name: Verify missing tag + droplet_ids fails
       ansible.builtin.assert:
         that:
-          - result.msg is search("required: tag, droplet_ids")
+          - result.msg is search("missing: tag, droplet_ids")
 
     - name: Create the Load Balancer (using tag)
       community.digitalocean.digital_ocean_load_balancer:

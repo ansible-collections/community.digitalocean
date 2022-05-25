@@ -780,6 +780,7 @@ def main():
         required_if=(
             [
                 ("state", "present", ["forwarding_rules"]),
+                ("state", "present", ["tag", "droplet_ids"], True),
             ]
         ),
         # Droplet ID and tag are mutually exclusive, check that both have not been defined
@@ -788,7 +789,6 @@ def main():
                 ("tag", "droplet_ids"),
             ]
         ),
-        required_one_of=[("tag", "droplet_ids")],
         supports_check_mode=True,
     )
 
