@@ -46,27 +46,19 @@ jobs:
           echo "${{ needs.changed-files.outputs.changed-files }}"
           echo "${{ needs.changed-files.outputs.matrix }}"
 
-      - name: Debugging
-        run: |
-          for file in ${{ steps.changed-files.outputs.changed-files }}; do
-            echo "$file was changed"
-          done
+  integration-module:
+    runs-on: ubuntu-latest
+    needs: changed-files
+    strategy:
+      matrix:
+        module: ${{ fromJson(needs.changed-files.outputs.matrix) }}
+    steps:
 
-  # integration-module:
-  #   runs-on: ubuntu-latest
-  #   needs: changed-files
-  #   strategy:
-  #     matrix:
-  #       value: ${{ fromJson(needs.setup.outputs.matrix) }}
-
-  #   steps:
-
-  #     - name: Run integration test
-  #       uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
-  #       with:
-  #         # module: digital_ocean_account_info
-  #         module: ${{ job.changed-files.changed-files }}
-  #       secrets: inherit
+      - name: Run integration test
+        uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
+        with:
+          module: ${{ matrix.module }}
+          secrets: inherit
 
   # integration:
   #   runs-on: ubuntu-latest
