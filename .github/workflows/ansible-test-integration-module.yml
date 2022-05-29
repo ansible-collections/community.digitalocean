@@ -7,9 +7,9 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: ci-cloud-integration-tests
-  cancel-in-progress: false
+# concurrency:
+#   group: ci-cloud-integration-tests
+#   cancel-in-progress: false
 
 jobs:
 
