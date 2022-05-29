@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
 
-  changed-files:
+  changed-modules:
     runs-on: ubuntu-latest
     steps:
 
@@ -23,8 +23,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get changed files
-        id: changed-files
+      - name: Get changed modules
+        id: changed-modules
         uses: tj-actions/changed-files@v21
         with:
           files: |
@@ -32,29 +32,35 @@ jobs:
             plugins/modules/**
 
       - name: Construct module matrix
-        id: basename-wo-py
+        id: changed-module-matrix
         run: |
           basenames=()
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          for file in ${{ steps.changed-modules.outputs.all_changed_files }}; do
             basenames+=($(basename $file .py))
           done
           printf '::set-output name=matrix::%s\n' $(printf '%s\n' "${basenames[@]}" | jq -R . | jq -sc .)
 
     outputs:
-      changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
-      matrix: ${{ steps.basename-wo-py.outputs.matrix }}
+      changed-files: ${{ steps.changed-modules.outputs.all_changed_files }}
+      matrix: ${{ steps.changed-module-matrix.outputs.matrix }}
 
   integration-test-by-module:
     runs-on: ubuntu-latest
     needs: changed-files
     strategy:
       matrix:
-        module: ${{ fromJson(needs.changed-files.outputs.matrix) }}
+        module: ${{ fromJson(needs.changed-modules.outputs.matrix) }}
       max-parallel: 1
     steps:
 
       - name: Perform module_utils or modules testing
-        if: ${{ needs.changed-files.outputs.matrix != '[""]' }}
+        if: ${{ needs.changed-modules.outputs.matrix == '[""]' }}
+        run: |
+          echo "No module_utils or modules to test"
+          exit 1
+
+      - name: Perform module_utils or modules testing
+        if: ${{ needs.changed-modules.outputs.matrix != '[""]' }}
         run: |
           echo "Testing: ${{ matrix.module }}"
 
