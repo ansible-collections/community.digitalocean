@@ -34,6 +34,7 @@ jobs:
   test-job:
     runs-on: ubuntu-latest
     name: changed-files
+    needs: changed-files
     steps:
 
       - name: Debugging
