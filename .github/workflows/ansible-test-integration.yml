@@ -59,12 +59,12 @@ jobs:
           echo "${{ needs.changed-files.outputs.matrix }}"
 
       - name: Perform module testing
-        if: ${{ needs.changed-files.outputs.matrix }}
+        if: ${{ needs.changed-files.outputs.matrix == '[""]' }}
         run: |
           echo "Got here 1"
 
       - name: Perform module testing
-        if: ${{ ! needs.changed-files.outputs.matrix }}
+        if: ${{ needs.changed-files.outputs.matrix != '[""]' }}
         run: |
           echo "Got here 2"
 
