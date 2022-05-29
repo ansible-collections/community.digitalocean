@@ -15,9 +15,7 @@ jobs:
     uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
     with:
       module: digital_ocean_account_info
-      DO_API_KEY: ${{ secrets.DO_API_KEY }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    secrets: inherit
 
   # integration:
   #   runs-on: ubuntu-latest
