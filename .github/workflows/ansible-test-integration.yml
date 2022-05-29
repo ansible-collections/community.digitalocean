@@ -46,7 +46,7 @@ jobs:
 
   integration-test-by-module:
     runs-on: ubuntu-latest
-    needs: changed-files
+    needs: changed-modules
     strategy:
       matrix:
         module: ${{ fromJson(needs.changed-modules.outputs.matrix) }}
