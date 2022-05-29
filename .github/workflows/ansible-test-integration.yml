@@ -55,10 +55,19 @@ jobs:
     steps:
 
       - name: Run integration test
-        uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
-        with:
-          module: ${{ matrix.module }}
-          secrets: inherit
+        run: |
+          echo "${{ matrix.module }}"
+
+    # uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
+    # with:
+    #   module: ${{ matrix.module }}
+    #   secrets: inherit
+
+      # - name: Run integration test
+      #   uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
+      #   with:
+      #     module: ${{ matrix.module }}
+      #     secrets: inherit
 
   # integration:
   #   runs-on: ubuntu-latest
