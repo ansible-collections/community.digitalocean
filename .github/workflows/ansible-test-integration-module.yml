@@ -1,4 +1,4 @@
-name: integration-module
+name: integration-${{ inputs.module }}
 
 on:
   workflow_call:
