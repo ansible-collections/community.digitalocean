@@ -38,7 +38,7 @@ jobs:
 
       - name: Debugging
         run: |
-          echo "${{ job.changed-files.changed-files }}"
+          echo "${{ needs.changed-files.outputs.changed-files }}"
 
   # integration-module:
   #   uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
