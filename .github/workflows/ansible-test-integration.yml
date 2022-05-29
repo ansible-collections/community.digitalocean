@@ -26,10 +26,10 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v21
-        with:
-          files: plugins/modules/**
+        # with:
+        #   files: plugins/modules/**
 
-      - name: Just the basename without py
+      - name: Construct module matrix
         id: basename-wo-py
         run: |
           basenames=()
@@ -41,16 +41,6 @@ jobs:
     outputs:
       changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
       matrix: ${{ steps.basename-wo-py.outputs.matrix }}
-
-  test-job:
-    runs-on: ubuntu-latest
-    needs: changed-files
-    steps:
-
-      - name: Debugging
-        run: |
-          echo "${{ needs.changed-files.outputs.changed-files }}"
-          echo "${{ needs.changed-files.outputs.matrix }}"
 
   integration-module:
     runs-on: ubuntu-latest
