@@ -62,6 +62,12 @@ jobs:
     steps:
 
       - name: Perform module testing
+        if: ${{ needs.changed-files.outputs.matrix }}
+        run: |
+          echo "Got here 0"
+          echo ${{ matrix.module }}
+
+      - name: Perform module testing
         if: ${{ needs.changed-files.outputs.matrix == '[""]' }}
         run: |
           echo "Got here 1"
