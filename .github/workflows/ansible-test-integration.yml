@@ -30,7 +30,7 @@ jobs:
           files: plugins/modules/**
 
       - id: set-matrix
-        run: echo "::set-output name=matrix::$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | jq -R -s -c 'split(" ")[:-1]')"
+        run: echo "::set-output name=matrix::$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | jq -R -s -c 'split(" ")')"
 
     outputs:
       changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
