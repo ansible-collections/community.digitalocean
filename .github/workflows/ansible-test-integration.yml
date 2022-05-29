@@ -58,23 +58,25 @@ jobs:
         run: |
           echo "No module_utils or modules to test"
 
+      # - name: Perform module_utils or modules testing
+      #   if: ${{ needs.changed-modules.outputs.matrix != '[""]' }}
+      #   run: |
+      #     echo "Testing: ${{ matrix.module }}"
+
       - name: Perform module_utils or modules testing
         if: ${{ needs.changed-modules.outputs.matrix != '[""]' }}
-        run: |
-          echo "Testing: ${{ matrix.module }}"
-
-        # uses: ansible-community/ansible-test-gh-action@unstable/v1
-        # with:
-        #   ansible-core-version: stable-2.11
-        #   target: ${{ matrix.module }}
-        #   pre-test-cmd: >-  # Configure integration test run
-        #     DO_API_KEY=${{ secrets.DO_API_KEY }}
-        #     AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-        #     AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #     ./tests/utils/render.sh
-        #     tests/integration/integration_config.yml.template
-        #     > tests/integration/integration_config.yml
-        #   python-version: 3.9
-        #   target-python-version: 3.9
-        #   testing-type: integration
-        #   test-deps: community.general
+        uses: ansible-community/ansible-test-gh-action@unstable/v1
+        with:
+          ansible-core-version: stable-2.11
+          target: ${{ matrix.module }}
+          pre-test-cmd: >-  # Configure integration test run
+            DO_API_KEY=${{ secrets.DO_API_KEY }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            ./tests/utils/render.sh
+            tests/integration/integration_config.yml.template
+            > tests/integration/integration_config.yml
+          python-version: 3.9
+          target-python-version: 3.9
+          testing-type: integration
+          test-deps: community.general
