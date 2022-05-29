@@ -33,10 +33,9 @@ jobs:
         run: |
           basenames=()
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            basenames+=$(basename $file .py)
+            basenames+=($(basename $file .py))
           done
           echo "::set-output name=foo::$(echo -n ${basenames[*]} | jq -R -s -c 'split(" ")')"
-          echo -n ${basenames[*]} | jq -R -s -c 'split(" ")'
 
       - id: set-matrix
         run: echo "::set-output name=matrix::$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | jq -R -s -c 'split(" ")')"
