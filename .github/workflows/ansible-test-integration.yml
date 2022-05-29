@@ -57,7 +57,6 @@ jobs:
         if: ${{ needs.changed-modules.outputs.matrix == '[""]' }}
         run: |
           echo "No module_utils or modules to test"
-          exit 1
 
       - name: Perform module_utils or modules testing
         if: ${{ needs.changed-modules.outputs.matrix != '[""]' }}
