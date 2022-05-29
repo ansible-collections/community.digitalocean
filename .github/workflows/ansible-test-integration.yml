@@ -54,7 +54,8 @@ jobs:
         module: ${{ fromJson(needs.changed-files.outputs.matrix) }}
     steps:
 
-      - name: Perform testing (digital_ocean_spaces_info)
+      - name: Perform module testing
+        if: ${{ needs.changed-files.outputs.matrix != null }}
         uses: ansible-community/ansible-test-gh-action@unstable/v1
         with:
           ansible-core-version: stable-2.11
