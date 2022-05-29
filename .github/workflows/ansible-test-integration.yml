@@ -44,7 +44,7 @@ jobs:
       changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
       matrix: ${{ steps.basename-wo-py.outputs.matrix }}
 
-  integration-module:
+  integration-test-by-module:
     runs-on: ubuntu-latest
     needs: changed-files
     strategy:
@@ -53,23 +53,10 @@ jobs:
       max-parallel: 1
     steps:
 
-      - name: Perform module testing
-        if: ${{ needs.changed-files.outputs.matrix }}
-        run: |
-          echo "Got here 0"
-          echo ${{ matrix.module }}
-
-      - name: Perform module testing
-        if: ${{ needs.changed-files.outputs.matrix == '[""]' }}
-        run: |
-          echo "Got here 1"
-          echo ${{ matrix.module }}
-
-      - name: Perform module testing
+      - name: Perform module_utils or modules testing
         if: ${{ needs.changed-files.outputs.matrix != '[""]' }}
         run: |
-          echo "Got here 2"
-          echo ${{ matrix.module }}
+          echo "Testing: ${{ matrix.module }}"
 
         # uses: ansible-community/ansible-test-gh-action@unstable/v1
         # with:
