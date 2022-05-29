@@ -173,6 +173,86 @@ releases:
     - 204-kubernetes-tags-and-info.yaml
     - 205-cdn-endpoints.yaml
     release_date: '2021-12-20'
+  1.15.0:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - move Droplet data under "droplet" key in returned
+        payload (https://github.com/ansible-collections/community.digitalocean/issues/211).
+    fragments:
+    - 211-droplet-data-key.yaml
+    modules:
+    - description: Create and remove DigitalOcean Spaces.
+      name: digital_ocean_spaces
+      namespace: ''
+    - description: List DigitalOcean Spaces.
+      name: digital_ocean_spaces_info
+      namespace: ''
+    release_date: '2022-01-19'
+  1.15.1:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - fix reporting of changed state when ``firewall`` argument
+        is present (https://github.com/ansible-collections/community.digitalocean/pull/219).
+      minor_changes:
+      - Updates DigitalOcean API documentation links to current domain with working
+        URL anchors (https://github.com/ansible-collections/community.digitalocean/issues/223).
+    fragments:
+    - 219-droplet-firewall-changed-reporting.yaml
+    - 223-fix-digitalocean-api-documentation-links.yaml
+    release_date: '2022-02-17'
+  1.16.0:
+    changes:
+      bugfixes:
+      - digital_ocean_kubernetes - add missing elements type to C(node_pools.tags)
+        and C(node_pools.taints) options (https://github.com/ansible-collections/community.digitalocean/issues/232).
+      minor_changes:
+      - black test - added a 15 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+      - digital_ocean_domain - add support for IPv6 apex domain records (https://github.com/ansible-collections/community.digitalocean/issues/226).
+      - integration tests - added a 120 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+      - sanity and unit tests - added a 30 minute timeout (https://github.com/ansible-collections/community.digitalocean/issues/228).
+    fragments:
+    - 226-ipv6-apex-domain-records.yml
+    - 228-integration-test-timeouts.yml
+    - 232-kubernetes-documentation-elements.yml
+    modules:
+    - description: Gather information about DigitalOcean domain records
+      name: digital_ocean_domain_record_info
+      namespace: ''
+    release_date: '2022-03-19'
+  1.17.0:
+    changes:
+      minor_changes:
+      - digital_ocean - parameterize the DigitalOcean API base url (https://github.com/ansible-collections/community.digitalocean/issues/237).
+    fragments:
+    - 237-parameterize-do-api-baseurl.yaml
+    release_date: '2022-04-28'
+  1.18.0:
+    changes:
+      minor_changes:
+      - ci - adding stable-2.13 to sanity and unit testing (https://github.com/ansible-collections/community.digitalocean/issues/239).
+      - digital_ocean_spaces - set C(no_log=True) for C(aws_access_key_id) parameter
+        (https://github.com/ansible-collections/community.digitalocean/issues/243).
+      - digital_ocean_spaces_info - set C(no_log=True) for C(aws_access_key_id) parameter
+        (https://github.com/ansible-collections/community.digitalocean/issues/243).
+    fragments:
+    - 239-ci-stable-2.13.yaml
+    - 243-no-log-spaces-access-key-id.yaml
+    release_date: '2022-05-03'
+  1.19.0:
+    changes:
+      bugfixes:
+      - digital_ocean_cdn_endpoints - remove non-API parameters before posting to
+        the API (https://github.com/ansible-collections/community.digitalocean/issues/252).
+      - digital_ocean_cdn_endpoints - use the correct module name in the C(EXAMPLES)
+        (https://github.com/ansible-collections/community.digitalocean/issues/251).
+      minor_changes:
+      - digital_ocean - reference C(DO_API_TOKEN) consistently in module documentation
+        and examples (https://github.com/ansible-collections/community.digitalocean/issues/248).
+    fragments:
+    - 248-oauth-token-consistency.yaml
+    - 251-cdn-endpoints-examples-wrong-module.yaml
+    - 252-cdn-endpoints-http-500.yaml
+    release_date: '2022-05-11'
   1.2.0:
     changes:
       bugfixes:

@@ -20,6 +20,13 @@ authors:
   - Tyler Auerbeck (https://github.com/tylerauerbeck)
   - Angel Aviel Domaoan (https://github.com/tenshiAMD)
   - Max Truxa (https://github.com/maxtruxa)
+  - Franco Posa (https://github.com/francoposa)
+  - magicrobotmonkey (https://github.com/magicrobotmonkey)
+  - radioactive73 (https://github.com/radioactive73)
+  - danxg87 (https://github.com/danxg87)
+  - Sviatoslav Sydorenko (https://github.com/webknjaz)
+  - Vitaly Khabarov (https://github.com/vitkhab)
+  - Onur Güzel (https://github.com/onurguzel)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
 documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
@@ -34,7 +41,7 @@ tags:
   - digitalocean
   - cloud
   - droplet
-version: 1.14.0
+version: 1.19.0
 build_ignore:
   - .DS_Store
   - '*.tar.gz'

@@ -13,6 +13,11 @@ class ModuleDocFragment(object):
     # Parameters for DigitalOcean modules
     DOCUMENTATION = r"""
 options:
+  baseurl:
+    description:
+      - DigitalOcean API base url.
+    type: str
+    default: https://api.digitalocean.com/v2
   oauth_token:
     description:
      - DigitalOcean OAuth token.

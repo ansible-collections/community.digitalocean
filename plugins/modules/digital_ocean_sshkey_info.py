@@ -48,7 +48,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_keys
 data:
     description: List of SSH keys on DigitalOcean
     returned: success and no resource constraint

@@ -92,8 +92,8 @@ notes:
 EXAMPLES = """
 - name: Create default A record for example.com
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     type: A
     name: "@"
@@ -101,8 +101,8 @@ EXAMPLES = """
 
 - name: Create A record for www
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     type: A
     name: www
@@ -110,8 +110,8 @@ EXAMPLES = """
 
 - name: Update A record for www based on name/type/data
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     type: A
     name: www
@@ -120,8 +120,8 @@ EXAMPLES = """
 
 - name: Update A record for www based on record_id
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     record_id: 123456
     type: A
@@ -131,8 +131,8 @@ EXAMPLES = """
 
 - name: Remove www record based on name/type/data
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: absent
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     type: A
     name: www
@@ -140,15 +140,15 @@ EXAMPLES = """
 
 - name: Remove www record based on record_id
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: absent
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     record_id: 1234567
 
 - name: Create MX record with priority 10 for example.com
   community.digitalocean.digital_ocean_domain_record:
-    oauth_token: xxxx
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     type: MX
     data: mail1.example.com

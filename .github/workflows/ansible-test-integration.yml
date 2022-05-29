@@ -19,6 +19,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    timeout-minutes: 120
+
     steps:
       - name: Perform testing (digital_ocean_spaces_info)
         uses: ansible-community/ansible-test-gh-action@unstable/v1

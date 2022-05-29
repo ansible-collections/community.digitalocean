@@ -194,6 +194,25 @@
           - result.data.droplet.name == droplet_name
           - result.data.droplet.status in ["new", "active", "available"]
 
+    - name: Create the same Droplet again (present, unique_name, default project)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify Droplet is already present (from present, unique_name, default project)
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status in ["new", "active", "available"]
+
     - name: Destroy the Droplet (absent)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
@@ -416,6 +435,25 @@
           - firewall_settings is defined
           - "{{ (firewall_settings.data | map(attribute='droplet_ids'))[0] | length > 0 }}"
           - "{{ firewall_droplet.data.droplet.id }} in {{ (firewall_settings.data | map(attribute='droplet_ids'))[0] }}"
+
+    - name: Rerun on above droplet without removing firewall
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        unique_name: true
+        firewall: ["{{ firewall_name }}"]
+        size: "{{ droplet_size }}"
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        wait_timeout: 500
+      register: firewall_droplet_unchanged
+
+    - name: Verify things were not changed when firewall was present but unchanged
+      ansible.builtin.assert:
+        that:
+          - firewall_droplet_unchanged is defined
+          - firewall_droplet_unchanged.changed is false
 
     - name: Rerun on above droplet and remove firewall
       community.digitalocean.digital_ocean_droplet:

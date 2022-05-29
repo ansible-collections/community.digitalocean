@@ -171,7 +171,9 @@ def run(module):
                 },
             )
 
-        module.fail_json(changed=False, msg=f"Failed to create Space {name} in {region}")
+        module.fail_json(
+            changed=False, msg=f"Failed to create Space {name} in {region}"
+        )
 
     elif state == "absent":
         have_it = False
@@ -217,6 +219,7 @@ def main():
             aliases=["AWS_ACCESS_KEY_ID"],
             fallback=(env_fallback, ["AWS_ACCESS_KEY_ID"]),
             required=True,
+            no_log=True,
         ),
         aws_secret_access_key=dict(
             type="str",

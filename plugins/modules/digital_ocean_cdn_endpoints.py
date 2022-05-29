@@ -56,20 +56,20 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 - name: Create DigitalOcean CDN Endpoint
-  community.digitalocean.digital_ocean_cdn_endpoints_info:
+  community.digitalocean.digital_ocean_cdn_endpoints:
     state: present
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     origin: mamercad.nyc3.digitaloceanspaces.com
 
 - name: Update DigitalOcean CDN Endpoint (change ttl to 600, default is 3600)
-  community.digitalocean.digital_ocean_cdn_endpoints_info:
+  community.digitalocean.digital_ocean_cdn_endpoints:
     state: present
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     origin: mamercad.nyc3.digitaloceanspaces.com
     ttl: 600
 
 - name: Delete DigitalOcean CDN Endpoint
-  community.digitalocean.digital_ocean_cdn_endpoints_info:
+  community.digitalocean.digital_ocean_cdn_endpoints:
     state: absent
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     origin: mamercad.nyc3.digitaloceanspaces.com
@@ -219,6 +219,12 @@ class DOCDNEndpoint(object):
 def run(module):
     state = module.params.pop("state")
     c = DOCDNEndpoint(module)
+
+    # Pop these away (don't need them beyond DOCDNEndpoint)
+    module.params.pop("baseurl")
+    module.params.pop("validate_certs")
+    module.params.pop("timeout")
+
     if state == "present":
         c.create()
     elif state == "absent":
@@ -226,29 +232,21 @@ def run(module):
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
-            oauth_token=dict(
-                aliases=["api_token"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-            ),
-            origin=dict(type="str", required=True),
-            ttl=dict(
-                type="int",
-                choices=[60, 600, 3600, 86400, 604800],
-                required=False,
-                default=3600,
-            ),
-            certificate_id=dict(type="str", default=""),
-            custom_domain=dict(type="str", default=""),
-            validate_certs=dict(type="bool", default=True),
-            timeout=dict(type="int", default=30),
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present", "absent"], default="present"),
+        origin=dict(type="str", required=True),
+        ttl=dict(
+            type="int",
+            choices=[60, 600, 3600, 86400, 604800],
+            required=False,
+            default=3600,
         ),
+        certificate_id=dict(type="str", default=""),
+        custom_domain=dict(type="str", default=""),
+    )
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         supports_check_mode=True,
     )
     run(module)

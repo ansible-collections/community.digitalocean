@@ -84,8 +84,8 @@ EXAMPLES = r"""
 - name: Create new Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     block_size: 10
     volume_name: nyc1-block-storage
@@ -93,8 +93,8 @@ EXAMPLES = r"""
 - name: Create new Block Storage (and assign to Project "test")
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     block_size: 10
     volume_name: nyc1-block-storage
@@ -103,8 +103,8 @@ EXAMPLES = r"""
 - name: Resize an existing Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     block_size: 20
     volume_name: nyc1-block-storage
@@ -112,16 +112,16 @@ EXAMPLES = r"""
 - name: Delete Block Storage
   community.digitalocean.digital_ocean_block_storage:
     state: absent
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: create
-    api_token: <TOKEN>
     region: nyc1
     volume_name: nyc1-block-storage
 
 - name: Attach Block Storage to a Droplet
   community.digitalocean.digital_ocean_block_storage:
     state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: attach
-    api_token: <TOKEN>
     volume_name: nyc1-block-storage
     region: nyc1
     droplet_id: <ID>
@@ -129,8 +129,8 @@ EXAMPLES = r"""
 - name: Detach Block Storage from a Droplet
   community.digitalocean.digital_ocean_block_storage:
     state: absent
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     command: attach
-    api_token: <TOKEN>
     volume_name: nyc1-block-storage
     region: nyc1
     droplet_id: <ID>
@@ -194,9 +194,9 @@ class DOBlockStorage(object):
 
     def poll_action_for_complete_status(self, action_id):
         url = "actions/{0}".format(action_id)
-        end_time = time.time() + self.module.params["timeout"]
-        while time.time() < end_time:
-            time.sleep(2)
+        end_time = time.monotonic() + self.module.params["timeout"]
+        while time.monotonic() < end_time:
+            time.sleep(10)
             response = self.rest.get(url)
             status = response.status_code
             json = response.json
@@ -205,7 +205,10 @@ class DOBlockStorage(object):
                     return True
                 elif json["action"]["status"] == "errored":
                     raise DOBlockStorageException(json["message"])
-        raise DOBlockStorageException("Unable to reach api.digitalocean.com")
+        raise DOBlockStorageException(
+            "Unable to reach the DigitalOcean API at %s"
+            % self.module.params.get("baseurl")
+        )
 
     def get_block_storage_by_name(self, volume_name, region):
         url = "volumes?name={0}&region={1}".format(volume_name, region)

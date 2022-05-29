@@ -88,6 +88,7 @@ options:
         description: The number of Droplet instances in the node pool.
       tags:
         type: list
+        elements: str
         description:
           - An array containing the tags applied to the node pool.
           - All node pools are automatically tagged C("k8s"), C("k8s-worker"), and C("k8s:$K8S_CLUSTER_ID").
@@ -96,6 +97,7 @@ options:
         description: An object containing a set of Kubernetes labels. The keys are user-defined.
       taints:
         type: list
+        elements: dict
         description:
           - An array of taints to apply to all nodes in a pool.
           - Taints will automatically be applied to all existing nodes and any subsequent nodes added to the pool.
@@ -183,7 +185,7 @@ EXAMPLES = r"""
 """
 
 
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#kubernetes
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/Kubernetes
 # The only variance from the documented response is that the kubeconfig is (if return_kubeconfig is True) merged in at data['kubeconfig']
 RETURN = r"""
 data:
@@ -327,7 +329,7 @@ class DOKubernetes(object):
 
     def get_kubernetes_options(self):
         """Fetches DigitalOcean Kubernetes options: regions, sizes, versions.
-        API reference: https://developers.digitalocean.com/documentation/v2/#list-available-regions--node-sizes--and-versions-of-kubernetes
+        API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/list_kubernetes_options
         """
         response = self.rest.get("kubernetes/options")
         json_data = response.json
@@ -337,17 +339,17 @@ class DOKubernetes(object):
 
     def ensure_running(self):
         """Waits for the newly created DigitalOcean Kubernetes cluster to be running"""
-        end_time = time.time() + self.wait_timeout
-        while time.time() < end_time:
+        end_time = time.monotonic() + self.wait_timeout
+        while time.monotonic() < end_time:
             cluster = self.get_by_id()
             if cluster["kubernetes_cluster"]["status"]["state"] == "running":
                 return cluster
-            time.sleep(min(2, end_time - time.time()))
+            time.sleep(10)
         self.module.fail_json(msg="Wait for Kubernetes cluster to be running")
 
     def create(self):
         """Creates a DigitalOcean Kubernetes cluster
-        API reference: https://developers.digitalocean.com/documentation/v2/#create-a-new-kubernetes-cluster
+        API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/create_kubernetes_cluster
         """
         # Get valid Kubernetes options (regions, sizes, versions)
         kubernetes_options = self.get_kubernetes_options()["options"]
@@ -403,7 +405,7 @@ class DOKubernetes(object):
 
     def delete(self):
         """Deletes a DigitalOcean Kubernetes cluster
-        API reference: https://developers.digitalocean.com/documentation/v2/#delete-a-kubernetes-cluster
+        API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/delete_kubernetes_cluster
         """
         json_data = self.get_kubernetes()
         if json_data:

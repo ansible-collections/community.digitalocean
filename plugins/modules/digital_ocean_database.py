@@ -54,7 +54,7 @@ options:
   size:
     description:
       - The slug identifier representing the size of the nodes in the database cluster.
-      - See U(https://developers.digitalocean.com/documentation/v2/#create-a-new-database-cluster) for supported sizes.
+      - See U(https://docs.digitalocean.com/reference/api/api-reference/#operation/create_database_cluster) for supported sizes.
     type: str
     required: true
     aliases: ['size_id']
@@ -403,34 +403,24 @@ def run(module):
 
 
 def main():
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present", "absent"], default="present"),
+        id=dict(type="int", aliases=["database_id"]),
+        name=dict(type="str", required=True),
+        engine=dict(choices=["pg", "mysql", "redis", "mongodb"], required=True),
+        version=dict(type="str"),
+        size=dict(type="str", aliases=["size_id"], required=True),
+        region=dict(type="str", aliases=["region_id"], required=True),
+        num_nodes=dict(type="int", choices=[1, 2, 3], default=1),
+        tags=dict(type="list", elements="str"),
+        private_network_uuid=dict(type="str"),
+        wait=dict(type="bool", default=True),
+        wait_timeout=dict(default=600, type="int"),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
-            oauth_token=dict(
-                aliases=["api_token"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-            ),
-            id=dict(type="int", aliases=["database_id"]),
-            name=dict(type="str", required=True),
-            engine=dict(choices=["pg", "mysql", "redis", "mongodb"], required=True),
-            version=dict(type="str"),
-            size=dict(type="str", aliases=["size_id"], required=True),
-            region=dict(type="str", aliases=["region_id"], required=True),
-            num_nodes=dict(type="int", choices=[1, 2, 3], default=1),
-            tags=dict(type="list", elements="str"),
-            private_network_uuid=dict(type="str"),
-            validate_certs=dict(type="bool", default=True),
-            timeout=dict(type="int", default=30),
-            wait=dict(type="bool", default=True),
-            wait_timeout=dict(default=600, type="int"),
-            project_name=dict(
-                type="str", aliases=["project"], required=False, default=""
-            ),
-        ),
+        argument_spec=argument_spec,
         required_one_of=(["id", "name"],),
         required_if=(
             [

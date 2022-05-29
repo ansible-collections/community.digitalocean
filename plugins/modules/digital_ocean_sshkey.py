@@ -36,26 +36,12 @@ options:
     description:
      - The Public SSH key to add.
     type: str
-  oauth_token:
-    description:
-     - DigitalOcean OAuth token.
-    required: true
-    type: str
-  timeout:
-    description:
-    - The timeout in seconds used for polling DigitalOcean's API.
-    type: int
-    default: 30
-  validate_certs:
-    description:
-    - If set to C(no), the SSL certificates will not be validated.
-    - This should only set to C(no) used on personally controlled sites using self-signed certificates.
-    type: bool
-    default: true
 notes:
   - Version 2 of DigitalOcean API is used.
 requirements:
   - "python >= 2.6"
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -77,7 +63,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-# Digital Ocean API info https://developers.digitalocean.com/documentation/v2/#list-all-keys
+# Digital Ocean API info https://docs.digitalocean.com/reference/api/api-reference/#tag/SSH-Keys
 data:
     description: This is only present when C(state=present)
     returned: when C(state=present)
@@ -99,6 +85,10 @@ import base64
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.urls import fetch_url
+
+from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
+    DigitalOceanHelper,
+)
 
 
 class Response(object):
@@ -128,7 +118,7 @@ class Rest(object):
     def __init__(self, module, headers):
         self.module = module
         self.headers = headers
-        self.baseurl = "https://api.digitalocean.com/v2"
+        self.baseurl = module.params.get("baseurl")
 
     def _url_builder(self, path):
         if path[0] == "/":
@@ -272,24 +262,15 @@ def ssh_key_fingerprint(module, ssh_pub_key):
 
 
 def main():
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present", "absent"], default="present"),
+        fingerprint=dict(aliases=["id"], required=False),
+        name=dict(required=False),
+        ssh_pub_key=dict(required=False),
+    )
     module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
-            fingerprint=dict(aliases=["id"], required=False),
-            name=dict(required=False),
-            ssh_pub_key=dict(required=False),
-            oauth_token=dict(
-                no_log=True,
-                # Support environment variable for DigitalOcean OAuth Token
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-                required=True,
-            ),
-            validate_certs=dict(type="bool", default=True),
-            timeout=dict(type="int", default=30),
-        ),
+        argument_spec=argument_spec,
         required_one_of=(("fingerprint", "ssh_pub_key"),),
         supports_check_mode=True,
     )
