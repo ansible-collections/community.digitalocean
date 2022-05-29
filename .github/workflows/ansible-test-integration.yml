@@ -55,13 +55,13 @@ jobs:
     steps:
 
       - name: Perform module testing
-        if: ${{ needs.changed-files.outputs.matrix != null }}
+        if: ${{ needs.changed-files.outputs.matrix != [] }}
         run: |
           echo "${{ needs.changed-files.outputs.matrix }}"
           echo "Got here 1"
 
       - name: Perform module testing
-        if: ${{ needs.changed-files.outputs.matrix == null }}
+        if: ${{ needs.changed-files.outputs.matrix == [] }}
         run: |
           echo "${{ needs.changed-files.outputs.matrix }}"
           echo "Got here 2"
