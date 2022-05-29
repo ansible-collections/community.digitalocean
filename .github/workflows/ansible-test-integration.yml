@@ -16,7 +16,6 @@ jobs:
 
   changed-files:
     runs-on: ubuntu-latest
-    name: changed-files
     steps:
 
       - name: Check out code
@@ -28,25 +27,44 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v21
 
+      - id: set-matrix
+        run: echo "::set-output name=matrix::$(echo "${{ steps.changed-files.outputs.all_changed_files }}" | jq -R -s -c 'split("\n")[:-1]')"
+
     outputs:
       changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
 
   test-job:
     runs-on: ubuntu-latest
-    name: changed-files
     needs: changed-files
     steps:
 
       - name: Debugging
         run: |
           echo "${{ needs.changed-files.outputs.changed-files }}"
+          echo "${{ needs.changed-files.outputs.matrix }}"
+
+      - name: Debugging
+        run: |
+          for file in ${{ steps.changed-files.outputs.changed-files }}; do
+            echo "$file was changed"
+          done
 
   # integration-module:
-  #   uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
-  #   with:
-  #     # module: digital_ocean_account_info
-  #     module: ${{ job.changed-files.changed-files }}
-  #   secrets: inherit
+  #   runs-on: ubuntu-latest
+  #   needs: changed-files
+  #   strategy:
+  #     matrix:
+  #       value: ${{ fromJson(needs.setup.outputs.matrix) }}
+
+  #   steps:
+
+  #     - name: Run integration test
+  #       uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
+  #       with:
+  #         # module: digital_ocean_account_info
+  #         module: ${{ job.changed-files.changed-files }}
+  #       secrets: inherit
 
   # integration:
   #   runs-on: ubuntu-latest
