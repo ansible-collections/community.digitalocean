@@ -19,6 +19,11 @@ jobs:
     name: changed-files
     steps:
 
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v21
