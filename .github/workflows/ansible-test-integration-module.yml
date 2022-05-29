@@ -14,9 +14,9 @@ on:
       AWS_SECRET_ACCESS_KEY:
         required: true
 
-# concurrency:
-#   group: ci-cloud-integration-tests
-#   cancel-in-progress: false
+concurrency:
+  group: ci-cloud-integration-tests-module
+  cancel-in-progress: false
 
 jobs:
 
