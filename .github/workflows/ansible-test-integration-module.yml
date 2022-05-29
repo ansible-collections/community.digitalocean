@@ -8,7 +8,7 @@ on:
         type: string
 
 concurrency:
-  group: cloud-integration-tests
+  group: ci-cloud-integration-tests
   cancel-in-progress: false
 
 jobs:
