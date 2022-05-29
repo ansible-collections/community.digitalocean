@@ -12,7 +12,7 @@ concurrency:
 jobs:
 
   integration-module:
-    uses: ansible-collections/community.digitalocean/actions/workflow/ansible-test-integration-module.yml@ci
+    uses: ansible-collections/community.digitalocean/.github/workflows/ansible-test-integration-module.yml@ci
     with:
       module: digital_ocean_account_info
 
