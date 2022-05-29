@@ -30,16 +30,17 @@ jobs:
           files: plugins/modules/**
 
       - name: Just the basename without py
+        id: basename-wo-py
         run: |
           basenames=()
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             basenames+=($(basename $file .py))
           done
-          printf '::set-output name=matrix::%s' $(printf '%s\n' "${basenames[@]}" | jq -R . | jq -sc .)
+          printf '::set-output name=matrix::%s\n' $(printf '%s\n' "${basenames[@]}" | jq -R . | jq -sc .)
 
     outputs:
       changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
-      matrix: ${{ steps.changed-files.outputs.matrix }}
+      matrix: ${{ steps.basename-wo-py.outputs.matrix }}
 
   test-job:
     runs-on: ubuntu-latest
