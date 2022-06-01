@@ -1,0 +1,2 @@
+minor_changes:
+  - ci - run pull request integration tests only on changed C(module_utils) or C(modules) (https://github.com/ansible-collections/community.digitalocean/pull/259).
