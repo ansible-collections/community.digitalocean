@@ -3,7 +3,7 @@ name: integration
 on:
   push:
     branches:
-      - ci
+      - main
     # paths:
     #   - plugins/module_utils/**
     #   - plugins/modules/**
