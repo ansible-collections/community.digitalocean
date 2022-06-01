@@ -23,6 +23,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Debug
+        run:
+          echo "${{ github.event_name }}"
+
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5
