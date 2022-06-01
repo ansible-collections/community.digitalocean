@@ -2,7 +2,7 @@ name: pull-request-integration
 
 on:
   pull_request_target:
-    branches: [ main, ci ]
+    branches: [ main ]
     types: [ opened, synchronize, reopened ]
 
 concurrency:
