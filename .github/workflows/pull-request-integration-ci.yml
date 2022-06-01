@@ -31,6 +31,12 @@ jobs:
             plugins/module_utils/**
             plugins/modules/**
 
+      - name: List all changed files
+        run: |
+          for file in ${{ steps.changed-modules.outputs.all_changed_files }}; do
+            echo "$file was changed"
+          done
+
       - name: Construct module matrix
         id: changed-module-matrix
         run: |
