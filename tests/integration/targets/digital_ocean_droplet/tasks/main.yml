@@ -115,6 +115,8 @@
           - result.assign_status == "assigned"
           - result.msg is search("Assigned")
           - result.msg is search("to project " ~ secondary_project_name)
+          # issue #220: droplet.networks.v4 is empty when unique_name != true
+          - result.data.droplet.networks.v4 != []
 
     - name: Destroy the Droplet (absent)
       community.digitalocean.digital_ocean_droplet:

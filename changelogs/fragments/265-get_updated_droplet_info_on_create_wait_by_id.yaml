@@ -1,0 +1,5 @@
+bugfixes:
+  - digital_ocean_droplet - fix regression where droplet info (for example
+    networking) doesn't update when waiting during creation unless
+    ``unique_name`` is set to true
+    (https://github.com/ansible-collections/community.digitalocean/issues/220).
