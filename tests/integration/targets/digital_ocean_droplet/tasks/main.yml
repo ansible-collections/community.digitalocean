@@ -116,17 +116,20 @@
           - result.msg is search("Assigned")
           - result.msg is search("to project " ~ secondary_project_name)
 
-    - name: Destroy the Droplet (absent)
+    - name: Destroy the Droplet (absent, by ID only)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
-        name: "{{ droplet_name }}"
         id: "{{ result.data.droplet.id }}"
-        unique_name: true
         region: "{{ do_region }}"
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
       register: result
+
+    - name: Verify Droplet is absent (from absent, by ID only)
+      ansible.builtin.assert:
+        that:
+          - result.changed
 
     - name: Give the cloud a minute to settle
       ansible.builtin.pause:
@@ -155,18 +158,19 @@
           - result.msg is search("Assigned")
           - result.msg is search("to project " ~ secondary_project_name)
 
-    - name: Destroy the Droplet (absent)
+    - name: Destroy the Droplet (absent, by unique name and ID)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
         name: "{{ droplet_name }}"
         unique_name: true
+        id: "{{ result.data.droplet.id }}"
         region: "{{ do_region }}"
         image: "{{ droplet_image }}"
         size: "{{ droplet_size }}"
       register: result
 
-    - name: Verify Droplet is absent (from absent)
+    - name: Verify Droplet is absent (from absent, by unique name and ID)
       ansible.builtin.assert:
         that:
           - result.changed
@@ -213,7 +217,7 @@
           - result.data.droplet.name == droplet_name
           - result.data.droplet.status in ["new", "active", "available"]
 
-    - name: Destroy the Droplet (absent)
+    - name: Destroy the Droplet (absent, by unique name only)
       community.digitalocean.digital_ocean_droplet:
         oauth_token: "{{ do_api_key }}"
         state: absent
@@ -224,7 +228,7 @@
         size: "{{ droplet_size }}"
       register: result
 
-    - name: Verify Droplet is absent (from absent)
+    - name: Verify Droplet is absent (from absent, by unique name only)
       ansible.builtin.assert:
         that:
           - result.changed
