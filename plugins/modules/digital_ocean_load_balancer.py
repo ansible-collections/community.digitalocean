@@ -57,9 +57,17 @@ options:
     description:
       - An array containing the IDs of the Droplets assigned to the load balancer.
       - Required when creating load balancers.
+      - Mutually exclusive with tag, you can either define tag or droplet_ids but not both.
     required: false
     type: list
     elements: int
+  tag:
+    description:
+      - A tag associated with the droplets that you want to dynamically assign to the load balancer.
+      - Required when creating load balancers.
+      - Mutually exclusive with droplet_ids, you can either define tag or droplet_ids but not both.
+    required: false
+    type: str
   region:
     description:
       - The slug identifier for the region where the resource will initially be available.
@@ -246,6 +254,13 @@ EXAMPLES = r"""
         certificate_id: ""
         tls_passthrough: false
     project: test
+
+- name: Create a Load Balancer and associate it with a tag
+  community.digitalocean.digital_ocean_load_balancer:
+    state: present
+    name: test-loadbalancer-1
+    tag: test-tag
+    region: tor1
 """
 
 
@@ -717,6 +732,7 @@ def main():
                 default="round_robin",
             ),
             droplet_ids=dict(type="list", elements="int", required=False),
+            tag=dict(type="str", required=False),
             region=dict(aliases=["region_id"], default="nyc1", required=False),
             forwarding_rules=dict(
                 type="list",
@@ -763,7 +779,14 @@ def main():
         ),
         required_if=(
             [
-                ("state", "present", ["droplet_ids", "forwarding_rules"]),
+                ("state", "present", ["forwarding_rules"]),
+                ("state", "present", ["tag", "droplet_ids"], True),
+            ]
+        ),
+        # Droplet ID and tag are mutually exclusive, check that both have not been defined
+        mutually_exclusive=(
+            [
+                ("tag", "droplet_ids"),
             ]
         ),
         supports_check_mode=True,
