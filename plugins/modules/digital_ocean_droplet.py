@@ -776,8 +776,7 @@ class DODroplet(object):
 
         # Get updated Droplet data (fallback to current data)
         if self.wait:
-            json_data = self.get_droplet()
-            # Without unique_name json_data is None
+            json_data = self.get_by_id(droplet_id)
             if json_data:
                 droplet = json_data.get("droplet", droplet)
 
