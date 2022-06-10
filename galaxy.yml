@@ -27,6 +27,8 @@ authors:
   - Sviatoslav Sydorenko (https://github.com/webknjaz)
   - Vitaly Khabarov (https://github.com/vitkhab)
   - Onur Güzel (https://github.com/onurguzel)
+  - Shuaib Munshi (https://github.com/shuaibmunshi)
+  - Corey Wright (https://github.com/coreywright)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
 documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
@@ -41,7 +43,7 @@ tags:
   - digitalocean
   - cloud
   - droplet
-version: 1.19.0
+version: 1.20.0
 build_ignore:
   - .DS_Store
   - '*.tar.gz'

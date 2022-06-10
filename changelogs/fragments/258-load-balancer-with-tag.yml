@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_load_balancer - Allow creating a load balancer and associating droplets by tag as an alternative to ``droplet_ids``. 
