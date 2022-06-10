@@ -1,6 +1,0 @@
-bugfixes:
-  - digital_ocean_droplet - fix regression in droplet deletion where
-    ``name`` and ``unique_name`` (set to true) are required and ``id``
-    alone is insufficient (though ``id`` is sufficient to uniquely
-    identify a droplet for deletion).
-    (https://github.com/ansible-collections/community.digitalocean/issues/260)

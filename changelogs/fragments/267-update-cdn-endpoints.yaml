@@ -1,2 +1,0 @@
-minor_changes:
-  - digital_ocean_cdn_endpoints - update Spaces endpoint and add a few delays to the integration test (https://github.com/ansible-collections/community.digitalocean/issues/267).
