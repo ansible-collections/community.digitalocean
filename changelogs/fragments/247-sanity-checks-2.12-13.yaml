@@ -1,2 +1,2 @@
 minor_changes:
-  - digital_ocean - Adding sanity test ignores for Ansible 2.12 and 2.13 (https://github.com/ansible-collections/community.digitalocean/issues/247).
+  - digital_ocean - add sanity test ignores for Ansible 2.12 and 2.13 (https://github.com/ansible-collections/community.digitalocean/issues/247).
