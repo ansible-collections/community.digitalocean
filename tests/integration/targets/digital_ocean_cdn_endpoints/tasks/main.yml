@@ -25,6 +25,10 @@
           - result.data.endpoint.origin == origin
           - result.data.endpoint.ttl == 3600
 
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
+
     - name: Update DigitalOcean CDN Endpoint (change ttl to 600, default is 3600)
       community.digitalocean.digital_ocean_cdn_endpoints:
         state: present
@@ -42,6 +46,10 @@
           - result.data.endpoint.endpoint == endpoint
           - result.data.endpoint.origin == origin
           - result.data.endpoint.ttl == 600
+
+    - name: Give the cloud a minute to settle
+      ansible.builtin.pause:
+        minutes: 1
 
   always:
 

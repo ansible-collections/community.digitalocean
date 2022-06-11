@@ -5,6 +5,35 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.20.0
+=======
+
+Minor Changes
+-------------
+
+- digital_ocean_cdn_endpoints - update Spaces endpoint and add a few delays to the integration test (https://github.com/ansible-collections/community.digitalocean/issues/267).
+- digital_ocean_load_balancer - allow creating a load balancer and associating droplets by tag as an alternative to ``droplet_ids`` (https://github.com/ansible-collections/community.digitalocean/issues/270).
+
+Bugfixes
+--------
+
+- digital_ocean_droplet - fix regression in droplet deletion where ``name`` and ``unique_name`` (set to true) are required and ``id`` alone is insufficient (though ``id`` is sufficient to uniquely identify a droplet for deletion). (https://github.com/ansible-collections/community.digitalocean/issues/260)
+- digital_ocean_droplet - fix regression where droplet info (for example networking) doesn't update when waiting during creation unless ``unique_name`` is set to true (https://github.com/ansible-collections/community.digitalocean/issues/220).
+
+v1.19.0
+=======
+
+Minor Changes
+-------------
+
+- digital_ocean - reference C(DO_API_TOKEN) consistently in module documentation and examples (https://github.com/ansible-collections/community.digitalocean/issues/248).
+
+Bugfixes
+--------
+
+- digital_ocean_cdn_endpoints - remove non-API parameters before posting to the API (https://github.com/ansible-collections/community.digitalocean/issues/252).
+- digital_ocean_cdn_endpoints - use the correct module name in the C(EXAMPLES) (https://github.com/ansible-collections/community.digitalocean/issues/251).
+
 v1.18.0
 =======
 

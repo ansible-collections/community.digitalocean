@@ -776,8 +776,7 @@ class DODroplet(object):
 
         # Get updated Droplet data (fallback to current data)
         if self.wait:
-            json_data = self.get_droplet()
-            # Without unique_name json_data is None
+            json_data = self.get_by_id(droplet_id)
             if json_data:
                 droplet = json_data.get("droplet", droplet)
 
@@ -816,9 +815,13 @@ class DODroplet(object):
         self.module.exit_json(changed=True, data={"droplet": droplet})
 
     def delete(self):
-        if not self.unique_name:
+        # to delete a droplet we need to know the droplet id or unique name, ie
+        # name is not None and unique_name is True, but as "id or name" is
+        # enforced elsewhere, we only need to enforce "id or unique_name" here
+        if not self.module.params["id"] and not self.unique_name:
             self.module.fail_json(
-                changed=False, msg="unique_name must be set for deletes"
+                changed=False,
+                msg="id must be set or unique_name must be true for deletes",
             )
         json_data = self.get_droplet()
         if json_data is None:
@@ -903,7 +906,6 @@ def main():
                 ("state", "present", ["name", "size", "image", "region"]),
                 ("state", "active", ["name", "size", "image", "region"]),
                 ("state", "inactive", ["name", "size", "image", "region"]),
-                ("state", "absent", ["name", "unique_name"]),
             ]
         ),
         supports_check_mode=True,

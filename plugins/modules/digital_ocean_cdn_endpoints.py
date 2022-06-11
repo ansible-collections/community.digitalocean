@@ -56,20 +56,20 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 - name: Create DigitalOcean CDN Endpoint
-  community.digitalocean.digital_ocean_cdn_endpoints_info:
+  community.digitalocean.digital_ocean_cdn_endpoints:
     state: present
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     origin: mamercad.nyc3.digitaloceanspaces.com
 
 - name: Update DigitalOcean CDN Endpoint (change ttl to 600, default is 3600)
-  community.digitalocean.digital_ocean_cdn_endpoints_info:
+  community.digitalocean.digital_ocean_cdn_endpoints:
     state: present
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     origin: mamercad.nyc3.digitaloceanspaces.com
     ttl: 600
 
 - name: Delete DigitalOcean CDN Endpoint
-  community.digitalocean.digital_ocean_cdn_endpoints_info:
+  community.digitalocean.digital_ocean_cdn_endpoints:
     state: absent
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     origin: mamercad.nyc3.digitaloceanspaces.com
@@ -219,6 +219,12 @@ class DOCDNEndpoint(object):
 def run(module):
     state = module.params.pop("state")
     c = DOCDNEndpoint(module)
+
+    # Pop these away (don't need them beyond DOCDNEndpoint)
+    module.params.pop("baseurl")
+    module.params.pop("validate_certs")
+    module.params.pop("timeout")
+
     if state == "present":
         c.create()
     elif state == "absent":

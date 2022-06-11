@@ -51,20 +51,20 @@ EXAMPLES = r"""
 - name: Retrieve all domain records for example.com
   community.digitalocean.digital_ocean_domain_record_info:
     state: present
-    oauth_token: xxxx
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
 
 - name: Get specific domain record by ID
   community.digitalocean.digital_ocean_domain_record_info:
     state: present
-    oauth_token: xxxx
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     record_id: 12345789
   register: result
 
 - name: Retrieve all A domain records for example.com
   community.digitalocean.digital_ocean_domain_record_info:
     state: present
-    oauth_token: xxxx
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     domain: example.com
     type: A
 """
