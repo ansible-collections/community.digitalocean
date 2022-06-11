@@ -130,6 +130,71 @@
           - lb.resources.status is defined
           - lb.resources.status == "assigned"
 
+    - name: Delete the Load Balancer
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ lb_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+    - name: Verify Load Balancer is deleted
+      ansible.builtin.assert:
+        that:
+          - result.changed
+
+    - name: Create the Load Balancer (invalid tag + droplet_ids)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: round_robin
+        droplet_ids:
+          - "{{ droplet.data.droplet.id }}"
+        tag: "{{ lb_tag }}"
+        region: "{{ do_region }}"
+      ignore_errors: true  # Expected to fail
+      register: result
+
+    - name: Verify invalid tag + droplet_ids fails
+      ansible.builtin.assert:
+        that:
+          - result.msg is search("mutually exclusive: tag|droplet_ids")
+  
+    - name: Create the Load Balancer (missing tag + droplet_ids)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: round_robin
+        region: "{{ do_region }}"
+      ignore_errors: true  # Expected to fail
+      register: result
+
+    - name: Verify missing tag + droplet_ids fails
+      ansible.builtin.assert:
+        that:
+          - result.msg is search("missing: tag, droplet_ids")
+
+    - name: Create the Load Balancer (using tag)
+      community.digitalocean.digital_ocean_load_balancer:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lb_name }}"
+        algorithm: round_robin
+        tag: "{{ lb_tag }}"
+        region: "{{ do_region }}"
+      register: lb
+    
+    - name: Verify Load Balancer is present (from present)
+      ansible.builtin.assert:
+        that:
+          - lb.data is defined
+          - lb.data.load_balancer is defined
+          - lb.data.load_balancer.tag is defined
+          - lb.data.load_balancer.tag == lb_tag
+          - lb.data.load_balancer.status in ["new", "active", "available"]
+
   always:
 
     - name: Delete the Droplet
