@@ -6,25 +6,6 @@
 
   tasks:
 
-    - name: 1-click-app (both "droplet" and "kubernetes")
+    - name: List all available 1-Click Applications
       community.digitalocean.one_click_info:
-        state: present
-
-    - name: 1-click-app (only "droplet")
-      community.digitalocean.one_click_info:
-        state: present
-        type: droplet
-
-    - name: 1-click-app (only "kubernetes")
-      community.digitalocean.one_click_info:
-        state: present
-        type: kubernetes
-
-    # - name: 1-click-app
-    #   community.digitalocean.one_click_info:
-    #     state: absent
-
-    # - name: 1-click-app
-    #   community.digitalocean.one_click:
-    #     state: absent
-    #     name: foo
+        oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
