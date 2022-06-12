@@ -6,13 +6,23 @@
 
   tasks:
 
-    - name: 1-click-app
+    - name: 1-click-app (both "droplet" and "kubernetes")
       community.digitalocean.one_click_info:
         state: present
 
-    - name: 1-click-app
+    - name: 1-click-app (only "droplet")
       community.digitalocean.one_click_info:
-        state: absent
+        state: present
+        type: droplet
+
+    - name: 1-click-app (only "kubernetes")
+      community.digitalocean.one_click_info:
+        state: present
+        type: kubernetes
+
+    # - name: 1-click-app
+    #   community.digitalocean.one_click_info:
+    #     state: absent
 
     # - name: 1-click-app
     #   community.digitalocean.one_click:

@@ -15,12 +15,12 @@ DOCUMENTATION = r"""
 module: one_click_info
 short_description: List all available 1-Click Applications
 description:
-    - List all available 1-Click Applications
-    - 1-Click applications are pre-built Droplet images or Kubernetes apps with software, features, and configuration details already set up for you
-    - They can be found in the in the DigitalOcean Marketplace U(https://docs.digitalocean.com/products/marketplace/)
+  - List all available 1-Click Applications
+  - 1-Click applications are pre-built Droplet images or Kubernetes apps with software, features, and configuration details already set up for you
+  - They can be found in the in the DigitalOcean Marketplace U(https://docs.digitalocean.com/products/marketplace/)
 author: Mark Mercado (@mamercad)
 extends_documentation_fragment:
-    - community.digitalocean.digital_ocean.documentation
+  - community.digitalocean.base_args.documentation
 """
 
 
@@ -57,9 +57,13 @@ class DOOneClick(DigitalOceanBaseModule):
     def __init__(self, module):
         super().__init__(module)
         self.module = module
+        self.type = self.module.params.get("type")
 
     def get(self):
-        response = self.api.get("1-clicks")
+        if self.type:
+            response = self.api.get("1-clicks?type={0}".format(self.type))
+        else:
+            response = self.api.get("1-clicks")
         status_code = response.status_code
 
         if status_code == 200:
@@ -102,10 +106,11 @@ def main():
     argument_spec = DigitalOceanBaseModule.argument_spec()
     argument_spec.update(
         state=dict(type="str", choices=["present"], default="present"),
+        type=dict(type="str", choices=["droplet", "kubernetes"], required=False),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
-        supports_check_mode=True,
+        supports_check_mode=False,
     )
     run(module)
 
