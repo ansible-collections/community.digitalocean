@@ -1,0 +1,8 @@
+plugins/modules/digital_ocean_spaces.py compile-2.7!skip
+plugins/modules/digital_ocean_spaces_info.py compile-2.7!skip
+plugins/modules/digital_ocean_spaces.py compile-3.5!skip
+plugins/modules/digital_ocean_spaces_info.py compile-3.5!skip
+plugins/modules/digital_ocean_spaces.py import-2.7!skip
+plugins/modules/digital_ocean_spaces_info.py import-2.7!skip
+plugins/modules/digital_ocean_spaces.py import-3.5!skip
+plugins/modules/digital_ocean_spaces_info.py import-3.5!skip
