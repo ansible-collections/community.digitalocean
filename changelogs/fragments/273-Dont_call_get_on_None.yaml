@@ -1,0 +1,2 @@
+bugfixes:
+  - digital_ocean_droplet - if the JSON response lacks a key and the associated variable is set to ``None``, then don't treat that variable like a ``dict`` and call ``get()`` on it without first testing it (https://github.com/ansible-collections/community.digitalocean/issues/272).

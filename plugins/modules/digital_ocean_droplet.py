@@ -542,7 +542,7 @@ class DODroplet(object):
             status_code = response.status_code
             message = json_data.get("message", "no error message")
             droplet = json_data.get("droplet", None)
-            droplet_status = droplet.get("status", None)
+            droplet_status = droplet.get("status", None) if droplet else None
 
             if droplet is None or droplet_status is None:
                 self.module.fail_json(
