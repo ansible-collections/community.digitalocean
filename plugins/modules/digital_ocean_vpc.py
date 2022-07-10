@@ -104,14 +104,16 @@ data:
   returned: success
   type: dict
   sample:
-    created_at: '2021-06-17T11:43:12.12121565Z'
-    default: false
-    description: ''
-    id: a3b72d97-192f-4984-9d71-08a5faf2e0c7
-    ip_range: 10.116.16.0/20
-    name: testvpc1
-    region: nyc1
-    urn: do:vpc:a3b72d97-192f-4984-9d71-08a5faf2e0c7
+    msg: Created VPC myvpc1 in nyc1
+    vpc:
+      created_at: '2021-06-17T11:43:12.12121565Z'
+      default: false
+      description: ''
+      id: a3b72d97-192f-4984-9d71-08a5faf2e0c7
+      ip_range: 10.116.16.0/20
+      name: testvpc1
+      region: nyc1
+      urn: do:vpc:a3b72d97-192f-4984-9d71-08a5faf2e0c7
 """
 
 
@@ -173,12 +175,16 @@ class DOVPC(object):
                 json = response.json
                 if response.status_code != 200:
                     self.module.fail_json(
-                        msg="Failed to update VPC {0}: {1}".format(
-                            self.name, json["message"]
+                        msg="Failed to update VPC {0} in {1}: {2}".format(
+                            self.name, self.region, json["message"]
                         )
                     )
                 else:
-                    self.module.exit_json(changed=False, data=json)
+                    self.module.exit_json(
+                        changed=False,
+                        data=json,
+                        msg="Updated VPC {0} in {1}".format(self.name, self.region),
+                    )
             else:
                 self.module.fail_json(
                     changed=False, msg="Unexpected error, please file a bug"
@@ -198,11 +204,17 @@ class DOVPC(object):
             status = response.status_code
             json = response.json
             if status == 201:
-                self.module.exit_json(changed=True, data=json["vpc"])
+                self.module.exit_json(
+                    changed=True,
+                    data=json,
+                    msg="Created VPC {0} in {1}".format(self.name, self.region),
+                )
             else:
                 self.module.fail_json(
                     changed=False,
-                    msg="Failed to create VPC: {0}".format(json["message"]),
+                    msg="Failed to create VPC {0} in {1}: {2}".format(
+                        self.name, self.region, json["message"]
+                    ),
                 )
 
     def delete(self):
@@ -211,7 +223,7 @@ class DOVPC(object):
 
         vpc = self.get_by_name()
         if vpc is None:
-            self.module.fail_json(msg="Unable to find VPC {0}".format(self.name))
+            self.module.fail_json(msg="Unable to find VPC {0} in {1}".format(self.name, self.region))
         else:
             vpc_id = vpc.get("id", None)
             if vpc_id is not None:
@@ -221,7 +233,7 @@ class DOVPC(object):
                 if status == 204:
                     self.module.exit_json(
                         changed=True,
-                        msg="Deleted VPC {0} ({1})".format(self.name, vpc_id),
+                        msg="Deleted VPC {0} in {1} ({2})".format(self.name, self.region, vpc_id),
                     )
                 else:
                     json = response.json

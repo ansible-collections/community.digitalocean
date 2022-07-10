@@ -1,0 +1,2 @@
+minor_changes:
+  - digital_ocean_vpc: add C(vpc) key to returned VPC data on create (https://github.com/ansible-collections/community.digitalocean/issues/276).
