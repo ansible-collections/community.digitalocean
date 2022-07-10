@@ -223,7 +223,9 @@ class DOVPC(object):
 
         vpc = self.get_by_name()
         if vpc is None:
-            self.module.fail_json(msg="Unable to find VPC {0} in {1}".format(self.name, self.region))
+            self.module.fail_json(
+                msg="Unable to find VPC {0} in {1}".format(self.name, self.region)
+            )
         else:
             vpc_id = vpc.get("id", None)
             if vpc_id is not None:
@@ -233,7 +235,9 @@ class DOVPC(object):
                 if status == 204:
                     self.module.exit_json(
                         changed=True,
-                        msg="Deleted VPC {0} in {1} ({2})".format(self.name, self.region, vpc_id),
+                        msg="Deleted VPC {0} in {1} ({2})".format(
+                            self.name, self.region, vpc_id
+                        ),
                     )
                 else:
                     json = response.json
