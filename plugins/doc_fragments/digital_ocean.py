@@ -20,9 +20,9 @@ options:
     default: https://api.digitalocean.com/v2
   oauth_token:
     description:
-     - DigitalOcean OAuth token.
-     - "There are several other environment variables which can be used to provide this value."
-     - "i.e., - 'DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN' and 'OAUTH_TOKEN'"
+      - DigitalOcean OAuth token.
+      - "There are several other environment variables which can be used to provide this value."
+      - "i.e., - 'DO_API_TOKEN', 'DO_API_KEY', 'DO_OAUTH_TOKEN' and 'OAUTH_TOKEN'"
     type: str
     aliases: [ api_token ]
   timeout:
