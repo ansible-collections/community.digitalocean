@@ -1,17 +1,14 @@
 name: dev-integration-module
+description: integration test by module
 
-on:
-  workflow_call:
-    inputs:
-      module:
-        required: true
-        type: string
+inputs:
+  module:
+    description: the module
+    required: true
 
-jobs:
-
-  integration-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: hello
-        run: |
-          echo "module: ${{ inputs.module }}"
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        echo "module: ${{ inputs.module }}"

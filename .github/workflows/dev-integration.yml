@@ -24,8 +24,6 @@ jobs:
       - uses: ./.github/workflows/dev-integration
         with:
           module: ${{ matrix.module }}
-        # secrets:
-        #   token: ${{ secrets.DO_API_KEY }}
 
   # changed-modules:
   #   runs-on: ubuntu-latest
