@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         module:
-          - hello-module
+          - digital_ocean_account_info
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/workflows/dev-integration
