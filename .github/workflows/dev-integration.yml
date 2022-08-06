@@ -6,6 +6,7 @@ on:
       - ci
     paths:
       - .github/workflows/dev-integration.yml
+      - .github/workflows/dev-integration/action.yml
 
 concurrency:
   group: dev-integration
