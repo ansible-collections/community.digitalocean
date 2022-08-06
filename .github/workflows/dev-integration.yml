@@ -24,7 +24,7 @@ jobs:
         run: |
           echo hello
       - name: asdf
-        uses: ansible-collections/community.digitalocean/actions/.github/workflows/dev-integration-module.yml
+        uses: ./.github/workflows/dev-integration-module.yml
         with:
           module: ${{ matrix.module }}
         # secrets:
