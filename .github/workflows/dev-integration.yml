@@ -21,7 +21,7 @@ jobs:
           - hello-module
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/dev-integration-module
+      - uses: ./.github/workflows/dev-integration
         with:
           module: ${{ matrix.module }}
         # secrets:
