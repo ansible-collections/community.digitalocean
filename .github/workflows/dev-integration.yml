@@ -17,10 +17,11 @@ jobs:
   integration-tests:
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         module:
           - digital_ocean_account_info
-          # - digital_ocean_balance_info
+          - digital_ocean_balance_info
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/workflows/dev-integration
