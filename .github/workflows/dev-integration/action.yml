@@ -21,7 +21,7 @@ runs:
     - shell: bash
       run: |
         echo "module: ${{ inputs.module }}"
-    - uses: ansible-community/ansible-test-gh-action@unstable/v1
+    - uses: ansible-community/ansible-test-gh-action@release/v1
       with:
         ansible-core-version: stable-2.11
         target: ${{ inputs.module }}
