@@ -1,0 +1,98 @@
+name: dev-integration
+
+on:
+  push:
+    branches:
+      - ci
+    paths:
+      - .github/workflows/dev-integration.yml
+
+concurrency:
+  group: dev-integration
+  cancel-in-progress: true
+
+jobs:
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module:
+          - hello-module
+    steps:
+      - name: asdf2
+        run: |
+          echo hello
+      - name: asdf
+        uses: ansible-collections/community.digitalocean/actions/.github/workflows/dev-integration-module.yml
+        with:
+          module: ${{ matrix.module }}
+        # secrets:
+        #   token: ${{ secrets.DO_API_KEY }}
+
+  # changed-modules:
+  #   runs-on: ubuntu-latest
+  #   steps:
+
+  #     - name: Check out code
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+
+  #     - name: Get changed modules
+  #       id: changed-modules
+  #       uses: tj-actions/changed-files@v21
+  #       with:
+  #         files: |
+  #           plugins/module_utils/**
+  #           plugins/modules/**
+
+  #     - name: Construct module matrix
+  #       id: changed-module-matrix
+  #       run: |
+  #         basenames=()
+  #         for file in ${{ steps.changed-modules.outputs.all_changed_files }}; do
+  #           basenames+=($(basename $file .py))
+  #         done
+  #         printf '::set-output name=matrix::%s\n' $(printf '%s\n' "${basenames[@]}" | jq -R . | jq -sc .)
+
+  #   outputs:
+  #     changed-files: ${{ steps.changed-modules.outputs.all_changed_files }}
+  #     matrix: ${{ steps.changed-module-matrix.outputs.matrix }}
+
+  # integration-test-by-module:
+  #   runs-on: ubuntu-latest
+  #   needs: changed-modules
+  #   strategy:
+  #     matrix:
+  #       module: ${{ fromJson(needs.changed-modules.outputs.matrix) }}
+  #     max-parallel: 1
+  #   steps:
+
+  #     - name: Perform module_utils or modules testing
+  #       if: ${{ needs.changed-modules.outputs.matrix == '[""]' }}
+  #       run: |
+  #         echo "No module_utils or modules to test"
+
+  #     # - name: Perform module_utils or modules testing
+  #     #   if: ${{ needs.changed-modules.outputs.matrix != '[""]' }}
+  #     #   run: |
+  #     #     echo "Testing: ${{ matrix.module }}"
+
+  #     - name: Perform module_utils or modules testing
+  #       if: ${{ needs.changed-modules.outputs.matrix != '[""]' }}
+  #       uses: ansible-community/ansible-test-gh-action@unstable/v1
+  #       with:
+  #         ansible-core-version: stable-2.11
+  #         target: ${{ matrix.module }}
+  #         pre-test-cmd: >-  # Configure integration test run
+  #           DO_API_KEY=${{ secrets.DO_API_KEY }}
+  #           AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+  #           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #           ./tests/utils/render.sh
+  #           tests/integration/integration_config.yml.template
+  #           > tests/integration/integration_config.yml
+  #         python-version: 3.9
+  #         target-python-version: 3.9
+  #         testing-type: integration
+  #         test-deps: community.general
