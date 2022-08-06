@@ -20,11 +20,8 @@ jobs:
         module:
           - hello-module
     steps:
-      - name: asdf2
-        run: |
-          echo hello
-      - name: asdf
-        uses: ./.github/workflows/dev-integration-module.yml
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/dev-integration-module.yml
         with:
           module: ${{ matrix.module }}
         # secrets:
