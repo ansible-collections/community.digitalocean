@@ -1,0 +1,2 @@
+minor_changes:
+  - "collection - added an action group 'community.digitalocean.all' for use with module defaults: https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html (https://github.com/ansible-collections/community.digitalocean/issues/281)"
