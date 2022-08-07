@@ -44,9 +44,10 @@ runs:
         target-python-version: 3.9
         testing-type: integration
         test-deps: community.general
+      continue-on-error: true
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
-      if: ${{ always() && steps.test.outcome == "success" }}
+      if: ${{ steps.test.outcome == 'success' }}
       with:
         auth: ${{ inputs.BADGES_GIST_TOKEN }}
         gistID: ${{ inputs.BADGES_GIST_ID }}
@@ -56,7 +57,7 @@ runs:
         color: green
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
-      if: ${{ always() && steps.test.outcome != "success" }}
+      if: ${{ steps.test.outcome != 'success' }}
       with:
         auth: ${{ inputs.BADGES_GIST_TOKEN }}
         gistID: ${{ inputs.BADGES_GIST_ID }}
