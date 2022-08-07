@@ -18,6 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 1
+      fail-fast: false
       matrix:
         module:
           - digital_ocean_account_info
