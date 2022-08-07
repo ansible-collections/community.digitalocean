@@ -29,6 +29,7 @@ runs:
       run: |
         echo "module: ${{ inputs.module }}"
     - uses: ansible-community/ansible-test-gh-action@release/v1
+      id: test
       with:
         ansible-core-version: stable-2.11
         target: ${{ inputs.module }}
@@ -45,7 +46,7 @@ runs:
         test-deps: community.general
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
-      if: always() && success()
+      if: always() && steps.test.outcome == "success"
       with:
         auth: ${{ inputs.BADGES_GIST_TOKEN }}
         gistID: ${{ inputs.BADGES_GIST_ID }}
@@ -55,7 +56,7 @@ runs:
         color: green
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
-      if: always() && failure()
+      if: always() && steps.test.outcome != "success"
       with:
         auth: ${{ inputs.BADGES_GIST_TOKEN }}
         gistID: ${{ inputs.BADGES_GIST_ID }}
