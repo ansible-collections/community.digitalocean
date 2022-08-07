@@ -37,3 +37,23 @@ runs:
         target-python-version: 3.9
         testing-type: integration
         test-deps: community.general
+
+    - uses: schneegans/dynamic-badges-action@v1.4.0
+      if: success()
+      with:
+        auth: ${{ secrets.BADGES_GIST_TOKEN }}
+        gistID: ${{ secrets.BADGES_GIST_ID }}
+        filename: ${{ inputs.module }}.json
+        label: ${{ inputs.module }}
+        message: ${{ job.status }}
+        color: green
+
+    - uses: schneegans/dynamic-badges-action@v1.4.0
+      if: failed()
+      with:
+        auth: ${{ secrets.BADGES_GIST_TOKEN }}
+        gistID: ${{ secrets.BADGES_GIST_ID }}
+        filename: ${{ inputs.module }}.json
+        label: ${{ inputs.module }}
+        message: ${{ job.status }}
+        color: red
