@@ -52,7 +52,7 @@ runs:
         gistID: ${{ inputs.BADGES_GIST_ID }}
         filename: ${{ inputs.module }}.json
         label: ${{ inputs.module }}
-        message: ${{ job.status }}
+        message: ${{ steps.test.outcome }}
         color: green
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
@@ -62,5 +62,5 @@ runs:
         gistID: ${{ inputs.BADGES_GIST_ID }}
         filename: ${{ inputs.module }}.json
         label: ${{ inputs.module }}
-        message: ${{ job.status }}
+        message: ${{ steps.test.outcome }}
         color: red
