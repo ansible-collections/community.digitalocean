@@ -6,6 +6,14 @@
 [![sanity](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml)
 [![unit](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-unit.yml)
 
+## Integration testing by module
+
+![digital_ocean_account_info](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mamercad/81f3b3f50394767aaf986e344dcdf6fd/raw/digital_ocean_account_info.json)
+![digital_ocean_balance_info](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mamercad/81f3b3f50394767aaf986e344dcdf6fd/raw/digital_ocean_balance_info.json)
+![digital_ocean_balance_info](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mamercad/81f3b3f50394767aaf986e344dcdf6fd/raw/digital_ocean_block_storage.json)
+![digital_ocean_balance_info](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mamercad/81f3b3f50394767aaf986e344dcdf6fd/raw/digital_ocean_cdn_endpoints.json)
+![digital_ocean_balance_info](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/mamercad/81f3b3f50394767aaf986e344dcdf6fd/raw/digital_ocean_cdn_endpoints_info.json)
+
 This collection contains modules and plugins to assist in automating [DigitalOcean](https://www.digitalocean.com) infrastructure and API interactions with Ansible.
 
 ## Included content
