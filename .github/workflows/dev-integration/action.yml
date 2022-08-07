@@ -54,7 +54,7 @@ runs:
         filename: ${{ inputs.module }}.json
         label: ${{ inputs.module }}
         message: ${{ steps.test.outcome }}
-        color: "#2FBF51"
+        color: "#3FBA50"
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
       if: ${{ steps.test.outcome != 'success' }}
@@ -64,7 +64,7 @@ runs:
         filename: ${{ inputs.module }}.json
         label: ${{ inputs.module }}
         message: ${{ steps.test.outcome }}
-        color: "#CF2B39"
+        color: "#F9514A"
 
     - if: ${{ steps.test.outcome != 'success' }}
       shell: bash
