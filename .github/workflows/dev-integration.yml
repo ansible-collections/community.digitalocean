@@ -22,7 +22,9 @@ jobs:
         module:
           - digital_ocean_account_info
           - digital_ocean_balance_info
-          # - digital_ocean_block_storage
+          - digital_ocean_block_storage
+          - digital_ocean_cdn_endpoints
+          - digital_ocean_cdn_endpoints_info
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/workflows/dev-integration
@@ -32,7 +34,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           BADGES_GIST_TOKEN: ${{ secrets.BADGES_GIST_TOKEN }}
-          BADGES_GIST_ID: ${{ secrets.BADGES_GIST_ID }}
+          BADGES_GIST_ID: 81f3b3f50394767aaf986e344dcdf6fd
 
   # changed-modules:
   #   runs-on: ubuntu-latest

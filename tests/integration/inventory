@@ -1,0 +1,2 @@
+[testgroup]
+testhost ansible_connection="local" ansible_pipelining="yes" ansible_python_interpreter="/Users/mark/.pyenv/versions/3.9.9/bin/python3.9"
