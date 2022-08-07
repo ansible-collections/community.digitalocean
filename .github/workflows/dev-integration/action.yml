@@ -14,6 +14,12 @@ inputs:
   AWS_SECRET_ACCESS_KEY:
     description: DigitalOcean Spaces key
     required: true
+  BADGES_GIST_TOKEN:
+    description: Badges Gist Token
+    required: true
+  BADGES_GIST_ID:
+    description: Badges Gist ID
+    required: true
 
 runs:
   using: composite
@@ -41,8 +47,8 @@ runs:
     - uses: schneegans/dynamic-badges-action@v1.4.0
       if: success()
       with:
-        auth: ${{ secrets.BADGES_GIST_TOKEN }}
-        gistID: ${{ secrets.BADGES_GIST_ID }}
+        auth: ${{ inputs.BADGES_GIST_TOKEN }}
+        gistID: ${{ inputs.BADGES_GIST_ID }}
         filename: ${{ inputs.module }}.json
         label: ${{ inputs.module }}
         message: ${{ job.status }}
@@ -51,8 +57,8 @@ runs:
     - uses: schneegans/dynamic-badges-action@v1.4.0
       if: failed()
       with:
-        auth: ${{ secrets.BADGES_GIST_TOKEN }}
-        gistID: ${{ secrets.BADGES_GIST_ID }}
+        auth: ${{ inputs.BADGES_GIST_TOKEN }}
+        gistID: ${{ inputs.BADGES_GIST_ID }}
         filename: ${{ inputs.module }}.json
         label: ${{ inputs.module }}
         message: ${{ job.status }}
