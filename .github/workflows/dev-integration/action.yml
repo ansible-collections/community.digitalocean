@@ -65,3 +65,8 @@ runs:
         label: ${{ inputs.module }}
         message: ${{ steps.test.outcome }}
         color: red
+
+    - if: ${{ steps.test.outcome != 'success' }}
+      shell: bash
+      run: |
+        exit 1
