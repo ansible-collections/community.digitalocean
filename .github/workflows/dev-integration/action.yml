@@ -45,7 +45,7 @@ runs:
         test-deps: community.general
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
-      if: success()
+      if: always() && success()
       with:
         auth: ${{ inputs.BADGES_GIST_TOKEN }}
         gistID: ${{ inputs.BADGES_GIST_ID }}
@@ -55,7 +55,7 @@ runs:
         color: green
 
     - uses: schneegans/dynamic-badges-action@v1.4.0
-      if: failed()
+      if: always() && failure()
       with:
         auth: ${{ inputs.BADGES_GIST_TOKEN }}
         gistID: ${{ inputs.BADGES_GIST_ID }}
