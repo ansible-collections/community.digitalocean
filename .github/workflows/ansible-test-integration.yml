@@ -76,7 +76,7 @@ jobs:
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
-          python-version: 3.9
+          origin-python-version: 3.9
           target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: integration
