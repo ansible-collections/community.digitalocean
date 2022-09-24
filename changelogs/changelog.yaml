@@ -320,6 +320,17 @@ releases:
     - 247-sanity-checks-2.12-13.yaml
     - 273-Dont_call_get_on_None.yaml
     release_date: '2022-06-29'
+  1.22.0:
+    changes:
+      minor_changes:
+      - 'collection - added an action group ''community.digitalocean.all'' for use
+        with module defaults: https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html
+        (https://github.com/ansible-collections/community.digitalocean/issues/281)'.
+      - digital_ocean_vpc - add C(vpc) key to returned VPC data on create (https://github.com/ansible-collections/community.digitalocean/issues/276).
+    fragments:
+    - 276-vpc-inconsistent-data-return.yml
+    - 281-default-all-action-group.yml
+    release_date: '2022-09-24'
   1.3.0:
     modules:
     - description: Create and delete a DigitalOcean database

@@ -5,6 +5,15 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.22.0
+=======
+
+Minor Changes
+-------------
+
+- collection - added an action group 'community.digitalocean.all' for use with module defaults: https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html (https://github.com/ansible-collections/community.digitalocean/issues/281).
+- digital_ocean_vpc - add C(vpc) key to returned VPC data on create (https://github.com/ansible-collections/community.digitalocean/issues/276).
+
 v1.21.0
 =======
 
