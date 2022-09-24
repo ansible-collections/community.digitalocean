@@ -17,6 +17,7 @@ concurrency:
 jobs:
   integration:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -63,7 +64,6 @@ jobs:
           - digital_ocean_volume_info
           - digital_ocean_vpc
           - digital_ocean_vpc_info
-    timeout-minutes: 120
 
     steps:
       - name: Perform testing
