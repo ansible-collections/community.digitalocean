@@ -1,14 +1,10 @@
 name: integration
 on:
-  # ! Don't enable pwn requests !
-  # pull_request:
   push:
     branches:
-      # - ci*
-      # - main
-      - mamercad/issue-280
-  # schedule:
-  #   - cron: "10 6 * * *"
+      - main
+  schedule:
+    - cron: "10 6 * * *"
 
 concurrency:
   group: cloud-integration-tests
