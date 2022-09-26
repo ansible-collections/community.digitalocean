@@ -121,6 +121,14 @@ options:
     required: false
     default: false
     type: bool
+  with_droplet_agent:
+    description:
+      - Indicates whether to install the DigitalOcean agent used for providing access to the Droplet web console in the control panel.
+      - By default, the agent is installed on new Droplets but installation errors (i.e. OS not supported) are ignored.
+      - To prevent it from being installed, set to C(false).
+      - To make installation errors fatal, explicitly set it to C(true).
+    required: false
+    type: bool
   tags:
     description:
       - A list of tag names as strings to apply to the Droplet after it is created.
@@ -885,6 +893,7 @@ def main():
         vpc_uuid=dict(type="str"),
         backups=dict(type="bool", default=False),
         monitoring=dict(type="bool", default=False),
+        with_droplet_agent=dict(type="bool"),
         id=dict(aliases=["droplet_id"], type="int"),
         user_data=dict(default=None),
         ipv6=dict(type="bool", default=False),
