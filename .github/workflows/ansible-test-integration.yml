@@ -5,6 +5,7 @@ on:
       - main
   schedule:
     - cron: "10 6 * * *"
+  workflow_dispatch:
 
 concurrency:
   group: cloud-integration-tests
