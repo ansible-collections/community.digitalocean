@@ -1,2 +1,0 @@
-minor_changes:
-  - integration tests - perform integration testing on all modules for changes in C(plugins/module_utils) or by changed module in C(plugins/modules) (https://github.com/ansible-collections/community.digitalocean/issues/286).
