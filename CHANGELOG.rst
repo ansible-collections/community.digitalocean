@@ -5,6 +5,17 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.22.0
+=======
+
+Minor Changes
+-------------
+
+- collection - added an action group C(community.digitalocean.all) for use with module defaults (https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html) (https://github.com/ansible-collections/community.digitalocean/issues/281).
+- digital_ocean_vpc - add C(vpc) key to returned VPC data on create (https://github.com/ansible-collections/community.digitalocean/issues/276).
+- integration tests - perform integration testing on all modules for changes in C(plugins/module_utils) or by changed module in C(plugins/modules) (https://github.com/ansible-collections/community.digitalocean/issues/286).
+- integration tests - split the integration tests by module and run them serially (https://github.com/ansible-collections/community.digitalocean/issues/280).
+
 v1.21.0
 =======
 
