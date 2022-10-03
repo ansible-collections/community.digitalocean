@@ -1,0 +1,2 @@
+minor_changes:
+  - documentation - refresh the "Testing and Development" section of the C(README.md) (https://github.com/ansible-collections/community.digitalocean/issues/268).
