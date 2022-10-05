@@ -103,6 +103,11 @@ It's preferable to use content in this collection using their Fully Qualified Co
   vars:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
 
+  # You can also default the value of a variable for every DO module using module_defaults
+  # module_defaults:
+  #   group/community.digitalocean.all:
+  #     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+
   tasks:
     - name: Create SSH key
       community.digitalocean.digital_ocean_sshkey:

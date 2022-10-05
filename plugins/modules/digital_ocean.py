@@ -189,7 +189,12 @@ import os
 import time
 import traceback
 
-from distutils.version import LooseVersion
+try:
+    from packaging.version import Version
+
+    HAS_PACKAGING = True
+except ImportError:
+    HAS_PACKAGING = False
 
 try:
     # Imported as a dependency for dopy
@@ -204,8 +209,14 @@ try:
     import dopy
     from dopy.manager import DoError, DoManager
 
-    if LooseVersion(dopy.__version__) >= LooseVersion("0.3.2"):
-        HAS_DOPY = True
+    # NOTE: Expressing Python dependencies isn't really possible:
+    # https://github.com/ansible/ansible/issues/62733#issuecomment-537098744
+    if HAS_PACKAGING:
+        if Version(dopy.__version__) >= Version("0.3.2"):
+            HAS_DOPY = True
+    else:
+        if dopy.__version__ >= "0.3.2":  # Naive lexographical check
+            HAS_DOPY = True
 except ImportError:
     pass
 

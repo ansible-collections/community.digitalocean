@@ -21,12 +21,13 @@
         that:
           - result.changed
           - result.data is defined
-          - result.data != {}
-          - result.data.name == vpc_name
+          - result.data.vpc is defined
+          - result.data.vpc != {}
+          - result.data.vpc.name == vpc_name
 
     - name: Set a fact for the VPC ID
       ansible.builtin.set_fact:
-        vpc_id: "{{ result.data.id }}"
+        vpc_id: "{{ result.data.vpc.id }}"
 
     - name: Fetch VPC members
       community.digitalocean.digital_ocean_vpc_info:

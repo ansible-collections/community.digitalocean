@@ -14,15 +14,9 @@ module: digital_ocean_load_balancer
 version_added: 1.10.0
 short_description: Manage DigitalOcean Load Balancers
 description:
-    - Manage DigitalOcean Load Balancers
+  - Manage DigitalOcean Load Balancers
 author: "Mark Mercado (@mamercad)"
 options:
-  oauth_token:
-    description:
-      - DigitalOcean OAuth token; can be specified in C(DO_API_KEY), C(DO_API_TOKEN), or C(DO_OAUTH_TOKEN) environment variables
-    type: str
-    aliases: ["API_TOKEN"]
-    required: true
   state:
     description:
       - The usual, C(present) to create, C(absent) to destroy
@@ -41,18 +35,24 @@ options:
       - The available sizes are C(lb-small), C(lb-medium), or C(lb-large).
       - You can resize load balancers after creation up to once per hour.
       - You cannot resize a load balancer within the first hour of its creation.
+      - This field has been replaced by the C(size_unit) field for all regions except in C(ams2), C(nyc2), and C(sfo1).
+      - Each available load balancer size now equates to the load balancer having a set number of nodes.
+      - The formula is C(lb-small) = 1 node, C(lb-medium) = 3 nodes, C(lb-large) = 6 nodes.
     required: false
     type: str
     choices: ["lb-small", "lb-medium", "lb-large"]
     default: lb-small
-  algorithm:
+  size_unit:
     description:
-      - The load balancing algorithm used to determine which backend Droplet will be selected by a client.
-      - It must be either C(round_robin) or C(least_connections).
-    type: str
+      - How many nodes the load balancer contains.
+      - Each additional node increases the load balancer's ability to manage more connections.
+      - Load balancers can be scaled up or down, and you can change the number of nodes after creation up to once per hour.
+      - This field is currently not available in the C(ams2), C(nyc2), or C(sfo1) regions.
+      - Use the C(size) field to scale load balancers that reside in these regions.
+      - The value must be in the range 1-100.
     required: false
-    choices: ["round_robin", "least_connections"]
-    default: round_robin
+    type: int
+    default: 1
   droplet_ids:
     description:
       - An array containing the IDs of the Droplets assigned to the load balancer.
@@ -74,7 +74,6 @@ options:
     required: false
     type: str
     aliases: ["region_id"]
-    default: nyc1
   forwarding_rules:
     description:
       - An array of objects specifying the forwarding rules for a load balancer.
@@ -220,6 +219,8 @@ options:
     type: str
     required: false
     default: ""
+extends_documentation_fragment:
+  - community.digitalocean.digital_ocean.documentation
 """
 
 
@@ -415,13 +416,55 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 
 
 class DOLoadBalancer(object):
+
+    # Regions which use 'size' versus 'size_unit'
+    size_regions = {"ams2", "nyc2", "sfo1"}
+    all_sizes = {"lb-small", "lb-medium", "lb-large"}
+    default_size = "lb-small"
+    min_size_unit = 1
+    max_size_unit = 100
+    default_size_unit = 1
+
     def __init__(self, module):
         self.rest = DigitalOceanHelper(module)
         self.module = module
         self.id = None
         self.name = self.module.params.get("name")
         self.region = self.module.params.get("region")
+
+        # Handle size versus size_unit
+        if self.region in DOLoadBalancer.size_regions:
+            self.module.params.pop("size_unit")
+            # Ensure that we have size
+            size = self.module.params.get("size", None)
+            if not size:
+                self.module.fail_json(msg="Missing required 'size' parameter")
+            elif size not in DOLoadBalancer.all_sizes:
+                self.module.fail_json(
+                    msg="Invalid 'size' parameter '{0}', must be one of: {1}".format(
+                        size, ", ".join(DOLoadBalancer.all_sizes)
+                    )
+                )
+        else:
+            self.module.params.pop("size")
+            # Ensure that we have size_unit
+            size_unit = self.module.params.get("size_unit", None)
+            if not size_unit:
+                self.module.fail_json(msg="Missing required 'size_unit' parameter")
+            elif (
+                size_unit < DOLoadBalancer.min_size_unit
+                or size_unit > DOLoadBalancer.max_size_unit
+            ):
+                self.module.fail_json(
+                    msg="Invalid 'size_unit' parameter '{0}', must be in range: {1}-{2}".format(
+                        size_unit,
+                        DOLoadBalancer.min_size_unit,
+                        DOLoadBalancer.max_size_unit,
+                    )
+                )
+
         self.updates = []
+
         # Pop these values so we don't include them in the POST data
         self.module.params.pop("oauth_token")
         self.wait = self.module.params.pop("wait", True)
@@ -532,7 +575,7 @@ class DOLoadBalancer(object):
         check_attributes = [
             "droplet_ids",
             "size",
-            "algorithm",
+            "size_unit",
             "forwarding_rules",
             "health_check",
             "sticky_sessions",
@@ -541,9 +584,30 @@ class DOLoadBalancer(object):
             "enable_backend_keepalive",
         ]
 
+        lb_region = found_lb.get("region", None)
+        if not lb_region:
+            self.module.fail_json(
+                msg="Unexpected error; please file a bug should this persist: empty load balancer region"
+            )
+
+        lb_region_slug = lb_region.get("slug", None)
+        if not lb_region_slug:
+            self.module.fail_json(
+                msg="Unexpected error; please file a bug should this persist: empty load balancer region slug"
+            )
+
         for attribute in check_attributes:
+            if (
+                attribute == "size"
+                and lb_region_slug not in DOLoadBalancer.size_regions
+            ):
+                continue
+            if (
+                attribute == "size_unit"
+                and lb_region_slug in DOLoadBalancer.size_regions
+            ):
+                continue
             if self.module.params.get(attribute, None) != found_lb.get(attribute, None):
-                # raise Exception(str(self.module.params.get(attribute, None)), str(found_lb.get(attribute, None)))
                 self.updates.append(attribute)
 
         # Check if the VPC needs changing.
@@ -564,7 +628,9 @@ class DOLoadBalancer(object):
         request_params = dict(self.module.params)
         self.id = self.lb.get("id", None)
         self.name = self.lb.get("name", None)
-        if self.id is not None and self.name is not None:
+        self.vpc_uuid = self.lb.get("vpc_uuid", None)
+        if self.id is not None and self.name is not None and self.vpc_uuid is not None:
+            request_params["vpc_uuid"] = self.vpc_uuid
             response = self.rest.put(
                 "load_balancers/{0}".format(self.id), data=request_params
             )
@@ -597,14 +663,33 @@ class DOLoadBalancer(object):
         if found_lb is not None:
             # Do we need to update it?
             if not self.is_same(found_lb):
-                self.update()
+                if self.module.check_mode:
+                    self.module.exit_json(
+                        changed=False,
+                        msg="Load Balancer {0} already exists in {1} (and needs changes)".format(
+                            self.name, self.region
+                        ),
+                        data={"load_balancer": found_lb},
+                    )
+                else:
+                    self.update()
             else:
                 self.module.exit_json(
                     changed=False,
                     msg="Load Balancer {0} already exists in {1} (and needs no changes)".format(
                         self.name, self.region
                     ),
+                    data={"load_balancer": found_lb},
                 )
+
+        # Check mode.
+        if self.module.check_mode:
+            self.module.exit_json(
+                changed=False,
+                msg="Would create Load Balancer {0} in {1}".format(
+                    self.name, self.region
+                ),
+            )
 
         # Create it.
         request_params = dict(self.module.params)
@@ -660,15 +745,17 @@ class DOLoadBalancer(object):
         if lb is not None:
             id = lb.get("id", None)
             name = lb.get("name", None)
-            if id is None or name is None:
-                self.module.fail_json(msg="Unexpected error; please file a bug: delete")
+            lb_region = lb.get("region", None)
+            if not lb_region:
+                self.module.fail_json(
+                    msg="Unexpected error; please file a bug: delete missing region"
+                )
+            lb_region_slug = lb_region.get("slug", None)
+            if id is None or name is None or lb_region_slug is None:
+                self.module.fail_json(
+                    msg="Unexpected error; please file a bug: delete missing id, name, or region slug"
+                )
             else:
-                lb_region = lb.get("region", None)
-                region = lb_region.get("slug", None)
-                if region is None:
-                    self.module.fail_json(
-                        msg="Unexpected error; please file a bug: delete"
-                    )
                 response = self.rest.delete("load_balancers/{0}".format(id))
                 json_data = response.json
                 if response.status_code == 204:
@@ -676,7 +763,7 @@ class DOLoadBalancer(object):
                     self.module.exit_json(
                         changed=True,
                         msg="Load Balancer {0} ({1}) in {2} deleted".format(
-                            name, id, region
+                            name, id, lb_region_slug
                         ),
                     )
                 else:
@@ -686,7 +773,7 @@ class DOLoadBalancer(object):
                     self.module.fail_json(
                         changed=False,
                         msg="Failed to delete Load Balancer {0} ({1}) in {2}: {3}".format(
-                            name, id, region, message
+                            name, id, lb_region_slug, message
                         ),
                     )
         else:
@@ -706,77 +793,71 @@ def run(module):
 
 
 def main():
-    module = AnsibleModule(
-        argument_spec=dict(
-            state=dict(choices=["present", "absent"], default="present"),
-            oauth_token=dict(
-                aliases=["API_TOKEN"],
-                no_log=True,
-                fallback=(
-                    env_fallback,
-                    ["DO_API_TOKEN", "DO_API_KEY", "DO_OAUTH_TOKEN"],
-                ),
-                required=True,
-            ),
-            name=dict(type="str", required=True),
-            size=dict(
-                type="str",
-                choices=["lb-small", "lb-medium", "lb-large"],
-                required=False,
-                default="lb-small",
-            ),
-            algorithm=dict(
-                type="str",
-                choices=["round_robin", "least_connections"],
-                required=False,
-                default="round_robin",
-            ),
-            droplet_ids=dict(type="list", elements="int", required=False),
-            tag=dict(type="str", required=False),
-            region=dict(aliases=["region_id"], default="nyc1", required=False),
-            forwarding_rules=dict(
-                type="list",
-                elements="dict",
-                required=False,
-                default=[
-                    {
-                        "entry_protocol": "http",
-                        "entry_port": 8080,
-                        "target_protocol": "http",
-                        "target_port": 8080,
-                        "certificate_id": "",
-                        "tls_passthrough": False,
-                    }
-                ],
-            ),
-            health_check=dict(
-                type="dict",
-                required=False,
-                default=dict(
-                    {
-                        "protocol": "http",
-                        "port": 80,
-                        "path": "/",
-                        "check_interval_seconds": 10,
-                        "response_timeout_seconds": 5,
-                        "healthy_threshold": 5,
-                        "unhealthy_threshold": 3,
-                    }
-                ),
-            ),
-            sticky_sessions=dict(
-                type="dict", required=False, default=dict({"type": "none"})
-            ),
-            redirect_http_to_https=dict(type="bool", required=False, default=False),
-            enable_proxy_protocol=dict(type="bool", required=False, default=False),
-            enable_backend_keepalive=dict(type="bool", required=False, default=False),
-            vpc_uuid=dict(type="str", required=False),
-            wait=dict(type="bool", default=True),
-            wait_timeout=dict(type="int", default=600),
-            project_name=dict(
-                type="str", aliases=["project"], required=False, default=""
+    argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
+    argument_spec.update(
+        state=dict(choices=["present", "absent"], default="present"),
+        name=dict(type="str", required=True),
+        size=dict(
+            type="str",
+            choices=list(DOLoadBalancer.all_sizes),
+            required=False,
+            default=DOLoadBalancer.default_size,
+        ),
+        size_unit=dict(
+            type="int",
+            required=False,
+            default=DOLoadBalancer.default_size_unit,
+        ),
+        droplet_ids=dict(type="list", elements="int", required=False),
+        tag=dict(type="str", required=False),
+        region=dict(
+            aliases=["region_id"],
+            required=False,
+        ),
+        forwarding_rules=dict(
+            type="list",
+            elements="dict",
+            required=False,
+            default=[
+                {
+                    "entry_protocol": "http",
+                    "entry_port": 8080,
+                    "target_protocol": "http",
+                    "target_port": 8080,
+                    "certificate_id": "",
+                    "tls_passthrough": False,
+                }
+            ],
+        ),
+        health_check=dict(
+            type="dict",
+            required=False,
+            default=dict(
+                {
+                    "protocol": "http",
+                    "port": 80,
+                    "path": "/",
+                    "check_interval_seconds": 10,
+                    "response_timeout_seconds": 5,
+                    "healthy_threshold": 5,
+                    "unhealthy_threshold": 3,
+                }
             ),
         ),
+        sticky_sessions=dict(
+            type="dict", required=False, default=dict({"type": "none"})
+        ),
+        redirect_http_to_https=dict(type="bool", required=False, default=False),
+        enable_proxy_protocol=dict(type="bool", required=False, default=False),
+        enable_backend_keepalive=dict(type="bool", required=False, default=False),
+        vpc_uuid=dict(type="str", required=False),
+        wait=dict(type="bool", default=True),
+        wait_timeout=dict(type="int", default=600),
+        project_name=dict(type="str", aliases=["project"], required=False, default=""),
+    )
+
+    module = AnsibleModule(
+        argument_spec=argument_spec,
         required_if=(
             [
                 ("state", "present", ["forwarding_rules"]),
@@ -787,6 +868,7 @@ def main():
         mutually_exclusive=(
             [
                 ("tag", "droplet_ids"),
+                ("size", "size_unit"),
             ]
         ),
         supports_check_mode=True,

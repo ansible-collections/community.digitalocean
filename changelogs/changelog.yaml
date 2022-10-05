@@ -308,6 +308,34 @@ releases:
     - 265-get_updated_droplet_info_on_create_wait_by_id.yaml
     - 267-update-cdn-endpoints.yaml
     release_date: '2022-06-10'
+  1.21.0:
+    changes:
+      bugfixes:
+      - digital_ocean_droplet - if the JSON response lacks a key and the associated
+        variable is set to ``None``, then don't treat that variable like a ``dict``
+        and call ``get()`` on it without first testing it (https://github.com/ansible-collections/community.digitalocean/issues/272).
+      minor_changes:
+      - digital_ocean - add sanity test ignores for Ansible 2.12 and 2.13 (https://github.com/ansible-collections/community.digitalocean/issues/247).
+    fragments:
+    - 247-sanity-checks-2.12-13.yaml
+    - 273-Dont_call_get_on_None.yaml
+    release_date: '2022-06-29'
+  1.22.0:
+    changes:
+      minor_changes:
+      - collection - added an action group C(community.digitalocean.all) for use with
+        module defaults (https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html)
+        (https://github.com/ansible-collections/community.digitalocean/issues/281).
+      - digital_ocean_vpc - add C(vpc) key to returned VPC data on create (https://github.com/ansible-collections/community.digitalocean/issues/276).
+      - integration tests - perform integration testing on all modules for changes
+        in C(plugins/module_utils) or by changed module in C(plugins/modules) (https://github.com/ansible-collections/community.digitalocean/issues/286).
+      - integration tests - split the integration tests by module and run them serially
+        (https://github.com/ansible-collections/community.digitalocean/issues/280).
+    fragments:
+    - 276-vpc-inconsistent-data-return.yml
+    - 281-default-all-action-group.yml
+    - 286-refactor-pr-integration-testing.yaml
+    release_date: '2022-10-03'
   1.3.0:
     modules:
     - description: Create and delete a DigitalOcean database

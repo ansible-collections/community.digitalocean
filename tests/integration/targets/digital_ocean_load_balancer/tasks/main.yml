@@ -54,7 +54,6 @@
         oauth_token: "{{ do_api_key }}"
         state: present
         name: "{{ lb_name }}"
-        algorithm: round_robin
         droplet_ids:
           - "{{ droplet.data.droplet.id }}"
         region: "{{ do_region }}"
@@ -69,24 +68,6 @@
           - lb.data.load_balancer.name is defined
           - lb.data.load_balancer.name == lb_name
           - lb.data.load_balancer.status in ["new", "active", "available"]
-
-    - name: Change the Load Balancer (algorithm)
-      community.digitalocean.digital_ocean_load_balancer:
-        oauth_token: "{{ do_api_key }}"
-        state: present
-        name: "{{ lb_name }}"
-        algorithm: least_connections
-        droplet_ids:
-          - "{{ droplet.data.droplet.id }}"
-        region: "{{ do_region }}"
-      register: lb
-
-    - name: Verify Load Balancer is changed
-      ansible.builtin.assert:
-        that:
-          - lb.changed is true
-          - lb.failed is false
-          - "'updated: algorithm' in lb.msg"
 
     - name: Delete the Load Balancer
       community.digitalocean.digital_ocean_load_balancer:
@@ -106,7 +87,6 @@
         oauth_token: "{{ do_api_key }}"
         state: present
         name: "{{ lb_name }}"
-        algorithm: round_robin
         droplet_ids:
           - "{{ droplet.data.droplet.id }}"
         region: "{{ do_region }}"
@@ -148,7 +128,6 @@
         oauth_token: "{{ do_api_key }}"
         state: present
         name: "{{ lb_name }}"
-        algorithm: round_robin
         droplet_ids:
           - "{{ droplet.data.droplet.id }}"
         tag: "{{ lb_tag }}"
@@ -160,13 +139,12 @@
       ansible.builtin.assert:
         that:
           - result.msg is search("mutually exclusive: tag|droplet_ids")
-  
+
     - name: Create the Load Balancer (missing tag + droplet_ids)
       community.digitalocean.digital_ocean_load_balancer:
         oauth_token: "{{ do_api_key }}"
         state: present
         name: "{{ lb_name }}"
-        algorithm: round_robin
         region: "{{ do_region }}"
       ignore_errors: true  # Expected to fail
       register: result
@@ -181,11 +159,10 @@
         oauth_token: "{{ do_api_key }}"
         state: present
         name: "{{ lb_name }}"
-        algorithm: round_robin
         tag: "{{ lb_tag }}"
         region: "{{ do_region }}"
       register: lb
-    
+
     - name: Verify Load Balancer is present (from present)
       ansible.builtin.assert:
         that:
