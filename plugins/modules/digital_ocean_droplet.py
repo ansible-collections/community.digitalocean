@@ -369,7 +369,10 @@ class DODroplet(object):
         if rule is None:
             err = "Failed to find firewalls: {0}".format(self.module.params["firewall"])
             return err
-        json_data = self.get_droplet()
+        if not self.unique_name:
+            json_data = self.get_droplet_by_name()
+        else:
+            json_data = self.get_droplet()
         if json_data is not None:
             request_params = {}
             droplet = json_data.get("droplet", None)
@@ -387,13 +390,17 @@ class DODroplet(object):
                         err = "Failed to add droplet {0} to firewall {1}".format(
                             droplet_id, rule[firewall]["id"]
                         )
-                        return err, changed
-                    changed = True
-        return None, changed
+                        return err
+        else:
+            err = f"Failed to find droplet data. got: {json_data}"
+            return err
+        return None
 
     def remove_droplet_from_firewalls(self):
-        changed = False
-        json_data = self.get_droplet()
+        if self.unique_name:
+            json_data = self.get_droplet()
+        else:
+            json_data = self.get_droplet_by_name()
         if json_data is not None:
             request_params = {}
             droplet = json_data.get("droplet", None)
@@ -497,6 +504,12 @@ class DODroplet(object):
             json_data = self.get_by_name(self.module.params["name"])
         return json_data
 
+    def get_droplet_by_name(self):
+        json_data = self.get_by_id(self.module.params["id"])
+        if not json_data:
+            json_data = self.get_by_name(self.module.params["name"])
+        return json_data
+
     def resize_droplet(self, state, droplet_id):
         if self.status != "off":
             self.module.fail_json(
@@ -542,7 +555,7 @@ class DODroplet(object):
             status_code = response.status_code
             message = json_data.get("message", "no error message")
             droplet = json_data.get("droplet", None)
-            droplet_status = droplet.get("status", None) if droplet else None
+            droplet_status = droplet.get("status", None)
 
             if droplet is None or droplet_status is None:
                 self.module.fail_json(
@@ -776,7 +789,8 @@ class DODroplet(object):
 
         # Get updated Droplet data (fallback to current data)
         if self.wait:
-            json_data = self.get_by_id(droplet_id)
+            json_data = self.get_droplet()
+            # Without unique_name json_data is None
             if json_data:
                 droplet = json_data.get("droplet", droplet)
 
@@ -795,7 +809,6 @@ class DODroplet(object):
             )
         # Add droplet to firewall if specified
         if self.module.params["firewall"] is not None:
-            # raise Exception(self.module.params["firewall"])
             firewall_add = self.add_droplet_to_firewalls()
             if firewall_add is not None:
                 self.module.fail_json(
@@ -815,13 +828,9 @@ class DODroplet(object):
         self.module.exit_json(changed=True, data={"droplet": droplet})
 
     def delete(self):
-        # to delete a droplet we need to know the droplet id or unique name, ie
-        # name is not None and unique_name is True, but as "id or name" is
-        # enforced elsewhere, we only need to enforce "id or unique_name" here
-        if not self.module.params["id"] and not self.unique_name:
+        if not self.unique_name:
             self.module.fail_json(
-                changed=False,
-                msg="id must be set or unique_name must be true for deletes",
+                changed=False, msg="unique_name must be set for deletes"
             )
         json_data = self.get_droplet()
         if json_data is None:
@@ -906,6 +915,7 @@ def main():
                 ("state", "present", ["name", "size", "image", "region"]),
                 ("state", "active", ["name", "size", "image", "region"]),
                 ("state", "inactive", ["name", "size", "image", "region"]),
+                ("state", "absent", ["name", "unique_name"]),
             ]
         ),
         supports_check_mode=True,
