@@ -1,0 +1,2 @@
+bugfixes:
+  - integration tests - add missing `environment` directive on pull request integration testing (https://github.com/ansible-collections/community.digitalocean/issues/293).
