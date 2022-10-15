@@ -54,6 +54,7 @@ jobs:
       module-matrix: ${{ steps.changed-modules.outputs.matrix }}
 
   test-module-utils:
+    environment: integration
     runs-on: ubuntu-latest
     timeout-minutes: 120
     needs: [changes]
@@ -123,6 +124,7 @@ jobs:
           target: ${{ matrix.module }}
 
   test-modules:
+    environment: integration
     runs-on: ubuntu-latest
     timeout-minutes: 40
     needs: [changes]
