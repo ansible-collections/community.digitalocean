@@ -31,6 +31,7 @@ jobs:
           - balance_info
           - regions_info
           - sizes_info
+          - volumes_info
 
     steps:
       - name: Perform testing

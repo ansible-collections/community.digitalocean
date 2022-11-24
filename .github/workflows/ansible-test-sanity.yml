@@ -25,6 +25,7 @@ jobs:
           - balance_info
           - regions_info
           - sizes_info
+          - volumes_info
 
     runs-on: ubuntu-latest
     steps:
