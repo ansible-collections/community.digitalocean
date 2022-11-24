@@ -1,2 +1,4 @@
-jmespath
+azure-core==1.26.1
 boto3
+jmespath
+pydo==0.1.3
