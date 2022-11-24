@@ -30,6 +30,7 @@ jobs:
           - account_info
           - balance_info
           - regions_info
+          - sizes_info
 
     steps:
       - name: Perform testing

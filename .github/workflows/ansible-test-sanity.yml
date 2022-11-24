@@ -24,6 +24,7 @@ jobs:
           - account_info
           - balance_info
           - regions_info
+          - sizes_info
 
     runs-on: ubuntu-latest
     steps:
