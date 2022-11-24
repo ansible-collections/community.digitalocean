@@ -30,6 +30,6 @@ jobs:
           target-python-version: 3.9
           testing-type: units
           test-deps: >-
-            ansible.netcommon
+            ansible.netcommon:==4.1.0
             ansible.utils
-            community.general
+            community.general:==6.1.0
