@@ -28,6 +28,7 @@ jobs:
         - devel
         module:
           - account_info
+          - balance_info
 
     steps:
       - name: Perform testing
