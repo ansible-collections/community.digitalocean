@@ -20,4 +20,4 @@
           - result.sizes is defined
           - result.sizes.links is defined
           - result.sizes.meta is defined
-          - result.sizes.regions is defined
+          - result.sizes.sizes is defined
