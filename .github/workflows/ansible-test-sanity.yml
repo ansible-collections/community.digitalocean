@@ -20,6 +20,9 @@ jobs:
         - stable-2.13
         - stable-2.14
         - devel
+        module:
+          - account_info
+
     runs-on: ubuntu-latest
     steps:
       - name: Perform testing
@@ -27,5 +30,6 @@ jobs:
         with:
           ansible-core-version: ${{ matrix.ansible }}
           origin-python-version: 3.9
+          target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: sanity

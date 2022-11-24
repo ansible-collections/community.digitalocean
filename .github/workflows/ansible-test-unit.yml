@@ -1,14 +1,13 @@
 name: unit
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
   push:
-    branches: [ main ]
+    branches: [main]
   schedule:
-    - cron: '10 6 * * *'
+    - cron: "10 6 * * *"
 
 jobs:
-
   units:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -21,12 +20,16 @@ jobs:
           - stable-2.13
           - stable-2.14
           - devel
+        module:
+          - account_info
+
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           ansible-core-version: ${{ matrix.ansible }}
           origin-python-version: 3.9
+          target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: units
           test-deps: >-
