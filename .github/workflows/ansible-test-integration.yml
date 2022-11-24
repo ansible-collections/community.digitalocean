@@ -16,7 +16,7 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    name: Integration (Ⓐ$${{ matrix.ansible }})
+    name: Integration (Ⓐ$${{ matrix.ansible }}/${{ matrix.module }})
     strategy:
       fail-fast: false
       max-parallel: 1
