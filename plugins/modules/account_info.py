@@ -64,18 +64,18 @@ from ansible_collections.community.digitalocean.plugins.module_utils.common_opti
 
 import traceback
 
+HAS_AZURE_LIBRARY = False
 try:
     from azure.core.exceptions import HttpResponseError
 except ImportError:
-    HAS_AZURE_LIBRARY = False
     AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_AZURE_LIBRARY = True
 
+HAS_PYDO_LIBRARY = False
 try:
     from pydo import Client
 except ImportError:
-    HAS_PYDO_LIBRARY = False
     PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
 else:
     HAS_PYDO_LIBRARY = True
