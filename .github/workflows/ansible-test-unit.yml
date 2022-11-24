@@ -9,29 +9,6 @@ on:
 
 jobs:
 
-  units_29:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    name: Units (Ⓐ${{ matrix.ansible }})
-    strategy:
-      fail-fast: true
-      matrix:
-        ansible:
-          - stable-2.9
-    steps:
-      - name: Perform testing
-        uses: ansible-community/ansible-test-gh-action@release/v1
-        with:
-          ansible-core-version: ${{ matrix.ansible }}
-          # pre-test-cmd:
-          python-version: 3.8
-          target-python-version: 3.8
-          testing-type: units
-          test-deps: >-
-            ansible.netcommon
-            ansible.utils
-            community.general
-
   units:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -40,17 +17,15 @@ jobs:
       fail-fast: true
       matrix:
         ansible:
-          - stable-2.10
-          - stable-2.11
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           ansible-core-version: ${{ matrix.ansible }}
-          # pre-test-cmd:
           python-version: 3.9
           target-python-version: 3.9
           testing-type: units
