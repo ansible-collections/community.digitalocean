@@ -39,7 +39,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 account:
-  description: DigitalOcean account information
+  description: DigitalOcean account information.
   returned: success
   type: dict
   sample:
