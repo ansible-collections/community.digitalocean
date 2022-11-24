@@ -17,7 +17,7 @@ short_description: Get current user account information
 version_added: 2.0.0
 
 description:
-  - This module gets the current user account information
+  - This module gets the current user account information.
 
 author: Mark Mercado (@mamercad)
 

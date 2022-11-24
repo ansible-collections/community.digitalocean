@@ -17,7 +17,7 @@ short_description: Get current user balance information
 version_added: 2.0.0
 
 description:
-  - This module gets the current user balance information
+  - This module gets the current user balance information.
 
 author: Mark Mercado (@mamercad)
 
