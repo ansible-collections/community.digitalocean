@@ -42,7 +42,12 @@ volumes:
   description: DigitalOcean volumes information.
   returned: success
   type: dict
-  sample: {}
+  sample:
+    links:
+      pages: {}
+    meta:
+      total: 0
+    volumes: []
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
