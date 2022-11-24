@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: balance_info
+module: regions_info
 
 short_description: Get current regions
 
