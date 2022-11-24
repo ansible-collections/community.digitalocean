@@ -1,4 +1,4 @@
-name: sanity
+name: Sanity tests
 on:
   pull_request:
     types: [ opened, synchronize, reopened ]
@@ -11,7 +11,7 @@ jobs:
 
   sanity:
     timeout-minutes: 30
-    name: Sanity (Ⓐ$${{ matrix.ansible }}/${{ matrix.module }})
+    name: Sanity (Ⓐ${{ matrix.ansible }}/${{ matrix.module }})
     strategy:
       fail-fast: false
       matrix:

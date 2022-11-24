@@ -1,5 +1,5 @@
 # https://black.readthedocs.io/en/stable/integrations/github_actions.html
-name: black
+name: Python psf/black test
 
 on:
   pull_request:
