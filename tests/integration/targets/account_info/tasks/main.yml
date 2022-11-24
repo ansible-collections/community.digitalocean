@@ -17,17 +17,16 @@
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.data is defined
-          - result.data.account is defined
-          - result.data.account.droplet_limit is defined
-          - result.data.account.email is defined
-          - result.data.account.email_verified is defined
-          - result.data.account.floating_ip_limit is defined
-          - result.data.account.reserved_ip_limit is defined
-          - result.data.account.status is defined
-          - result.data.account.status_message is defined
-          - result.data.account.team is defined
-          - result.data.account.team.name is defined
-          - result.data.account.team.uuid is defined
-          - result.data.account.uuid is defined
-          - result.data.account.volume_limit is defined
+          - result.account is defined
+          - result.account.droplet_limit is defined
+          - result.account.email is defined
+          - result.account.email_verified is defined
+          - result.account.floating_ip_limit is defined
+          - result.account.reserved_ip_limit is defined
+          - result.account.status is defined
+          - result.account.status_message is defined
+          - result.account.team is defined
+          - result.account.team.name is defined
+          - result.account.team.uuid is defined
+          - result.account.uuid is defined
+          - result.account.volume_limit is defined

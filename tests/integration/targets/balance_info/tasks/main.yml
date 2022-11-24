@@ -17,8 +17,8 @@
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.data is defined
-          - result.data.account_balance is defined
-          - result.data.generated_at is defined
-          - result.data.month_to_date_balance is defined
-          - result.data.month_to_date_usage is defined
+          - result.balance is defined
+          - result.balance.account_balance is defined
+          - result.balance.generated_at is defined
+          - result.balance.month_to_date_balance is defined
+          - result.balance.month_to_date_usage is defined

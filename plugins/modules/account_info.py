@@ -87,14 +87,14 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         account = client.account.get()
-        module.exit_json(changed=False, data=account)
+        module.exit_json(changed=False, account=account.get("account"))
     except HttpResponseError as err:
-        data = {
+        error = {
             "Message": err.error.message,
             "Status Code": err.status_code,
             "Reason": err.reason,
         }
-        module.fail_json(changed=False, msg=data.get("Message"), data=data)
+        module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():

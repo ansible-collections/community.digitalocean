@@ -38,26 +38,31 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-account_balance:
-  description: Current account balance.
+balance:
+  description: DigitalOcean account information.
   returned: success
-  type: string
-  sample: '0.0'
-generated_at:
-  description: When the account balance was generated.
-  returned: success
-  type: string
-  sample: '2022-11-24T00:00:00Z'
-month_to_date_balance:
-  description: Month-to-date account balance.
-  returned: success
-  type: string
-  sample: '0.00'
-month_to_date_usage:
-  description: Month-to-date account spend.
-  returned: success
-  type: string
-  sample: '0.00'
+  type: dict
+  sample:
+    account_balance:
+      description: Current account balance.
+      returned: success
+      type: string
+      sample: '0.0'
+    generated_at:
+      description: When the account balance was generated.
+      returned: success
+      type: string
+      sample: '2022-11-24T00:00:00Z'
+    month_to_date_balance:
+      description: Month-to-date account balance.
+      returned: success
+      type: string
+      sample: '0.00'
+    month_to_date_usage:
+      description: Month-to-date account spend.
+      returned: success
+      type: string
+      sample: '0.00'
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -90,14 +95,14 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         balance = client.balance.get()
-        module.exit_json(changed=False, data=balance)
+        module.exit_json(changed=False, balance=balance)
     except HttpResponseError as err:
-        data = {
+        error = {
             "Message": err.error.message,
             "Status Code": err.status_code,
             "Reason": err.reason,
         }
-        module.fail_json(changed=False, msg=data.get("Message"), data=data)
+        module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
