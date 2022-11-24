@@ -32,4 +32,4 @@ jobs:
           test-deps: >-
             ansible.netcommon:==4.1.0
             ansible.utils
-            community.general:==6.1.0
+            community.general:==6.0.1
