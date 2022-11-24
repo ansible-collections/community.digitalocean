@@ -29,6 +29,7 @@ jobs:
         module:
           - account_info
           - balance_info
+          - regions_info
 
     steps:
       - name: Perform testing

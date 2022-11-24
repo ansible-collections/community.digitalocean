@@ -23,6 +23,7 @@ jobs:
         module:
           - account_info
           - balance_info
+          - regions_info
 
     runs-on: ubuntu-latest
     steps:
