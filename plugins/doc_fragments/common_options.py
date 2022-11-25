@@ -15,7 +15,7 @@ options:
     description:
       - State of the resource, C(present) to create, C(absent) to destroy.
     type: str
-    required: true
+    choices: [ present, absent ]
     default: present
   token:
     description:

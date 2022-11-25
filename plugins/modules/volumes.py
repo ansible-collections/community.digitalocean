@@ -37,12 +37,7 @@ options:
     description:
       - An optional free-form text field to describe a block storage volume.
     type: str
-    required: true
-  region:
-    description:
-      - Region of the volume.
-    type: str
-    required: true
+    required: false
   size_gigabytes:
     description:
       - The size of the block storage volume in GiB C(1024^3).
@@ -65,7 +60,9 @@ options:
       - The name of the filesystem type to be used on the volume.
       - When provided, the volume will automatically be formatted to the specified filesystem type.
       - Currently, the available options are C(ext4) and C(xfs).
-      - Pre-formatted volumes are automatically mounted when attached to Ubuntu, Debian, Fedora, Fedora Atomic, and CentOS Droplets created on or after April 26, 2018.
+      - |
+        Pre-formatted volumes are automatically mounted when attached to Ubuntu, Debian, Fedora,
+        Fedora Atomic, and CentOS Droplets created on or after April 26, 2018.
       - Attaching pre-formatted volumes to other Droplets is not recommended.
     type: str
     choices: ["ext4", "xfs"]
@@ -74,6 +71,7 @@ options:
     description:
       - The slug identifier for the region where the resource will initially be available.
     choices: ["ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1", "sfo2", "sfo3", "sgp1", "tor1"]
+    type: str
     required: true
   filesystem_label:
     description:
@@ -259,8 +257,8 @@ def main():
     argument_spec.update(
         name=dict(type="str", required=True),
         description=dict(type="str", required=False),
-        size_gigabytes=dict(type="str", required=False),
-        tags=dict(type="list", required=False),
+        size_gigabytes=dict(type="int", required=False),
+        tags=dict(type="list", elements="str", required=False),
         snapshot_id=dict(type="str", required=False),
         filesystem_type=dict(type="str", choices=["ext4", "xfs"], required=False),
         region=dict(
