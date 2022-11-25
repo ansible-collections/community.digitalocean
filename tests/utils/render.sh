@@ -8,10 +8,10 @@ set -u
 
 function main()
 {
-  readonly template
+  local template
   template="$1"
   shift
-  readonly content
+  local content
   content="$(cat "$template")"
 
   eval "echo \"$content\""
