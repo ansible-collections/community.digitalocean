@@ -82,7 +82,7 @@ options:
     required: false
 
 extends_documentation_fragment:
-  - community.digitalocean.common_options.documentation
+  - community.digitalocean.common.documentation
 """
 
 
@@ -98,6 +98,13 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
+msg:
+  description: DigitalOcean volume information.
+  returned: always
+  type: str
+  sample:
+    - Created volume test-vol in nyc3
+    - Deleted volume test-vol in nyc3
 volume:
   description: DigitalOcean volume information.
   returned: success
@@ -109,7 +116,7 @@ volume:
     filesystem_label: ''
     filesystem_type: ''
     id: 698d7221-6c2d-11ed-93f9-0a58ac14790c
-    name: test-vol-delete-1
+    name: test-vol
     region:
       available: true
       features:
@@ -131,11 +138,8 @@ volume:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.digitalocean.plugins.module_utils.common_options import (
-    DigitalOceanOptions,
-)
-from ansible_collections.community.digitalocean.plugins.module_utils.common_functions import (
-    DigitalOceanFunctions,
+from ansible_collections.community.digitalocean.plugins.module_utils.common import (
+    DigitalOceanOptions, DigitalOceanFunctions,
 )
 
 import traceback
@@ -207,14 +211,19 @@ def core(module):
     region = module.params.get("region")
 
     if module.params.get("state") == "present":
+        size_gigabytes = int(module.params.get("size_gigabytes"))
         try:
             body = {
-                "name": module.params.get("name"),
-                "region": module.params.get("region"),
-                "size_gigabytes": int(module.params.get("size_gigabytes")),
+                "name": volume_name,
+                "region": region,
+                "size_gigabytes": size_gigabytes,
             }
             volume = client.volumes.create(body=body)
-            module.exit_json(changed=True, volume=volume.get("volume"))
+            module.exit_json(
+                changed=True,
+                msg=f"Created volume {volume_name} in {region}",
+                volume=volume.get("volume"),
+            )
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -224,25 +233,23 @@ def core(module):
             module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
     elif module.params.get("state") == "absent":
-        volume = find_volume(
-            module=module,
-            client=client,
-            volume_name=module.params.get("name"),
-            region=module.params.get("region"),
-        )
-
-        if not volume:
+        try:
+            resp = client.volumes.delete_by_name(name=volume_name, region=region)
+            if resp:
+                message = resp.get("message")
+                id = resp.get("id")
+                if id == "not_found":
+                    module.exit_json(changed=False, msg=message)
             module.exit_json(
-                changed=False, msg=f"Volume {volume_name} in {region} not found"
+                changed=True, msg=f"Deleted volume {volume_name} in {region}"
             )
-        else:
-            volume_id = volume.get("id")
-            delete_volume(module=module, client=client, volume_id=volume_id)
-            module.exit_json(
-                changed=True,
-                msg=f"Volume {volume_name} in {region} deleted",
-                volume=volume,
-            )
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():

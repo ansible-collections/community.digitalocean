@@ -26,7 +26,7 @@ requirements:
   - azure-core >= 1.26.1
 
 extends_documentation_fragment:
-  - community.digitalocean.common_options.documentation
+  - community.digitalocean.common.documentation
 """
 
 
@@ -70,7 +70,7 @@ sizes:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible_collections.community.digitalocean.plugins.module_utils.common_options import (
+from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
 )
 

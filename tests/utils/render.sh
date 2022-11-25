@@ -8,8 +8,11 @@ set -u
 
 function main()
 {
-  readonly template="$1"; shift
-  readonly content="$(cat "$template")"
+  readonly template
+  template="$1"
+  shift
+  readonly content
+  content="$(cat "$template")"
 
   eval "echo \"$content\""
 }
