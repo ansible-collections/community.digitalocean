@@ -26,7 +26,7 @@ requirements:
   - azure-core >= 1.26.1
 
 extends_documentation_fragment:
-  - community.digitalocean.token.documentation
+  - community.digitalocean.common_options.documentation
 """
 
 
