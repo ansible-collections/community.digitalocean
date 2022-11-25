@@ -13,7 +13,13 @@ class DigitalOceanOptions:
     @staticmethod
     def argument_spec():
         return dict(
+            state=dict(
+                type="str",
+                choices=["present", "absent"],
+                default="present",
+            ),
             token=dict(
+                type="str",
                 fallback=(
                     env_fallback,
                     [
