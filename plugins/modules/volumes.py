@@ -131,9 +131,11 @@ volume:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
-from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
 from ansible_collections.community.digitalocean.plugins.module_utils.common_options import (
     DigitalOceanOptions,
+)
+from ansible_collections.community.digitalocean.plugins.module_utils.common_functions import (
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -178,19 +180,10 @@ def find_volume(module, client, volume_name, region):
             }
             module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
-        links = resp.get("links")
-        if links:
-            pages = links.get("pages")
-            if pages:
-                next_ = pages.get("next")
-                if next_:
-                    parsed_url = urlparse(next_)
-                    if parsed_url:
-                        query = parsed_url.query
-                        if query:
-                            page = parse_qs(parsed_url.query)["page"][0]
-                            if page:
-                                return page
+        next_page = DigitalOceanFunctions.get_next_page(links=resp.get("links"))
+        if next_page:
+            return next_page
+
         paginated = False
 
     return None
