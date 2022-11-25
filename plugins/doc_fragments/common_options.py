@@ -11,6 +11,12 @@ class ModuleDocFragment(object):
 
     DOCUMENTATION = r"""
 options:
+  state:
+    description:
+      - State of the resource, C(present) to create, C(absent) to destroy.
+    type: str
+    required: true
+    default: present
   token:
     description:
       - DigitalOcean API token.
@@ -18,4 +24,5 @@ options:
       - C(DIGITALOCEAN_TOKEN), C(DO_API_TOKEN), C(DO_API_KEY), C(DO_OAUTH_TOKEN) and C(OAUTH_TOKEN)
     type: str
     aliases: [ oauth_token, api_token ]
+    required: false
 """
