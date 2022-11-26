@@ -56,6 +56,11 @@ account:
       uuid: 4281ad4a-0092-4e6b-abd2-c7a7ed111504
     uuid: fab13a8a-99e3-4ffd-a587-b8a7789f0091
     volume_limit: 100
+msg:
+  description: Account information result information.
+  returned: failed
+  sample:
+    - Account information not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

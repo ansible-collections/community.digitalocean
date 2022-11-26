@@ -10,15 +10,14 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: billing_history_info
+module: domains_info
 
-short_description: Retrieve a list of all billing history entries
+short_description: Get current domains
 
 version_added: 2.0.0
 
 description:
-  - Retrieve a list of all billing history entries
-  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/billingHistory_list).
+  - This module gets the current domains.
 
 author: Mark Mercado (@mamercad)
 
@@ -32,30 +31,32 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean billing history information
-  community.digitalocean.billing_history_info:
+- name: Get DigitalOcean domains
+  community.digitalocean.domains_info:
     token: "{{ token }}"
 """
 
 
 RETURN = r"""
-billing_history:
-  description: DigitalOcean billing history information.
+domains:
+  description: DigitalOcean domains.
   returned: success
-  type: list
+  type: dict
   sample:
-    - description: Invoice for May 2018
-      amount: 12.34
-      invoice_id: 123
-      invoice_uuid: example-uuid
-      date: '2018-06-01T08:44:38Z'
-      type: Invoice
-msg:
-  description: Billing history result information.
-  returned: failed
-  type: str
-  sample:
-    - Billing history information not found
+    endpoints:
+      description: Current CDN endpoints.
+      returned: success
+      type: list
+      elements: string
+    meta:
+      description: CDN endpoints metadata.
+      returned: success
+      type: dict
+      sample:
+        total:
+          description: Total number of CDN endpoints.
+          type: int
+          sample: 0
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -87,11 +88,8 @@ else:
 def core(module):
     client = Client(token=module.params.get("token"))
     try:
-        billing_history = client.billing_history.list()
-        billing_history_info = billing_history.get("billing_history")
-        if billing_history_info:
-            module.exit_json(changed=False, billing_history=billing_history)
-        module.fail_json(changed=False, msg="Billing history not found")
+        domains = client.domains.list()
+        module.exit_json(changed=False, domains=domains.get("domains"))
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,
