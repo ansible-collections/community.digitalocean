@@ -88,7 +88,10 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         account = client.account.get()
-        module.exit_json(changed=False, account=account.get("account"))
+        account_info = account.get("account")
+        if account_info:
+            module.exit_json(changed=False, account=account_info)
+        module.fail_json(changed=False, msg="Account information not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,
