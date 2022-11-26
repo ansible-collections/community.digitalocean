@@ -23,6 +23,7 @@ jobs:
         module:
           - account_info
           - balance_info
+          - billing_history_info
           - regions_info
           - sizes_info
           - volumes_info
