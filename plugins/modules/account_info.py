@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: account_info
 
-short_description: Get current user account information
+short_description: Show information about the current user account
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current user account information.
+  - Show information about the current user account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/account_get).
 
 author: Mark Mercado (@mamercad)
 
