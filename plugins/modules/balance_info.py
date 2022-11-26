@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: balance_info
 
-short_description: Get current user balance information
+short_description: Retrieve the balances on a customer's account
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current user balance information.
+  - Retrieve the balances on a customer's account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/balance_get).
 
 author: Mark Mercado (@mamercad)
 
@@ -39,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 balance:
-  description: DigitalOcean account information.
+  description: DigitalOcean balance information.
   returned: success
   type: dict
   sample:
