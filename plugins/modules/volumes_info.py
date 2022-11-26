@@ -39,7 +39,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 volumes:
-  description: DigitalOcean volumes information.
+  description: DigitalOcean volumes.
   returned: success
   type: dict
   sample:
