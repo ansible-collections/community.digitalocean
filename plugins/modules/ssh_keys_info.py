@@ -50,10 +50,10 @@ ssh_keys:
       public_key: |-
         ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC...x2Ck1mq67aVba+B0wxSGN+j7Fi27quUw== SSH key comment
 msg:
-  description: Informational message
+  description: SSH keys result information.
   returned: failed
   type: str
-  sample: Retrieved no SSH keys
+  sample: SSH keys not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -89,7 +89,7 @@ def core(module):
         ssh_keys = ssh_keys_list.get("ssh_keys")
         if ssh_keys:
             module.exit_json(changed=False, ssh_keys=ssh_keys)
-        module.fail_json(changed=False, msg="Retrieved no SSH keys")
+        module.fail_json(changed=False, msg="SSH keys not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

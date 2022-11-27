@@ -59,8 +59,8 @@ account:
 msg:
   description: Account information result information.
   returned: failed
-  sample:
-    - Account information not found
+  type: str
+  sample: Account information not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
