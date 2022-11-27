@@ -33,6 +33,7 @@ jobs:
           - cdn_endpoints_info
           - regions_info
           - sizes_info
+          - ssh_keys_info
           - volumes_info
           - volumes
 
