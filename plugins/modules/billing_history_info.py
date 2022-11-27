@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 billing_history:
-  description: DigitalOcean billing history information.
+  description: DigitalOcean billing history.
   returned: success
   type: list
   sample:
@@ -55,7 +55,7 @@ msg:
   returned: failed
   type: str
   sample:
-    - Billing history information not found
+    - Billing history not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

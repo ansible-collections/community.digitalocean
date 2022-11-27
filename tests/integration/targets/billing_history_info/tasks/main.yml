@@ -12,10 +12,19 @@
       community.digitalocean.billing_history_info:
         token: "{{ do_api_key }}"
       register: result
+      ignore_errors: true
 
     - name: Verify balance information idempotency and formatting
+      when: result.msg is defined
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.billing_history.links is defined
-          - result.billing_history.meta is defined
+          - result.msg is string
+          - result.msg == "Billing history not found"
+
+    - name: Verify balance information idempotency and formatting
+      when: result.billing_history is defined
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.billing_history is list
