@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 balance:
-  description: DigitalOcean balance information.
+  description: DigitalOcean balance.
   returned: success
   type: dict
   sample:
@@ -64,6 +64,11 @@ balance:
       returned: success
       type: string
       sample: '0.00'
+msg:
+  description: Balance result information.
+  returned: failed
+  type: str
+  sample: Balance not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -96,7 +101,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         balance = client.balance.get()
-        module.exit_json(changed=False, balance=balance)
+        if balance:
+            module.exit_json(changed=False, balance=balance)
+        module.fail_json(changed=False, msg="Balance information not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

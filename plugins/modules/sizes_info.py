@@ -67,6 +67,11 @@ sizes:
       transfer: 0.5
       vcpus: 1
     - ...
+msg:
+  description: Sizes result information.
+  returned: failed
+  type: str
+  sample: Sizes not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -99,7 +104,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         sizes = client.sizes.list()
-        module.exit_json(changed=False, sizes=sizes)
+        if sizes:
+            module.exit_json(changed=False, sizes=sizes)
+        module.fail_json(changed=False, msg="Sizes not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

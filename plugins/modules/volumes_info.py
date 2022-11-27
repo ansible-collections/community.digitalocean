@@ -48,6 +48,11 @@ volumes:
     meta:
       total: 0
     volumes: []
+msg:
+  description: Volumes result information.
+  returned: failed
+  type: str
+  sample: Volumes not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -80,7 +85,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         volumes = client.volumes.list()
-        module.exit_json(changed=False, volumes=volumes)
+        if volumes:
+            module.exit_json(changed=False, volumes=volumes)
+        module.fail_json(changed=False, msg="Volumes not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

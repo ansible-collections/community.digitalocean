@@ -12,12 +12,12 @@ DOCUMENTATION = r"""
 ---
 module: regions_info
 
-short_description: Get current regions
+short_description: Get regions
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current regions.
+  - This module gets the regions.
 
 author: Mark Mercado (@mamercad)
 
@@ -39,7 +39,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 regions:
-  description: DigitalOcean regions information.
+  description: DigitalOcean regions.
   returned: success
   type: dict
   sample:
@@ -65,6 +65,11 @@ regions:
           - ...
         slug: nyc1
       - ...
+msg:
+  description: Regions result information.
+  returned: failed
+  type: str
+  sample: Regions not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -97,7 +102,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         regions = client.regions.list()
-        module.exit_json(changed=False, regions=regions)
+        if regions:
+            module.exit_json(changed=False, regions=regions)
+        module.fail_json(changed=False, msg="Regions not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

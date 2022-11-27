@@ -12,12 +12,12 @@ DOCUMENTATION = r"""
 ---
 module: cdn_endpoints_info
 
-short_description: Get current CDN endpoints
+short_description: Get CDN endpoints
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current CDN endpoints.
+  - This module gets the CDN endpoints.
 
 author: Mark Mercado (@mamercad)
 
@@ -89,7 +89,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         cdn = client.cdn.list_endpoints()
-        module.exit_json(changed=False, cdn=cdn)
+        if cdn:
+            module.exit_json(changed=False, cdn=cdn)
+        module.fail_json(changed=False, msg="CDN endpoints not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,
