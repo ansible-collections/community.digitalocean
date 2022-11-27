@@ -1,11 +1,13 @@
 name: Unit tests
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
   push:
-    branches: [main]
-  schedule:
-    - cron: "10 6 * * *"
+    # branches: [main]
+    branches:
+      - v2-pydo
+  # schedule:
+  #   - cron: "10 6 * * *"
 
 jobs:
   units:

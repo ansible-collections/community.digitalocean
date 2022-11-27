@@ -1,11 +1,13 @@
 name: Sanity tests
 on:
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+  # pull_request:
+  #   types: [ opened, synchronize, reopened ]
   push:
-    branches: [ main ]
-  schedule:
-    - cron: '0 6 * * *'
+    # branches: [ main ]
+    branches:
+      - v2-pydo
+  # schedule:
+  #   - cron: '0 6 * * *'
 
 jobs:
 
