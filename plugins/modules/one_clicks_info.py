@@ -117,7 +117,9 @@ def core(module):
         if one_clicks:
             click_type = module.params.get("type")
             if click_type:
-                filtered_clicks = list(filter(lambda val: val.get("type") == click_type, one_clicks))
+                filtered_clicks = list(
+                    filter(lambda val: val.get("type") == click_type, one_clicks)
+                )
                 module.exit_json(changed=False, one_clicks=filtered_clicks)
             module.exit_json(changed=False, one_clicks=one_clicks)
         module.fail_json(changed=False, msg="1-Click applications not found")
