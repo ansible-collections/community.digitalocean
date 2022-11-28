@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 balance:
-  description: DigitalOcean balance.
+  description: DigitalOcean balance information.
   returned: success
   type: dict
   sample:

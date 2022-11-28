@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: domains_info
 
-short_description: Get domains
+short_description: Retrieve a list of all of the domains in your account
 
 version_added: 2.0.0
 
 description:
-  - This module gets the domains.
+  - Retrieve a list of all of the domains in your account.
+  - View the API documentation at (https://docs.digitalocean.com/reference/api/api-reference/#operation/domains_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -41,22 +42,19 @@ RETURN = r"""
 domains:
   description: DigitalOcean domains.
   returned: success
-  type: dict
+  type: list
+  elements: dict
   sample:
-    endpoints:
-      description: Current CDN endpoints.
-      returned: success
-      type: list
-      elements: string
-    meta:
-      description: CDN endpoints metadata.
-      returned: success
-      type: dict
-      sample:
-        total:
-          description: Total number of CDN endpoints.
-          type: int
-          sample: 0
+    - name: example.com
+      ttl: 1800
+      zone_file: |-
+        $ORIGIN example.com.
+        $TTL 1800
+        example.com. IN SOA ns1.digitalocean.com. hostmaster.example.com 1657981824 10800 3600 604800 1800
+        test.example.com. 300 IN A 1.2.3.4
+        example.com. 1800 IN NS ns1.digitalocean.com.
+        example.com. 1800 IN NS ns2.digitalocean.com.
+        example.com. 1800 IN NS ns3.digitalocean.com.
 msg:
   description: Domain result information.
   returned: failed

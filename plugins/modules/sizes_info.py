@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: sizes_info
 
-short_description: Get current Droplet sizes
+short_description: List all of available Droplet sizes
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current Droplet sizes.
+  - List all of available Droplet sizes.
+  - View the API documentation at (https://docs.digitalocean.com/reference/api/api-reference/#operation/sizes_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -41,15 +42,9 @@ RETURN = r"""
 sizes:
   description: DigitalOcean Droplet sizes information.
   returned: success
-  type: dict
+  type: list
+  elements: dict
   sample:
-    links:
-      pages:
-        last: https://api.digitalocean.com/v2/sizes?page=4&per_page=20
-        next: https://api.digitalocean.com/v2/sizes?page=2&per_page=20
-    meta:
-      total: 73
-    sizes:
     - available: true
       description: Basic
       disk: 10

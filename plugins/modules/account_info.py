@@ -57,7 +57,7 @@ account:
     uuid: fab13a8a-99e3-4ffd-a587-b8a7789f0091
     volume_limit: 100
 msg:
-  description: Account information result information.
+  description: Account information result.
   returned: failed
   type: str
   sample: Account information not found

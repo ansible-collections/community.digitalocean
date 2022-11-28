@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: ssh_keys_info
 
-short_description: Get SSH keys
+short_description: List all of the keys in your account
 
 version_added: 2.0.0
 
 description:
-  - This module gets SSH keys.
+  - List all of the keys in your account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list).
 
 author: Mark Mercado (@mamercad)
 

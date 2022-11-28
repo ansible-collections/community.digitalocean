@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: regions_info
 
-short_description: Get regions
+short_description: List all of the regions that are available
 
 version_added: 2.0.0
 
 description:
-  - This module gets the regions.
+  - List all of the regions that are available.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/regions_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -41,30 +42,27 @@ RETURN = r"""
 regions:
   description: DigitalOcean regions.
   returned: success
-  type: dict
+  type: list
+  elements: dict
   sample:
-    links: {}
-    meta:
-      total: 14
-    regions:
-      - available: true
-        features:
-          - backups
-          - ipv6
-          - metadata
-          - install_agent
-          - storage
-          - image_transfer
-        name: New York 1
-        sizes:
-          - s-1vcpu-512mb-10gb
-          - s-1vcpu-1gb
-          - s-1vcpu-1gb-amd
-          - s-1vcpu-1gb-intel
-          - s-1vcpu-2gb
-          - ...
-        slug: nyc1
-      - ...
+    - available: true
+      features:
+        - backups
+        - ipv6
+        - metadata
+        - install_agent
+        - storage
+        - image_transfer
+      name: New York 1
+      sizes:
+        - s-1vcpu-512mb-10gb
+        - s-1vcpu-1gb
+        - s-1vcpu-1gb-amd
+        - s-1vcpu-1gb-intel
+        - s-1vcpu-2gb
+        - ...
+      slug: nyc1
+    - ...
 msg:
   description: Regions result information.
   returned: failed
