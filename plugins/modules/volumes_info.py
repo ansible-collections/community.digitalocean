@@ -44,7 +44,7 @@ volumes:
   returned: success
   type: list
   elements: dict
-  sample: []
+  sample:
     - created_at: '2022-11-28T02:07:45Z'
       description: ''
       droplet_ids: []
