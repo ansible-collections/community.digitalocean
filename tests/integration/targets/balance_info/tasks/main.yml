@@ -8,15 +8,17 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean balance information
+    - name: Get balance information
       community.digitalocean.balance_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify balance information idempotency and formatting
+    - name: Verify balance information
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is defined
+          - result.msg == "Current balance information"
           - result.balance is defined
           - result.balance.account_balance is defined
           - result.balance.generated_at is defined
