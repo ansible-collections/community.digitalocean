@@ -68,7 +68,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 cdn:
-  description: DigitalOcean CDN endpoints.
+  description: DigitalOcean CDN endpoint.
   returned: success
   type: dict
   sample:
@@ -78,11 +78,23 @@ cdn:
       id: e6893ada-0fd7-48c2-88af-7c2784f404f2
       origin: ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com
       ttl: 3600
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: CDN endpoints result information.
-  returned: failed
+  returned: always
   type: str
-  sample: CDN endpoints not found
+  sample:
+    - CDN endpoint not found
+    - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com created
+    - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com deleted
+    - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com exists
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -155,10 +167,19 @@ class CDNEndpoints:
                 "certificate_id": self.module.params.get("certificate_id"),
                 "custom_domain": self.module.params.get("custom_domain"),
             }
+            cdn = self.find()
+            if cdn:
+                self.module.exit_json(
+                    changed=False, msg=f"CDN endpoint {self.origin} exists", cdn=cdn
+                )
             cdn = self.client.cdn.create_endpoint(body=body)
             if cdn:
-                self.module.exit_json(changed=False, cdn=cdn)
-            self.module.fail_json(changed=False, msg="CDN endpoint not found")
+                self.module.exit_json(
+                    changed=True, msg=f"CDN endpoint {self.origin} created", cdn=cdn
+                )
+            self.module.fail_json(
+                changed=False, msg=f"CDN endpoint {self.origin} not created"
+            )
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -178,13 +199,19 @@ class CDNEndpoints:
         """Removes a CDN endpoint."""
         cdn = self.find()
         if not cdn:
-            self.module.fail_json(changed=False, msg=f"CDN endpoint {self.origin} not found")
+            self.module.fail_json(
+                changed=False, msg=f"CDN endpoint {self.origin} not found"
+            )
         cdn_id = cdn.get("id")
         if not cdn_id:
-            self.module.fail_json(changed=False, msg=f"CDN endpoint {self.origin} ID not found")
+            self.module.fail_json(
+                changed=False, msg=f"CDN endpoint {self.origin} ID not found"
+            )
         try:
             self.client.cdn.delete_endpoint(cdn_id=cdn_id)
-            self.module.exit_json(changed=True, msg=f"CDN endpoint {self.origin} deleted")
+            self.module.exit_json(
+                changed=True, msg=f"CDN endpoint {self.origin} deleted"
+            )
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,
