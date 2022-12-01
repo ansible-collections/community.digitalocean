@@ -8,23 +8,23 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean billing history information
+    - name: Get billing history information
       community.digitalocean.billing_history_info:
         token: "{{ do_api_key }}"
       register: result
       ignore_errors: true
 
-    - name: Verify balance information idempotency and formatting
-      when: result.msg is defined
+    - name: Verify billing history information
+      when: result.msg == "Current billing history"
       ansible.builtin.assert:
         that:
           - not result.changed
           - result.msg is string
-          - result.msg == "Billing history not found"
+          - result.billing_history is list
 
-    - name: Verify balance information idempotency and formatting
-      when: result.billing_history is defined
+    - name: Verify billing history information
+      when: result.msg == "Current billing history not found"
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.billing_history is list
+          - result.msg is string

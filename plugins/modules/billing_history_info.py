@@ -52,9 +52,11 @@ billing_history:
       type: Invoice
 msg:
   description: Billing history result information.
-  returned: failed
+  returned: always
   type: str
-  sample: Billing history not found
+  sample:
+    - Current billing history
+    - Current billing history not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -89,8 +91,12 @@ def core(module):
         billing_history = client.billing_history.list()
         billing_history_info = billing_history.get("billing_history")
         if billing_history_info:
-            module.exit_json(changed=False, billing_history=billing_history)
-        module.fail_json(changed=False, msg="Billing history not found")
+            module.exit_json(
+                changed=False,
+                msg="Current billing history",
+                billing_history=billing_history,
+            )
+        module.fail_json(changed=False, msg="Current billing history not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

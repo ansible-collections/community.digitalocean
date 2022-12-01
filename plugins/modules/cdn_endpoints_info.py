@@ -60,9 +60,11 @@ cdn:
           sample: 0
 msg:
   description: CDN endpoints result information.
-  returned: failed
+  returned: always
   type: str
-  sample: CDN endpoints not found
+  sample:
+    - Current CDN endpoints
+    - Current CDN endpoints not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -96,8 +98,8 @@ def core(module):
     try:
         cdn = client.cdn.list_endpoints()
         if cdn:
-            module.exit_json(changed=False, cdn=cdn)
-        module.fail_json(changed=False, msg="CDN endpoints not found")
+            module.exit_json(changed=False, msg="Current CDN endpointks", cdn=cdn)
+        module.fail_json(changed=False, msg="Current CDN endpoints not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,
