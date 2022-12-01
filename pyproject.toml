@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "digitalocean"
+version = "2.0.0"
+description = "Ansible Community DigitalOcean Collection"
+authors = ["Mark Mercado <mmercado@digitalocean.com>"]
+license = "GPL-3.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+ansible-core = "2.14.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
