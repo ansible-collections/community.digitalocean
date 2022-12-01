@@ -104,7 +104,9 @@ def core(module):
     try:
         balance = client.balance.get()
         if balance:
-            module.exit_json(changed=False, msg="Current balance information", balance=balance)
+            module.exit_json(
+                changed=False, msg="Current balance information", balance=balance
+            )
         module.fail_json(changed=False, msg="Current balance information not found")
     except HttpResponseError as err:
         error = {
