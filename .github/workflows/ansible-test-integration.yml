@@ -23,8 +23,8 @@ jobs:
       matrix:
         ansible:
         # - stable-2.12
-        # - stable-2.13
-        - stable-2.14
+        - stable-2.13
+        # - stable-2.14
         # - devel
         module:
           - account_info
