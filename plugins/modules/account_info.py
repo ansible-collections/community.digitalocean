@@ -58,9 +58,11 @@ account:
     volume_limit: 100
 msg:
   description: Account information result.
-  returned: failed
+  returned: always
   type: str
-  sample: Account information not found
+  sample:
+    - Current account information
+    - Current account information not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -95,8 +97,8 @@ def core(module):
         account = client.account.get()
         account_info = account.get("account")
         if account_info:
-            module.exit_json(changed=False, account=account_info)
-        module.fail_json(changed=False, msg="Account information not found")
+            module.exit_json(changed=False, msg="Current account information", account=account_info)
+        module.fail_json(changed=False, msg="Current account information not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

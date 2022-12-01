@@ -8,15 +8,17 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean account information
+    - name: Get account information
       community.digitalocean.account_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify account information idempotency and formatting
+    - name: Verify account information
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is defined
+          - result.msg == "Current account information"
           - result.account is defined
           - result.account.droplet_limit is defined
           - result.account.email is defined
