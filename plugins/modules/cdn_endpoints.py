@@ -17,7 +17,7 @@ short_description: Manage CDN endpoints
 version_added: 2.0.0
 
 description:
-  - Manage CDN endpoints: create, update, delete, purge cache.
+  - "Manage CDN endpoints: create, update, delete, purge cache."
   - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/cdn_create_endpoint).
 
 author: Mark Mercado (@mamercad)
@@ -226,7 +226,12 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         origin=dict(type="str", required=True),
-        ttl=dict(type="int", default=3600, required=False),
+        ttl=dict(
+            type="int",
+            choices=[60, 600, 3600, 86400, 604800],
+            default=3600,
+            required=False,
+        ),
         certificate_id=dict(type="str", required=False),
         custom_domain=dict(type="str", required=False),
     )
