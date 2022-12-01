@@ -74,7 +74,7 @@ This collection contains modules and plugins to assist in automating [DigitalOce
 The collection is tested and supported with:
 
 - ansible-core >= 2.12 (including `devel`)
-- python >= 3.8
+- python >= 3.9
 
 ### Installing the Collection from Ansible Galaxy
 
@@ -213,9 +213,9 @@ running unit, sanity, and integration tests using [`ansible-test`](https://docs.
 You can run the collection's test suites with the commands:
 
 ```shell
-ansible-test units --venv --python 3.8
-ansible-test sanity --venv --python 3.8
-ansible-test integration --venv --python 3.8
+ansible-test units --venv --python 3.9
+ansible-test sanity --venv --python 3.9
+ansible-test integration --venv --python 3.9
 ```
 
 Replace `--venv` with `--docker` if you'd like to use Docker for the testing runtime environment.
