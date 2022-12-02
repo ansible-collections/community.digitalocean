@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean regions
+- name: Get regions
   community.digitalocean.regions_info:
     token: "{{ token }}"
 """
@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 regions:
-  description: DigitalOcean regions.
+  description: Regions.
   returned: success
   type: list
   elements: dict
@@ -65,9 +65,11 @@ regions:
     - ...
 msg:
   description: Regions result information.
-  returned: failed
+  returned: always
   type: str
-  sample: Regions not found
+  sample:
+    - Current regions
+    - Current regions not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -96,20 +98,30 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def core(module):
-    client = Client(token=module.params.get("token"))
-    try:
-        regions = client.regions.list()
-        if regions:
-            module.exit_json(changed=False, regions=regions)
-        module.fail_json(changed=False, msg="Regions not found")
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+class RegionsInformation:
+    def __init__(self, module):
+        """Class constructor."""
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        if self.state == "present":
+            self.present()
+
+    def present(self):
+        try:
+            regions = self.client.regions.list()
+            if regions:
+                self.module.exit_json(
+                    changed=False, msg="Curreng regions", regions=regions
+                )
+            self.module.fail_json(changed=False, msg="Current regions not found")
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
@@ -126,7 +138,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    RegionsInformation(module)
 
 
 if __name__ == "__main__":

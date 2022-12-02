@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean volumes
+- name: Get volumes
   community.digitalocean.volumes_info:
     token: "{{ token }}"
 """
@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 volumes:
-  description: DigitalOcean volumes.
+  description: Volumes.
   returned: success
   type: list
   elements: dict
@@ -72,9 +72,11 @@ volumes:
       tags: []
 msg:
   description: Volumes result information.
-  returned: failed
+  returned: always
   type: str
-  sample: Volumes not found
+  sample:
+    - Current volumes
+    - Current volumes not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -103,20 +105,30 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def core(module):
-    client = Client(token=module.params.get("token"))
-    try:
-        volumes = client.volumes.list()
-        if volumes:
-            module.exit_json(changed=False, volumes=volumes)
-        module.fail_json(changed=False, msg="Volumes not found")
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+class VolumesInformation:
+    def __init__(self, module):
+        """Class constructor."""
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        if self.state == "present":
+            self.present()
+
+    def present(self):
+        try:
+            volumes = self.client.volumes.list()
+            if volumes:
+                self.module.exit_json(
+                    changed=False, msg="Current volumes", volumes=volumes
+                )
+            self.module.fail_json(changed=False, msg="Current volumes not found")
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
@@ -133,7 +145,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    VolumesInformation(module)
 
 
 if __name__ == "__main__":

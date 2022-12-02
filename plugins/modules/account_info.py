@@ -91,7 +91,7 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class AccountInfo:
+class AccountInformation:
     def __init__(self, module):
         """Class constructor."""
         self.module = module
@@ -102,15 +102,18 @@ class AccountInfo:
 
     def present(self):
         """Get the Account information."""
-        client = Client(token=self.module.params.get("token"))
         try:
             account = self.client.account.get()
             account_info = account.get("account")
             if account_info:
                 self.module.exit_json(
-                    changed=False, msg="Current account information", account=account_info
+                    changed=False,
+                    msg="Current account information",
+                    account=account_info,
                 )
-            self.module.fail_json(changed=False, msg="Current account information not found")
+            self.module.fail_json(
+                changed=False, msg="Current account information not found"
+            )
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -134,7 +137,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    AccountInfo(module)
+    AccountInformation(module)
 
 
 if __name__ == "__main__":

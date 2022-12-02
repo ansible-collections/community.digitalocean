@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean domains
+- name: Get domains
   community.digitalocean.domains_info:
     token: "{{ token }}"
 """
@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 domains:
-  description: DigitalOcean domains.
+  description: Domains.
   returned: success
   type: list
   elements: dict
@@ -57,9 +57,11 @@ domains:
         example.com. 1800 IN NS ns3.digitalocean.com.
 msg:
   description: Domain result information.
-  returned: failed
+  returned: always
   type: str
-  sample: Domains not found
+  sample:
+    - Current domains
+    - Current domains not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -88,20 +90,30 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def core(module):
-    client = Client(token=module.params.get("token"))
-    try:
-        domains = client.domains.list()
-        if domains:
-            module.exit_json(changed=False, domains=domains.get("domains"))
-        module.fail_json(changed=False, msg="Domains not found")
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+class DomainsInformation:
+    def __init__(self, module):
+        """Class constructor."""
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        if self.state == "present":
+            self.present()
+
+    def present(self):
+        try:
+            domains = self.client.domains.list()
+            if domains:
+                self.module.exit_json(
+                    changed=False, msg="Current domains", domains=domains.get("domains")
+                )
+            self.module.fail_json(changed=False, msg="Current domains not found")
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
@@ -118,7 +130,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    DomainsInformation(module)
 
 
 if __name__ == "__main__":

@@ -8,13 +8,15 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean SSH keys
+    - name: Get SSH keys
       community.digitalocean.ssh_keys_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify SSH keys idempotency and formatting
+    - name: Verify SSH keys
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is string
+          - result.msg == "Current SSH keys"
           - result.ssh_keys is defined

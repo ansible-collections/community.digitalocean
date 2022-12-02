@@ -40,16 +40,16 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean 1-Click applications
+- name: Get 1-Click applications
   community.digitalocean.one_click_info:
     token: "{{ token }}"
 
-- name: Get DigitalOcean Droplet 1-Click applications
+- name: Get Droplet 1-Click applications
   community.digitalocean.one_click_info:
     token: "{{ token }}"
     type: droplet
 
-- name: Get DigitalOcean Kubernetes 1-Click applications
+- name: Get Kubernetes 1-Click applications
   community.digitalocean.one_click_info:
     token: "{{ token }}"
     type: kubernetes
@@ -78,9 +78,13 @@ account:
       type: kubernetes
 msg:
   description: 1-Click applications result information.
-  returned: failed
+  returned: always
   type: str
-  sample: 1-Click applications not found
+  sample:
+    - Current 1-Click applications
+    - Current Droplet 1-Click applications
+    - Current Kubernetes 1-Click applications
+    - Current 1-Click applications not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -109,27 +113,46 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def core(module):
-    client = Client(token=module.params.get("token"))
-    try:
-        one_clicks_info = client.one_clicks.list()
-        one_clicks = one_clicks_info.get("1_clicks")
-        if one_clicks:
-            click_type = module.params.get("type")
-            if click_type:
-                filtered_clicks = list(
-                    filter(lambda val: val.get("type") == click_type, one_clicks)
+class OneClickApplicationsInformation:
+    def __init__(self, module):
+        """Class constructor."""
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        self.type = module.params.get("type")
+        if self.state == "present":
+            self.present()
+
+    def present(self):
+        try:
+            one_clicks_info = self.client.one_clicks.list()
+            one_clicks = one_clicks_info.get("1_clicks")
+            if one_clicks:
+                click_type = self.module.params.get("type")
+                if click_type:
+                    filtered_clicks = list(
+                        filter(lambda val: val.get("type") == click_type, one_clicks)
+                    )
+                    self.module.exit_json(
+                        changed=False,
+                        msg=f"Current {self.type.capitalize()} 1-Click applications",
+                        one_clicks=filtered_clicks,
+                    )
+                self.module.exit_json(
+                    changed=False,
+                    msg="Current 1-Click applications",
+                    one_clicks=one_clicks,
                 )
-                module.exit_json(changed=False, one_clicks=filtered_clicks)
-            module.exit_json(changed=False, one_clicks=one_clicks)
-        module.fail_json(changed=False, msg="1-Click applications not found")
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(
+                changed=False, msg="Current 1-Click applications not found"
+            )
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
@@ -149,7 +172,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    OneClickApplicationsInformation(module)
 
 
 if __name__ == "__main__":

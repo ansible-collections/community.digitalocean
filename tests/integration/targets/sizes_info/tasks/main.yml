@@ -8,15 +8,17 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean sizes information
+    - name: Get Droplet sizes
       community.digitalocean.sizes_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify sizes information idempotency and formatting
+    - name: Verify Droplet sizes
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is string
+          - regult.msg == "Current Droplet sizes"
           - result.sizes is defined
           - result.sizes.links is defined
           - result.sizes.meta is defined

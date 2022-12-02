@@ -8,15 +8,17 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean regions information
+    - name: Get regions
       community.digitalocean.regions_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify regions information idempotency and formatting
+    - name: Verify regions
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is string
+          - result.msg == "Current regions"
           - result.regions is defined
           - result.regions.links is defined
           - result.regions.meta is defined

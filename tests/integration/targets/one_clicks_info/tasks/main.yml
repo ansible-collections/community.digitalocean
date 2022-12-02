@@ -8,15 +8,53 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean 1-Click applications
+    - name: Get 1-Click applications
       community.digitalocean.one_clicks_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify 1-Clicks applications idempotency and formatting
+    - name: Verify 1-Clicks applications
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is string
+          - result.msg == "Current 1-Click applications"
+          - result.one_clicks is defined
+          - result.one_clicks is iterable
+          - result.one_clicks.0 is defined
+          - result.one_clicks.0.type is defined
+          - result.one_clicks.0.slug is defined
+
+    - name: Get Droplet 1-Click applications
+      community.digitalocean.one_clicks_info:
+        token: "{{ do_api_key }}"
+        type: droplet
+      register: result
+
+    - name: Verify Droplet 1-Clicks applications
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+          - result.msg == "Current Droplet 1-Click applications"
+          - result.one_clicks is defined
+          - result.one_clicks is iterable
+          - result.one_clicks.0 is defined
+          - result.one_clicks.0.type is defined
+          - result.one_clicks.0.slug is defined
+
+    - name: Get Kubernetes 1-Click applications
+      community.digitalocean.one_clicks_info:
+        token: "{{ do_api_key }}"
+        type: kubernetes
+      register: result
+
+    - name: Verify Kubernetes 1-Clicks applications
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+          - result.msg == "Current Kubernetes 1-Click applications"
           - result.one_clicks is defined
           - result.one_clicks is iterable
           - result.one_clicks.0 is defined

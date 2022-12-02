@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean SSH keys
+- name: Get SSH keys
   community.digitalocean.ssh_keys_info:
     token: "{{ token }}"
 """
@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 ssh_keys:
-  description: DigitalOcean SSH keys.
+  description: SSH keys.
   returned: success
   type: list
   elements: dict
@@ -52,9 +52,11 @@ ssh_keys:
         ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC...x2Ck1mq67aVba+B0wxSGN+j7Fi27quUw== SSH key comment
 msg:
   description: SSH keys result information.
-  returned: failed
+  returned: always
   type: str
-  sample: SSH keys not found
+  sample:
+    - Current SSH keys
+    - Current SSH keys not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -83,21 +85,31 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def core(module):
-    client = Client(token=module.params.get("token"))
-    try:
-        ssh_keys_list = client.ssh_keys.list()
-        ssh_keys = ssh_keys_list.get("ssh_keys")
-        if ssh_keys:
-            module.exit_json(changed=False, ssh_keys=ssh_keys)
-        module.fail_json(changed=False, msg="SSH keys not found")
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+class SSHKeysInformation:
+    def __init__(self, module):
+        """Class constructor."""
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        if self.state == "present":
+            self.present()
+
+    def present(self):
+        try:
+            ssh_keys_list = self.client.ssh_keys.list()
+            ssh_keys = ssh_keys_list.get("ssh_keys")
+            if ssh_keys:
+                self.module.exit_json(
+                    changed=False, msg="Current SSH keys", ssh_keys=ssh_keys
+                )
+            self.module.fail_json(changed=False, msg="Current SSH keys not found")
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
@@ -114,7 +126,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    SSHKeysInformation(module)
 
 
 if __name__ == "__main__":

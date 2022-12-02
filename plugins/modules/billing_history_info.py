@@ -17,7 +17,7 @@ short_description: Retrieve a list of all billing history entries
 version_added: 2.0.0
 
 description:
-  - Retrieve a list of all billing history entries
+  - Retrieve a list of all billing history entries.
   - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/billingHistory_list).
 
 author: Mark Mercado (@mamercad)
@@ -32,7 +32,7 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean billing history information
+- name: Get billing history information
   community.digitalocean.billing_history_info:
     token: "{{ token }}"
 """
@@ -40,7 +40,7 @@ EXAMPLES = r"""
 
 RETURN = r"""
 billing_history:
-  description: DigitalOcean billing history information.
+  description: Billing history information.
   returned: success
   type: list
   sample:
@@ -55,8 +55,8 @@ msg:
   returned: always
   type: str
   sample:
-    - Current billing history
-    - Current billing history not found
+    - Current billing history information
+    - Current billing history information not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -85,25 +85,35 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def core(module):
-    client = Client(token=module.params.get("token"))
-    try:
-        billing_history = client.billing_history.list()
-        billing_history_info = billing_history.get("billing_history")
-        if billing_history_info:
-            module.exit_json(
-                changed=False,
-                msg="Current billing history",
-                billing_history=billing_history,
+class BillingHistoryInformation:
+    def __init__(self, module):
+        """Class constructor."""
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        if self.state == "present":
+            self.present()
+
+    def present(self):
+        try:
+            billing_history = self.client.billing_history.list()
+            billing_history_info = billing_history.get("billing_history")
+            if billing_history_info:
+                self.module.exit_json(
+                    changed=False,
+                    msg="Current billing history information",
+                    billing_history=billing_history,
+                )
+            self.module.fail_json(
+                changed=False, msg="Current billing history information not found"
             )
-        module.fail_json(changed=False, msg="Current billing history not found")
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def main():
@@ -120,7 +130,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    BillingHistoryInformation(module)
 
 
 if __name__ == "__main__":

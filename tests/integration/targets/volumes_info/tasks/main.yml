@@ -8,15 +8,17 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get DigitalOcean volumes information
+    - name: Get volumes
       community.digitalocean.volumes_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify volumes information idempotency and formatting
+    - name: Verify volumes
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is string
+          - result.msg == "Current volumes"
           - result.volumes is defined
           - result.volumes.links is defined
           - result.volumes.meta is defined
