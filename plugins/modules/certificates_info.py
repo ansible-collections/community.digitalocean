@@ -62,7 +62,9 @@ msg:
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
+from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
+    DigitalOceanConstants,
     DigitalOceanOptions,
 )
 
@@ -97,22 +99,46 @@ class CertificatesInformation:
             self.present()
 
     def present(self):
-        try:
-            certificates = self.client.certificates.list()
-            if certificates.get("certificates"):
-                self.module.exit_json(
-                    changed=False,
-                    msg="Current certificates",
-                    certificates=certificates.get("certificates"),
+        certificates = []
+        page = 1
+        paginated = True
+        while paginated:
+            page = 1
+            paginated = True
+            try:
+                resp = self.client.certificates.list(
+                    per_page=DigitalOceanConstants.PAGE_SIZE, page=page
                 )
-            self.module.exit_json(changed=False, msg="No certificates", certificates=[])
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+                certificates.extend(resp.get("certificates"))
+                links = resp.get("links")
+                if links:
+                    pages = links.get("pages")
+                    if pages:
+                        next_page = pages.get("next")
+                        if next_page:
+                            parsed_url = urlparse(pages["next"])
+                            page = parse_qs(parsed_url.query)["page"][0]
+                        else:
+                            paginated = False
+                    paginated = False
+                else:
+                    paginated = False
+            except HttpResponseError as err:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                self.module.fail_json(
+                    changed=False, msg=error.get("Message"), error=error
+                )
+        if certificates:
+            self.module.exit_json(
+                changed=False,
+                msg="Current certificates",
+                certificates=certificates,
+            )
+        self.module.exit_json(changed=False, msg="No certificates", certificates=[])
 
 
 def main():
