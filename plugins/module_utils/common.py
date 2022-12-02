@@ -37,6 +37,10 @@ class DigitalOceanFunctions:
         return None
 
 
+class DigitalOceanConstants:
+    PAGE_SIZE = 10
+
+
 class DigitalOceanOptions:
     @staticmethod
     def argument_spec():
