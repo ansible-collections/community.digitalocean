@@ -28,6 +28,7 @@ jobs:
           - billing_history_info
           - cdn_endpoints_info
           - cdn_endpoints
+          - certificates_info
           - one_clicks_info
           - regions_info
           - sizes_info
