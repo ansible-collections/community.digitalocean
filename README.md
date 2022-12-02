@@ -73,14 +73,16 @@ This collection contains modules and plugins to assist in automating [DigitalOce
 
 The collection is tested and supported with:
 
-- ansible >= 2.9.10 or ansible-core >= 2.11 (as well as the [devel branch](https://github.com/ansible/ansible))
-- python >= 3.6
+- ansible-core >= 2.12 (including `devel`)
+- python >= 3.9
 
 ### Installing the Collection from Ansible Galaxy
 
 Before using the DigitalOcean collection, you need to install it with the Ansible Galaxy CLI:
 
-    ansible-galaxy collection install community.digitalocean
+```shell
+ansible-galaxy collection install community.digitalocean
+```
 
 You can also include it in a `requirements.yml` file and install it via `ansible-galaxy collection install -r requirements.yml`, using the format:
 
@@ -173,16 +175,18 @@ If you want to develop new content for this collection or improve what's already
 
 Alternatively, to develop completely out of `~/src/ansible-dev`, one could:
 
-    mkdir -p ~/src/ansible-dev
-    cd ~/src/ansible-dev
-    python3 -m venv venv
-    source venv/bin/activate
-    git clone https://github.com/ansible/ansible.git
-    pip install --requirement ansible/requirements.txt
-    pip install kubernetes
-    source ansible/hacking/env-setup
-    export ANSIBLE_COLLECTIONS_PATHS="~/src/ansible-dev/ansible_collections"
-    ansible-galaxy collection install community.digitalocean community.general
+```shell
+mkdir -p ~/src/ansible-dev
+cd ~/src/ansible-dev
+python3 -m venv venv
+source venv/bin/activate
+git clone https://github.com/ansible/ansible.git
+pip install --requirement ansible/requirements.txt
+pip install kubernetes
+source ansible/hacking/env-setup
+export ANSIBLE_COLLECTIONS_PATHS="~/src/ansible-dev/ansible_collections"
+ansible-galaxy collection install community.digitalocean community.general
+```
 
 This gives us a self-contained environment in `~/src/ansible-dev` consisting of Python, Ansible, and this collection (located in `~/src/ansible-dev/ansible_collections/community/digitalocean`).
 This collection requires functionality from `community.general`, and as such, we install it as well.
@@ -191,11 +195,13 @@ If you would like to contribute any changes which you have made to the collectio
 If you do not have a fork yet, you can create one [here](https://github.com/ansible-collections/community.digitalocean/fork).
 Once you have a fork:
 
-    cd ~/src/ansible-dev/ansible_collections/community/digitalocean
-    git remote add origin git@github.com:{your fork organization}/community.digitalocean.git
-    git checkout -b my-awesome-fixes
-    git commit -am "My awesome fixes"
-    git push -u origin my-awesome-fixes
+```shell
+cd ~/src/ansible-dev/ansible_collections/community/digitalocean
+git remote add origin git@github.com:{your fork organization}/community.digitalocean.git
+git checkout -b my-awesome-fixes
+git commit -am "My awesome fixes"
+git push -u origin my-awesome-fixes
+```
 
 Now, you should be ready to create a [Pull Request](https://github.com/ansible-collections/community.digitalocean/pulls).
 
@@ -206,9 +212,11 @@ running unit, sanity, and integration tests using [`ansible-test`](https://docs.
 
 You can run the collection's test suites with the commands:
 
-    ansible-test units --venv --python 3.9
-    ansible-test sanity --venv --python 3.9
-    ansible-test integration --venv --python 3.9
+```shell
+ansible-test units --venv --python 3.9
+ansible-test sanity --venv --python 3.9
+ansible-test integration --venv --python 3.9
+```
 
 Replace `--venv` with `--docker` if you'd like to use Docker for the testing runtime environment.
 
@@ -241,11 +249,11 @@ After the version is published, verify it exists on the [DigitalOcean Collection
 
 ## More information
 
-  - [DigitalOcean Working Group](https://github.com/ansible/community/wiki/Digital-Ocean)
-  - [Ansible Collection overview](https://github.com/ansible-collections/overview)
-  - [Ansible User guide](https://docs.ansible.com/ansible/latest/user_guide/index.html)
-  - [Ansible Developer guide](https://docs.ansible.com/ansible/latest/dev_guide/index.html)
-  - [Ansible Community code of conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html)
+- [DigitalOcean Working Group](https://github.com/ansible/community/wiki/Digital-Ocean)
+- [Ansible Collection overview](https://github.com/ansible-collections/overview)
+- [Ansible User guide](https://docs.ansible.com/ansible/latest/user_guide/index.html)
+- [Ansible Developer guide](https://docs.ansible.com/ansible/latest/dev_guide/index.html)
+- [Ansible Community code of conduct](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html)
 
 ## Licensing
 

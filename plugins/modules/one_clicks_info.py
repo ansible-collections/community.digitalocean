@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: sizes_info
+module: one_clicks_info
 
-short_description: List all of available Droplet sizes
+short_description: List all available 1-Click applications
 
 version_added: 2.0.0
 
 description:
-  - List all of available Droplet sizes.
-  - View the API documentation at (https://docs.digitalocean.com/reference/api/api-reference/#operation/sizes_list).
+  - List all available 1-Click applications.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/oneClicks_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -26,47 +26,61 @@ requirements:
   - pydo >= 0.1.3
   - azure-core >= 1.26.1
 
+options:
+  type:
+    description:
+      - Limit by type of 1-Click application.
+    type: str
+    required: false
+    choices: [ droplet, kubernetes ]
+
 extends_documentation_fragment:
   - community.digitalocean.common.documentation
 """
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean Droplet sizes
-  community.digitalocean.sizes_info:
+- name: Get DigitalOcean 1-Click applications
+  community.digitalocean.one_click_info:
     token: "{{ token }}"
+
+- name: Get DigitalOcean Droplet 1-Click applications
+  community.digitalocean.one_click_info:
+    token: "{{ token }}"
+    type: droplet
+
+- name: Get DigitalOcean Kubernetes 1-Click applications
+  community.digitalocean.one_click_info:
+    token: "{{ token }}"
+    type: kubernetes
 """
 
 
 RETURN = r"""
-sizes:
-  description: DigitalOcean Droplet sizes information.
+account:
+  description: DigitalOcean account information.
   returned: success
   type: list
   elements: dict
   sample:
-    - available: true
-      description: Basic
-      disk: 10
-      memory: 512
-      price_hourly: 0.00595
-      price_monthly: 4.0
-      regions:
-        - ams3
-        - fra1
-        - nyc1
-        - sfo3
-        - sgp1
-        - syd1
-      slug: s-1vcpu-512mb-10gb
-      transfer: 0.5
-      vcpus: 1
+    - slug: cpanel-cpanelwhm-7-9
+      type: droplet
+    - slug: npool
+      type: droplet
+    - slug: optimajet-workflowserver-18-04
+      type: droplet
     - ...
+    - slug: netdata
+      type: kubernetes
+    - slug: okteto
+      type: kubernetes
+    - slug: fyipe
+      type: kubernetes
 msg:
-  description: Sizes result information.
+  description: 1-Click applications result information.
   returned: failed
   type: str
-  sample: Sizes not found
+  sample: 1-Click applications not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -98,10 +112,17 @@ else:
 def core(module):
     client = Client(token=module.params.get("token"))
     try:
-        sizes = client.sizes.list()
-        if sizes:
-            module.exit_json(changed=False, sizes=sizes)
-        module.fail_json(changed=False, msg="Sizes not found")
+        one_clicks_info = client.one_clicks.list()
+        one_clicks = one_clicks_info.get("1_clicks")
+        if one_clicks:
+            click_type = module.params.get("type")
+            if click_type:
+                filtered_clicks = list(
+                    filter(lambda val: val.get("type") == click_type, one_clicks)
+                )
+                module.exit_json(changed=False, one_clicks=filtered_clicks)
+            module.exit_json(changed=False, one_clicks=one_clicks)
+        module.fail_json(changed=False, msg="1-Click applications not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,
@@ -113,6 +134,9 @@ def core(module):
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
+    argument_spec.update(
+        type=dict(type="str", choices=["droplet", "kubernetes"], required=False),
+    )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     if not HAS_AZURE_LIBRARY:
         module.fail_json(

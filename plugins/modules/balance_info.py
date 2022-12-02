@@ -64,6 +64,13 @@ balance:
       returned: success
       type: string
       sample: '0.00'
+msg:
+  description: Balance result information.
+  returned: always
+  type: str
+  sample:
+    - Current balance information
+    - Balance not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -96,7 +103,11 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         balance = client.balance.get()
-        module.exit_json(changed=False, balance=balance)
+        if balance:
+            module.exit_json(
+                changed=False, msg="Current balance information", balance=balance
+            )
+        module.fail_json(changed=False, msg="Current balance information not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

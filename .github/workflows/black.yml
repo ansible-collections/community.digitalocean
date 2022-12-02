@@ -2,10 +2,12 @@
 name: Python psf/black test
 
 on:
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+  # pull_request:
+  #   types: [ opened, synchronize, reopened ]
   push:
-    branches: [ main ]
+    # branches: [ main ]
+    branches:
+      - v2-pydo
 
 jobs:
   lint:

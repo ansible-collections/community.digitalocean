@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: sizes_info
+module: ssh_keys_info
 
-short_description: List all of available Droplet sizes
+short_description: List all of the keys in your account
 
 version_added: 2.0.0
 
 description:
-  - List all of available Droplet sizes.
-  - View the API documentation at (https://docs.digitalocean.com/reference/api/api-reference/#operation/sizes_list).
+  - List all of the keys in your account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -32,41 +32,29 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get DigitalOcean Droplet sizes
-  community.digitalocean.sizes_info:
+- name: Get DigitalOcean SSH keys
+  community.digitalocean.ssh_keys_info:
     token: "{{ token }}"
 """
 
 
 RETURN = r"""
-sizes:
-  description: DigitalOcean Droplet sizes information.
+ssh_keys:
+  description: DigitalOcean SSH keys.
   returned: success
   type: list
   elements: dict
   sample:
-    - available: true
-      description: Basic
-      disk: 10
-      memory: 512
-      price_hourly: 0.00595
-      price_monthly: 4.0
-      regions:
-        - ams3
-        - fra1
-        - nyc1
-        - sfo3
-        - sgp1
-        - syd1
-      slug: s-1vcpu-512mb-10gb
-      transfer: 0.5
-      vcpus: 1
-    - ...
+    - fingerprint: 40:24:52:5c:e1:81:f7:ff:76:70:14:b8:81:f9:ee:f1
+      id: 36702776
+      name: SSH key name
+      public_key: |-
+        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC...x2Ck1mq67aVba+B0wxSGN+j7Fi27quUw== SSH key comment
 msg:
-  description: Sizes result information.
+  description: SSH keys result information.
   returned: failed
   type: str
-  sample: Sizes not found
+  sample: SSH keys not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -98,10 +86,11 @@ else:
 def core(module):
     client = Client(token=module.params.get("token"))
     try:
-        sizes = client.sizes.list()
-        if sizes:
-            module.exit_json(changed=False, sizes=sizes)
-        module.fail_json(changed=False, msg="Sizes not found")
+        ssh_keys_list = client.ssh_keys.list()
+        ssh_keys = ssh_keys_list.get("ssh_keys")
+        if ssh_keys:
+            module.exit_json(changed=False, ssh_keys=ssh_keys)
+        module.fail_json(changed=False, msg="SSH keys not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

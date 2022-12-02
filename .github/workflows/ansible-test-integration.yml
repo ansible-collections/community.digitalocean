@@ -14,7 +14,8 @@ concurrency:
 
 jobs:
   integration:
-    runs-on: ubuntu-latest
+    # https://github.com/ansible-collections/news-for-maintainers/issues/28
+    runs-on: ubuntu-20.04
     timeout-minutes: 40
     name: Integration (Ⓐ${{ matrix.ansible }}/${{ matrix.module }})
     strategy:
@@ -23,16 +24,19 @@ jobs:
       matrix:
         ansible:
         # - stable-2.12
-        # - stable-2.13
-        - stable-2.14
-        - devel
+        - stable-2.13
+        # - stable-2.14
+        # - devel
         module:
           - account_info
           - balance_info
           - billing_history_info
           - cdn_endpoints_info
+          - cdn_endpoints
+          - one_clicks_info
           - regions_info
           - sizes_info
+          - ssh_keys_info
           - volumes_info
           - volumes
 
@@ -53,3 +57,4 @@ jobs:
           target-python-version: 3.9
           testing-type: integration
           test-deps: community.general
+          # docker-image: quay.io/ansible/default-test-container:7.4.0

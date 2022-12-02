@@ -1,11 +1,13 @@
 name: Sanity tests
 on:
-  pull_request:
-    types: [ opened, synchronize, reopened ]
+  # pull_request:
+  #   types: [ opened, synchronize, reopened ]
   push:
-    branches: [ main ]
-  schedule:
-    - cron: '0 6 * * *'
+    # branches: [ main ]
+    branches:
+      - v2-pydo
+  # schedule:
+  #   - cron: '0 6 * * *'
 
 jobs:
 
@@ -16,21 +18,25 @@ jobs:
       fail-fast: false
       matrix:
         ansible:
-        - stable-2.12
+        # - stable-2.12
         - stable-2.13
-        - stable-2.14
-        - devel
+        # - stable-2.14
+        # - devel
         module:
           - account_info
           - balance_info
           - billing_history_info
           - cdn_endpoints_info
+          - cdn_endpoints
+          - one_clicks_info
           - regions_info
           - sizes_info
+          - ssh_keys_info
           - volumes_info
           - volumes
 
-    runs-on: ubuntu-latest
+    # https://github.com/ansible-collections/news-for-maintainers/issues/28
+    runs-on: ubuntu-20.04
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -40,3 +46,4 @@ jobs:
           target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: sanity
+          # docker-image: quay.io/ansible/default-test-container:7.4.0

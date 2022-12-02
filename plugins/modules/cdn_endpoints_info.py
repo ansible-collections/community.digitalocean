@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: cdn_endpoints_info
 
-short_description: Get current CDN endpoints
+short_description: List all of the CDN endpoints available on your account
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current CDN endpoints.
+  - List all of the CDN endpoints available on your account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/cdn_list_endpoints).
 
 author: Mark Mercado (@mamercad)
 
@@ -57,6 +58,13 @@ cdn:
           description: Total number of CDN endpoints.
           type: int
           sample: 0
+msg:
+  description: CDN endpoints result information.
+  returned: always
+  type: str
+  sample:
+    - Current CDN endpoints
+    - Current CDN endpoints not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -89,7 +97,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         cdn = client.cdn.list_endpoints()
-        module.exit_json(changed=False, cdn=cdn)
+        if cdn:
+            module.exit_json(changed=False, msg="Current CDN endpointks", cdn=cdn)
+        module.fail_json(changed=False, msg="Current CDN endpoints not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

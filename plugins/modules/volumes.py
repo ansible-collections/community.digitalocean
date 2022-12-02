@@ -17,7 +17,19 @@ short_description: Create or delete volumes
 version_added: 2.0.0
 
 description:
-  - This module creates or deletes volumes.
+  - Creates or deletes volumes.
+  - View the create API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/volumes_create).
+  - View the delete API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/volumes_delete_byName).
+  - |
+    Optionally, a filesystem_type attribute may be provided in order to
+    jautomatically format the volume's filesystem.
+  - |
+    Pre-formatted volumes are automatically mounted when attached to Ubuntu,
+    Debian, Fedora, Fedora Atomic, and CentOS Droplets created on or after April
+    26, 2018.
+  - |
+    Attaching pre-formatted volumes to Droplets without support for
+    auto-mounting is not recommended.
 
 author: Mark Mercado (@mamercad)
 
@@ -94,6 +106,13 @@ EXAMPLES = r"""
     name: test-vol-delete-1
     region: nyc3
     size_gigabytes: 1
+
+- name: Delete DigitalOcean volume
+  community.digitalocean.volumes:
+    token: "{{ token }}"
+    state: absentj
+    name: test-vol-delete-1
+    region: nyc3
 """
 
 
@@ -140,7 +159,6 @@ volume:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
-    DigitalOceanFunctions,
 )
 
 import traceback
@@ -164,46 +182,46 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-def find_volume(module, client, volume_name, region):
-    page = 1
-    paginated = True
-    while paginated:
-        try:
-            resp = client.volumes.list(per_page=10, page=page)
-            for volume in resp.get("volumes"):
-                if volume.get("name") == volume_name:
-                    volume_region = volume.get("region")
-                    if volume_region:
-                        volume_region_slug = volume_region.get("slug")
-                        if volume_region_slug == region:
-                            return volume
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            module.fail_json(changed=False, msg=error.get("Message"), error=error)
+# def find_volume(module, client, volume_name, region):
+#     page = 1
+#     paginated = True
+#     while paginated:
+#         try:
+#             resp = client.volumes.list(per_page=10, page=page)
+#             for volume in resp.get("volumes"):
+#                 if volume.get("name") == volume_name:
+#                     volume_region = volume.get("region")
+#                     if volume_region:
+#                         volume_region_slug = volume_region.get("slug")
+#                         if volume_region_slug == region:
+#                             return volume
+#         except HttpResponseError as err:
+#             error = {
+#                 "Message": err.error.message,
+#                 "Status Code": err.status_code,
+#                 "Reason": err.reason,
+#             }
+#             module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
-        next_page = DigitalOceanFunctions.get_next_page(links=resp.get("links"))
-        if next_page:
-            return next_page
+#         next_page = DigitalOceanFunctions.get_next_page(links=resp.get("links"))
+#         if next_page:
+#             return next_page
 
-        paginated = False
+#         paginated = False
 
-    return None
+#     return None
 
 
-def delete_volume(module, client, volume_id):
-    try:
-        client.volumes.delete(volume_id=volume_id)
-    except HttpResponseError as err:
-        error = {
-            "Message": err.error.message,
-            "Status Code": err.status_code,
-            "Reason": err.reason,
-        }
-        module.fail_json(changed=False, msg=error.get("Message"), error=error)
+# def delete_volume(module, client, volume_id):
+#     try:
+#         client.volumes.delete(volume_id=volume_id)
+#     except HttpResponseError as err:
+#         error = {
+#             "Message": err.error.message,
+#             "Status Code": err.status_code,
+#             "Reason": err.reason,
+#         }
+#         module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
 
 def core(module):

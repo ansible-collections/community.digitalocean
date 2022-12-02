@@ -57,10 +57,12 @@ account:
     uuid: fab13a8a-99e3-4ffd-a587-b8a7789f0091
     volume_limit: 100
 msg:
-  description: Account information result information.
-  returned: failed
+  description: Account information result.
+  returned: always
+  type: str
   sample:
-    - Account information not found
+    - Current account information
+    - Current account information not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -95,8 +97,10 @@ def core(module):
         account = client.account.get()
         account_info = account.get("account")
         if account_info:
-            module.exit_json(changed=False, account=account_info)
-        module.fail_json(changed=False, msg="Account information not found")
+            module.exit_json(
+                changed=False, msg="Current account information", account=account_info
+            )
+        module.fail_json(changed=False, msg="Current account information not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,

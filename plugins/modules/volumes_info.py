@@ -12,12 +12,13 @@ DOCUMENTATION = r"""
 ---
 module: volumes_info
 
-short_description: Get current volumes
+short_description: List all of the block storage volumes available on your account
 
 version_added: 2.0.0
 
 description:
-  - This module gets the current volumes.
+  - List all of the block storage volumes available on your account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/volumes_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -41,13 +42,39 @@ RETURN = r"""
 volumes:
   description: DigitalOcean volumes.
   returned: success
-  type: dict
+  type: list
+  elements: dict
   sample:
-    links:
-      pages: {}
-    meta:
-      total: 0
-    volumes: []
+    - created_at: '2022-11-28T02:07:45Z'
+      description: ''
+      droplet_ids: []
+      filesystem_label: ''
+      filesystem_type: ''
+      id: 72b1d6de-6ec1-11ed-8a0d-0a58ac1466a8
+      name: test-vol-delete-1
+      region:
+        available: true
+        features:
+          - backups
+          - ipv6
+          - metadata
+          - install_agent
+          - storage
+          - image_transfer
+        name: New York 3
+        sizes:
+          - s-1vcpu-1gb
+          - s-1vcpu-1gb-amd
+          - s-1vcpu-1gb-intel
+          - ...
+        slug: nyc3
+      size_gigabytes: 1
+      tags: []
+msg:
+  description: Volumes result information.
+  returned: failed
+  type: str
+  sample: Volumes not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -80,7 +107,9 @@ def core(module):
     client = Client(token=module.params.get("token"))
     try:
         volumes = client.volumes.list()
-        module.exit_json(changed=False, volumes=volumes)
+        if volumes:
+            module.exit_json(changed=False, volumes=volumes)
+        module.fail_json(changed=False, msg="Volumes not found")
     except HttpResponseError as err:
         error = {
             "Message": err.error.message,
