@@ -45,3 +45,4 @@ jobs:
           target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: sanity
+          docker-image: quay.io/ansible/default-test-container:7.4.0

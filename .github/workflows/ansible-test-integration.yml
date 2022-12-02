@@ -56,3 +56,4 @@ jobs:
           target-python-version: 3.9
           testing-type: integration
           test-deps: community.general
+          docker-image: quay.io/ansible/default-test-container:7.4.0
