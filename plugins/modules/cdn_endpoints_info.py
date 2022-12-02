@@ -63,6 +63,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -96,22 +97,20 @@ class CDNEndpointsInformation:
             self.present()
 
     def present(self):
-        try:
-            endpoints = self.client.cdn.list_endpoints()
-            if endpoints.get("endpoints"):
-                self.module.exit_json(
-                    changed=False,
-                    msg="Current CDN endpoints",
-                    endpoints=endpoints.get("endpoints"),
-                )
-            self.module.exit_json(changed=False, msg="No CDN endpoints", endpoints=[])
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        cdn_endpoints = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.cdn,
+            meth="list_endpoints",
+            key="endpoints",
+            exc=HttpResponseError,
+        )
+        if cdn_endpoints:
+            self.module.exit_json(
+                changed=False,
+                msg="Current CDN endpoints",
+                endpoints=cdn_endpoints,
+            )
+        self.module.exit_json(changed=False, msg="No CDN endpoints", endpoints=[])
 
 
 def main():
