@@ -47,7 +47,7 @@ ssh_keys:
   sample:
     - id: 289794
       fingerprint: '3b:16:e4:bf:8b:00:8b:b8:59:8c:a9:d3:f0:19:fa:45'
-      public_key: 'ssh-rsa ANOTHEREXAMPLEaC1yc2EAAAADAQABAAAAQQDDHr/jh2Jy4yALcK4JyWbVkPRaWmhck3IgCoeOO3z1e2dBowLh64QAM+Qb72pxekALga2oi4GvT+TlWNhzPH4V anotherexample'
+      public_key: 'ssh-rsa ANOTHEREXAMPLEaC1yc2EAAAADAQABAAAAQ...owLh64b72pxekALga2oi4GvT+TlWNhzPH4V anotherexample'
       name: Other Public Key
 msg:
   description: SSH keys result information.
