@@ -36,4 +36,4 @@ jobs:
             ansible.netcommon:==4.1.0
             ansible.utils
             community.general:==6.0.1
-          docker-image: quay.io/ansible/default-test-container:7.4.0
+          # docker-image: quay.io/ansible/default-test-container:7.4.0
