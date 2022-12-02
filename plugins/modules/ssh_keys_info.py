@@ -45,18 +45,17 @@ ssh_keys:
   type: list
   elements: dict
   sample:
-    - fingerprint: 40:24:52:5c:e1:81:f7:ff:76:70:14:b8:81:f9:ee:f1
-      id: 36702776
-      name: SSH key name
-      public_key: |-
-        ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC...x2Ck1mq67aVba+B0wxSGN+j7Fi27quUw== SSH key comment
+    - id: 289794
+      fingerprint: '3b:16:e4:bf:8b:00:8b:b8:59:8c:a9:d3:f0:19:fa:45'
+      public_key: 'ssh-rsa ANOTHEREXAMPLEaC1yc2EAAAADAQABAAAAQQDDHr/jh2Jy4yALcK4JyWbVkPRaWmhck3IgCoeOO3z1e2dBowLh64QAM+Qb72pxekALga2oi4GvT+TlWNhzPH4V anotherexample'
+      name: Other Public Key
 msg:
   description: SSH keys result information.
   returned: always
   type: str
   sample:
     - Current SSH keys
-    - Current SSH keys not found
+    - No SSH keys
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -96,13 +95,14 @@ class SSHKeysInformation:
 
     def present(self):
         try:
-            ssh_keys_list = self.client.ssh_keys.list()
-            ssh_keys = ssh_keys_list.get("ssh_keys")
-            if ssh_keys:
+            ssh_keys = self.client.ssh_keys.list()
+            if ssh_keys.get("ssh_keys"):
                 self.module.exit_json(
-                    changed=False, msg="Current SSH keys", ssh_keys=ssh_keys
+                    changed=False,
+                    msg="Current SSH keys",
+                    ssh_keys=ssh_keys.get("ssh_keys"),
                 )
-            self.module.fail_json(changed=False, msg="Current SSH keys not found")
+            self.module.exit_json(changed=False, msg="No SSH keys", ssh_keys=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,

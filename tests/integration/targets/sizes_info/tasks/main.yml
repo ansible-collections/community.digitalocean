@@ -13,13 +13,13 @@
         token: "{{ do_api_key }}"
       register: result
 
+    - name: Assert result message
+      ansible.builtin.assert:
+        that: result.msg is string
+
     - name: Verify Droplet sizes
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
-          - regult.msg == "Current Droplet sizes"
-          - result.sizes is defined
-          - result.sizes.links is defined
-          - result.sizes.meta is defined
-          - result.sizes.sizes is defined
+          - result.msg == "Current Droplet sizes"
+          - result.sizes is iterable

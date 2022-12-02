@@ -46,12 +46,12 @@ volumes:
   elements: dict
   sample:
     - created_at: '2022-11-28T02:07:45Z'
-      description: ''
+      description: Block store for examples
       droplet_ids: []
-      filesystem_label: ''
-      filesystem_type: ''
+      filesystem_label: example
+      filesystem_type: ext4
       id: 72b1d6de-6ec1-11ed-8a0d-0a58ac1466a8
-      name: test-vol-delete-1
+      name: example
       region:
         available: true
         features:
@@ -76,7 +76,7 @@ msg:
   type: str
   sample:
     - Current volumes
-    - Current volumes not found
+    - No volumes
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -117,11 +117,11 @@ class VolumesInformation:
     def present(self):
         try:
             volumes = self.client.volumes.list()
-            if volumes:
+            if volumes.get("volumes"):
                 self.module.exit_json(
-                    changed=False, msg="Current volumes", volumes=volumes
+                    changed=False, msg="Current volumes", volumes=volumes.get("volumes")
                 )
-            self.module.fail_json(changed=False, msg="Current volumes not found")
+            self.module.exit_json(changed=False, msg="No volumes", volumes=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,

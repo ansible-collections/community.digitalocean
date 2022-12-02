@@ -69,7 +69,7 @@ msg:
   type: str
   sample:
     - Current regions
-    - Current regions not found
+    - No regions
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -110,11 +110,11 @@ class RegionsInformation:
     def present(self):
         try:
             regions = self.client.regions.list()
-            if regions:
+            if regions.get("regions"):
                 self.module.exit_json(
-                    changed=False, msg="Curreng regions", regions=regions
+                    changed=False, msg="Current regions", regions=regions.get("regions")
                 )
-            self.module.fail_json(changed=False, msg="Current regions not found")
+            self.module.exit_json(changed=False, msg="No regions", regions=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,

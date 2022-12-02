@@ -57,7 +57,7 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-account:
+one_clicks:
   description: DigitalOcean account information.
   returned: success
   type: list

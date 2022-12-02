@@ -44,26 +44,10 @@ balance:
   returned: success
   type: dict
   sample:
-    account_balance:
-      description: Current account balance.
-      returned: success
-      type: string
-      sample: '0.0'
-    generated_at:
-      description: When the account balance was generated.
-      returned: success
-      type: string
-      sample: '2022-11-24T00:00:00Z'
-    month_to_date_balance:
-      description: Month-to-date account balance.
-      returned: success
-      type: string
-      sample: '0.00'
-    month_to_date_usage:
-      description: Month-to-date account spend.
-      returned: success
-      type: string
-      sample: '0.00'
+    month_to_date_balance: 23.44
+    account_balance: 12.23
+    month_to_date_usage: 11.21
+    generated_at: '2019-07-09T15:01:12Z'
 msg:
   description: Balance result information.
   returned: always

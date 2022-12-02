@@ -13,10 +13,12 @@
         token: "{{ do_api_key }}"
       register: result
 
+    - name: Assert result message
+      ansible.builtin.assert:
+        that: result.msg is string
+
     - name: Verify SSH keys
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
-          - result.msg == "Current SSH keys"
-          - result.ssh_keys is defined
+          - result.ssh_keys is iterable

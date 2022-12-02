@@ -39,32 +39,25 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-cdn:
+endpoints:
   description: CDN endpoints.
-  returned: success
-  type: dict
+  returned: always
+  type: list
   sample:
-    endpoints:
-      description: Current CDN endpoints.
-      returned: success
-      type: list
-      elements: string
-    meta:
-      description: CDN endpoints metadata.
-      returned: success
-      type: dict
-      sample:
-        total:
-          description: Total number of CDN endpoints.
-          type: int
-          sample: 0
+    - id: 19f06b6a-3ace-4315-b086-499a0e521b76
+      origin: static-images.nyc3.digitaloceanspaces.com
+      endpoint: static-images.nyc3.cdn.digitaloceanspaces.com
+      created_at: '2018-07-19T15:04:16Z'
+      certificate_id: 892071a0-bb95-49bc-8021-3afd67a210bf
+      custom_domain: static.example.com
+      ttl: 3600
 msg:
   description: CDN endpoints result information.
   returned: always
   type: str
   sample:
     - Current CDN endpoints
-    - Current CDN endpoints not found
+    - No CDN endpoints
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -104,12 +97,14 @@ class CDNEndpointsInformation:
 
     def present(self):
         try:
-            cdn = self.client.cdn.list_endpoints()
-            if cdn:
+            endpoints = self.client.cdn.list_endpoints()
+            if endpoints.get("endpoints"):
                 self.module.exit_json(
-                    changed=False, msg="Current CDN endpoints", cdn=cdn
+                    changed=False,
+                    msg="Current CDN endpoints",
+                    endpoints=endpoints.get("endpoints"),
                 )
-            self.module.fail_json(changed=False, msg="Current CDN endpoints not found")
+            self.module.exit_json(changed=False, msg="No CDN endpoints", endpoints=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,

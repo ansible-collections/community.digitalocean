@@ -68,7 +68,7 @@ msg:
   type: str
   sample:
     - Current Droplet sizes
-    - Current Droplet sizes not found
+    - No Droplet sizes
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -109,11 +109,11 @@ class DropletSizesInformation:
     def present(self):
         try:
             sizes = self.client.sizes.list()
-            if sizes:
+            if sizes.get("sizes"):
                 self.module.exit_json(
-                    changed=False, msg="Current Droplet sizes", sizes=sizes
+                    changed=False, msg="Current Droplet sizes", sizes=sizes.get("sizes")
                 )
-            self.module.fail_json(changed=False, msg="Current Droplet sizes not found")
+            self.module.exit_json(changed=False, msg="No Droplet sizes", sizes=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,

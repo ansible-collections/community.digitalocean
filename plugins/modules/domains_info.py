@@ -61,7 +61,7 @@ msg:
   type: str
   sample:
     - Current domains
-    - Current domains not found
+    - No domains
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -102,11 +102,11 @@ class DomainsInformation:
     def present(self):
         try:
             domains = self.client.domains.list()
-            if domains:
+            if domains.get("domains"):
                 self.module.exit_json(
                     changed=False, msg="Current domains", domains=domains.get("domains")
                 )
-            self.module.fail_json(changed=False, msg="Current domains not found")
+            self.module.exit_json(changed=False, msg="No domains", domains=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,

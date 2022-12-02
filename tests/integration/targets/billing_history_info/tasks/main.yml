@@ -12,7 +12,11 @@
       community.digitalocean.billing_history_info:
         token: "{{ do_api_key }}"
       register: result
-      ignore_errors: true
+      ignore_errors: true  # NOTE: Might not have any billing history (free account)
+
+    - name: Assert result message
+      ansible.builtin.assert:
+        that: result.msg is string
 
     - name: Verify billing history information
       when: result.msg == "Current billing history"

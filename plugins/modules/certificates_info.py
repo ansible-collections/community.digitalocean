@@ -10,15 +10,15 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: account_info
+module: certificates_info
 
-short_description: Show information about the current user account
+short_description: List all of the certificates available on your account
 
 version_added: 2.0.0
 
 description:
-  - Show information about the current user account.
-  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/account_get).
+  - List all of the certificates available on your account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/certificates_list).
 
 author: Mark Mercado (@mamercad)
 
@@ -32,35 +32,33 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get account information
-  community.digitalocean.account_info:
+- name: Get certificates
+  community.digitalocean.certificates_info:
     token: "{{ token }}"
 """
 
 
 RETURN = r"""
-account:
-  description: Account information.
+certificates:
+  description: Certificates.
   returned: success
   type: dict
   sample:
-    droplet_limit: 25
-    floating_ip_limit: 5
-    email: sammy@digitalocean.com
-    uuid": b6fr89dbf6d9156cace5f3c78dc9851d957381ef
-    email_verified": true,
-    status": active
-    status_message: ' '
-    team:
-      uuid: 5df3e3004a17e242b7c20ca6c9fc25b701a47ece
-      name: My Team
+    - id: 892071a0-bb95-49bc-8021-3afd67a210bf
+      name: web-cert-01
+      not_after: '2017-02-22T00:23:00Z',
+      sha1_fingerprint: dfcc9f57d86bf58e321c2c6c31c7a971be244ac7
+      created_at: '2017-02-08T16:02:37Z'
+      dns_names: [],
+      state: verified
+      type: custom
 msg:
-  description: Account information result.
+  description: Certificates result information.
   returned: always
   type: str
   sample:
-    - Current account information
-    - Current account information not found
+    - Current certificates
+    - No certificates
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -89,7 +87,7 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class AccountInformation:
+class CertificatesInformation:
     def __init__(self, module):
         """Class constructor."""
         self.module = module
@@ -99,19 +97,15 @@ class AccountInformation:
             self.present()
 
     def present(self):
-        """Get the Account information."""
         try:
-            account = self.client.account.get()
-            account_info = account.get("account")
-            if account_info:
+            certificates = self.client.certificates.list()
+            if certificates.get("certificates"):
                 self.module.exit_json(
                     changed=False,
-                    msg="Current account information",
-                    account=account_info,
+                    msg="Current certificates",
+                    certificates=certificates.get("certificates"),
                 )
-            self.module.fail_json(
-                changed=False, msg="Current account information not found"
-            )
+            self.module.exit_json(changed=False, msg="No certificates", certificates=[])
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -135,7 +129,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    AccountInformation(module)
+    CertificatesInformation(module)
 
 
 if __name__ == "__main__":

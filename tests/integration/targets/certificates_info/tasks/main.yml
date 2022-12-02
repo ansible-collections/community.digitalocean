@@ -8,8 +8,8 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get balance information
-      community.digitalocean.balance_info:
+    - name: Get certificates
+      community.digitalocean.certificates_info:
         token: "{{ do_api_key }}"
       register: result
 
@@ -17,13 +17,8 @@
       ansible.builtin.assert:
         that: result.msg is string
 
-    - name: Verify balance information
+    - name: Verify certificates
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg == "Current balance information"
-          - result.balance is defined
-          - result.balance.account_balance is defined
-          - result.balance.generated_at is defined
-          - result.balance.month_to_date_balance is defined
-          - result.balance.month_to_date_usage is defined
+          - result.certificates is iterable

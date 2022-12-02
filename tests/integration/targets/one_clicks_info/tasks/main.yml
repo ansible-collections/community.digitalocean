@@ -13,17 +13,18 @@
         token: "{{ do_api_key }}"
       register: result
 
+    - name: Assert result message
+      ansible.builtin.assert:
+        that: result.msg is string
+
     - name: Verify 1-Clicks applications
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
           - result.msg == "Current 1-Click applications"
-          - result.one_clicks is defined
           - result.one_clicks is iterable
-          - result.one_clicks.0 is defined
-          - result.one_clicks.0.type is defined
-          - result.one_clicks.0.slug is defined
+          - result.one_clicks.0.type is string
+          - result.one_clicks.0.slug is string
 
     - name: Get Droplet 1-Click applications
       community.digitalocean.one_clicks_info:
@@ -35,13 +36,10 @@
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
           - result.msg == "Current Droplet 1-Click applications"
-          - result.one_clicks is defined
           - result.one_clicks is iterable
-          - result.one_clicks.0 is defined
-          - result.one_clicks.0.type is defined
-          - result.one_clicks.0.slug is defined
+          - result.one_clicks.0.type is string
+          - result.one_clicks.0.slug is string
 
     - name: Get Kubernetes 1-Click applications
       community.digitalocean.one_clicks_info:
@@ -53,10 +51,7 @@
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
           - result.msg == "Current Kubernetes 1-Click applications"
-          - result.one_clicks is defined
           - result.one_clicks is iterable
-          - result.one_clicks.0 is defined
-          - result.one_clicks.0.type is defined
-          - result.one_clicks.0.slug is defined
+          - result.one_clicks.0.type is string
+          - result.one_clicks.0.slug is string

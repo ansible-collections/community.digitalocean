@@ -13,11 +13,14 @@
         token: "{{ do_api_key }}"
       register: result
 
+    - name: Assert result message
+      ansible.builtin.assert:
+        that: result.msg is string
+
     - name: Verify account information
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
           - result.msg == "Current account information"
           - result.account is defined
           - result.account.droplet_limit is defined

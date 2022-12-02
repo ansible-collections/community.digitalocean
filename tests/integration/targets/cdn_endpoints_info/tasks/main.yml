@@ -13,13 +13,12 @@
         token: "{{ do_api_key }}"
       register: result
 
+    - name: Assert result message
+      ansible.builtin.assert:
+        that: result.msg is string
+
     - name: Verify CDN endpoints
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg is string
-          - result.msg == "Current CDN endpoints"
-          - result.cdn is defined
-          - result.cdn.endpoints is defined
-          - result.cdn.meta is defined
-          - result.cdn.meta.total is defined
+          - result.endpoints is iterable
