@@ -12,29 +12,39 @@ from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
 
 class DigitalOceanFunctions:
     @staticmethod
-    def get_next_page(links):
-        """
-        "links": {
-            "pages": {
-                "last": "https://api.digitalocean.com/v2/images?page=2",
-                "next": "https://api.digitalocean.com/v2/images?page=2"
-            }
-        }
-        """
-        pages = links.get("pages")
-        if pages:
-            next_page = pages.get("next")
-            if next_page:
-                parsed_url = urlparse(next_page)
-                if parsed_url:
-                    if hasattr(parsed_url, "query"):
-                        query = parsed_url.query
-                        if query:
-                            page_list = parse_qs(parsed_url.query).get("page")
-                            if type(page_list) is list:
-                                if len(page_list) == 1:
-                                    return page_list[0]
-        return None
+    def get_paginated(module, obj, meth, key, exc):
+        results = []
+        page = 1
+        paginated = True
+        while paginated:
+            page = 1
+            paginated = True
+            try:
+                fn = getattr(obj, meth)
+                resp = fn(per_page=DigitalOceanConstants.PAGE_SIZE, page=page)
+                results.extend(resp.get(key))
+                links = resp.get(key)
+                if links:
+                    pages = links.get("pages")
+                    if pages:
+                        next_page = pages.get("next")
+                        if next_page:
+                            parsed_url = urlparse(pages["next"])
+                            page = parse_qs(parsed_url.query)["page"][0]
+                        else:
+                            paginated = False
+                    else:
+                        paginated = False
+                else:
+                    paginated = False
+            except exc as err:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        return results
 
 
 class DigitalOceanConstants:
