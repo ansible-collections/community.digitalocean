@@ -40,6 +40,7 @@ jobs:
           - domain_records_info
           - droplets_info
           - firewalls_info
+          - images_info
           - one_clicks_info
           - regions_info
           - reserved_ips_info

@@ -8,14 +8,14 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Gather information about all images
-      community.digitalocean.digital_ocean_image_info:
-        oauth_token: "{{ do_api_key }}"
-        image_type: "{{ image_type }}"
+    - name: Get images
+      community.digitalocean.images_info:
+        token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify image info fetched
+    - name: Verify images
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.data is defined
+          - result.msg is string
+          - result.images is iterable
