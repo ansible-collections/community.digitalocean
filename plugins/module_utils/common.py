@@ -19,7 +19,9 @@ class DigitalOceanFunctions:
         while paginated:
             try:
                 fn = getattr(obj, meth)
-                resp = fn(per_page=DigitalOceanConstants.PAGE_SIZE, page=page, params=params)
+                resp = fn(
+                    per_page=DigitalOceanConstants.PAGE_SIZE, page=page, params=params
+                )
                 if key:
                     results.extend(resp.get(key))
                 else:
