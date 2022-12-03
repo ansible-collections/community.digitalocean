@@ -70,7 +70,7 @@ error:
     Reason: Unauthorized
     Status Code: 401
 msg:
-  description: Droplets result information.
+  description: Firewalls result information.
   returned: always
   type: str
   sample:
