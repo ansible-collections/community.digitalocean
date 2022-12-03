@@ -32,8 +32,8 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Get Droplets
-  community.digitalocean.droplets_info:
+- name: Get firewalls
+  community.digitalocean.firewalls_info:
     token: "{{ token }}"
 """
 
