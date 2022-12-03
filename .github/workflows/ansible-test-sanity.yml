@@ -29,6 +29,7 @@ jobs:
           - cdn_endpoints_info
           - cdn_endpoints
           - certificates_info
+          - certificates
           - one_clicks_info
           - regions_info
           - sizes_info
