@@ -36,6 +36,7 @@ jobs:
           - regions_info
           - sizes_info
           - ssh_keys_info
+          - tags_info
           - volumes_info
           - volumes
 
