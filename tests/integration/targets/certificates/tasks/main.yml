@@ -1,0 +1,106 @@
+---
+- block:
+
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
+
+    - name: Get certificates
+      community.digitalocean.certificates_info:
+        token: "{{ do_api_key }}"
+      register: result
+
+    - name: Create custom certificate
+      community.digitalocean.certificates:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ custom_cert.cn }}"
+        private_key: "{{ custom_cert.key }}"
+        leaf_certificate: "{{ custom_cert.crt }}"
+      register: result
+
+    - name: Verify certificate
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.msg == "Certificate " ~ custom_cert.cn ~ " created"
+          - result.certificate is defined
+          - result.certificate.created_at is string
+          - result.certificate.dns_names is iterable
+          - result.certificate.dns_names.0 == custom_cert.cn
+          - result.certificate.id is string
+          - result.certificate.name == custom_cert.cn
+          - result.certificate.not_after is string
+          - result.certificate.sha1_fingerprint is string
+          - result.certificate.state == "verified"
+          - result.certificate.type == "custom"
+
+    - name: Pause for 10 seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete custom certificate
+      community.digitalocean.certificates:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ custom_cert.cn }}"
+        private_key: "{{ custom_cert.key }}"
+        leaf_certificate: "{{ custom_cert.crt }}"
+      register: result
+
+    - name: Verify certificate
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.msg == "Certificate " ~ custom_cert.cn ~ " deleted"
+
+    - name: Create Let's Encrypt certificate
+      community.digitalocean.certificates:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ lets_encrypt_cert.cn }}"
+        dns_names: [ "{{ lets_encrypt_cert.cn }}" ]
+      register: result
+
+    - name: Verify certificate
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.msg == "Certificate " ~ lets_encrypt_cert.cn ~ " created"
+          - result.certificate is defined
+          - result.certificate.created_at is string
+          - result.certificate.dns_names is iterable
+          - result.certificate.dns_names.0 == lets_encrypt_cert.cn
+          - result.certificate.id is string
+          - result.certificate.name == lets_encrypt_cert.cn
+          - result.certificate.not_after is string
+          - result.certificate.sha1_fingerprint is string
+          - result.certificate.state == "verified"
+          - result.certificate.type == "lets_encrypt"
+
+  always:
+
+    - name: Delete custom certificate (leftover)
+      community.digitalocean.certificates:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ custom_cert.cn }}"
+        private_key: "{{ custom_cert.key }}"
+        leaf_certificate: "{{ custom_cert.crt }}"
+      register: result
+      ignore_errors: true
+
+    - name: Delete Let's Encrypt certificate (leftover)
+      community.digitalocean.certificates:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ lets_encrypt_cert.cn }}"
+        dns_names: [ "{{ lets_encrypt_cert.cn }}" ]
+      register: result
+      ignore_errors: true
