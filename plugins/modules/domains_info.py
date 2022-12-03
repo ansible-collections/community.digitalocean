@@ -67,6 +67,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -114,6 +115,24 @@ class DomainsInformation:
                 "Reason": err.reason,
             }
             self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+
+        # NOTE: This would be nice, but for some reason, domains.list() does not not have a per_page argument?!
+        #       https://pydo.readthedocs.io/en/latest/#pydo.operations.DomainsOperations.list
+        #
+        # domains = DigitalOceanFunctions.get_paginated(
+        #     module=self.module,
+        #     obj=self.client.domains,
+        #     meth="list",
+        #     key="domains",
+        #     exc=HttpResponseError,
+        # )
+        # if domains:
+        #     self.module.exit_json(
+        #         changed=False,
+        #         msg="Current domains",
+        #         domains=domains,
+        #     )
+        # self.module.exit_json(changed=False, msg="No domains", domains=[])
 
 
 def main():
