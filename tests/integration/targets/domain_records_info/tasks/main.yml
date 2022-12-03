@@ -1,0 +1,22 @@
+---
+- block:
+
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
+
+    - name: Get domain records
+      community.digitalocean.domain_records_info:
+        token: "{{ do_api_key }}"
+        domain_name: "{{ domain_name }}"
+      register: result
+
+    - name: Verify domain records
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+          - result.domain_records is iterable

@@ -32,6 +32,7 @@ jobs:
           - certificates
           - database_clusters_info
           - domains_info
+          - domain_records_info
           - one_clicks_info
           - regions_info
           - sizes_info
