@@ -95,6 +95,8 @@ msg:
     - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com created
     - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com deleted
     - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com exists
+    - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com updated
+    - CDN endpoint ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com not updated
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -138,7 +140,7 @@ class CDNEndpoints:
         elif self.state == "absent":
             self.absent()
 
-    def find(self):
+    def find_by_origin(self):
         """Finds and returns existing CDN based on the "origin" FQDN."""
         try:
             cdns = self.client.cdn.list_endpoints()
@@ -147,7 +149,7 @@ class CDNEndpoints:
                 return None
             for cdn in cdn_endpoints:
                 origin = cdn.get("origin")
-                if origin == self.module.params.get("origin"):
+                if origin == self.origin:
                     return cdn
             return None
         except HttpResponseError as err:
@@ -158,20 +160,63 @@ class CDNEndpoints:
             }
             self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
+    def is_same(self, found_cdn):
+        if self.origin != found_cdn.get("origin"):
+            return False
+        if self.ttl != found_cdn.get("ttl"):
+            return False
+        return True
+
     def present(self):
-        """Creates a CDN endpoint."""
+        """Creates or updates a CDN endpoint."""
+
+        found_cdn = self.find_by_origin()
+        if found_cdn:
+            if self.is_same(found_cdn=found_cdn):
+                self.module.exit_json(
+                    changed=False,
+                    msg=f"CDN endpoint {self.origin} exists",
+                    cdn=found_cdn,
+                )
+            try:
+                found_cdn_id = found_cdn.get("id")
+                body = {
+                    "ttl": self.ttl,
+                    "certificate_id": self.certificate_id,
+                    "custom_domain": self.custom_domain,
+                }
+                cdn = self.client.cdn.update_endpoints(cdn_id=found_cdn_id, body=body)
+                if cdn:
+                    self.module.exit_json(
+                        changed=True, msg=f"CDN endpoint {self.origin} updated", cdn=cdn
+                    )
+                self.module.fail_json(
+                    changed=False, msg=f"CDN endpoint {self.origin} not updated"
+                )
+            except HttpResponseError as err:
+                error = {
+                    "Message": err.error.message,
+                    "Status Code": err.status_code,
+                    "Reason": err.reason,
+                }
+                if err.status_code == 409:  # The CDN already exists
+                    existing_cdn = self.find()
+                    if not existing_cdn:
+                        self.module.fail_json(
+                            changed=False, msg=error.get("Message"), error=error
+                        )
+                    self.module.exit_json(changed=False, cdn=existing_cdn)
+                self.module.fail_json(
+                    changed=False, msg=error.get("Message"), error=error
+                )
+
         try:
             body = {
-                "origin": self.module.params.get("origin"),
-                "ttl": self.module.params.get("ttl"),
-                "certificate_id": self.module.params.get("certificate_id"),
-                "custom_domain": self.module.params.get("custom_domain"),
+                "origin": self.origin,
+                "ttl": self.ttl,
+                "certificate_id": self.certificate_id,
+                "custom_domain": self.custom_domain,
             }
-            cdn = self.find()
-            if cdn:
-                self.module.exit_json(
-                    changed=False, msg=f"CDN endpoint {self.origin} exists", cdn=cdn
-                )
             cdn = self.client.cdn.create_endpoint(body=body)
             if cdn:
                 self.module.exit_json(
@@ -197,18 +242,18 @@ class CDNEndpoints:
 
     def absent(self):
         """Removes a CDN endpoint."""
-        cdn = self.find()
-        if not cdn:
+        found_cdn = self.find()
+        if not found_cdn:
             self.module.fail_json(
                 changed=False, msg=f"CDN endpoint {self.origin} not found"
             )
-        cdn_id = cdn.get("id")
-        if not cdn_id:
+        found_cdn_id = found_cdn.get("id")
+        if not found_cdn_id:
             self.module.fail_json(
                 changed=False, msg=f"CDN endpoint {self.origin} ID not found"
             )
         try:
-            self.client.cdn.delete_endpoint(cdn_id=cdn_id)
+            self.client.cdn.delete_endpoint(cdn_id=found_cdn_id)
             self.module.exit_json(
                 changed=True, msg=f"CDN endpoint {self.origin} deleted"
             )
