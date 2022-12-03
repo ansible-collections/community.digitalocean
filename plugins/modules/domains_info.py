@@ -124,24 +124,6 @@ class DomainsInformation:
             }
             self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
-        # NOTE: Our API doesn't paginate (have per_page) for domains list:
-        #       https://docs.digitalocean.com/reference/api/api-reference/#operation/domains_list
-        #
-        # domains = DigitalOceanFunctions.get_paginated(
-        #     module=self.module,
-        #     obj=self.client.domains,
-        #     meth="list",
-        #     key="domains",
-        #     exc=HttpResponseError,
-        # )
-        # if domains:
-        #     self.module.exit_json(
-        #         changed=False,
-        #         msg="Current domains",
-        #         domains=domains,
-        #     )
-        # self.module.exit_json(changed=False, msg="No domains", domains=[])
-
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
