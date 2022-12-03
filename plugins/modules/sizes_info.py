@@ -74,6 +74,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -107,20 +108,20 @@ class DropletSizesInformation:
             self.present()
 
     def present(self):
-        try:
-            sizes = self.client.sizes.list()
-            if sizes.get("sizes"):
-                self.module.exit_json(
-                    changed=False, msg="Current Droplet sizes", sizes=sizes.get("sizes")
-                )
-            self.module.exit_json(changed=False, msg="No Droplet sizes", sizes=[])
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        sizes = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.sizes,
+            meth="list",
+            key="sizes",
+            exc=HttpResponseError,
+        )
+        if sizes:
+            self.module.exit_json(
+                changed=False,
+                msg="Current Droplet sizes",
+                sizes=sizes,
+            )
+        self.module.exit_json(changed=False, msg="No Droplet sizes", sizes=[])
 
 
 def main():

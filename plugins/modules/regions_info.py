@@ -75,6 +75,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -108,20 +109,20 @@ class RegionsInformation:
             self.present()
 
     def present(self):
-        try:
-            regions = self.client.regions.list()
-            if regions.get("regions"):
-                self.module.exit_json(
-                    changed=False, msg="Current regions", regions=regions.get("regions")
-                )
-            self.module.exit_json(changed=False, msg="No regions", regions=[])
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        regions = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.regions,
+            meth="list",
+            key="regions",
+            exc=HttpResponseError,
+        )
+        if regions:
+            self.module.exit_json(
+                changed=False,
+                msg="Current regions",
+                regions=regions,
+            )
+        self.module.exit_json(changed=False, msg="No regions", regions=[])
 
 
 def main():

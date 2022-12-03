@@ -82,6 +82,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -115,20 +116,20 @@ class VolumesInformation:
             self.present()
 
     def present(self):
-        try:
-            volumes = self.client.volumes.list()
-            if volumes.get("volumes"):
-                self.module.exit_json(
-                    changed=False, msg="Current volumes", volumes=volumes.get("volumes")
-                )
-            self.module.exit_json(changed=False, msg="No volumes", volumes=[])
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        volumes = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.volumes,
+            meth="list",
+            key="volumes",
+            exc=HttpResponseError,
+        )
+        if volumes:
+            self.module.exit_json(
+                changed=False,
+                msg="Current volumes",
+                volumes=volumes,
+            )
+        self.module.exit_json(changed=False, msg="No volumes", volumes=[])
 
 
 def main():

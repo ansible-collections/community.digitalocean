@@ -61,6 +61,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -94,22 +95,20 @@ class SSHKeysInformation:
             self.present()
 
     def present(self):
-        try:
-            ssh_keys = self.client.ssh_keys.list()
-            if ssh_keys.get("ssh_keys"):
-                self.module.exit_json(
-                    changed=False,
-                    msg="Current SSH keys",
-                    ssh_keys=ssh_keys.get("ssh_keys"),
-                )
-            self.module.exit_json(changed=False, msg="No SSH keys", ssh_keys=[])
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        ssh_keys = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.ssh_keys,
+            meth="list",
+            key="ssh_keys",
+            exc=HttpResponseError,
+        )
+        if ssh_keys:
+            self.module.exit_json(
+                changed=False,
+                msg="Current SSH keys",
+                ssh_keys=ssh_keys,
+            )
+        self.module.exit_json(changed=False, msg="No SSH keys", ssh_keys=[])
 
 
 def main():
