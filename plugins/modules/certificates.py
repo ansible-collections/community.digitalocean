@@ -30,25 +30,11 @@ options:
   name:
     description:
       - A unique human-readable name referring to a certificate.
+      - To create a certificate from Let's Encrypt, provide C(dns_names).
+      - To create a custom certificate, provide C(private_key), C(leaf_certificate), and optionally C(certificate_chain).
+      - View API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/certificates_create).
     required: true
     type: str
-  type:
-    description:
-      - A string representing the type of the certificate.
-      - The value will be custom for a user-uploaded certificate or C(lets_encrypt) for one automatically generated with Let's Encrypt.
-    type: str
-    choices: [ custom, lets_encrypt ]
-    default: lets_encrypt
-  lets_encrypt:
-    description:
-      - Request a certificate from Let's Encrypt.
-    type: bool
-    default: True
-  custom:
-    description:
-      - Create a custom certificate.
-    type: bool
-    default: False
   dns_names:
     description:
       - An array of fully qualified domain names (FQDNs) for which the certificate was issued.
@@ -162,13 +148,15 @@ class Certificates:
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
         self.name = module.params.get("name")
-        self.type = module.params.get("type")
-        self.lets_encrypt = module.params.get("lets_encrypt")
-        self.custom = module.params.get("custom")
         self.dns_names = module.params.get("dns_names")
         self.private_key = module.params.get("private_key")
         self.leaf_certificate = module.params.get("leaf_certificate")
         self.certificate_chain = module.params.get("certificate_chain")
+        self.type = None
+        if self.dns_names:
+            self.type = "lets_encrypt"
+        elif self.private_key and self.leaf_certificate:
+            self.type = "custom"
         if self.state == "present":
             self.present()
         elif self.state == "absent":
@@ -183,7 +171,6 @@ class Certificates:
             key="certificates",
             exc=HttpResponseError,
         )
-        # raise Exception(str(certificates))
         for certificate in certificates:
             if self.name == certificate.get("name"):
                 if self.type == certificate.get("type"):
@@ -257,8 +244,8 @@ class Certificates:
                     "Reason": err.reason,
                 }
                 if err.status_code == 202:  # Accepted (not in the API documentation)
-                    time.sleep(60)
-                    found_certificate = self.find_by_name()
+                    time.sleep(30)  # TODO: Put this in a loop or something
+                    found_certificate = self.find_by_name_and_type()
                     if found_certificate:
                         self.module.exit_json(
                             changed=True,
@@ -312,12 +299,7 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         name=dict(type="str", required=True),
-        type=dict(
-            type="str",
-            choices=["custom", "lets_encrypt"],
-            default="lets_encrypt",
-        ),
-        lets_encrypt=dict(type="bool", default=True),
+        lets_encrypt=dict(type="bool", default=False),
         custom=dict(type="bool", default=False),
         dns_names=dict(type="list", required=False),
         private_key=dict(type="str", required=False),
@@ -327,13 +309,16 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        required_if=(
-            ("state", "present", ("lets_encrypt", "custom"), True),
+        mutually_exclusive=(
+            ("dns_names", "private_key"),
+            ("dns_names", "leaf_certificate"),
+            ("dns_names", "certificate_chain"),
         ),
-        mutually_exclusive=(("lets_encrypt", "custom"),),
-        required_together=(("private_key", "leaf_certificate"),),
+        required_one_of=(
+            ("dns_names", "private_key"),
+        ),
         required_by={
-            "certificate_chain": ("private_key", "leaf_certificate"),
+            "private_key": "leaf_certificate",
         },
     )
     if not HAS_AZURE_LIBRARY:
