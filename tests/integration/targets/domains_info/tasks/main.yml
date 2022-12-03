@@ -8,13 +8,14 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Gather domain information
-      community.digitalocean.digital_ocean_domain_info:
-        oauth_token: "{{ do_api_key }}"
+    - name: Get domains
+      community.digitalocean.domains_info:
+        token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify domain information fetched
+    - name: Verify domains
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.data is defined
+          - result.msg is string
+          - result.domains is iterable
