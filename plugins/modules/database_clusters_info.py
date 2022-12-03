@@ -150,7 +150,9 @@ class DatabaseClustersInformation:
     def present(self):
         try:
             if self.tag_name:
-                database_clusters = self.client.databases.list_clusters(tag_name=self.tag_name)
+                database_clusters = self.client.databases.list_clusters(
+                    tag_name=self.tag_name
+                )
             else:
                 database_clusters = self.client.databases.list_clusters()
             databases = database_clusters.get("databases")
