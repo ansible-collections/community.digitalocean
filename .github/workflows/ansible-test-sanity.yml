@@ -40,6 +40,7 @@ jobs:
           - tags_info
           - volumes_info
           - volumes
+          - vpcs_info
 
     # https://github.com/ansible-collections/news-for-maintainers/issues/28
     runs-on: ubuntu-20.04

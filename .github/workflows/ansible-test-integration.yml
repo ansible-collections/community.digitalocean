@@ -45,6 +45,7 @@ jobs:
           - tags_info
           - volumes_info
           - volumes
+          - vpcs_info
 
     steps:
       - name: Perform testing
