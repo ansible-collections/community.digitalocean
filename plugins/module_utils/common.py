@@ -12,14 +12,14 @@ from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
 
 class DigitalOceanFunctions:
     @staticmethod
-    def get_paginated(module, obj, meth, key, exc):
+    def get_paginated(module, obj, meth, key, exc, params=None):
         results = []
         page = 1
         paginated = True
         while paginated:
             try:
                 fn = getattr(obj, meth)
-                resp = fn(per_page=DigitalOceanConstants.PAGE_SIZE, page=page)
+                resp = fn(per_page=DigitalOceanConstants.PAGE_SIZE, page=page, params=params)
                 if key:
                     results.extend(resp.get(key))
                 else:
