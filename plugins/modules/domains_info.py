@@ -116,8 +116,8 @@ class DomainsInformation:
             }
             self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
-        # NOTE: This would be nice, but for some reason, domains.list() does not not have a per_page argument?!
-        #       https://pydo.readthedocs.io/en/latest/#pydo.operations.DomainsOperations.list
+        # NOTE: Our API doesn't paginate (have per_page) for domains list:
+        #       https://docs.digitalocean.com/reference/api/api-reference/#operation/domains_list
         #
         # domains = DigitalOceanFunctions.get_paginated(
         #     module=self.module,
