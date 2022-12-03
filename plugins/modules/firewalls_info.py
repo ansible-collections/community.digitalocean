@@ -45,79 +45,22 @@ firewalls:
   type: list
   elements: dict
   sample:
-    - backup_ids: []
-      created_at: '2022-11-30T03:15:17Z'
-      disk: 25
-      features:
-        - droplet_agent
-        - private_networking
-      id: 328912829
-      image:
-        created_at: '2022-07-18T19:40:04Z'
-        description: Ubuntu 20.04 x86
-        distribution: Ubuntu
-        id: 112929454
-        min_disk_size: 7
-        name: 20.04 (LTS) x64
-        public: true
-        regions:
-        - nyc3
-        - ...
-        size_gigabytes: 0.63
-        slug: ubuntu-20-04-x64
-        status: available
-        tags: []
-        type: base
-      kernel: null
-      locked: false
-      memory: 8192
-      name: test-droplet-1
-      networks:
-        v4:
-        - gateway: 10.108.0.1
-          ip_address: 10.108.0.2
-          netmask: 255.255.240.0
-          type: private
-        - gateway: 159.65.240.1
-          ip_address: 159.65.142.211
-          netmask: 255.255.240.0
-          type: public
-        v6: []
-      next_backup_window: null
-      region:
-        available: true
-        features:
-          - backups
-          - ipv6
-          - metadata
-          - install_agent
-          - storage
-          - image_transfer
-        name: New York 3
-        sizes:
-          - s-1vcpu-1gb
-          - ...
-        slug: nyc3
-      size:
-        available: true
-        description: General Purpose
-        disk: 25
-        memory: 8192
-        price_hourly: 0.09375
-        price_monthly: 63.0
-        regions:
-          - ams3
-          - ...
-        slug: g-2vcpu-8gb
-        transfer: 4.0
-        vcpus: 2
-      size_slug: g-2vcpu-8gb
-      snapshot_ids: []
-      status: active
-      tags: []
-      vcpus: 2
-      volume_ids: []
-      vpc_uuid: 30f86d25-414e-434f-852d-993ed8d6815e
+    - id: fb6045f1-cf1d-4ca3-bfac-18832663025b
+      name: firewall
+      status: succeeded
+      inbound_rules:
+        - protocol: tcp
+          ports: '80'
+          sources:
+            load_balancer_uids:
+              - 4de7ac8b-495b-4884-9a69-1050c6793cd6
+        - protocol: tcp
+          ports: '22'
+          sources:
+            tags:
+              - gateway
+            addresses:
+              - 18.0.0.0/8
 error:
   description: DigitalOcean API error.
   returned: failure
