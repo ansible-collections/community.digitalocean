@@ -22,18 +22,17 @@
           - result.changed
           - result.msg is string
           - result.msg == "CDN endpoint " ~ origin ~ " created"
-          - result.cdn is defined
-          - result.cdn.endpoint is defined
-          - result.cdn.endpoint.created_at is defined
-          - result.cdn.endpoint.endpoint == endpoint
-          - result.cdn.endpoint.id is defined
-          - result.cdn.endpoint.origin is defined
-          - result.cdn.endpoint.origin == origin
-          - result.cdn.endpoint.ttl is defined
+          - result.endpoint is defined
+          - result.endpoint.created_at is defined
+          - result.endpoint.endpoint == endpoint
+          - result.endpoint.id is defined
+          - result.endpoint.origin is defined
+          - result.endpoint.origin == origin
+          - result.endpoint.ttl is defined
 
-    - name: Pause for a minute
+    - name: Pause for 10 seconds
       ansible.builtin.pause:
-        minutes: 1
+        seconds: 10
 
     - name: Update CDN endpoint
       community.digitalocean.cdn_endpoints:
@@ -49,18 +48,17 @@
           - result.changed
           - result.msg is string
           - result.msg == "CDN endpoint " ~ origin ~ " updated"
-          - result.cdn is defined
-          - result.cdn.endpoint is defined
-          - result.cdn.endpoint.created_at is defined
-          - result.cdn.endpoint.endpoint == endpoint
-          - result.cdn.endpoint.id is defined
-          - result.cdn.endpoint.origin is defined
-          - result.cdn.endpoint.origin == origin
-          - result.cdn.endpoint.ttl is defined
+          - result.endpoint is defined
+          - result.endpoint.created_at is defined
+          - result.endpoint.endpoint == endpoint
+          - result.endpoint.id is defined
+          - result.endpoint.origin is defined
+          - result.endpoint.origin == origin
+          - result.endpoint.ttl is defined
 
-    - name: Pause for a minute
+    - name: Pause for 10 seconds
       ansible.builtin.pause:
-        minutes: 1
+        seconds: 10
 
     - name: Update CDN endpoint (no change)
       community.digitalocean.cdn_endpoints:
@@ -75,19 +73,16 @@
         that:
           - not result.changed
           - result.msg is string
-          - result.msg == "CDN endpoint " ~ origin ~ " not updated"
-          - result.cdn is defined
-          - result.cdn.endpoint is defined
-          - result.cdn.endpoint.created_at is defined
-          - result.cdn.endpoint.endpoint == endpoint
-          - result.cdn.endpoint.id is defined
-          - result.cdn.endpoint.origin is defined
-          - result.cdn.endpoint.origin == origin
-          - result.cdn.endpoint.ttl is defined
+          - result.msg == "CDN endpoint " ~ origin ~ " exists"
+          - result.endpoint is defined
+          - result.endpoint.id is defined
+          - result.endpoint.origin is defined
+          - result.endpoint.origin == origin
+          - result.endpoint.ttl is defined
 
-    - name: Pause for a minute
+    - name: Pause for 10 seconds
       ansible.builtin.pause:
-        minutes: 1
+        seconds: 10
 
     - name: Delete CDN endpoint
       community.digitalocean.cdn_endpoints:
@@ -100,8 +95,9 @@
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.msg is defined
+          - result.msg is string
           - result.msg == "CDN endpoint " ~ origin ~ " deleted"
+          - result.endpoint is defined
 
   always:
 

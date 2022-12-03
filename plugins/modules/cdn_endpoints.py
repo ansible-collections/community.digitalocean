@@ -67,17 +67,16 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-cdn:
+endpoint:
   description: DigitalOcean CDN endpoint.
   returned: success
   type: dict
   sample:
-    endpoint:
-      created_at: '2022-12-01T15:05:42Z'
-      endpoint: ansible-gh-ci-space-0.nyc3.cdn.digitaloceanspaces.com
-      id: e6893ada-0fd7-48c2-88af-7c2784f404f2
-      origin: ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com
-      ttl: 3600
+    created_at: '2022-12-01T15:05:42Z'
+    endpoint: ansible-gh-ci-space-0.nyc3.cdn.digitaloceanspaces.com
+    id: e6893ada-0fd7-48c2-88af-7c2784f404f2
+    origin: ansible-gh-ci-space-0.nyc3.digitaloceanspaces.com
+    ttl: 3600
 error:
   description: DigitalOcean API error.
   returned: failure
@@ -158,7 +157,9 @@ class CDNEndpoints:
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, endpoint=[]
+            )
 
     def is_same(self, found_cdn):
         if self.origin != found_cdn.get("origin"):
@@ -176,7 +177,7 @@ class CDNEndpoints:
                 self.module.exit_json(
                     changed=False,
                     msg=f"CDN endpoint {self.origin} exists",
-                    cdn=found_cdn,
+                    endpoint=found_cdn,
                 )
             try:
                 found_cdn_id = found_cdn.get("id")
@@ -188,7 +189,9 @@ class CDNEndpoints:
                 cdn = self.client.cdn.update_endpoints(cdn_id=found_cdn_id, body=body)
                 if cdn:
                     self.module.exit_json(
-                        changed=True, msg=f"CDN endpoint {self.origin} updated", cdn=cdn
+                        changed=True,
+                        msg=f"CDN endpoint {self.origin} updated",
+                        endpoint=cdn.get("endpoint"),
                     )
                 self.module.fail_json(
                     changed=False, msg=f"CDN endpoint {self.origin} not updated"
@@ -200,14 +203,17 @@ class CDNEndpoints:
                     "Reason": err.reason,
                 }
                 if err.status_code == 409:  # The CDN already exists
-                    existing_cdn = self.find()
+                    existing_cdn = self.find_by_origin()
                     if not existing_cdn:
                         self.module.fail_json(
-                            changed=False, msg=error.get("Message"), error=error
+                            changed=False,
+                            msg=error.get("Message"),
+                            error=error,
+                            endpoint=[],
                         )
-                    self.module.exit_json(changed=False, cdn=existing_cdn)
+                    self.module.exit_json(changed=False, endpoint=existing_cdn)
                 self.module.fail_json(
-                    changed=False, msg=error.get("Message"), error=error
+                    changed=False, msg=error.get("Message"), error=error, endpiont=[]
                 )
 
         try:
@@ -220,10 +226,14 @@ class CDNEndpoints:
             cdn = self.client.cdn.create_endpoint(body=body)
             if cdn:
                 self.module.exit_json(
-                    changed=True, msg=f"CDN endpoint {self.origin} created", cdn=cdn
+                    changed=True,
+                    msg=f"CDN endpoint {self.origin} created",
+                    endpoint=cdn.get("endpoint"),
                 )
             self.module.fail_json(
-                changed=False, msg=f"CDN endpoint {self.origin} not created"
+                changed=False,
+                msg=f"CDN endpoint {self.origin} not created",
+                endpoint=[],
             )
         except HttpResponseError as err:
             error = {
@@ -232,22 +242,27 @@ class CDNEndpoints:
                 "Reason": err.reason,
             }
             if err.status_code == 409:  # The CDN already exists
-                existing_cdn = self.find()
+                existing_cdn = self.find_by_origin()
                 if not existing_cdn:
                     self.module.fail_json(
-                        changed=False, msg=error.get("Message"), error=error
+                        changed=False,
+                        msg=error.get("Message"),
+                        error=error,
+                        endpoint=[],
                     )
-                self.module.exit_json(changed=False, cdn=existing_cdn)
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+                self.module.exit_json(changed=False, endpoint=existing_cdn)
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, endpoint=[]
+            )
 
     def absent(self):
         """Removes a CDN endpoint."""
-        found_cdn = self.find()
+        found_cdn = self.find_by_origin()
         if not found_cdn:
             self.module.exit_json(
                 changed=False,
                 msg=f"CDN endpoint {self.origin} not found",
-                cdn=[],
+                endpoint=[],
             )
 
         found_cdn_id = found_cdn.get("id")
@@ -255,7 +270,7 @@ class CDNEndpoints:
             self.module.fail_json(
                 changed=False,
                 msg=f"CDN endpoint {self.origin} ID not found",
-                cdn=found_cdn,
+                endpoint=found_cdn,
             )
 
         try:
@@ -263,7 +278,7 @@ class CDNEndpoints:
             self.module.exit_json(
                 changed=True,
                 msg=f"CDN endpoint {self.origin} deleted",
-                cdn=found_cdn,
+                endpoint=found_cdn,
             )
         except HttpResponseError as err:
             error_message = None
@@ -274,7 +289,9 @@ class CDNEndpoints:
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            self.module.fail_json(changed=False, msg=error_message, error=error)
+            self.module.fail_json(
+                changed=False, msg=error_message, error=error, endpoint=found_cdn
+            )
 
 
 def main():
