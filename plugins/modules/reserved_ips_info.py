@@ -85,7 +85,6 @@ from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
-    DigitalOceanFunctions,
 )
 
 import traceback
