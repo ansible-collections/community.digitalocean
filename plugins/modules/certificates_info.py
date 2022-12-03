@@ -52,6 +52,14 @@ certificates:
       dns_names: []
       state: verified
       type: custom
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: Certificates result information.
   returned: always
