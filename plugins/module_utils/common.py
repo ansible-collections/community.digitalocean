@@ -17,13 +17,14 @@ class DigitalOceanFunctions:
         page = 1
         paginated = True
         while paginated:
-            page = 1
-            paginated = True
             try:
                 fn = getattr(obj, meth)
                 resp = fn(per_page=DigitalOceanConstants.PAGE_SIZE, page=page)
-                results.extend(resp.get(key))
-                links = resp.get(key)
+                if key:
+                    results.extend(resp.get(key))
+                else:
+                    results.extend(resp)
+                links = resp.get("links")
                 if links:
                     pages = links.get("pages")
                     if pages:
