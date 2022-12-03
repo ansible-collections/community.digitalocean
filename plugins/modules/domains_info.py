@@ -55,6 +55,14 @@ domains:
         example.com. 1800 IN NS ns1.digitalocean.com.
         example.com. 1800 IN NS ns2.digitalocean.com.
         example.com. 1800 IN NS ns3.digitalocean.com.
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: Domain result information.
   returned: always

@@ -76,6 +76,14 @@ one_clicks:
       type: kubernetes
     - slug: fyipe
       type: kubernetes
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: 1-Click applications result information.
   returned: always

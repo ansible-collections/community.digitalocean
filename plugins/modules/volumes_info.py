@@ -70,6 +70,14 @@ volumes:
         slug: nyc3
       size_gigabytes: 1
       tags: []
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: Volumes result information.
   returned: always

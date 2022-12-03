@@ -117,13 +117,6 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-msg:
-  description: DigitalOcean volume information.
-  returned: always
-  type: str
-  sample:
-    - Created volume test-vol in nyc3
-    - Deleted volume test-vol in nyc3
 volume:
   description: DigitalOcean volume information.
   returned: success
@@ -154,6 +147,21 @@ volume:
       slug: nyc3
     size_gigabytes: 1
     tags: null
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
+msg:
+  description: DigitalOcean volume information.
+  returned: always
+  type: str
+  sample:
+    - Created volume test-vol in nyc3
+    - Deleted volume test-vol in nyc3
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib

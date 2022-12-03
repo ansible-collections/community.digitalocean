@@ -49,6 +49,14 @@ ssh_keys:
       fingerprint: '3b:16:e4:bf:8b:00:8b:b8:59:8c:a9:d3:f0:19:fa:45'
       public_key: 'ssh-rsa ANOTHEREXAMPLEaC1yc2EAAAADAQABAAAAQ...owLh64b72pxekALga2oi4GvT+TlWNhzPH4V anotherexample'
       name: Other Public Key
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: User cannot enable a cdn for a space they do not own.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: SSH keys result information.
   returned: always
