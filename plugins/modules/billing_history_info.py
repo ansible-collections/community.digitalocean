@@ -55,13 +55,14 @@ msg:
   returned: always
   type: str
   sample:
-    - Current billing history information
-    - Current billing history information not found
+    - Current billing history
+    - No billing history
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -95,25 +96,20 @@ class BillingHistoryInformation:
             self.present()
 
     def present(self):
-        try:
-            billing_history = self.client.billing_history.list()
-            billing_history_info = billing_history.get("billing_history")
-            if billing_history_info:
-                self.module.exit_json(
-                    changed=False,
-                    msg="Current billing history information",
-                    billing_history=billing_history,
-                )
-            self.module.fail_json(
-                changed=False, msg="Current billing history information not found"
+        billing_history = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.cdn,
+            meth="list",
+            key="billing_history",
+            exc=HttpResponseError,
+        )
+        if billing_history:
+            self.module.exit_json(
+                changed=False,
+                msg="Current billing history",
+                billing_history=billing_history,
             )
-        except HttpResponseError as err:
-            error = {
-                "Message": err.error.message,
-                "Status Code": err.status_code,
-                "Reason": err.reason,
-            }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        self.module.exit_json(changed=False, msg="No billing history", endpoints=[])
 
 
 def main():
