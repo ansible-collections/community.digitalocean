@@ -13,12 +13,9 @@
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Assert result message
-      ansible.builtin.assert:
-        that: result.msg is string
-
     - name: Verify CDN endpoints
       ansible.builtin.assert:
         that:
           - not result.changed
+          - result.msg is string
           - result.endpoints is iterable
