@@ -31,6 +31,15 @@ options:
     description: The name of the domain itself.
     type: str
     required: true
+  name:
+    description: Retrieve a specific fully qualified record name.
+    type: str
+    required: false
+  type:
+    description: Retrieve a specific type of record.
+    type: str
+    required: false
+    choices: [A, AAAA, CNAME, MX, TXT, SRV, NS, CAA]
 
 extends_documentation_fragment:
   - community.digitalocean.common.documentation
@@ -112,13 +121,17 @@ class DomainRecordsInformation:
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
         self.domain_name = module.params.get("domain_name")
+        self.name = module.params.get("name")
+        self.type = module.params.get("type")
         if self.state == "present":
             self.present()
 
     def present(self):
         try:
             domain_records = self.client.domains.list_records(
-                domain_name=self.domain_name
+                domain_name=self.domain_name,
+                name=self.name,
+                type=self.type,
             )
             if domain_records.get("domain_records"):
                 self.module.exit_json(
@@ -142,7 +155,15 @@ class DomainRecordsInformation:
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
-    argument_spec.update(domain_name=dict(type="str", required=True))
+    argument_spec.update(
+        domain_name=dict(type="str", required=True),
+        name=dict(type="str", required=False),
+        type=dict(
+            type="str",
+            choices=["A", "AAAA", "CNAME", "MX", "TXT", "SRV", "NS", "CAA"],
+            required=False,
+        ),
+    )
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
     if not HAS_AZURE_LIBRARY:
         module.fail_json(
