@@ -244,26 +244,37 @@ class CDNEndpoints:
         """Removes a CDN endpoint."""
         found_cdn = self.find()
         if not found_cdn:
-            self.module.fail_json(
-                changed=False, msg=f"CDN endpoint {self.origin} not found"
+            self.module.exit_json(
+                changed=False,
+                msg=f"CDN endpoint {self.origin} not found",
+                cdn=[],
             )
+
         found_cdn_id = found_cdn.get("id")
         if not found_cdn_id:
             self.module.fail_json(
-                changed=False, msg=f"CDN endpoint {self.origin} ID not found"
+                changed=False,
+                msg=f"CDN endpoint {self.origin} ID not found",
+                cdn=found_cdn,
             )
+
         try:
             self.client.cdn.delete_endpoint(cdn_id=found_cdn_id)
             self.module.exit_json(
-                changed=True, msg=f"CDN endpoint {self.origin} deleted"
+                changed=True,
+                msg=f"CDN endpoint {self.origin} deleted",
+                cdn=found_cdn,
             )
         except HttpResponseError as err:
+            error_message = None
+            if hasattr("err.error", "message"):
+                error_message = err.error.message
             error = {
-                "Message": err.error.message,
+                "Message": error_message,
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(changed=False, msg=error_message, error=error)
 
 
 def main():
