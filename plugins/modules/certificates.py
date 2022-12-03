@@ -40,6 +40,7 @@ options:
       - An array of fully qualified domain names (FQDNs) for which the certificate was issued.
       - A certificate covering all subdomains can be issued using a wildcard (e.g. C(*.example.com)).
     type: list
+    elements: str
     required: false
   private_key:
     description:
@@ -66,14 +67,24 @@ EXAMPLES = r"""
 - name: Create custom certificate
   community.digitalocean.cdn_endpoints:
     token: "{{ token }}"
-    name: x.example.com
-    type: custom
+    name: custom.example.com
+    private_key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQDE39Eyyp2QJIp6
+      IvXELS4L+Wa8dAM4Uk0enV3PJKm2a674Ys0WSle2dzsd1EfpRXMNTt+iPZCyZQIS
+      ...
+    leaf_certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIF8jCCA9oCCQDHvZvzJneVuzANBgkqhkiG9w0BAQsFADCBujELMAkGA1UEBhMC
+      VVMxETAPBgNVBAgMCE1pY2hpZ2FuMRQwEgYDVQQHDAtHcmFuZCBCbGFuYzETMBEG
+      ...
 
 - name: Create Let's Encrypt certificate
   community.digitalocean.cdn_endpoints:
     token: "{{ token }}"
-    name: y.example.com
-    type: lets_encrypt
+    name: letsencrypt.example.com
+    dns_names:
+      - letsencrypt.example.com
 """
 
 
@@ -299,10 +310,8 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         name=dict(type="str", required=True),
-        lets_encrypt=dict(type="bool", default=False),
-        custom=dict(type="bool", default=False),
-        dns_names=dict(type="list", required=False),
-        private_key=dict(type="str", required=False),
+        dns_names=dict(type="list", elements="str", required=False),
+        private_key=dict(type="str", required=False, no_log=True),
         leaf_certificate=dict(type="str", required=False),
         certificate_chain=dict(type="str", required=False),
     )
