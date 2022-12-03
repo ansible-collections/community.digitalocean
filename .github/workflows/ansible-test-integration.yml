@@ -39,6 +39,7 @@ jobs:
           - domains_info
           - domain_records_info
           - droplets_info
+          - firewalls_info
           - one_clicks_info
           - regions_info
           - sizes_info

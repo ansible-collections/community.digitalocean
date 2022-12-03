@@ -8,13 +8,14 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Gather firewall information
-      community.digitalocean.digital_ocean_firewall_info:
-        oauth_token: "{{ do_api_key }}"
+    - name: Get firewalls
+      community.digitalocean.firewalls_info:
+        token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify firewall information fetched
+    - name: Verify firewalls
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.data is defined
+          - result.msg is string
+          - result.firewalls is iterable
