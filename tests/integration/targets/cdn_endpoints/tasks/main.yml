@@ -13,14 +13,69 @@
         token: "{{ do_api_key }}"
         state: present
         origin: "{{ origin }}"
+        ttl: 3600
       register: result
 
     - name: Verify CDN endpoint
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.msg is defined
+          - result.msg is string
           - result.msg == "CDN endpoint " ~ origin ~ " created"
+          - result.cdn is defined
+          - result.cdn.endpoint is defined
+          - result.cdn.endpoint.created_at is defined
+          - result.cdn.endpoint.endpoint == endpoint
+          - result.cdn.endpoint.id is defined
+          - result.cdn.endpoint.origin is defined
+          - result.cdn.endpoint.origin == origin
+          - result.cdn.endpoint.ttl is defined
+
+    - name: Pause for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Update CDN endpoint
+      community.digitalocean.cdn_endpoints:
+        token: "{{ do_api_key }}"
+        state: present
+        origin: "{{ origin }}"
+        ttl: 600
+      register: result
+
+    - name: Verify CDN endpoint
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.msg == "CDN endpoint " ~ origin ~ " updated"
+          - result.cdn is defined
+          - result.cdn.endpoint is defined
+          - result.cdn.endpoint.created_at is defined
+          - result.cdn.endpoint.endpoint == endpoint
+          - result.cdn.endpoint.id is defined
+          - result.cdn.endpoint.origin is defined
+          - result.cdn.endpoint.origin == origin
+          - result.cdn.endpoint.ttl is defined
+
+    - name: Pause for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Update CDN endpoint (no change)
+      community.digitalocean.cdn_endpoints:
+        token: "{{ do_api_key }}"
+        state: present
+        origin: "{{ origin }}"
+        ttl: 600
+      register: result
+
+    - name: Verify CDN endpoint
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - result.msg is string
+          - result.msg == "CDN endpoint " ~ origin ~ " not updated"
           - result.cdn is defined
           - result.cdn.endpoint is defined
           - result.cdn.endpoint.created_at is defined
