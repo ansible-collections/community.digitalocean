@@ -201,7 +201,7 @@ class Certificates:
                     self.module.exit_json(
                         changed=True,
                         msg=f"Certificate {self.name} created",
-                        certificate=certificate,
+                        certificate=certificate.get("certificate"),
                     )
                 self.module.fail_json(
                     changed=False, msg=f"Certificate {self.name} not created"
@@ -314,9 +314,7 @@ def main():
             ("dns_names", "leaf_certificate"),
             ("dns_names", "certificate_chain"),
         ),
-        required_one_of=(
-            ("dns_names", "private_key"),
-        ),
+        required_one_of=(("dns_names", "private_key"),),
         required_by={
             "private_key": "leaf_certificate",
         },
