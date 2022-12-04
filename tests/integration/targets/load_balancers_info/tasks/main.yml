@@ -8,14 +8,14 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Get monitoring alert policies
-      community.digitalocean.monitoring_alert_policies_info:
+    - name: Get load balancers
+      community.digitalocean.load_balancers_info:
         token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify monitoring alert policies
+    - name: Verify load balancers
       ansible.builtin.assert:
         that:
           - not result.changed
           - result.msg is string
-          - result.volumes is iterable
+          - result.load_balancers is iterable
