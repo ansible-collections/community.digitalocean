@@ -41,6 +41,7 @@ jobs:
           - droplets_info
           - firewalls_info
           - images_info
+          - kubernetes_clusters_info
           - one_clicks_info
           - regions_info
           - reserved_ips_info
