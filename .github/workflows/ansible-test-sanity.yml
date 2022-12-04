@@ -39,6 +39,7 @@ jobs:
           - kubernetes_clusters_info
           - load_balancers_info
           - one_clicks_info
+          - projects_info
           - regions_info
           - reserved_ips_info
           - sizes_info

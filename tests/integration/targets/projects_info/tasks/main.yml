@@ -8,13 +8,14 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Gather project information
-      community.digitalocean.digital_ocean_project_info:
-        oauth_token: "{{ do_api_key }}"
+    - name: Get projects
+      community.digitalocean.projects_info:
+        token: "{{ do_api_key }}"
       register: result
 
-    - name: Verify project info fetched
+    - name: Verify projects
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.data is defined
+          - result.msg is string
+          - result.projects is iterable
