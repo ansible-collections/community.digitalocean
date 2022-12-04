@@ -41,7 +41,7 @@ jobs:
           - images_info
           - kubernetes_clusters_info
           - load_balancers_info
-          - monitoring_alert_polices_info
+          - monitoring_alert_policies_info
           - one_clicks_info
           - projects_info
           - regions_info
