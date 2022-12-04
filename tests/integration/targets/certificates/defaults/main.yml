@@ -89,5 +89,7 @@ custom_cert:
     hLRc7QcpWsPMOn0R3VBZeX8NhQOeg6rsCykI9pJrFdY6BOObV7k=
     -----END CERTIFICATE-----
 
+current_epoch_time: "{{ ansible_date_time.epoch }}"
+
 lets_encrypt_cert:
-  cn: ansible-gh-ci-1.analogpuddle.cloud
+  cn: "ansible-gh-ci-{{ current_epoch_time }}.analogpuddle.cloud"
