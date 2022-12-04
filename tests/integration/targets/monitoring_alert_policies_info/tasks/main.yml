@@ -18,4 +18,4 @@
         that:
           - not result.changed
           - result.msg is string
-          - result.volumes is iterable
+          - result.policies is iterable
