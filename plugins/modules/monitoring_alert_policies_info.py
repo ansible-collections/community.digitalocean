@@ -67,7 +67,7 @@ error:
   returned: failure
   type: dict
   sample:
-    Message: Informational error message
+    Message: Informational error message.
     Reason: Unauthorized
     Status Code: 401
 msg:

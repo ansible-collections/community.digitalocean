@@ -41,13 +41,21 @@ EXAMPLES = r"""
 RETURN = r"""
 balance:
   description: Balance information.
-  returned: success
+  returned: always
   type: dict
   sample:
     month_to_date_balance: 23.44
     account_balance: 12.23
     month_to_date_usage: 11.21
     generated_at: '2019-07-09T15:01:12Z'
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: Informational error message.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: Balance result information.
   returned: always

@@ -41,7 +41,7 @@ EXAMPLES = r"""
 RETURN = r"""
 billing_history:
   description: Billing history information.
-  returned: success
+  returned: always
   type: list
   sample:
     - description: Invoice for May 2018
@@ -50,6 +50,14 @@ billing_history:
       invoice_uuid: example-uuid
       date: '2018-06-01T08:44:38Z'
       type: Invoice
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: Informational error message.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: Billing history result information.
   returned: always

@@ -41,7 +41,7 @@ EXAMPLES = r"""
 RETURN = r"""
 volumes:
   description: Volumes.
-  returned: success
+  returned: always
   type: list
   elements: dict
   sample:
@@ -75,7 +75,7 @@ error:
   returned: failure
   type: dict
   sample:
-    Message: User cannot enable a cdn for a space they do not own.
+    Message: Informational error message.
     Reason: Unauthorized
     Status Code: 401
 msg:

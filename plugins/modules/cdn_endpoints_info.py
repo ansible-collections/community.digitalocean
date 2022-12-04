@@ -51,6 +51,14 @@ endpoints:
       certificate_id: 892071a0-bb95-49bc-8021-3afd67a210bf
       custom_domain: static.example.com
       ttl: 3600
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: Informational error message.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: CDN endpoints result information.
   returned: always

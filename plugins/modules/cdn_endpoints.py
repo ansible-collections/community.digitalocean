@@ -69,7 +69,7 @@ EXAMPLES = r"""
 RETURN = r"""
 endpoint:
   description: DigitalOcean CDN endpoint.
-  returned: success
+  returned: always
   type: dict
   sample:
     created_at: '2022-12-01T15:05:42Z'
@@ -82,7 +82,7 @@ error:
   returned: failure
   type: dict
   sample:
-    Message: User cannot enable a cdn for a space they do not own.
+    Message: Informational error message.
     Reason: Unauthorized
     Status Code: 401
 msg:

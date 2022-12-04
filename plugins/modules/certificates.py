@@ -91,7 +91,7 @@ EXAMPLES = r"""
 RETURN = r"""
 certificate:
   description: Certificate.
-  returned: success
+  returned: always
   type: dict
   sample:
     id: 892071a0-bb95-49bc-8021-3afd67a210bf
@@ -107,7 +107,7 @@ error:
   returned: failure
   type: dict
   sample:
-    Message: User cannot enable a cdn for a space they do not own.
+    Message: Informational error message.
     Reason: Unauthorized
     Status Code: 401
 msg:

@@ -41,7 +41,7 @@ EXAMPLES = r"""
 RETURN = r"""
 account:
   description: Account information.
-  returned: success
+  returned: always
   type: dict
   sample:
     droplet_limit: 25
@@ -54,6 +54,14 @@ account:
     team:
       uuid: 5df3e3004a17e242b7c20ca6c9fc25b701a47ece
       name: My Team
+error:
+  description: DigitalOcean API error.
+  returned: failure
+  type: dict
+  sample:
+    Message: Informational error message.
+    Reason: Unauthorized
+    Status Code: 401
 msg:
   description: Account information result.
   returned: always
