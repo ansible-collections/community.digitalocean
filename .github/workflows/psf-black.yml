@@ -9,6 +9,10 @@ on:
     branches:
       - v2-pydo
 
+concurrency:
+  group: psf-black
+  cancel-in-progress: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest

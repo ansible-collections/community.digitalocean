@@ -9,8 +9,8 @@ on:
   # workflow_dispatch:
 
 concurrency:
-  group: cloud-integration-tests
-  cancel-in-progress: false
+  group: ansible-test-integration
+  cancel-in-progress: true
 
 jobs:
   integration:
@@ -23,8 +23,8 @@ jobs:
       max-parallel: 1
       matrix:
         ansible:
-        # - stable-2.12
-        - stable-2.13
+          # - stable-2.12
+          - stable-2.13
         # - stable-2.14
         # - devel
         module:
