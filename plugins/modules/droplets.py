@@ -406,7 +406,7 @@ class Droplets:
                     droplet=droplets[0],
                 )
             elif len(droplets) > 1:
-                droplet_ids = ", ".join([str(droplet['id']) for droplet in droplets])
+                droplet_ids = ", ".join([str(droplet["id"]) for droplet in droplets])
                 self.module.fail_json(
                     changed=False,
                     msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
@@ -447,7 +447,7 @@ class Droplets:
                 else:
                     self.delete_droplet(droplets[0])
             elif len(droplets) > 1:
-                droplet_ids = ", ".join([str(droplet['id']) for droplet in droplets])
+                droplet_ids = ", ".join([str(droplet["id"]) for droplet in droplets])
                 self.module.fail_json(
                     changed=False,
                     msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
