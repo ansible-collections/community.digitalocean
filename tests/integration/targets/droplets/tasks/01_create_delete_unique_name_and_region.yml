@@ -1,0 +1,61 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create Droplet
+      community.digitalocean.droplets:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ region }}"
+        size: "{{ size }}"
+        image: "{{ image }}"
+        unique_name: true
+      register: result
+
+    - name: Verify create Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.droplet is iterable
+          - result.droplet.id is integer
+          - result.droplet.name == droplet_name
+          - result.droplet.region.slug == region
+          - result.droplet.size.slug == size
+          - result.msg == "Created Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ region
+
+    - name: Sleep for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Delete Droplet
+      community.digitalocean.droplets:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        region: "{{ region }}"
+        unique_name: true
+      register: result
+
+    - name: Verify delete Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is string
+          - result.msg == "Deleted Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ region
+
+    - name: Sleep for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+  always:
+
+    - name: Cleanup Droplet | Leftover from unexpected failure
+      community.digitalocean.droplets:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        region: "{{ region }}"
+        unique_name: true
+      ignore_errors: true
