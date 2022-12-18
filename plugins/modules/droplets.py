@@ -442,7 +442,7 @@ class Droplets:
                     self.module.exit_json(
                         changed=True,
                         msg=f"Droplet {self.name} ({droplets[0]['id']}) in {self.region} would be deleted",
-                        droplet=[],
+                        droplet=droplets[0],
                     )
                 else:
                     self.delete_droplet(droplets[0])
@@ -472,7 +472,7 @@ class Droplets:
             self.module.exit_json(
                 changed=True,
                 msg=f"Droplet with ID {self.droplet_id} would be deleted",
-                droplet=[],
+                droplet=droplet,
             )
         else:
             self.delete_droplet(droplet)
