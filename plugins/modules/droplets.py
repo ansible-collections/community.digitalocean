@@ -249,8 +249,17 @@ msg:
   returned: always
   type: str
   sample:
-    - Created Droplet example.com in nyc3
-    - Droplet example.com in nyc3 exists
+    - Created Droplet example.com (11223344) in nyc3
+    - Deleted Droplet example.com (11223344) in nyc3
+    - Droplet example.com in nyc3 would be created
+    - Droplet example.com (11223344) in nyc3 exists
+    - There are currently 2 Droplets named example.com in nyc3: 11223344, 55667788
+    - Droplet example.com in nyc3 would be created
+    - Droplet example.com not found
+    - Droplet example.com (11223344) in nyc3 would be deleted
+    - Must provide droplet_id when deleting Droplets without unique_name
+    - Droplet with ID 11223344 not found
+    - Droplet with ID 11223344 would be deleted
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -393,19 +402,20 @@ class Droplets:
             elif len(droplets) == 1:
                 self.module.exit_json(
                     changed=False,
-                    msg=f"Droplet {self.name} in {self.region} exists",
+                    msg=f"Droplet {self.name} ({droplets[0]['id']}) in {self.region} exists",
                     droplet=droplets[0],
                 )
             elif len(droplets) > 1:
+                droplet_ids = ", ".join([str(droplet['id']) for droplet in droplets])
                 self.module.fail_json(
                     changed=False,
-                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}",
+                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
                     droplet=[],
                 )
         if self.module.check_mode:
             self.module.exit_json(
                 changed=True,
-                msg=f"Droplet {self.name} would be created",
+                msg=f"Droplet {self.name} in {self.region} would be created",
                 droplet=[],
             )
         else:
@@ -431,15 +441,16 @@ class Droplets:
                 if self.module.check_mode:
                     self.module.exit_json(
                         changed=True,
-                        msg=f"Droplet {self.name} in {self.region} would be deleted",
+                        msg=f"Droplet {self.name} ({droplets[0]['id']}) in {self.region} would be deleted",
                         droplet=[],
                     )
                 else:
                     self.delete_droplet(droplets[0])
-            elif len(droplets) >= 1:
+            elif len(droplets) > 1:
+                droplet_ids = ", ".join([str(droplet['id']) for droplet in droplets])
                 self.module.fail_json(
                     changed=False,
-                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}",
+                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}: {droplet_ids}",
                     droplet=[],
                 )
 
