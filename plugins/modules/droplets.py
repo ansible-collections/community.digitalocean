@@ -37,12 +37,19 @@ options:
         The name set during creation will also determine the hostname for the Droplet
         in its internal configuration.
     type: str
-    required: true
+    required: false
+  droplet_id:
+    description:
+      - |
+        The Droplet ID which can be used for C(state=absent) when there are more than
+        one Droplet with the same name within the same region
+    type: int
+    required: false
   region:
     description:
       - The slug identifier for the region that you wish to deploy the Droplet in.
       - |
-        If the specific datacenter is not not important, a slug prefix (e.g. C(nyc)) can be
+        If the specific datacenter is not important, a slug prefix (e.g. C(nyc)) can be
         used to deploy the Droplet in any of the that region's locations (C(nyc1), C(nyc2),
         or nyc3).
       - If the region is omitted from the create request completely, the Droplet may
@@ -50,19 +57,18 @@ options:
     type: str
       - The slug identifier for the region where the resource will initially be available.
     type: str
-    choices: ["ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1", "sfo2", "sfo3", "sgp1", "tor1"]
-    required: true
+    required: false
   size:
     description:
       - The slug identifier for the size that you wish to select for this Droplet.
     type: str
-    required: true
+    required: false
   image:
     description:
       - The image ID of a public or private image or the slug identifier for a public image.
       - This image will be the base image for your Droplet.
     type: str
-    required: true
+    required: false
   ssh_keys:
     description:
       - |
@@ -122,7 +128,12 @@ options:
       - To make installation errors fatal, explicitly set it to C(true).
   unique_name:
     description:
-      - If C(true) the Droplet will only be created if it is uniquely named in the region.
+      - |
+        When C(true) for C(state=present) the Droplet will only be created if it is uniquely
+        named in the region and the region is specified.
+      - |
+        When C(true) for C(state=absent) the Droplet will only be destroyed if it is uniquely
+        named in the region and the region is specified.
     type: bool
     required: false
     default: false
@@ -150,6 +161,7 @@ droplet:
   returned: always
   type: dict
   sample:
+    id: 3164444
     name: example.com
     memory: 1024
       vcpus: 1
@@ -268,24 +280,13 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-# def delete_volume(module, client, volume_id):
-#     try:
-#         client.volumes.delete(volume_id=volume_id)
-#     except HttpResponseError as err:
-#         error = {
-#             "Message": err.error.message,
-#             "Status Code": err.status_code,
-#             "Reason": err.reason,
-#         }
-#         module.fail_json(changed=False, msg=error.get("Message"), error=error)
-
-
 class Droplets:
     def __init__(self, module):
         self.module = module
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
         self.name = module.params.get("name")
+        self.droplet_id = module.params.get("droplet_id")
         self.region = module.params.get("region")
         self.size = module.params.get("size")
         self.image = module.params.get("image")
@@ -300,8 +301,10 @@ class Droplets:
         self.unique_name = module.params.get("unique_name")
         if self.state == "present":
             self.present()
+        elif self.state == "absent":
+            self.absent()
 
-    def find_droplet(self):
+    def get_droplets_by_name_and_region(self):
         droplets = DigitalOceanFunctions.get_paginated(
             module=self.module,
             obj=self.client.droplets,
@@ -310,6 +313,8 @@ class Droplets:
             params=dict(name=self.name),
             exc=HttpResponseError,
         )
+        # NOTE: DigitalOcean Droplet names are not unique!
+        found_droplets = []
         for droplet in droplets:
             droplet_name = droplet.get("name")
             if droplet_name == self.name:
@@ -317,8 +322,11 @@ class Droplets:
                 if droplet_region:
                     droplet_region_slug = droplet_region.get("slug")
                     if droplet_region_slug == self.region:
-                        return droplet
-        return None
+                        found_droplets.append(droplet)
+        return found_droplets
+
+    def get_droplet_by_id(self):
+        return self.client.droplets.get(droplet_id=self.droplet_id)
 
     def create_droplet(self):
         try:
@@ -336,11 +344,29 @@ class Droplets:
                 "vpc_uuid": self.vpc_uuid,
                 "with_droplet_agent": self.with_droplet_agent,
             }
-            droplet = self.client.droplets.create(body=body)
+            droplet = self.client.droplets.create(body=body)["droplet"]
             self.module.exit_json(
                 changed=True,
-                msg=f"Created Droplet {self.name} in {self.region}",
-                droplet=droplet.get("droplet"),
+                msg=f"Created Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
+                droplet=droplet,
+            )
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, droplet=[]
+            )
+
+    def delete_droplet(self, droplet):
+        try:
+            self.client.droplets.destroy(droplet_id=droplet["id"])
+            self.module.exit_json(
+                changed=True,
+                msg=f"Deleted Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
+                droplet=[],
             )
         except HttpResponseError as err:
             error = {
@@ -354,62 +380,66 @@ class Droplets:
 
     def present(self):
         if self.unique_name:
-            droplet = self.find_droplet()
-            if droplet:
+            droplets = self.get_droplets_by_name_and_region()
+            if len(droplets) == 0:
+                self.create_droplet()
+            elif len(droplets) == 1:
                 self.module.exit_json(
                     changed=False,
                     msg=f"Droplet {self.name} in {self.region} exists",
-                    droplet=droplet,
+                    droplet=droplets[0],
+                )
+            elif len(droplets) > 1:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}",
+                    droplet=[],
                 )
         self.create_droplet()
 
     def absent(self):
-        raise Exception("Needs implementation")
-        # try:
-        #     resp = self.client.droplets.destroy(
-        #     if resp:
-        #         message = resp.get("message")
-        #         id = resp.get("id")
-        #         if id == "not_found":
-        #             module.exit_json(changed=False, msg=message)
-        #     module.exit_json(
-        #         changed=True, msg=f"Deleted volume {volume_name} in {region}"
-        #     )
-        # except HttpResponseError as err:
-        #     error = {
-        #         "Message": err.error.message,
-        #         "Status Code": err.status_code,
-        #         "Reason": err.reason,
-        #     }
-        #     module.fail_json(changed=False, msg=error.get("Message"), error=error)
+        if self.unique_name:
+            droplets = self.get_droplets_by_name_and_region()
+            if len(droplets) == 0:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"Droplet {self.name} in {self.region} not found",
+                    droplet=[],
+                )
+            elif len(droplets) == 1:
+                self.delete_droplet(droplets[0])
+            elif len(droplets) >= 1:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}",
+                    droplet=[],
+                )
+
+        if not self.droplet_id:
+            self.module.fail_json(
+                changed=False,
+                msg=f"Must provide droplet_id when deleting Droplets without unique_name",
+                droplet=[],
+            )
+
+        droplet = self.get_droplet_by_id()
+        if not droplet:
+            self.module.fail_json(
+                changed=False,
+                msg=f"Droplet with ID {self.droplet_id} not found",
+                droplet=[],
+            )
+        self.delete_droplet(droplet)
 
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
-        name=dict(type="str", required=True),
-        region=dict(
-            type="str",
-            choices=[
-                "ams1",
-                "ams2",
-                "ams3",
-                "blr1",
-                "fra1",
-                "lon1",
-                "nyc1",
-                "nyc2",
-                "nyc3",
-                "sfo1",
-                "sfo2",
-                "sfo3",
-                "sgp1",
-                "tor1",
-            ],
-            required=True,
-        ),
-        size=dict(type="str", required=True),
-        image=dict(type="str", required=True),
+        name=dict(type="str", required=False),
+        droplet_id=dict(type="int", required=False),
+        region=dict(type="str", required=False),
+        size=dict(type="str", required=False),
+        image=dict(type="str", required=False),
         ssh_keys=dict(type="list", required=False, default=[]),
         backups=dict(type="bool", required=False, default=False),
         ipv6=dict(type="bool", required=False, default=False),
@@ -418,12 +448,18 @@ def main():
         volumes=dict(type="list", required=False, default=[]),
         vpc_uuid=dict(type="str", required=False),
         with_droplet_agent=dict(type="bool", required=False, default=False),
-        unique_name=dict(type="bool", required=False, default=False),
+        unique_name=dict(type="bool", required=False),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_if=[
+            ("state", "present", ("name", "size", "image")),
+        ],
+        required_by={
+            "unique_name": "region",
+        },
     )
 
     if not HAS_AZURE_LIBRARY:
