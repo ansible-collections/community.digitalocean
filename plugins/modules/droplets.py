@@ -403,7 +403,7 @@ class Droplets:
                     droplet=[],
                 )
         if self.module.check_mode:
-            self.module.fail_json(
+            self.module.exit_json(
                 changed=True,
                 msg=f"Droplet {self.name} would be created",
                 droplet=[],
