@@ -375,7 +375,7 @@ class Droplets:
             self.module.exit_json(
                 changed=True,
                 msg=f"Deleted Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
-                droplet=[],
+                droplet=droplet,
             )
         except HttpResponseError as err:
             error = {
