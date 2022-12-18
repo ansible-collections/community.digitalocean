@@ -382,7 +382,14 @@ class Droplets:
         if self.unique_name:
             droplets = self.get_droplets_by_name_and_region()
             if len(droplets) == 0:
-                self.create_droplet()
+                if self.module.check_mode:
+                    self.module.exit_json(
+                        changed=True,
+                        msg=f"Droplet {self.name} in {self.region} would be created",
+                        droplet=droplets[0],
+                    )
+                else:
+                    self.create_droplet()
             elif len(droplets) == 1:
                 self.module.exit_json(
                     changed=False,
@@ -395,19 +402,40 @@ class Droplets:
                     msg=f"There are currently {len(droplets)} Droplets named {self.name} in {self.region}",
                     droplet=[],
                 )
-        self.create_droplet()
+        if self.module.check_mode:
+            self.module.fail_json(
+                changed=True,
+                msg=f"Droplet {self.name} would be created",
+                droplet=[],
+            )
+        else:
+            self.create_droplet()
 
     def absent(self):
         if self.unique_name:
             droplets = self.get_droplets_by_name_and_region()
             if len(droplets) == 0:
-                self.module.fail_json(
-                    changed=False,
-                    msg=f"Droplet {self.name} in {self.region} not found",
-                    droplet=[],
-                )
+                if self.module.check_mode:
+                    self.module.exit_json(
+                        changed=False,
+                        msg=f"Droplet {self.name} in {self.region} not found",
+                        droplet=[],
+                    )
+                else:
+                    self.module.fail_json(
+                        changed=False,
+                        msg=f"Droplet {self.name} in {self.region} not found",
+                        droplet=[],
+                    )
             elif len(droplets) == 1:
-                self.delete_droplet(droplets[0])
+                if self.module.check_mode:
+                    self.module.exit_json(
+                        changed=True,
+                        msg=f"Droplet {self.name} in {self.region} would be deleted",
+                        droplet=[],
+                    )
+                else:
+                    self.delete_droplet(droplets[0])
             elif len(droplets) >= 1:
                 self.module.fail_json(
                     changed=False,
@@ -429,7 +457,14 @@ class Droplets:
                 msg=f"Droplet with ID {self.droplet_id} not found",
                 droplet=[],
             )
-        self.delete_droplet(droplet)
+        if self.module.check_mode:
+            self.module.exit_json(
+                changed=True,
+                msg=f"Droplet with ID {self.droplet_id} would be deleted",
+                droplet=[],
+            )
+        else:
+            self.delete_droplet(droplet)
 
 
 def main():
