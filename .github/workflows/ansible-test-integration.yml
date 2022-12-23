@@ -73,5 +73,7 @@ jobs:
           target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: integration
-          test-deps: community.general
-          # docker-image: quay.io/ansible/default-test-container:7.4.0
+          test-deps: >-
+            ansible.netcommon:==4.1.0
+            ansible.utils
+            community.general:==6.0.1
