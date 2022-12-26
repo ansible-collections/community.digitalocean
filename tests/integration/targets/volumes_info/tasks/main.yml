@@ -9,7 +9,7 @@
         - do_api_key | length == 0
 
     - name: Get volumes
-      community.digitalocean.volumes_info:
+      community.digitalocean.volume_info:
         token: "{{ do_api_key }}"
       register: result
 

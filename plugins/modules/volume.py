@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: volumes
+module: volume
 
 short_description: Create or delete volumes
 
@@ -100,7 +100,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 - name: Create DigitalOcean volume
-  community.digitalocean.volumes:
+  community.digitalocean.volume:
     token: "{{ token }}"
     state: present
     name: test-vol-delete-1
@@ -108,7 +108,7 @@ EXAMPLES = r"""
     size_gigabytes: 1
 
 - name: Delete DigitalOcean volume
-  community.digitalocean.volumes:
+  community.digitalocean.volume:
     token: "{{ token }}"
     state: absentj
     name: test-vol-delete-1

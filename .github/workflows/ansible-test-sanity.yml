@@ -52,7 +52,7 @@ jobs:
           - ssh_keys_info
           - tags_info
           - volumes_info
-          - volumes
+          - volume
           - vpcs_info
 
     # https://github.com/ansible-collections/news-for-maintainers/issues/28

@@ -13,7 +13,7 @@
         - do_api_key | length == 0
 
     - name: Delete DigitalOcean volume (leftover)
-      community.digitalocean.volumes:
+      community.digitalocean.volume:
         state: absent
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
@@ -22,7 +22,7 @@
       ignore_errors: true
 
     - name: Create DigitalOcean volume
-      community.digitalocean.volumes:
+      community.digitalocean.volume:
         state: present
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
@@ -42,7 +42,7 @@
         minutes: 1
 
     - name: Delete DigitalOcean volume
-      community.digitalocean.volumes:
+      community.digitalocean.volume:
         state: absent
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
@@ -61,7 +61,7 @@
     #
 
     - name: Create DigitalOcean volume
-      community.digitalocean.volumes:
+      community.digitalocean.volume:
         state: present
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
@@ -81,7 +81,7 @@
         minutes: 1
 
     - name: Create DigitalOcean volume
-      community.digitalocean.volumes:
+      community.digitalocean.volume:
         state: present
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
@@ -101,7 +101,7 @@
   always:
 
     - name: Delete DigitalOcean volume
-      community.digitalocean.volumes:
+      community.digitalocean.volume:
         state: absent
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
