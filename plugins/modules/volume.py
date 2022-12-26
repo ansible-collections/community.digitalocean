@@ -22,11 +22,10 @@ description:
   - View the delete API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/volumes_delete_byName).
   - |
     Optionally, a filesystem_type attribute may be provided in order to
-    jautomatically format the volume's filesystem.
+    automatically format the volume's filesystem.
   - |
-    Pre-formatted volumes are automatically mounted when attached to Ubuntu,
-    Debian, Fedora, Fedora Atomic, and CentOS Droplets created on or after April
-    26, 2018.
+    Pre-formatted volumes are automatically mounted when attached to Ubuntu, Debian, Fedora, Fedora
+    Atomic, and CentOS Droplets created on or after April 26, 2018.
   - |
     Attaching pre-formatted volumes to Droplets without support for
     auto-mounting is not recommended.
@@ -41,7 +40,9 @@ options:
   name:
     description:
       - A human-readable name for the block storage volume.
-      - Must be lowercase and be composed only of numbers, letters and "-", up to a limit of 64 characters.
+      - |
+        Must be lowercase and be composed only of numbers, letters and "-", up to a limit of 64
+        characters.
       - The name must begin with a letter.
     type: str
     required: true
@@ -88,7 +89,9 @@ options:
   filesystem_label:
     description:
       - The label applied to the filesystem.
-      - Labels for ext4 type filesystems may contain 16 characters while labels for xfs type filesystems are limited to 12 characters.
+      - |
+        Labels for ext4 type filesystems may contain 16 characters while labels for xfs type
+        filesystems are limited to 12 characters.
       - May only be used in conjunction with filesystem_type.
     type: str
     required: false
@@ -167,6 +170,7 @@ msg:
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
+    DigitalOceanFunctions,
 )
 
 import traceback
@@ -190,65 +194,60 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-# def find_volume(module, client, volume_name, region):
-#     page = 1
-#     paginated = True
-#     while paginated:
-#         try:
-#             resp = client.volumes.list(per_page=10, page=page)
-#             for volume in resp.get("volumes"):
-#                 if volume.get("name") == volume_name:
-#                     volume_region = volume.get("region")
-#                     if volume_region:
-#                         volume_region_slug = volume_region.get("slug")
-#                         if volume_region_slug == region:
-#                             return volume
-#         except HttpResponseError as err:
-#             error = {
-#                 "Message": err.error.message,
-#                 "Status Code": err.status_code,
-#                 "Reason": err.reason,
-#             }
-#             module.fail_json(changed=False, msg=error.get("Message"), error=error)
+class Volume:
+    def __init__(self, module):
+        self.module = module
+        self.client = Client(token=module.params.get("token"))
+        self.state = module.params.get("state")
+        self.name = module.params.get("name")
+        self.description = module.params.get("description")
+        self.size_gigabytes = int(module.params.get("size_gigabytes"))
+        self.tags = module.params.get("tags")
+        self.snapshot_id = module.params.get("snapshot_id")
+        self.filesystem_type = module.params.get("filesystem_type")
+        self.region = module.params.get("region")
+        self.filesystem_label = module.params.get("filesystem_label")
+        if self.state == "present":
+            self.present()
+        elif self.state == "absent":
+            self.absent()
 
-#         next_page = DigitalOceanFunctions.get_next_page(links=resp.get("links"))
-#         if next_page:
-#             return next_page
+    def get_volumes_by_name_and_region(self):
+        volumes = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.volumes,
+            meth="list",
+            key="volumes",
+            params=dict(name=self.name),
+            exc=HttpResponseError,
+        )
+        found_volumes = []
+        for volume in volumes:
+            volume_name = volume.get("name")
+            if volume_name == self.name:
+                volume_region = volume.get("region")
+                if volume_region:
+                    volume_region_slug = volume_region.get("slug")
+                    if volume_region_slug == self.region:
+                        found_volumes.append(volume)
+        return found_volumes
 
-#         paginated = False
-
-#     return None
-
-
-# def delete_volume(module, client, volume_id):
-#     try:
-#         client.volumes.delete(volume_id=volume_id)
-#     except HttpResponseError as err:
-#         error = {
-#             "Message": err.error.message,
-#             "Status Code": err.status_code,
-#             "Reason": err.reason,
-#         }
-#         module.fail_json(changed=False, msg=error.get("Message"), error=error)
-
-
-def core(module):
-    client = Client(token=module.params.get("token"))
-    volume_name = module.params.get("name")
-    region = module.params.get("region")
-
-    if module.params.get("state") == "present":
-        size_gigabytes = int(module.params.get("size_gigabytes"))
+    def create_volume(self):
         try:
             body = {
-                "name": volume_name,
-                "region": region,
-                "size_gigabytes": size_gigabytes,
+                "name": self.name,
+                "description": self.description,
+                "size_gigabytes": self.size_gigabytes,
+                "tags": self.tags,
+                "snapshot_id": self.snapshot_id,
+                "filesystem_type": self.filesystem_type,
+                "region": self.region,
+                "filesystem_label": self.filesystem_label,
             }
-            volume = client.volumes.create(body=body)
-            module.exit_json(
+            volume = self.client.volumes.create(body=body)
+            self.module.exit_json(
                 changed=True,
-                msg=f"Created volume {volume_name} in {region}",
+                msg=f"Created volume {self.name} in {self.region}",
                 volume=volume.get("volume"),
             )
         except HttpResponseError as err:
@@ -257,18 +256,20 @@ def core(module):
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
 
-    elif module.params.get("state") == "absent":
+    def delete_volume(self):
         try:
-            resp = client.volumes.delete_by_name(name=volume_name, region=region)
+            resp = self.client.volumes.delete_by_name(
+                name=self.name, region=self.region
+            )
             if resp:
                 message = resp.get("message")
                 id = resp.get("id")
                 if id == "not_found":
-                    module.exit_json(changed=False, msg=message)
-            module.exit_json(
-                changed=True, msg=f"Deleted volume {volume_name} in {region}"
+                    self.module.exit_json(changed=False, msg=message)
+            self.module.exit_json(
+                changed=True, msg=f"Deleted volume {self.name} in {self.region}"
             )
         except HttpResponseError as err:
             error = {
@@ -276,7 +277,64 @@ def core(module):
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+
+    def present(self):
+        volumes = self.get_volumes_by_name_and_region()
+        if len(volumes) == 0:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Volume {self.name} in {self.region} would be created",
+                    volume=[],
+                )
+            else:
+                self.create_volume()
+        elif len(volumes) == 1:
+            self.module.exit_json(
+                changed=False,
+                msg=f"Volume {self.name} ({volumes[0]['id']}) in {self.region} exists",
+                volume=volumes[0],
+            )
+        elif len(volumes) > 1:
+            volume_ids = ", ".join([str(volume["id"]) for volume in volumes])
+            self.module.fail_json(
+                changed=False,
+                msg=f"There are currently {len(volumes)} volumes named {self.name} in {self.region}: {volume_ids}",
+                droplet=[],
+            )
+
+    def absent(self):
+        volumes = self.get_volumes_by_name_and_region()
+        if len(volumes) == 0:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=False,
+                    msg=f"Volume {self.name} in {self.region} not found",
+                    volume=[],
+                )
+            else:
+                self.module.fail_json(
+                    changed=False,
+                    msg=f"Volume {self.name} in {self.region} not found",
+                    volume=[],
+                )
+        elif len(volumes) == 1:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Volume {self.name} ({volumes[0]['id']}) in {self.region} would be deleted",
+                    volume=volumes[0],
+                )
+            else:
+                self.delete_volume()
+        elif len(volumes) > 1:
+            volume_ids = ", ".join([str(volume["id"]) for volume in volumes])
+            self.module.fail_json(
+                changed=False,
+                msg=f"There are currently {len(volumes)} volumes named {self.name} in {self.region}: {volume_ids}",
+                volume=[],
+            )
 
 
 def main():
@@ -331,7 +389,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    core(module)
+    Volume(module)
 
 
 if __name__ == "__main__":
