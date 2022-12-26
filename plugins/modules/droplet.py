@@ -428,7 +428,7 @@ class Droplet:
                     self.module.exit_json(
                         changed=True,
                         msg=f"Droplet {self.name} in {self.region} would be created",
-                        droplet=droplets[0],
+                        droplet=[],
                     )
                 else:
                     self.create_droplet()
