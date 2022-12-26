@@ -1,3 +1,4 @@
+# code: language=ansible
 ---
 - block:
 
@@ -61,7 +62,7 @@
           - result.data.project.name is defined
           - result.data.project.name == "my-test-project"
 
-    - name: Update the project 
+    - name: Update the project
       community.digitalocean.digital_ocean_project:
         oauth_token: "{{ do_api_key }}"
         state: present
