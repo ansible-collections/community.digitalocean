@@ -55,8 +55,6 @@ options:
       - If the region is omitted from the create request completely, the Droplet may
         deploy in any region.
     type: str
-      - The slug identifier for the region where the resource will initially be available.
-    type: str
     required: false
   size:
     description:
@@ -161,22 +159,23 @@ droplet:
   returned: always
   type: dict
   sample:
-    id: 3164444
-    name: example.com
-    memory: 1024
+    droplet:
+      id: 3164444
+      name: example.com
+      memory: 1024
       vcpus: 1
       disk: 25
       locked: false
       status: new
-      kernel: null
+      kernel:
       created_at: '2020-07-21T18:37:44Z'
       features:
-        - backups
-        - private_networking
-        - ipv6
-        - monitoring
+      - backups
+      - private_networking
+      - ipv6
+      - monitoring
       backup_ids: []
-      next_backup_window: null
+      next_backup_window:
       snapshot_ids: []
       image:
         id: 63663980
@@ -185,8 +184,19 @@ droplet:
         slug: ubuntu-20-04-x64
         public: true
         regions:
-          - ams2
-          - ...
+        - ams2
+        - ams3
+        - blr1
+        - fra1
+        - lon1
+        - nyc1
+        - nyc2
+        - nyc3
+        - sfo1
+        - sfo2
+        - sfo3
+        - sgp1
+        - tor1
         created_at: '2020-05-15T05:47:50Z'
         type: snapshot
         min_disk_size: 20
@@ -205,8 +215,19 @@ droplet:
         price_monthly: 5
         price_hourly: 0.00743999984115362
         regions:
-          - ams2
-          - ...
+        - ams2
+        - ams3
+        - blr1
+        - fra1
+        - lon1
+        - nyc1
+        - nyc2
+        - nyc3
+        - sfo1
+        - sfo2
+        - sfo3
+        - sgp1
+        - tor1
         available: true
         description: Basic
       size_slug: s-1vcpu-1gb
@@ -217,22 +238,34 @@ droplet:
         name: New York 3
         slug: nyc3
         features:
-          - private_networking
-          - backups
-          - ipv6
-          - metadata
-          - install_agent
-          - storage
-          - image_transfer
+        - private_networking
+        - backups
+        - ipv6
+        - metadata
+        - install_agent
+        - storage
+        - image_transfer
         available: true
         sizes:
-          - s-1vcpu-1gb
-          - ...
+        - s-1vcpu-1gb
+        - s-1vcpu-2gb
+        - s-1vcpu-3gb
+        - s-2vcpu-2gb
+        - s-3vcpu-1gb
+        - s-2vcpu-4gb
+        - s-4vcpu-8gb
+        - s-6vcpu-16gb
+        - s-8vcpu-32gb
+        - s-12vcpu-48gb
+        - s-16vcpu-64gb
+        - s-20vcpu-96gb
+        - s-24vcpu-128gb
+        - s-32vcpu-192g
       tags:
       - web
       - env:prod
-  links:
-    actions:
+    links:
+      actions:
       - id: 7515
         rel: create
         href: https://api.digitalocean.com/v2/actions/7515
@@ -253,7 +286,7 @@ msg:
     - Deleted Droplet example.com (11223344) in nyc3
     - Droplet example.com in nyc3 would be created
     - Droplet example.com (11223344) in nyc3 exists
-    - There are currently 2 Droplets named example.com in nyc3: 11223344, 55667788
+    - 'There are currently 2 Droplets named example.com in nyc3: 11223344, 55667788'
     - Droplet example.com in nyc3 would be created
     - Droplet example.com not found
     - Droplet example.com (11223344) in nyc3 would be deleted
@@ -457,7 +490,7 @@ class Droplet:
         if not self.droplet_id:
             self.module.fail_json(
                 changed=False,
-                msg=f"Must provide droplet_id when deleting Droplets without unique_name",
+                msg="Must provide droplet_id when deleting Droplets without unique_name",
                 droplet=[],
             )
 
