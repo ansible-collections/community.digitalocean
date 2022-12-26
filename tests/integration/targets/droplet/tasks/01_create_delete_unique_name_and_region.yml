@@ -3,7 +3,7 @@
 - block:
 
     - name: Create Droplet
-      community.digitalocean.droplets:
+      community.digitalocean.droplet:
         token: "{{ do_api_key }}"
         state: present
         name: "{{ droplet_name }}"
@@ -30,7 +30,7 @@
         minutes: 1
 
     - name: Delete Droplet
-      community.digitalocean.droplets:
+      community.digitalocean.droplet:
         token: "{{ do_api_key }}"
         state: absent
         name: "{{ droplet_name }}"
@@ -52,7 +52,7 @@
   always:
 
     - name: Cleanup Droplet | Leftover from unexpected failure
-      community.digitalocean.droplets:
+      community.digitalocean.droplet:
         token: "{{ do_api_key }}"
         state: absent
         name: "{{ droplet_name }}"

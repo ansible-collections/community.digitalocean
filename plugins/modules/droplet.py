@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: droplets
+module: droplet
 
 short_description: Create or delete Droplets
 
@@ -145,7 +145,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 - name: Create Droplet
-  community.digitalocean.droplets:
+  community.digitalocean.droplet:
     token: "{{ token }}"
     state: present
     name: example.com
@@ -289,7 +289,7 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class Droplets:
+class Droplet:
     def __init__(self, module):
         self.module = module
         self.client = Client(token=module.params.get("token"))
@@ -520,7 +520,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    Droplets(module)
+    Droplet(module)
 
 
 if __name__ == "__main__":

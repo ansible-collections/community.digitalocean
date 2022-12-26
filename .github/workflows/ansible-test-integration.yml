@@ -39,7 +39,7 @@ jobs:
           - domains_info
           - domain_records_info
           - droplets_info
-          - droplets
+          - droplet
           - firewalls_info
           - images_info
           - kubernetes_clusters_info
