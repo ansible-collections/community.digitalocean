@@ -113,7 +113,7 @@ EXAMPLES = r"""
 - name: Delete DigitalOcean volume
   community.digitalocean.volume:
     token: "{{ token }}"
-    state: absentj
+    state: absent
     name: test-vol-delete-1
     region: nyc3
 """
