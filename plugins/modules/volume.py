@@ -201,7 +201,10 @@ class Volume:
         self.state = module.params.get("state")
         self.name = module.params.get("name")
         self.description = module.params.get("description")
-        self.size_gigabytes = int(module.params.get("size_gigabytes"))
+        if module.params.get("size_gigabytes"):
+            self.size_gigabytes = int(module.params.get("size_gigabytes"))
+        else:
+            self.size_gigabytes = None
         self.tags = module.params.get("tags")
         self.snapshot_id = module.params.get("snapshot_id")
         self.filesystem_type = module.params.get("filesystem_type")
