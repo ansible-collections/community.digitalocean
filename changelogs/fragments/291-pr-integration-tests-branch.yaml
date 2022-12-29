@@ -1,2 +1,0 @@
-minor_changes:
-  - integration tests - set pull request integration tests to run against branch instead of last commit (https://github.com/ansible-collections/community.digitalocean/issues/291).

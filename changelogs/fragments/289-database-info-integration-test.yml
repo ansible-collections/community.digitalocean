@@ -1,2 +1,0 @@
-minor_changes:
-  - integration tests - add a dedicated integration test for C(digital_ocean_database_info) (https://github.com/ansible-collections/community.digitalocean/issues/289).
