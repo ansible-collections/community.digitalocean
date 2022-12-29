@@ -5,6 +5,23 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.23.0
+=======
+
+Minor Changes
+-------------
+
+- digital_ocean_load_balancer - add support for C(size_unit) over deprecated C(size); deprecate C(algorithm) completely (https://github.com/ansible-collections/community.digitalocean/issues/270).
+- documentation - refresh the "Testing and Development" section of the C(README.md) (https://github.com/ansible-collections/community.digitalocean/issues/268).
+- integration tests - add a dedicated integration test for C(digital_ocean_database_info) (https://github.com/ansible-collections/community.digitalocean/issues/289).
+- integration tests - set pull request integration tests to run against branch instead of last commit (https://github.com/ansible-collections/community.digitalocean/issues/291).
+
+Bugfixes
+--------
+
+- inventory plugin - bugfix for baseurl parameter (https://github.com/ansible-collections/community.digitalocean/pull/297).
+- integration tests - add missing `environment` directive on pull request integration testing (https://github.com/ansible-collections/community.digitalocean/issues/293).
+
 v1.22.0
 =======
 
