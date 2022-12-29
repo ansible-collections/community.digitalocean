@@ -177,7 +177,7 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class CertificatesInformation:
+class DropletsInformation:
     def __init__(self, module):
         """Class constructor."""
         self.module = module
@@ -233,7 +233,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    CertificatesInformation(module)
+    DropletsInformation(module)
 
 
 if __name__ == "__main__":
