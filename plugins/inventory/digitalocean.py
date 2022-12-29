@@ -170,7 +170,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         pagination = self.get_option("pagination")
         url = "https://api.digitalocean.com/v2"
         if self.get_option("baseurl"):
-          url = self.get_option("baseurl")
+            url = self.get_option("baseurl")
         url += "/droplets?per_page=" + str(pagination)
 
         # send request(s)
