@@ -8,7 +8,26 @@ __metaclass__ = type
 
 from ansible.module_utils.basic import env_fallback
 from ansible.module_utils.six.moves.urllib.parse import urlparse, parse_qs
-from azure.core.exceptions import HttpResponseError
+
+import traceback
+
+HAS_AZURE_LIBRARY = False
+AZURE_LIBRARY_IMPORT_ERROR = None
+try:
+    from azure.core.exceptions import HttpResponseError
+except ImportError:
+    AZURE_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_AZURE_LIBRARY = True
+
+HAS_PYDO_LIBRARY = False
+PYDO_LIBRARY_IMPORT_ERROR = None
+try:
+    from pydo import Client
+except ImportError:
+    PYDO_LIBRARY_IMPORT_ERROR = traceback.format_exc()
+else:
+    HAS_PYDO_LIBRARY = True
 
 
 class DigitalOceanFunctions:
