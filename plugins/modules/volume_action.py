@@ -133,6 +133,8 @@ msg:
     - Attached volume test-vol in nyc3 to test-droplet
     - Volume test-vol in nyc3 not attached to test-droplet
     - Detached volume test-vol in nyc3 from test-droplet
+    - Volume test-vol in nyc3 would be attahed to test-droplet
+    - Volume test-vol in nyc3 would be detached from test-droplet
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -227,6 +229,13 @@ class VolumeAction:
                 msg=f"Volume {self.volume_name} in {self.region} attached to {self.droplet_name}",
                 action=[],
             )
+        else:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Volume {self.volume_name} in {self.region} would be attached to {self.droplet_name}",
+                    action=[],
+                )
 
         try:
             body = {
@@ -261,6 +270,13 @@ class VolumeAction:
                 msg=f"Volume {self.volume_name} in {self.region} not attached to {self.droplet_name}",
                 action=[],
             )
+        else:
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Volume {self.volume_name} in {self.region} would be detached from {self.droplet_name}",
+                    action=[],
+                )
 
         try:
             body = {
