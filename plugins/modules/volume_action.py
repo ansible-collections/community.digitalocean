@@ -76,36 +76,42 @@ EXAMPLES = r"""
 
 
 RETURN = r"""
-volume:
-  description: DigitalOcean volume information.
+action:
+  description: DigitalOcean volume action information.
   returned: always
   type: dict
   sample:
-    created_at: '2022-11-24T19:23:01Z'
-    description: ''
-    droplet_ids: null
-    filesystem_label: ''
-    filesystem_type: ''
-    id: 698d7221-6c2d-11ed-93f9-0a58ac14790c
-    name: test-vol
+    id: 72531856
+    status: completed
+    type: attach_volume
+    started_at: '2020-11-12T17:51:03Z'
+    completed_at: '2020-11-12T17:51:14Z'
+    resource_type: volume
     region:
-      available: true
+      name: New York 1
+      slug: nyc1
+      sizes:
+        - s-1vcpu-1gb
+        - s-1vcpu-2gb
+        - s-1vcpu-3gb
+        - s-2vcpu-2gb
+        - s-3vcpu-1gb
+        - s-2vcpu-4gb
+        - s-4vcpu-8gb
+        - s-6vcpu-16gb
+        - s-8vcpu-32gb
+        - s-12vcpu-48gb
+        - s-16vcpu-64gb
+        - s-20vcpu-96gb
+        - s-24vcpu-128gb
+        - s-32vcpu-192gb
       features:
+        - private_networking
         - backups
         - ipv6
         - metadata
-        - install_agent
-        - storage
-        - image_transfer
-      name: New York 3
-      sizes:
-        - s-1vcpu-1gb
-        - s-1vcpu-1gb-amd
-        - s-1vcpu-1gb-intel
-        - ...
-      slug: nyc3
-    size_gigabytes: 1
-    tags: null
+      available: true
+    region_slug: nyc1
 error:
   description: DigitalOcean API error.
   returned: failure
@@ -115,12 +121,18 @@ error:
     Reason: Unauthorized
     Status Code: 401
 msg:
-  description: DigitalOcean volume information.
+  description: DigitalOcean volume action information.
   returned: always
   type: str
   sample:
-    - Created volume test-vol in nyc3
-    - Deleted volume test-vol in nyc3
+    - No volume named test-vol in nyc3
+    - Multiple volumes named test-vol in nyc3
+    - No Droplet named test-droplet in nyc3
+    - Multiple Droplets named test-droplet in nyc3
+    - Volume test-vol in nyc3 attached to test-droplet
+    - Attached volume test-vol in nyc3 to test-droplet
+    - Volume test-vol in nyc3 not attached to test-droplet
+    - Detached volume test-vol in nyc3 from test-droplet
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -163,63 +175,115 @@ class VolumeAction:
         elif self.state == "absent":
             self.absent()
 
-    def get_volumes_by_region(self):
-        volumes = DigitalOceanFunctions.get_paginated(
+    def get_volume_by_name(self):
+        volumes = DigitalOceanFunctions.get_volume_by_name_in_region(
             module=self.module,
-            obj=self.client.volumes,
-            meth="list",
-            key="volumes",
-            params=None,
-            exc=HttpResponseError,
+            client=self.client,
+            region=self.region,
+            name=self.volume_name,
         )
-        found_volumes = []
-        for volume in volumes:
-            volume_region = volume.get("region")
-            if volume_region == self.region:
-                found_volumes.append(volume)
-        return found_volumes
+        if len(volumes) == 0:
+            self.module.fail_json(
+                changed=False,
+                msg=f"No volume named {self.volume_name} in {self.region}",
+                action=[],
+            )
+        elif len(volumes) > 1:
+            self.module.fail_json(
+                changed=False,
+                msg=f"Multiple volumes ({len(volumes)}) found in {self.region}",
+                action=[],
+            )
+        return volumes[0]
 
-    def get_droplets_by_region(self):
-        droplets = DigitalOceanFunctions.get_paginated(
+    def get_droplet_by_name(self):
+        droplets = DigitalOceanFunctions.get_droplet_by_name_in_region(
             module=self.module,
-            obj=self.client.droplets,
-            meth="list",
-            key="droplets",
-            params=None,
-            exc=HttpResponseError,
+            client=self.client,
+            region=self.region,
+            name=self.droplet_name,
         )
-        found_droplets = []
-        for droplet in droplets:
-            droplet_region = droplet["region"]["slug"]
-            if droplet_region == self.region:
-                found_droplets.append(droplet)
-        droplets_id_name_region = [
-            {
-                "id": droplet["id"],
-                "name": droplet["name"],
-                "region": droplet["region"]["slug"],
-            }
-            for droplet in found_droplets
-        ]
-        return droplets_id_name_region
+        if len(droplets) == 0:
+            self.module.fail_json(
+                changed=False,
+                msg=f"No Droplet named {self.droplet_name} in {self.region}",
+                action=[],
+            )
+        elif len(droplets) > 1:
+            self.module.fail_json(
+                changed=False,
+                msg=f"Multiple Droplets ({len(droplets)}) found in {self.region}",
+                action=[],
+            )
+        return droplets[0]
 
     def attach_volume(self):
-        volumes = self.get_volumes_by_region()
-        droplets = self.get_droplets_by_region()
-        self.module.exit_json(
-            changed=True,
-            msg=f"Attached volume {self.volume_name} to {self.droplet_name} in {self.region}",
-            volume_action=[],
-            volumes=volumes,
-            droplets=droplets,
-        )
+        volume = self.get_volume_by_name()
+        droplet = self.get_droplet_by_name()
+
+        if droplet["id"] in volume["droplet_ids"]:
+            self.module.exit_json(
+                changed=False,
+                msg=f"Volume {self.volume_name} in {self.region} attached to {self.droplet_name}",
+                action=[],
+            )
+
+        try:
+            body = {
+                "type": "attach",
+                "volume_name": self.volume_name,
+                "droplet_id": droplet["id"],
+                "region": self.region,
+            }
+            action = self.client.volume_actions.post(body=body)["action"]
+            self.module.exit_json(
+                changed=True,
+                msg=f"Attached volume {self.volume_name} in {self.region} to {self.droplet_name}",
+                action=action,
+            )
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, action=[]
+            )
 
     def detach_volume(self):
-        self.module.exit_json(
-            changed=True,
-            msg=f"Detached volume {self.volume_name} from {self.droplet_name} in {self.region}",
-            volume_action=[],
-        )
+        volume = self.get_volume_by_name()
+        droplet = self.get_droplet_by_name()
+
+        if droplet["id"] not in volume["droplet_ids"]:
+            self.module.exit_json(
+                changed=False,
+                msg=f"Volume {self.volume_name} in {self.region} not attached to {self.droplet_name}",
+                action=[],
+            )
+
+        try:
+            body = {
+                "type": "detach",
+                "volume_name": self.volume_name,
+                "droplet_id": droplet["id"],
+                "region": self.region,
+            }
+            action = self.client.volume_actions.post(body=body)["action"]
+            self.module.exit_json(
+                changed=True,
+                msg=f"Detached volume {self.volume_name} in {self.region} from {self.droplet_name}",
+                action=action,
+            )
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, action=[]
+            )
 
     def present(self):
         self.attach_volume()
