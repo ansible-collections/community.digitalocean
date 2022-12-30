@@ -54,6 +54,7 @@ jobs:
           - ssh_keys_info
           - tags_info
           - volumes_info
+          - volume_action
           - volume
           - vpcs_info
 
