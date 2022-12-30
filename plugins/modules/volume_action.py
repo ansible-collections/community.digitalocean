@@ -42,7 +42,7 @@ options:
   droplet_name:
     description:
       - The name of the Droplet to attach or detach to the volume to.
-    type: int
+    type: str
     required: true
   region:
     description:
