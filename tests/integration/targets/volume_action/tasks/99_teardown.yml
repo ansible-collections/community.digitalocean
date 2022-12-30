@@ -1,0 +1,17 @@
+# code: language=ansible
+- block:
+
+    - name: Teardown | Delete volume
+      community.digitalocean.volume:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ volume_name }}"
+        region: "{{ volume_region }}"
+
+    - name: Teardown | Delete Droplet
+      community.digitalocean.droplet:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true

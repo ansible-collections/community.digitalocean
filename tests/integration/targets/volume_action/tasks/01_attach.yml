@@ -1,0 +1,49 @@
+# code: language=ansible
+- block:
+
+    - name: Attach block storage volume
+      when: true
+      community.digitalocean.volume_action:
+        token: "{{ do_api_key }}"
+        state: present
+        volume_name: "{{ volume_name }}"
+        droplet_name: "{{ droplet_name }}"
+        region: "{{ volume_region }}"
+      register: result
+
+    - name: Sleep for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Verify attach volume
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.action is defined
+          - result.action.type == "attach_volume"
+          - result.msg == "Attached volume " ~ volume_name ~ " in " ~ volume_region ~ " to " ~ droplet_name
+
+  rescue:
+
+    - name: Detach block storage volume
+      community.digitalocean.volume_action:
+        token: "{{ do_api_key }}"
+        state: absent
+        volume_name: "{{ volume_name }}"
+        droplet_name: "{{ droplet_name }}"
+        region: "{{ volume_region }}"
+
+    - name: Teardown | Delete volume
+      community.digitalocean.volume:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ volume_name }}"
+        region: "{{ volume_region }}"
+
+    - name: Teardown | Delete Droplet
+      community.digitalocean.droplet:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true

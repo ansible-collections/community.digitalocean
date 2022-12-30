@@ -1,0 +1,8 @@
+volume_name: gh-ci-test-volume-1
+volume_region: nyc3
+volume_size_gigabytes: 1
+
+droplet_name: gh-ci-test-droplet-1
+droplet_region: nyc3
+droplet_size: s-1vcpu-2gb
+droplet_image: ubuntu-22-04-x64
