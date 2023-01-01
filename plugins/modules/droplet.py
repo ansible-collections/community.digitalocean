@@ -73,6 +73,7 @@ options:
         An array containing the IDs or fingerprints of the SSH keys that you wish to embed
         in the Droplet's root account upon creation.
     type: list
+    elements: str
     required: false
     default: []
   backups:
@@ -98,6 +99,7 @@ options:
       - A flat array of tag names as strings to apply to the Droplet after it is created.
       - Tag names can either be existing or new tags.
     type: list
+    elements: str
     required: false
     default: []
   volumes:
@@ -107,6 +109,7 @@ options:
         once created.
       - The volumes must not already be attached to an existing Droplet.
     type: list
+    elements: str
     required: false
     default: []
   vpc_uuid:
@@ -124,6 +127,9 @@ options:
         (i.e. OS not supported) are ignored.
       - To prevent it from being installed, set to C(false).
       - To make installation errors fatal, explicitly set it to C(true).
+    type: bool
+    required: false
+    default: false
   unique_name:
     description:
       - |
@@ -519,15 +525,15 @@ def main():
         region=dict(type="str", required=False),
         size=dict(type="str", required=False),
         image=dict(type="str", required=False),
-        ssh_keys=dict(type="list", required=False, default=[]),
+        ssh_keys=dict(type="list", elements="str", required=False, default=[], no_log=True),
         backups=dict(type="bool", required=False, default=False),
         ipv6=dict(type="bool", required=False, default=False),
         monitoring=dict(type="bool", required=False, default=False),
-        tags=dict(type="list", required=False, default=[]),
-        volumes=dict(type="list", required=False, default=[]),
+        tags=dict(type="list", elements="str", required=False, default=[]),
+        volumes=dict(type="list", elements="str", required=False, default=[]),
         vpc_uuid=dict(type="str", required=False),
         with_droplet_agent=dict(type="bool", required=False, default=False),
-        unique_name=dict(type="bool", required=False),
+        unique_name=dict(type="bool", required=False, default=False),
     )
 
     module = AnsibleModule(
