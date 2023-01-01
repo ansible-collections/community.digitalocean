@@ -36,7 +36,7 @@
       ansible.builtin.assert:
         that:
           - not result.changed
-          - result.msg == "Volume " ~ volume_name ~ " in " ~ region ~ " exists"
+          - result.msg == "Volume " ~ volume_name ~ " (" ~ result.volume.id ~ ") in " ~ region ~ " exists"
 
     - name: Sleep for a minute
       ansible.builtin.pause:
