@@ -525,7 +525,9 @@ def main():
         region=dict(type="str", required=False),
         size=dict(type="str", required=False),
         image=dict(type="str", required=False),
-        ssh_keys=dict(type="list", elements="str", required=False, default=[], no_log=True),
+        ssh_keys=dict(
+            type="list", elements="str", required=False, default=[], no_log=True
+        ),
         backups=dict(type="bool", required=False, default=False),
         ipv6=dict(type="bool", required=False, default=False),
         monitoring=dict(type="bool", required=False, default=False),
