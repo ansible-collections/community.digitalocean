@@ -38,6 +38,7 @@ jobs:
           - database_clusters_info
           - domains_info
           - domain_records_info
+          - domain
           - droplets_info
           - droplet
           - firewalls_info

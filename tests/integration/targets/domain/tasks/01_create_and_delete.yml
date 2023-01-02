@@ -1,0 +1,46 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create domain
+      community.digitalocean.domain:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ domain_name }}"
+      register: result
+
+    - name: Verify create domain
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created domain " ~ domain_name
+          - result.domain.name == domain_name
+          - result.domain.ttl is defined
+          - result.domain.zone_file is defined
+
+    - name: Sleep for a minute
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Delete domain
+      community.digitalocean.domain:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ domain_name }}"
+      register: result
+
+    - name: Verify create domain
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted domain " ~ domain_name
+          - result.domain == []
+
+  always:
+
+    - name: Cleanup domain | Leftover from unexpected failure
+      community.digitalocean.domain:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ domain_name }}"
+      ignore_errors: true
