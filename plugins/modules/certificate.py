@@ -10,7 +10,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: certificates
+module: certificate
 
 short_description: Manage certificates
 
@@ -65,7 +65,7 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 - name: Create custom certificate
-  community.digitalocean.cdn_endpoints:
+  community.digitalocean.certificate:
     token: "{{ token }}"
     name: custom.example.com
     private_key: |
@@ -80,7 +80,7 @@ EXAMPLES = r"""
       ...
 
 - name: Create Let's Encrypt certificate
-  community.digitalocean.cdn_endpoints:
+  community.digitalocean.certificate:
     token: "{{ token }}"
     name: letsencrypt.example.com
     dns_names:
@@ -152,7 +152,7 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class Certificates:
+class Certificate:
     def __init__(self, module):
         """Class constructor."""
         self.module = module
@@ -339,7 +339,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    Certificates(module)
+    Certificate(module)
 
 
 if __name__ == "__main__":

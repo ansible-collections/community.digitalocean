@@ -34,7 +34,7 @@ jobs:
           - cdn_endpoints_info
           - cdn_endpoints
           - certificates_info
-          - certificates
+          - certificate
           - database_clusters_info
           - domains_info
           - domain_records_info

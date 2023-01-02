@@ -15,7 +15,7 @@
       register: result
 
     - name: Create custom certificate
-      community.digitalocean.certificates:
+      community.digitalocean.certificate:
         token: "{{ do_api_key }}"
         state: present
         name: "{{ custom_cert.cn }}"
@@ -45,7 +45,7 @@
         seconds: 10
 
     - name: Delete custom certificate
-      community.digitalocean.certificates:
+      community.digitalocean.certificate:
         token: "{{ do_api_key }}"
         state: absent
         name: "{{ custom_cert.cn }}"
@@ -61,7 +61,7 @@
           - result.msg == "Certificate " ~ custom_cert.cn ~ " deleted"
 
     - name: Create Let's Encrypt certificate
-      community.digitalocean.certificates:
+      community.digitalocean.certificate:
         token: "{{ do_api_key }}"
         state: present
         name: "{{ lets_encrypt_cert.cn }}"
@@ -88,7 +88,7 @@
   always:
 
     - name: Delete custom certificate (leftover)
-      community.digitalocean.certificates:
+      community.digitalocean.certificate:
         token: "{{ do_api_key }}"
         state: absent
         name: "{{ custom_cert.cn }}"
@@ -98,7 +98,7 @@
       ignore_errors: true
 
     - name: Delete Let's Encrypt certificate (leftover)
-      community.digitalocean.certificates:
+      community.digitalocean.certificate:
         token: "{{ do_api_key }}"
         state: absent
         name: "{{ lets_encrypt_cert.cn }}"
