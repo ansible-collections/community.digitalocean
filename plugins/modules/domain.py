@@ -99,7 +99,6 @@ msg:
     - Domain example.com does not exist
 """
 
-import time
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
