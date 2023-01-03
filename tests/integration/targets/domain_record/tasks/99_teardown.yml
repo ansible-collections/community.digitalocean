@@ -1,0 +1,26 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Delete domain
+      community.digitalocean.domain:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ domain_name }}"
+      register: result
+
+    - name: Verify delete domain
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted domain " ~ domain_name
+          - result.domain == []
+
+  always:
+
+    - name: Delete domain | Leftover from unexpected failure
+      community.digitalocean.domain:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ domain_name }}"
+      ignore_errors: true

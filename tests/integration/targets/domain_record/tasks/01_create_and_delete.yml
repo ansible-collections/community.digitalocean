@@ -1,0 +1,49 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create domain record
+      community.digitalocean.domain_record:
+        token: "{{ do_api_key }}"
+        state: present
+        domain_name: "{{ domain_name }}"
+        name: www
+        type: A
+        data: 192.168.100.50
+      register: result
+
+    - name: Verify create domain record
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created domain record www A in " ~ domain_name
+          - result.domain_record.name == "www"
+          - result.domain_record.type == "A"
+          - result.domain_record.data == "192.168.100.50"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete domain record
+      community.digitalocean.domain_record:
+        token: "{{ do_api_key }}"
+        state: absent
+        domain_name: "{{ domain_name }}"
+        name: www
+        type: A
+        data: 192.168.100.50
+      register: result
+
+    - name: Verify create domain record
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted domain record www A (" ~ result.domain_record.id ~ ") in " ~ domain_name
+          - result.domain_record.name == "www"
+          - result.domain_record.type == "A"
+          - result.domain_record.data == "192.168.100.50"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
