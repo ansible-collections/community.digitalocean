@@ -17,7 +17,10 @@ short_description: Create or delete firewalls
 version_added: 2.0.0
 
 description:
-  - Create or delete database firewalls.
+  - Create or delete firewalls.
+  - |
+    DigitalOcean Cloud Firewalls provide the ability to restrict network access to and from a
+    Droplet allowing you to define which ports will accept inbound or outbound connections.
   - View the create API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#tag/Firewalls).
 
 author: Mark Mercado (@mamercad)
