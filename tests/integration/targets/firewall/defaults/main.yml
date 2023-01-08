@@ -1,0 +1,8 @@
+firewall_name: ansible-gh-ci-firewall-0
+inbound_rules:
+  - protocol: tcp
+    ports: 80
+    sources:
+      addresses:
+        - "0.0.0.0/0"
+        - "::/0"

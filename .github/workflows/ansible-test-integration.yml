@@ -43,6 +43,7 @@ jobs:
           - domain
           - droplet
           - droplets_info
+          - firewall
           - firewalls_info
           - images_info
           - kubernetes_clusters_info

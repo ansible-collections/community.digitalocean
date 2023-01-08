@@ -1,7 +1,0 @@
-firewall_name: gh-ci-firewall
-firewall_inbound_rules:
-  - protocol: "tcp"
-    ports: "9999"
-    sources:
-      addresses: ["0.0.0.0/0", "::/0"]
-firewall_outbound_rules: []

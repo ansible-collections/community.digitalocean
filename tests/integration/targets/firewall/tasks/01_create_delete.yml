@@ -1,0 +1,41 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create firewall
+      community.digitalocean.firewall:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ firewall_name }}"
+        inbound_rules: "{{ inbound_rules }}"
+      register: result
+
+    - name: Verify create firewall
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created firewall " ~ firewall_name ~ " (" ~ result.firewall.id ~ ")"
+          - result.firewall.name == firewall_name
+
+    - name: Delete firewall
+      community.digitalocean.firewall:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ firewall_name }}"
+      register: result
+
+    - name: Verify delete firewall
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted firewall " ~ firewall_name ~ " (" ~ result.firewall.id ~ ")"
+          - result.firewall.name == firewall_name
+
+  always:
+
+    - name: Cleanup firewall | Leftover from unexpected failure
+      community.digitalocean.firewall:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ firewall_name }}"
+      ignore_errors: true
