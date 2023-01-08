@@ -149,7 +149,6 @@ msg:
     - Firewall test-firewall (e23647ff-4b57-4da0-8f31-72616d932c0d) would be deleted
 """
 
-import time
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
