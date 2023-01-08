@@ -68,7 +68,8 @@ options:
     description:
       - The slug identifier representing the size of the nodes in the database cluster.
     type: str
-    required: true
+    required: false
+    default: db-s-1vcpu-1gb
   region:
     description:
       - The slug identifier for the region where the database cluster is located.
@@ -404,7 +405,7 @@ def main():
         ),
         version=dict(type="str", required=False),
         num_nodes=dict(type="int", default=1),
-        size=dict(type="str", required=True),
+        size=dict(type="str", default="db-s-1vcpu-1gb", required=False),
         region=dict(type="str", required=True),
         private_network_uuid=dict(type="str", required=False),
         tags=dict(type="list", elements="str", required=False),
@@ -416,7 +417,6 @@ def main():
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
-        required_if=[("state", "present", ("size",))],
     )
 
     if not HAS_AZURE_LIBRARY:
