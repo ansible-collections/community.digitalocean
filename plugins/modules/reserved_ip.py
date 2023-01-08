@@ -108,11 +108,11 @@ reserved_ip:
     droplets:
       - id: 213939433
         rel: droplet
-        href: https://api.digitalocean.com/v2/droplets/213939433
+        href: 'https://api.digitalocean.com/v2/droplets/213939433'
     actions:
       - id: 1088924622
         rel: assign_ip
-        href: https://api.digitalocean.com/v2/actions/1088924622
+        href: 'https://api.digitalocean.com/v2/actions/1088924622'
 error:
   description: DigitalOcean API error.
   returned: failure
