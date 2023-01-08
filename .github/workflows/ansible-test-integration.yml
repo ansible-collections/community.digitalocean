@@ -57,6 +57,7 @@ jobs:
           - sizes_info
           - snapshots_info
           - ssh_keys_info
+          - tag
           - tags_info
           - volume
           - volume_action

@@ -1,0 +1,40 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create tag
+      community.digitalocean.tag:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ tag_name }}"
+      register: result
+
+    - name: Verify create tag
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created tag " ~ tag_name
+          - result.tag.name == tag_name
+
+    - name: Delete tag
+      community.digitalocean.tag:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ tag_name }}"
+      register: result
+
+    - name: Verify delete firewall
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted tag " ~ tag_name
+          - result.tag.name == tag_name
+
+  always:
+
+    - name: Cleanup tag | Leftover from unexpected failure
+      community.digitalocean.tag:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ tag_name }}"
+      ignore_errors: true
