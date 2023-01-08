@@ -94,11 +94,11 @@ msg:
   type: str
   sample:
     - Created tag extra-awesome
-    - Deleted tag test-tag (e23647ff-4b57-4da0-8f31-72616d932c0d)
-    - tag test-tag would be created
-    - tag test-tag (e23647ff-4b57-4da0-8f31-72616d932c0d) exists
-    - tag test-tag does not exist
-    - tag test-tag (e23647ff-4b57-4da0-8f31-72616d932c0d) would be deleted
+    - Deleted tag extra-awesome
+    - Tag extra-awesome would be created
+    - Tag extra-awesome exists
+    - Tag extra-awesome does not exist
+    - Tag extra-awesome deleted
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
