@@ -52,6 +52,7 @@ jobs:
           - one_clicks_info
           - projects_info
           - regions_info
+          - reserved_ip
           - reserved_ips_info
           - sizes_info
           - snapshots_info

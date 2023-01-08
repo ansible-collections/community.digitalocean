@@ -1,0 +1,81 @@
+# code: language=ansible
+---
+- block:
+    - name: Create Droplet
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ region }}"
+        size: "{{ size }}"
+        image: "{{ image }}"
+        unique_name: true
+      register: result
+
+    # - name: Verify create Droplet
+    #   ansible.builtin.assert:
+    #     that:
+    #       - result.changed
+    #       - result.msg == "Created Droplet " ~ droplet_name ~ " (" ~ result.droplet.id ~ ") in " ~ region
+    #       - result.droplet.name == droplet_name
+    #       - result.droplet.region.slug == region
+    #       - result.droplet.size.slug == size
+
+    - name: Set a fact for the Droplet ID
+      ansible.builtin.set_fact:
+        droplet_id: "{{ result.droplet.id }}"
+
+    - name: Created reserved IP
+      community.digitalocean.reserved_ip:
+        token: "{{ do_api_key }}"
+        state: present
+        droplet_id: "{{ droplet_id }}"
+      register: result
+
+    - name: Set a fact for the reserved IP
+      ansible.builtin.set_fact:
+        reserved_ip: "{{ result.reserved_ip.ip }}"
+
+    - name: Verify create reserved IP
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created reserved IP " ~ reserved_ip ~ " for Droplet ID " ~ droplet_id
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete reserved IP
+      community.digitalocean.reserved_ip:
+        token: "{{ do_api_key }}"
+        state: absent
+        floating_ip: "{{ reserved_ip }}"
+      register: result
+
+    - name: Verify delete reserved IP
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted reserved IP " ~ reserved_ip
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+  always:
+    - name: Cleanup Droplet | Leftover from unexpected failure
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        region: "{{ region }}"
+        unique_name: true
+      ignore_errors: true
+
+    - name: Cleanup reserved IP | Leftover from unexpected failure
+      community.digitalocean.reserved_ip:
+        token: "{{ do_api_key }}"
+        state: absent
+        floating_ip: "{{ reserved_ip }}"
+      ignore_errors: true

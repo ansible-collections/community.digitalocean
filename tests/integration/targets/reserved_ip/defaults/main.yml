@@ -1,0 +1,4 @@
+region: nyc3
+size: s-1vcpu-2gb
+image: ubuntu-22-04-x64
+droplet_name: ansible-gh-ci-droplet-0

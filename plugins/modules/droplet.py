@@ -301,10 +301,12 @@ msg:
     - Droplet with ID 11223344 would be deleted
 """
 
+import time
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
 from ansible_collections.community.digitalocean.plugins.module_utils.common import (
     DigitalOceanOptions,
     DigitalOceanFunctions,
+    DigitalOceanConstants,
 )
 
 import traceback
@@ -333,6 +335,7 @@ class Droplet:
         self.module = module
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
+        self.timeout = module.params.get("timeout")
         self.name = module.params.get("name")
         self.droplet_id = module.params.get("droplet_id")
         self.region = module.params.get("region")
@@ -393,6 +396,13 @@ class Droplet:
                 "with_droplet_agent": self.with_droplet_agent,
             }
             droplet = self.client.droplets.create(body=body)["droplet"]
+
+            status = droplet["status"]
+            end_time = time.monotonic() + self.timeout
+            while time.monotonic() < end_time and status != "active":
+                time.sleep(DigitalOceanConstants.SLEEP)
+                status = self.get_droplet_by_id(droplet["id"])["status"]
+
             self.module.exit_json(
                 changed=True,
                 msg=f"Created Droplet {droplet['name']} ({droplet['id']}) in {droplet['region']['slug']}",
