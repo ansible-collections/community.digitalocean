@@ -10,19 +10,18 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: tag
+module: vpc
 
-short_description: Create or delete tags
+short_description: Create or delete VPCs
 
 version_added: 2.0.0
 
 description:
-  - Create or delete tags.
+  - Create or delete VPCs.
   - |
-    A tag is a label that can be applied to a resource (currently Droplets, Images, Volumes,
-    Volume Snapshots, and Database clusters) in order to better organize or facilitate the
-    lookups and actions on it.
-  - View the create API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#tag/Tags).
+    VPCs (virtual private clouds) allow you to create virtual networks containing resources that
+    can communicate with each other in full isolation using private IP addresses.
+  - View the create API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#tag/VPCs).
 
 author: Mark Mercado (@mamercad)
 
@@ -33,19 +32,31 @@ requirements:
 options:
   name:
     description:
-      - The name of the tag.
-      - Tags may contain letters, numbers, colons, dashes, and underscores.
-      - There is a limit of 255 characters per tag.
-      - |
-        Note: Tag names are case stable, which means the capitalization you use when you first
-        create a tag is canonical.
-      - When working with tags in the API, you must use the tag's canonical capitalization.
-      - Tagged resources in the control panel will always display the canonical capitalization.
-      - |
-        For example, if you create a tag named "PROD", you can tag resources in the control panel
-        by entering "prod". The tag will still display with its canonical capitalization, "PROD".
+      - The name of the VPC. Must be unique and may only contain alphanumeric characters, dashes, and periods.
     type: str
     required: true
+  description:
+    description:
+      - A free-form text field for describing the VPC's purpose. It may be a maximum of 255 characters.
+    type: str
+    required: false
+  region:
+    description:
+      - The slug identifier for the region where the VPC will be created.
+    type: str
+    required: true
+  ip_range:
+    description:
+      - The range of IP addresses in the VPC in CIDR notation.
+      - |
+        Network ranges cannot overlap with other networks in the same account and must be in range
+        of private addresses as defined in RFC1918.
+      - It may not be smaller than /28 nor larger than /16.
+      - |
+        If no IP range is specified, a /20 network range is generated that won't conflict with
+        other VPC networks in your account.
+    type: str
+    required: false
 
 extends_documentation_fragment:
   - community.digitalocean.common.documentation
@@ -53,33 +64,30 @@ extends_documentation_fragment:
 
 
 EXAMPLES = r"""
-- name: Create tag
-  community.digitalocean.tag:
+- name: Create VPC
+  community.digitalocean.vpc:
     token: "{{ token }}"
     state: present
-    name: extra-awesome
+    name: env.prod-vpc
+    region: nyc1
+    ip_range: "10.10.10.0/24"
 """
 
 
 RETURN = r"""
-tag:
-  description: Tag information.
+vpc:
+  description: VPC information.
   returned: always
   type: dict
   sample:
-    name: extra-awesome
-    resources:
-      count: 0
-      databases:
-        count: 0
-      droplets:
-        count: 0
-      images:
-        count: 0
-      volume_snapshots:
-        count: 0
-      volumes:
-        count: 0
+    name: env.prod-vpc
+    description: VPC for production environment
+    region: nyc1
+    ip_range: 10.10.10.0/24
+    default: true
+    id: 5a4981aa-9653-4bd1-bef5-d6bff52042e4
+    urn: 'do:vpc:5a4981aa-9653-4bd1-bef5-d6bff52042e4'
+    created_at: '2020-03-13T19:20:47.442049222Z'
 error:
   description: DigitalOcean API error.
   returned: failure
@@ -93,12 +101,12 @@ msg:
   returned: always
   type: str
   sample:
-    - Created tag extra-awesome
-    - Deleted tag extra-awesome
-    - Tag extra-awesome would be created
-    - Tag extra-awesome exists
-    - Tag extra-awesome does not exist
-    - Tag extra-awesome deleted
+    - Created VPC env.prod-vpc (5a4981aa-9653-4bd1-bef5-d6bff52042e4)
+    - Deleted VPC env.prod-vpc (5a4981aa-9653-4bd1-bef5-d6bff52042e4)
+    - VPC env.prod-vpc would be created
+    - VPC env.prod-vpc (5a4981aa-9653-4bd1-bef5-d6bff52042e4) exists
+    - VPC env.prod-vpc does not exist
+    - VPC env.prod-vpc (5a4981aa-9653-4bd1-bef5-d6bff52042e4) would be deleted
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -127,26 +135,29 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class Tag:
+class VPC:
     def __init__(self, module):
         self.module = module
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
         self.name = module.params.get("name")
+        self.description = module.params.get("description")
+        self.region = module.params.get("region")
+        self.ip_range = module.params.get("ip_range")
 
         if self.state == "present":
             self.present()
         elif self.state == "absent":
             self.absent()
 
-    def get_tags(self):
+    def get_vpcs(self):
         try:
-            tags = self.client.tags.list()["tags"]
-            found_tags = []
-            for tag in tags:
-                if self.name == tag["name"]:
-                    found_tags.append(tag)
-            return found_tags
+            vpcs = self.client.vpcs.list()["vpcs"]
+            found_vpcs = []
+            for vpc in vpcs:
+                if self.name == vpc["name"]:
+                    found_vpcs.append(vpc)
+            return found_vpcs
         except HttpResponseError as err:
             error = {
                 "Message": err.error.message,
@@ -157,20 +168,23 @@ class Tag:
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                tag=[],
+                vpc=[],
             )
 
-    def create_tag(self):
+    def create_vpc(self):
         try:
             body = {
                 "name": self.name,
+                "description": self.description,
+                "region": self.region,
+                "ip_range": self.ip_range,
             }
-            tag = self.client.tags.create(body=body)["tag"]
+            vpc = self.client.vpcs.create(body=body)["vpc"]
 
             self.module.exit_json(
                 changed=True,
-                msg=f"Created tag {self.name}",
-                tag=tag,
+                msg=f"Created VPC {self.name} ({(vpc['id'])})",
+                vpc=vpc,
             )
         except HttpResponseError as err:
             error = {
@@ -182,13 +196,13 @@ class Tag:
                 changed=False, msg=error.get("Message"), error=error, droplet=[]
             )
 
-    def delete_tag(self, tag):
+    def delete_vpc(self, vpc):
         try:
-            self.client.tags.delete(tag_id=tag["name"])
+            self.client.vpcs.delete(vpc_id=vpc["id"])
             self.module.exit_json(
                 changed=True,
-                msg=f"Deleted tag {self.name}",
-                tag=tag,
+                msg=f"Deleted VPC {self.name} ({vpc['id']})",
+                vpc=vpc,
             )
         except HttpResponseError as err:
             error = {
@@ -200,55 +214,55 @@ class Tag:
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                tag=[],
+                vpc=[],
             )
 
     def present(self):
-        tags = self.get_tags()
-        if len(tags) == 0:
+        vpcs = self.get_vpcs()
+        if len(vpcs) == 0:
             if self.module.check_mode:
                 self.module.exit_json(
                     changed=True,
-                    msg=f"Tag {self.name} would be created",
-                    tag=[],
+                    msg=f"VPC {self.name} would be created",
+                    vpc=[],
                 )
             else:
-                self.create_tag()
-        elif len(tags) == 1:
+                self.create_vpc()
+        elif len(vpcs) == 1:
             self.module.exit_json(
                 changed=False,
-                msg=f"Tag {self.name} exists",
-                tag=tags[0],
+                msg=f"VPC {self.name} ({vpcs[0]['id']}) exists",
+                vpc=vpcs[0],
             )
         else:
             self.module.exit_json(
                 changed=False,
-                msg=f"There are currently {len(tags)} named {self.name}",
-                tag=[],
+                msg=f"There are currently {len(vpcs)} named {self.name}",
+                vpc=[],
             )
 
     def absent(self):
-        tags = self.get_tags()
-        if len(tags) == 0:
+        vpcs = self.get_vpcs()
+        if len(vpcs) == 0:
             self.module.exit_json(
                 changed=False,
-                msg=f"Tag {self.name} does not exist",
-                tag=[],
+                msg=f"VPC {self.name} does not exist",
+                vpc=[],
             )
-        elif len(tags) == 1:
+        elif len(vpcs) == 1:
             if self.module.check_mode:
                 self.module.exit_json(
                     changed=True,
-                    msg=f"Tag {self.name} would be deleted",
-                    tag=tags[0],
+                    msg=f"VPC {self.name} {vpcs[0]['id']} would be deleted",
+                    vpc=vpcs[0],
                 )
             else:
-                self.delete_tag(tag=tags[0])
+                self.delete_vpc(vpc=vpcs[0])
         else:
             self.module.exit_json(
                 changed=False,
-                msg=f"There are currently {len(tags)} tags named {self.name}",
-                tag=[],
+                msg=f"There are currently {len(vpcs)} VPCs named {self.name}",
+                vpc=[],
             )
 
 
@@ -256,6 +270,9 @@ def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
         name=dict(type="str", required=True),
+        description=dict(type="str", required=False),
+        region=dict(type="str", required=True),
+        ip_range=dict(type="str", required=False),
     )
 
     module = AnsibleModule(
@@ -275,7 +292,7 @@ def main():
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    Tag(module)
+    VPC(module)
 
 
 if __name__ == "__main__":

@@ -60,6 +60,7 @@ jobs:
           - volume
           - volume_action
           - volumes_info
+          - vpc
           - vpcs_info
 
     # https://github.com/ansible-collections/news-for-maintainers/issues/28

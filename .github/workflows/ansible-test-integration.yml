@@ -62,6 +62,7 @@ jobs:
           - volume
           - volume_action
           - volumes_info
+          - vpc
           - vpcs_info
 
     steps:

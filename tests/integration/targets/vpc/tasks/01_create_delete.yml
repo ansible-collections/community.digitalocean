@@ -1,0 +1,49 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create VPC
+      community.digitalocean.vpc:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ vpc_name }}"
+        region: "{{ region }}"
+      register: result
+
+    - name: Verify create VPC
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created VPC " ~ vpc_name ~ " (" ~ result.vpc.id ~ ")"
+          - result.vpc.name == vpc_name
+          - result.vpc.region == region
+
+    - name: Sleep a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete VPC
+      community.digitalocean.vpc:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ vpc_name }}"
+        region: "{{ region }}"
+      register: result
+
+    - name: Verify delete firewall
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted VPC " ~ vpc_name ~ " (" ~ result.vpc.id ~ ")"
+          - result.vpc.name == vpc_name
+          - result.vpc.region == region
+
+  always:
+
+    - name: Cleanup tag | Leftover from unexpected failure
+      community.digitalocean.vpc:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ vpc_name }}"
+        region: "{{ region }}"
+      ignore_errors: true
