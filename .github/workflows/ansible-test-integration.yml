@@ -33,15 +33,16 @@ jobs:
           - billing_history_info
           - cdn_endpoints_info
           - cdn_endpoints
-          - certificates_info
           - certificate
+          - certificates_info
+          - database_cluster
           - database_clusters_info
           - domains_info
-          - domain_records_info
           - domain_record
+          - domain_records_info
           - domain
-          - droplets_info
           - droplet
+          - droplets_info
           - firewalls_info
           - images_info
           - kubernetes_clusters_info
@@ -55,9 +56,9 @@ jobs:
           - snapshots_info
           - ssh_keys_info
           - tags_info
-          - volumes_info
-          - volume_action
           - volume
+          - volume_action
+          - volumes_info
           - vpcs_info
 
     steps:
