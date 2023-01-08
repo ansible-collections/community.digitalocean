@@ -221,7 +221,6 @@ class Firewall:
                 "inbound_rules": self.inbound_rules,
                 "outbound_rules": self.outbound_rules,
             }
-            # raise RuntimeError(body)
             firewall = self.client.firewalls.create(body=body)["firewall"]
 
             self.module.exit_json(
