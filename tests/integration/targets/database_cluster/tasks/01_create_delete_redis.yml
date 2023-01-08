@@ -1,0 +1,50 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create database cluster
+      community.digitalocean.database_cluster:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ database_name }}"
+        region: "{{ region }}"
+        engine: "{{ engine }}"
+        size: "{{ size }}"
+        num_nodes: "{{ num_nodes }}"
+      register: result
+
+    - name: Verify create database cluster
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created " ~ engine ~ " database cluster " ~ database_name ~ " (" ~ result.database.id ~ ") in " ~ region
+          - result.database.name == database_name
+          - result.database.engine == engine
+          - result.database.num_nodes == num_nodes
+          - result.database.region == region
+
+    - name: Delete database cluster
+      community.digitalocean.database_cluster:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ database_name }}"
+        region: "{{ region }}"
+        engine: "{{ engine}}"
+      register: result
+
+    - name: Verify delete database cluster
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted " ~ engine ~ " database cluster " ~ database_name ~ " (" ~ result.database.id ~ ") in " ~ region
+
+  always:
+
+    - name: Cleanup database cluster | Leftover from unexpected failure
+      community.digitalocean.database_cluster:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ database_name }}"
+        region: "{{ region }}"
+        engine: "{{ engine}}"
+      ignore_errors: true

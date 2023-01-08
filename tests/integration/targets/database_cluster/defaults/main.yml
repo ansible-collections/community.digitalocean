@@ -1,0 +1,5 @@
+region: nyc3
+size: db-s-1vcpu-2gb
+engine: redis
+database_name: ansible-gh-ci-redis-0
+num_nodes: 1
