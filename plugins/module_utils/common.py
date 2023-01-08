@@ -142,6 +142,7 @@ class DigitalOceanFunctions:
 
 class DigitalOceanConstants:
     PAGE_SIZE = 10
+    SLEEP = 10
 
 
 class DigitalOceanOptions:
@@ -152,6 +153,10 @@ class DigitalOceanOptions:
                 type="str",
                 choices=["present", "absent"],
                 default="present",
+            ),
+            timeout=dict(
+                type="int",
+                default=300, # 5 minutes
             ),
             token=dict(
                 type="str",

@@ -17,6 +17,11 @@ options:
     type: str
     choices: [ present, absent ]
     default: present
+  timeout:
+    description:
+      - Polling timeout in seconds.
+    type: int
+    default: 300
   token:
     description:
       - DigitalOcean API token.
