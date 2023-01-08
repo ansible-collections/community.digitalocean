@@ -251,7 +251,8 @@ class DomainRecord:
     def delete_domain_record(self, domain_record):
         try:
             self.client.domains.delete_record(
-                domain_name=self.domain_name, domain_record_id=domain_record["id"],
+                domain_name=self.domain_name,
+                domain_record_id=domain_record["id"],
             )
             self.module.exit_json(
                 changed=True,

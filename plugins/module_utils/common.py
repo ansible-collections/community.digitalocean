@@ -156,7 +156,7 @@ class DigitalOceanOptions:
             ),
             timeout=dict(
                 type="int",
-                default=300, # 5 minutes
+                default=300,  # 5 minutes
             ),
             token=dict(
                 type="str",
