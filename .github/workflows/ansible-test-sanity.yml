@@ -54,6 +54,7 @@ jobs:
           - reserved_ips_info
           - sizes_info
           - snapshots_info
+          - ssh_key
           - ssh_keys_info
           - tag
           - tags_info

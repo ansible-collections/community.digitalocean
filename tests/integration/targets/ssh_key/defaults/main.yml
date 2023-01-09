@@ -1,0 +1,4 @@
+ssh_key_name: ansible-gh-ci-ssh-key-0
+ssh_public_key: >-
+  ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBH6bTtnmZNhXUuxe+SZ6KOPG8JDo01scHYm26jfFmt5tjoYcZffFO5NS+pf7SFQ/0DD1w3O+/hZFKmBVMhbHoT4= mark@Marks-MacBook-Pro.local
+ssh_fingerprint: d1:d5:59:5e:7f:b8:5c:4c:3d:0f:5b:c7:e7:a4:67:a5

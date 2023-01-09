@@ -1,0 +1,45 @@
+# code: language=ansible
+---
+- block:
+
+    - name: Create SSH key
+      community.digitalocean.ssh_key:
+        token: "{{ do_api_key }}"
+        state: present
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: result
+
+    - name: Verify create SSH key
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created SSH key " ~ ssh_key_name ~ " (" ~ result.ssh_key.fingerprint ~ ")"
+          - result.ssh_key.name == ssh_key_name
+          - result.ssh_key.fingerprint == ssh_fingerprint
+
+    - name: Delete SSH key
+      community.digitalocean.ssh_key:
+        token: "{{ do_api_key }}"
+        state: absent
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      register: result
+
+    - name: Verify delete SSH key
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted SSH key " ~ ssh_key_name ~ " (" ~ result.ssh_key.fingerprint ~ ")"
+          - result.ssh_key.name == ssh_key_name
+          - result.ssh_key.fingerprint == ssh_fingerprint
+
+  always:
+
+    - name: Cleanup SSH key | Leftover from unexpected failure
+      community.digitalocean.ssh_key:
+        token: "{{ do_api_key }}"
+        state: absent
+        public_key: "{{ ssh_public_key }}"
+        name: "{{ ssh_key_name }}"
+      ignore_errors: true
