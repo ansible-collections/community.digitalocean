@@ -256,7 +256,7 @@ class Firewall:
                 changed=False,
                 msg=error.get("Message"),
                 error=error,
-                database=[],
+                firewall=[],
             )
 
     def present(self):
