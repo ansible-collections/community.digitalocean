@@ -376,8 +376,22 @@ class Droplet:
                         found_droplets.append(droplet)
         return found_droplets
 
-    def get_droplet_by_id(self):
-        return self.client.droplets.get(droplet_id=self.droplet_id)
+    def get_droplet_by_id(self, id):
+        try:
+            droplet = self.client.droplets.get(droplet_id=id)["droplet"]
+            return droplet
+        except HttpResponseError as err:
+            error = {
+                "Message": err.error.message,
+                "Status Code": err.status_code,
+                "Reason": err.reason,
+            }
+            self.module.fail_json(
+                changed=False,
+                msg=error.get("Message"),
+                error=error,
+                droplet=[],
+            )
 
     def create_droplet(self):
         try:
