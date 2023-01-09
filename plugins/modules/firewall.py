@@ -235,7 +235,7 @@ class Firewall:
                 "Reason": err.reason,
             }
             self.module.fail_json(
-                changed=False, msg=error.get("Message"), error=error, droplet=[]
+                changed=False, msg=error.get("Message"), error=error, firewall=[]
             )
 
     def delete_firewall(self, firewall):
