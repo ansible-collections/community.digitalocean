@@ -279,7 +279,7 @@ class Firewall:
         else:
             self.module.exit_json(
                 changed=False,
-                msg=f"There are currently {len(firewalls)} named {self.name}",
+                msg=f"There are currently {len(firewalls)} firewalls named {self.name}",
                 firewall=[],
             )
 
@@ -304,7 +304,7 @@ class Firewall:
             self.module.exit_json(
                 changed=False,
                 msg=f"There are currently {len(firewalls)} firewalls named {self.name}",
-                database=[],
+                firewall=[],
             )
 
 
