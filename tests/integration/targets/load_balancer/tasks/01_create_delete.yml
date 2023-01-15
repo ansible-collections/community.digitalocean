@@ -1,0 +1,94 @@
+# code: language=ansible
+---
+- name: Testing block
+  block:
+    - name: Create Droplet
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet.name }}"
+        region: "{{ droplet.region }}"
+        size: "{{ droplet.size }}"
+        image: "{{ droplet.image }}"
+        unique_name: true
+      register: result
+
+    - name: Verify create Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created Droplet " ~ droplet.name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet.region
+          - result.droplet.name == droplet.name
+          - result.droplet.region.slug == droplet.region
+          - result.droplet.size.slug == droplet.size
+
+    - name: Set a fact for the Droplet ID
+      ansible.builtin.set_fact:
+        droplet_id: "{{ result.droplet.id }}"
+
+    - name: Create load balancer
+      community.digitalocean.load_balancer:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ load_balancer.name }}"
+        region: "{{ load_balancer.region }}"
+        droplet_ids: ["{{ droplet_id }}"]
+        forwarding_rules: "{{ load_balancer.forwarding_rules }}"
+        disable_lets_encrypt_dns_records: "{{ load_balancer.disable_lets_encrypt_dns_records }}"
+        http_idle_timeout_seconds: "{{ load_balancer.http_idle_timeout_seconds }}"
+        firewall: "{{ load_balancer.firewall }}"
+      register: result
+
+    - name: Verify create load balancer
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created load balancer " ~ result.load_balancer.name ~ " (" ~ result.load_balancer.id ~ ")"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete load balancer
+      community.digitalocean.load_balancer:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ load_balancer.name }}"
+        region: "{{ load_balancer.region }}"
+      register: result
+
+    - name: Verify delete load balancer
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted load balancer " ~ result.load_balancer.name ~ " (" ~ result.load_balancer.id ~ ")"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete Droplet
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet.name }}"
+        region: "{{ droplet.region }}"
+        unique_name: true
+
+  always:
+    - name: Cleanup Droplet | Leftover from unexpected failure
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet.name }}"
+        region: "{{ droplet.region }}"
+        unique_name: true
+      ignore_errors: true  # noqa ignore-errors
+
+    - name: Cleanup load balancer | Leftover from unexpected failure
+      community.digitalocean.load_balancer:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ load_balancer.name }}"
+        region: "{{ load_balancer.region }}"
+      ignore_errors: true  # noqa ignore-errors

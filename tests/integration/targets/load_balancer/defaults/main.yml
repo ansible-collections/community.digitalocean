@@ -1,0 +1,28 @@
+droplet:
+  name: ansible-gh-ci-droplet-0
+  region: nyc3
+  size: s-1vcpu-2gb
+  image: ubuntu-22-04-x64
+
+load_balancer:
+  name: ansible-gh-ci-lb-0
+  region: nyc3
+  forwarding_rules:
+    - entry_protocol: http
+      entry_port: 80
+      target_protocol: http
+      target_port: 80
+    - entry_protocol: https
+      entry_port: 443
+      target_protocol: https
+      target_port: 443
+      tls_passthrough: true
+  disable_lets_encrypt_dns_records: true
+  http_idle_timeout_seconds: 60
+  firewall:
+    deny:
+      - cidr:1.2.0.0/16
+      - ip:2.3.4.5
+    allow:
+      - ip:1.2.3.4
+      - cidr:2.3.4.0/24

@@ -45,6 +45,7 @@ jobs:
           - firewalls_info
           - images_info
           - kubernetes_clusters_info
+          - load_balancer
           - load_balancers_info
           - monitoring_alert_policies_info
           - one_clicks_info
