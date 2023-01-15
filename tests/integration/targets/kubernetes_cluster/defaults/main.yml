@@ -1,0 +1,8 @@
+kubernetes_cluster:
+  name: ansible-gh-ci-k8s-0
+  region: nyc3
+  version: "1.25.4-do.0"
+  node_pools:
+    - size: s-2vcpu-4gb
+      name: ansible-gh-ci-k8s-pool-0
+      count: 1

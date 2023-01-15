@@ -1,0 +1,54 @@
+# code: language=ansible
+---
+- name: Testing block
+  block:
+    - name: Create Kubernetes cluster
+      community.digitalocean.kubernetes_cluster:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ kubernetes_cluster.name }}"
+        region: "{{ kubernetes_cluster.region }}"
+        version: "{{ kubernetes_cluster.version }}"
+        node_pools: "{{ kubernetes_cluster.node_pools }}"
+      register: result
+
+    - name: Verify create Kubernetes cluster
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - |
+            result.msg == "Created Kubernetes cluster " ~ result.kubernetes_cluster.name
+            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ result.kubernetes_cluster.region
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete Kubernetes cluster
+      community.digitalocean.kubernetes_cluster:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ kubernetes_cluster.name }}"
+        region: "{{ kubernetes_cluster.region }}"
+      register: result
+
+    - name: Verify delete load balancer
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - |
+            result.msg == "Deleted Kubernetes cluster " ~ result.kubernetes_cluster.name
+            ~ " (" ~ result.kubernetes_cluster.id ~ ") in " ~ result.kubernetes_cluster.region
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+  always:
+    - name: Cleanup Kubernetes cluster | Leftover from unexpected failure
+      community.digitalocean.kubernetes_cluster:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ kubernetes_cluster.name }}"
+        region: "{{ kubernetes_cluster.region }}"
+      ignore_errors: true  # noqa ignore-errors
