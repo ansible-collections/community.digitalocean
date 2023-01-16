@@ -1,0 +1,110 @@
+# code: language=ansible
+---
+- name: Testing block
+  block:
+    - name: Create Droplet
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet.name }}"
+        region: "{{ droplet.region }}"
+        size: "{{ droplet.size }}"
+        image: "{{ droplet.image }}"
+        unique_name: true
+      register: result
+
+    - name: Verify create Droplet
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created Droplet " ~ droplet.name ~ " (" ~ result.droplet.id ~ ") in " ~ droplet.region
+          - result.droplet.name == droplet.name
+          - result.droplet.region.slug == droplet.region
+          - result.droplet.size.slug == droplet.size
+
+    - name: Set a fact for the Droplet ID
+      ansible.builtin.set_fact:
+        droplet_id: "{{ result.droplet.id }}"
+
+    - name: Create monitoring alert policy
+      community.digitalocean.monitoring_alert_policy:
+        token: "{{ do_api_key }}"
+        state: present
+        alerts: "{{ policy.alerts }}"
+        compare: "{{ policy.compare }}"
+        description: "{{ policy.description }}"
+        enabled: "{{ policy.enabled }}"
+        entities: ["{{ droplet_id }}"]
+        tags: "{{ policy.tags }}"
+        type: "{{ policy.type }}"
+        value: "{{ policy.value }}"
+        window: "{{ policy.window }}"
+      register: result
+
+    - name: Verify create monitoring alert policy
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created monitoring alert policy " ~ policy.description ~ " (" ~ result.policy.uuid ~ ")"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete monitoring alert policy
+      community.digitalocean.monitoring_alert_policy:
+        token: "{{ do_api_key }}"
+        state: absent
+        alerts: "{{ policy.alerts }}"
+        compare: "{{ policy.compare }}"
+        description: "{{ policy.description }}"
+        enabled: "{{ policy.enabled }}"
+        entities: ["{{ droplet_id }}"]
+        tags: "{{ policy.tags }}"
+        type: "{{ policy.type }}"
+        value: "{{ policy.value }}"
+        window: "{{ policy.window }}"
+      register: result
+
+    - name: Verify delete monitoring alert policy
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted monitoring alert policy " ~ policy.description ~ " (" ~ result.policy.uuid ~ ")"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete Droplet
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet.name }}"
+        region: "{{ droplet.region }}"
+        unique_name: true
+
+  always:
+    - name: Cleanup Droplet | Leftover from unexpected failure
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet.name }}"
+        region: "{{ droplet.region }}"
+        unique_name: true
+      ignore_errors: true  # noqa ignore-errors
+
+    - name: Cleanup monitoring alert policy | Leftover from unexpected failure
+      community.digitalocean.monitoring_alert_policy:
+        token: "{{ do_api_key }}"
+        state: absent
+        alerts: "{{ policy.alerts }}"
+        compare: "{{ policy.compare }}"
+        description: "{{ policy.description }}"
+        enabled: "{{ policy.enabled }}"
+        entities: ["{{ droplet_id }}"]
+        tags: "{{ policy.tags }}"
+        type: "{{ policy.type }}"
+        value: "{{ policy.value }}"
+        window: "{{ policy.window }}"
+      ignore_errors: true  # noqa ignore-errors

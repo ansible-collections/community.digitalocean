@@ -17,8 +17,8 @@ short_description: Returns all alert policies that are configured for the given 
 version_added: 2.0.0
 
 description:
-  - Returns all alert policies that are configured for the given account
-  - View the API documentation at (https://docs.digitalocean.com/reference/api/api-reference/#operation/monitoring_list_alertPolicy).
+  - Returns all alert policies that are configured for the given account.
+  - View the API documentation at U(https://docs.digitalocean.com/reference/api/api-reference/#operation/monitoring_list_alertPolicy).
 
 author: Mark Mercado (@mamercad)
 
@@ -75,8 +75,7 @@ msg:
   returned: always
   type: str
   sample:
-    - Current monitoring alert policies
-    - No monitoring alert policies
+    - Current alert polices
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -106,12 +105,13 @@ else:
     HAS_PYDO_LIBRARY = True
 
 
-class MonitoringAlertPolicyInformation:
+class MonitoringAlertPoliciesInformation:
     def __init__(self, module):
         """Class constructor."""
         self.module = module
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
+
         if self.state == "present":
             self.present()
 
@@ -123,32 +123,30 @@ class MonitoringAlertPolicyInformation:
             key="policies",
             exc=HttpResponseError,
         )
-        if policies:
-            self.module.exit_json(
-                changed=False,
-                msg="Current monitoring alert policies",
-                policies=policies,
-            )
         self.module.exit_json(
-            changed=False, msg="No monitoring alert policies", policies=[]
+            changed=False,
+            msg="Current alert policies",
+            polices=policies,
         )
 
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
+
     if not HAS_AZURE_LIBRARY:
         module.fail_json(
             msg=missing_required_lib("azure.core.exceptions"),
             exception=AZURE_LIBRARY_IMPORT_ERROR,
         )
+
     if not HAS_PYDO_LIBRARY:
         module.fail_json(
             msg=missing_required_lib("pydo"),
             exception=PYDO_LIBRARY_IMPORT_ERROR,
         )
 
-    MonitoringAlertPolicyInformation(module)
+    MonitoringAlertPoliciesInformation(module)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,21 @@
+droplet:
+  name: ansible-gh-ci-droplet-0
+  region: nyc3
+  size: s-1vcpu-2gb
+  image: ubuntu-22-04-x64
+
+policy:
+  alerts:
+    email:
+      - mamercad@gmail.com
+    function: []
+    slack: []
+  compare: GreaterThan
+  description: CPU Alert Testing
+  enabled: true
+  entities: []
+  tags:
+    - droplet_tag
+  type: "v1/insights/droplet/cpu"
+  value: 80
+  window: 5m
