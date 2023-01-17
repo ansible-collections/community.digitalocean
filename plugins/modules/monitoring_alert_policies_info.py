@@ -126,7 +126,7 @@ class MonitoringAlertPoliciesInformation:
         self.module.exit_json(
             changed=False,
             msg="Current alert policies",
-            polices=policies,
+            policies=policies,
         )
 
 
