@@ -244,7 +244,7 @@ class DropletAction:
 
         self.module.fail_json(
             changed=False,
-            msg=f"Should not reach this",
+            msg="Should not reach this",
             action=[],
         )
 
@@ -329,7 +329,7 @@ def main():
                 "sgp1",
                 "tor1",
             ],
-            required=True,
+            required=False,
         ),
         type=dict(
             type="str",
@@ -350,6 +350,7 @@ def main():
                 # "enable_ipv6",
                 "snapshot",
             ],
+            required=True,
         ),
         snapshot_name=dict(type="str", required=False),
     )
