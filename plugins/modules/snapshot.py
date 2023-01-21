@@ -32,7 +32,13 @@ options:
       - Either the ID of an existing snapshot.
       - This will be an integer for a Droplet snapshot or a string for a volume snapshot.
     type: str
-    required: true
+    required: false
+  snapshot_name:
+    description:
+      - The name of an existing snapshot.
+      - The module will fail if there is more than one by the same name, use C(snapshot)id).
+    type: str
+    required: false
 
 extends_documentation_fragment:
   - community.digitalocean.common.documentation
@@ -84,8 +90,11 @@ msg:
   type: str
   sample:
     - Deleted snapshot 125349720
-    - Would 125349720 would be deleted
+    - Deleted snapshot test-snapshot-1
+    - Snapshot 125349720 would be deleted
+    - Snapshot test-snapshot-1 would be deleted
     - Snapshot 125349720 not found
+    - Snapshot test-snapshot-1 not found
 """
 
 from ansible.module_utils.basic import AnsibleModule, missing_required_lib
@@ -121,6 +130,7 @@ class Snapshot:
         self.client = Client(token=module.params.get("token"))
         self.state = module.params.get("state")
         self.snapshot_id = module.params.get("snapshot_id")
+        self.snapshot_name = module.params.get("snapshot_name")
 
         if self.state == "absent":
             self.absent()
@@ -146,7 +156,7 @@ class Snapshot:
                 snapshot=[],
             )
 
-    def get_snapshot(self, snapshot_id):
+    def get_snapshot_by_id(self, snapshot_id):
         snapshots = DigitalOceanFunctions.get_paginated(
             module=self.module,
             obj=self.client.snapshots,
@@ -160,35 +170,84 @@ class Snapshot:
                 return snapshot
         return None
 
+    def get_snapshot_by_name(self, snapshot_name):
+        snapshots = DigitalOceanFunctions.get_paginated(
+            module=self.module,
+            obj=self.client.snapshots,
+            meth="list",
+            key="snapshots",
+            params=None,
+            exc=HttpResponseError,
+        )
+        found_snapshots = []
+        for snapshot in snapshots:
+            if snapshot["name"] == snapshot_name:
+                found_snapshots.append(snapshot)
+
+        if len(found_snapshots) == 0:
+            return None
+
+        elif len(found_snapshots) == 1:
+            return found_snapshots[0]
+
+        self.module.fail_json(
+            changed=True,
+            msg=f"More than one ({len(found_snapshots)}) found named {snapshot_name})",
+            snapshot=[],
+        )
+
     def absent(self):
-        snapshot = self.get_snapshot(snapshot_id=self.snapshot_id)
+        if self.snapshot_id:
+            snapshot = self.get_snapshot_by_id(snapshot_id=self.snapshot_id)
 
-        if not snapshot:
-            self.module.exit_json(
-                changed=False,
-                msg=f"Snapshot {self.snapshot_id} not found",
-                snapshot=[],
-            )
+            if not snapshot:
+                self.module.exit_json(
+                    changed=False,
+                    msg=f"Snapshot {self.snapshot_id} not found",
+                    snapshot=[],
+                )
 
-        if self.module.check_mode:
-            self.module.exit_json(
-                changed=True,
-                msg=f"Snapshot {snapshot['id']} would be deleted",
-                snapshot=snapshot,
-            )
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Snapshot {self.snapshot_id} would be deleted",
+                    snapshot=snapshot,
+                )
 
-        self.delete_snapshot(snapshot=snapshot)
+            self.delete_snapshot(snapshot=snapshot)
+
+        elif self.snapshot_name:
+            snapshot = self.get_snapshot_by_name(snapshot_name=self.snapshot_name)
+
+            if not snapshot:
+                self.module.exit_json(
+                    changed=False,
+                    msg=f"Snapshot {self.snapshot_name} not found",
+                    snapshot=[],
+                )
+
+            if self.module.check_mode:
+                self.module.exit_json(
+                    changed=True,
+                    msg=f"Snapshot {self.snapshot_name} would be deleted",
+                    snapshot=snapshot,
+                )
+
+            self.delete_snapshot(snapshot=snapshot)
 
 
 def main():
     argument_spec = DigitalOceanOptions.argument_spec()
     argument_spec.update(
-        snapshot_id=dict(type="str", required=True),
+        snapshot_id=dict(type="str", required=False),
+        snapshot_name=dict(type="str", required=False),
     )
 
     module = AnsibleModule(
         argument_spec=argument_spec,
         supports_check_mode=True,
+        required_one_of=[("snapshot_id", "snapshot_name")],
+        mutually_exclusive=[("snapshot_id", "snapshot_name")],
     )
 
     if not HAS_AZURE_LIBRARY:
