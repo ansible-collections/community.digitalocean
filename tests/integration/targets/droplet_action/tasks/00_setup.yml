@@ -1,0 +1,12 @@
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Create Droplet
+      community.digitalocean.droplet:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        size: "{{ droplet_size }}"
+        image: "{{ droplet_image }}"
+        unique_name: true

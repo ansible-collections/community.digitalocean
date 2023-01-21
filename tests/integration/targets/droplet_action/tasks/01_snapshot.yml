@@ -1,0 +1,37 @@
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Create Droplet snapshot
+      when: true
+      community.digitalocean.droplet_action:
+        token: "{{ do_api_key }}"
+        state: present
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        type: snapshot
+        snapshot_name: "{{ snapshot_name }}"
+      register: result
+
+    - name: Verify create Droplet snapshot
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Droplet " ~ droplet_name ~ " (" ~ result.action.resource_id ~ ") in " ~ droplet_region ~ " sent action 'snapshot'"
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete snapshot
+      when: true
+      community.digitalocean.snapshot:
+        token: "{{ do_api_key }}"
+        state: absent
+        snapshot_name: "{{ snapshot_name }}"
+      register: result
+
+    - name: Verify delete snapshot
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted snapshot " ~ result.snapshot.id

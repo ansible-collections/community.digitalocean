@@ -1,0 +1,10 @@
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Teardown | Delete Droplet
+      community.digitalocean.droplet:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ droplet_name }}"
+        region: "{{ droplet_region }}"
+        unique_name: true

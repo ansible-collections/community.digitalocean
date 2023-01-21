@@ -1,0 +1,6 @@
+droplet_name: gh-ci-test-droplet-1
+droplet_region: nyc3
+droplet_size: s-1vcpu-2gb
+droplet_image: ubuntu-22-04-x64
+
+snapshot_name: gh-ci-test-droplet-1-snapshot-1

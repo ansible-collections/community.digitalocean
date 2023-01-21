@@ -42,6 +42,7 @@ jobs:
           - domain_records_info
           - domain
           - droplet
+          - droplet_action
           - droplets_info
           - firewall
           - firewalls_info
