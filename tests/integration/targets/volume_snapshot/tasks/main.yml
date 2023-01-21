@@ -9,6 +9,6 @@
         - do_api_key is not defined
         - do_api_key | length == 0
 
-    - name: Test volume | Create and delete
+    - name: Test volume snapshot | Create and delete
       ansible.builtin.include_tasks:
         file: 01_create_delete.yml

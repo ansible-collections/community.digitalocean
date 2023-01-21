@@ -32,7 +32,7 @@ else:
 
 class DigitalOceanFunctions:
     @staticmethod
-    def get_paginated(module, obj, meth, key, exc, params=None):
+    def get_paginated(module, obj, meth, key, exc, params=None, **kwargs):
         results = []
         page = 1
         paginated = True
@@ -40,7 +40,10 @@ class DigitalOceanFunctions:
             try:
                 fn = getattr(obj, meth)
                 resp = fn(
-                    per_page=DigitalOceanConstants.PAGE_SIZE, page=page, params=params
+                    per_page=DigitalOceanConstants.PAGE_SIZE,
+                    page=page,
+                    params=params,
+                    **kwargs,
                 )
                 if key:
                     results.extend(resp.get(key))

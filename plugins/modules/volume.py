@@ -247,11 +247,11 @@ class Volume:
                 "region": self.region,
                 "filesystem_label": self.filesystem_label,
             }
-            volume = self.client.volumes.create(body=body)
+            volume = self.client.volumes.create(body=body)["volume"]
             self.module.exit_json(
                 changed=True,
-                msg=f"Created volume {self.name} in {self.region}",
-                volume=volume.get("volume"),
+                msg=f"Created volume {self.name} ({volume['id']}) in {self.region}",
+                volume=volume,
             )
         except HttpResponseError as err:
             error = {
@@ -259,20 +259,19 @@ class Volume:
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, volume=[]
+            )
 
-    def delete_volume(self):
+    def delete_volume(self, volume):
         try:
-            resp = self.client.volumes.delete_by_name(
-                name=self.name, region=self.region
+            self.client.volumes.delete_by_name(
+                name=volume["name"], region=volume["region"]["slug"]
             )
-            if resp:
-                message = resp.get("message")
-                id = resp.get("id")
-                if id == "not_found":
-                    self.module.exit_json(changed=False, msg=message)
             self.module.exit_json(
-                changed=True, msg=f"Deleted volume {self.name} in {self.region}"
+                changed=True,
+                msg=f"Deleted volume {volume['name']} ({volume['id']}) in {self.region}",
+                volume=volume,
             )
         except HttpResponseError as err:
             error = {
@@ -280,7 +279,9 @@ class Volume:
                 "Status Code": err.status_code,
                 "Reason": err.reason,
             }
-            self.module.fail_json(changed=False, msg=error.get("Message"), error=error)
+            self.module.fail_json(
+                changed=False, msg=error.get("Message"), error=error, volume=volume
+            )
 
     def present(self):
         volumes = self.get_volumes_by_name_and_region()
@@ -330,7 +331,7 @@ class Volume:
                     volume=volumes[0],
                 )
             else:
-                self.delete_volume()
+                self.delete_volume(volume=volumes[0])
         elif len(volumes) > 1:
             volume_ids = ", ".join([str(volume["id"]) for volume in volumes])
             self.module.fail_json(

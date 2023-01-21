@@ -1,0 +1,95 @@
+# code: language=ansible
+- name: Testing block
+  block:
+    - name: Create volume
+      community.digitalocean.volume:
+        state: present
+        token: "{{ do_api_key }}"
+        name: "{{ volume_name }}"
+        region: "{{ region }}"
+        size_gigabytes: "{{ size_gigabytes }}"
+      register: result
+
+    - name: Create a fact for the volume id
+      ansible.builtin.set_fact:
+        volume_id: "{{ result.volume.id }}"
+
+    - name: Verify create volume
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created volume " ~ volume_name ~ " (" ~ volume_id ~ ") in " ~ region
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Create volume snapshot
+      community.digitalocean.volume_snapshot:
+        token: "{{ do_api_key }}"
+        state: present
+        volume_id: "{{ volume_id }}"
+        name: "{{ volume_snapshot_name }}"
+        tags: "{{ volume_snapshot_tags }}"
+      register: result
+
+    - name: Verify create volume snapshot
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Created volume snapshot " ~ volume_snapshot_name ~ " (" ~ result.snapshot.id ~ ") of volume " ~ volume_id
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Delete volume snapshot
+      community.digitalocean.volume_snapshot:
+        token: "{{ do_api_key }}"
+        state: absent
+        volume_id: "{{ volume_id }}"
+        name: "{{ volume_snapshot_name }}"
+        tags: "{{ volume_snapshot_tags }}"
+      register: result
+
+    - name: Verify delete volume snapshot
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted volume snapshot " ~ volume_snapshot_name ~ " (" ~ result.snapshot.id ~ ") of volume " ~ volume_id
+
+    - name: Delete volume
+      community.digitalocean.volume:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ volume_name }}"
+        region: "{{ region }}"
+      register: result
+
+    - name: Verify delete volume
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg == "Deleted volume " ~ volume_name ~ " (" ~ result.volume.id ~ ") in " ~ region
+
+    - name: Sleep for a few seconds
+      ansible.builtin.pause:
+        seconds: 10
+
+  always:
+    - name: Delete volume snapshot | Always
+      community.digitalocean.volume_snapshot:
+        token: "{{ do_api_key }}"
+        state: absent
+        volume_id: "{{ volume_id }}"
+        name: "{{ volume_snapshot_name }}"
+        tags: "{{ volume_snapshot_tags }}"
+      ignore_errors: true # noqa ignore-errors
+
+    - name: Delete volume | Always
+      community.digitalocean.volume:
+        state: absent
+        token: "{{ do_api_key }}"
+        name: "{{ volume_name }}"
+        region: "{{ region }}"
+      ignore_errors: true # noqa ignore-errors

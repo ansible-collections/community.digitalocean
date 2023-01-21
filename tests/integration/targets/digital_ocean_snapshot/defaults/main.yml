@@ -1,9 +1,0 @@
-do_region: nyc1
-droplet_name: gh-ci-droplet
-droplet_image: ubuntu-18-04-x64
-droplet_size: s-1vcpu-1gb
-snapshot_name: gh-ci-snapshot
-volume_name: gh-ci-volume
-volume_size: 15
-volume_down_size: 10
-volume_up_size: 20

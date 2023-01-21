@@ -63,6 +63,7 @@ jobs:
           - tags_info
           - volume
           - volume_action
+          - volume_snapshot
           - volumes_info
           - vpc
           - vpcs_info

@@ -1,6 +1,6 @@
 # code: language=ansible
-- block:
-
+- name: Testing block
+  block:
     - name: Create volume
       community.digitalocean.volume:
         state: present
@@ -14,13 +14,11 @@
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.volume is defined
-          - result.volume.id is defined
-          - result.msg == "Created volume " ~ volume_name ~ " in " ~ region
+          - result.msg == "Created volume " ~ volume_name ~ " (" ~ result.volume.id ~ ") in " ~ region
 
-    - name: Sleep for a minute
+    - name: Sleep for a few seconds
       ansible.builtin.pause:
-        minutes: 1
+        seconds: 10
 
     - name: Delete volume
       community.digitalocean.volume:
@@ -34,19 +32,17 @@
       ansible.builtin.assert:
         that:
           - result.changed
-          - result.msg is defined
-          - result.msg == "Deleted volume " ~ volume_name ~ " in " ~ region
+          - result.msg == "Deleted volume " ~ volume_name ~ " (" ~ result.volume.id ~ ") in " ~ region
 
-    - name: Sleep for a minute
+    - name: Sleep for a few seconds
       ansible.builtin.pause:
-        minutes: 1
+        seconds: 10
 
   always:
-
     - name: Delete volume | Always
       community.digitalocean.volume:
         state: absent
         token: "{{ do_api_key }}"
         name: "{{ volume_name }}"
         region: "{{ region }}"
-      ignore_errors: true
+      ignore_errors: true # noqa ignore-errors
