@@ -169,7 +169,7 @@ EXAMPLES = r"""
       - name: hacktoberfest-workers
         size: s-1vcpu-2gb
         count: 3
-    return_kubeconfig: yes
+    return_kubeconfig: true
     wait_timeout: 600
     register: my_cluster
 

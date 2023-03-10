@@ -42,7 +42,7 @@ EXAMPLES = r"""
   community.digitalocean.digital_ocean_kubernetes_info:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
-    return_kubeconfig: yes
+    return_kubeconfig: true
   register: my_cluster
 
 - ansible.builtin.debug:
