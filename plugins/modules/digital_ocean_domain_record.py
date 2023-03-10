@@ -218,7 +218,6 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
             )
 
     def __get_all_records(self):
-
         records = []
         page = 1
         while True:
@@ -315,7 +314,6 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
             )
 
     def create_or_update_record(self):
-
         # if record_id is given we need to update the record no matter what
         if self.record_id:
             changed, result = self.__update_record(self.record_id)
@@ -394,7 +392,6 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
             )
 
     def __build_payload(self):
-
         payload = dict(
             data=self.module.params.get("data"),
             flags=self.module.params.get("flags"),
@@ -418,7 +415,6 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
         return payload
 
     def delete_record(self):
-
         # if record_id is given, try to find the record based on the id
         if self.record_id:
             record = self.__find_record_by_id(self.record_id)

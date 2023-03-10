@@ -119,7 +119,6 @@ from ansible.plugins.inventory import BaseInventoryPlugin, Constructable, Cachea
 
 
 class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
-
     NAME = "community.digitalocean.digitalocean"
 
     # Constructable methods use the following function to construct group names. By
@@ -195,7 +194,6 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
         strict = self.get_option("strict")
         host_filters = self.get_option("filters")
         for record in records:
-
             host_name = record.get("name")
             if not host_name:
                 continue
