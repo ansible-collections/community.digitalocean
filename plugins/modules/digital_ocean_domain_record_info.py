@@ -116,7 +116,6 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
             )
 
     def __get_all_records(self):
-
         records = []
         page = 1
         while True:
@@ -176,7 +175,6 @@ class DigitalOceanDomainRecordManager(DigitalOceanHelper, object):
         return None
 
     def __build_payload(self):
-
         payload = dict(
             name=self.module.params.get("name"),
             type=self.module.params.get("type"),

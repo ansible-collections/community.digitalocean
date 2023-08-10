@@ -295,7 +295,6 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 
 
 class DODroplet(object):
-
     failure_message = {
         "empty_response": "Empty response from the DigitalOcean API; please try again or open a bug if it never "
         "succeeds.",

@@ -208,7 +208,6 @@ def run(module):
 
 
 def main():
-
     argument_spec = DigitalOceanHelper.digital_ocean_argument_spec()
     argument_spec.update(
         state=dict(type="str", choices=["present", "absent"], default="present"),
