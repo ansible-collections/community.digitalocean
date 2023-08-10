@@ -15,11 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         ansible:
-          - stable-2.10
-          - stable-2.11
           - stable-2.12
           - stable-2.13
-          - devel
+          - stable-2.14
     runs-on: ubuntu-22.04
     steps:
       - name: Perform testing

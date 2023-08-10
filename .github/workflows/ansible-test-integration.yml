@@ -17,6 +17,8 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
+        ansible:
+          - stable-2.14
         module:
           - digital_ocean_account_info
           - digital_ocean_balance_info
@@ -71,6 +73,7 @@ jobs:
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
+          ansible-core-version: ${{ matrix.ansible }}
           origin-python-version: 3.9
           target: ${{ matrix.module }}
           target-python-version: 3.9

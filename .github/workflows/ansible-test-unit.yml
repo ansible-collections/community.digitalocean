@@ -15,11 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         ansible:
-          - stable-2.10
-          - stable-2.11
           - stable-2.12
           - stable-2.13
-          - devel
+          - stable-2.14
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
