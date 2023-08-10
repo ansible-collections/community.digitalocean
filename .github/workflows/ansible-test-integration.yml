@@ -1,19 +1,17 @@
 name: integration
+
 on:
   push:
-    branches:
-      - main
-  schedule:
-    - cron: "10 6 * * *"
+    branches: [main, mamercad/fix-tests]
   workflow_dispatch:
 
 concurrency:
-  group: cloud-integration-tests
-  cancel-in-progress: false
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   integration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 40
     strategy:
       fail-fast: false

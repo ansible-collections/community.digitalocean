@@ -9,8 +9,8 @@ on:
       - plugins/modules/**
 
 concurrency:
-  group: cloud-integration-tests
-  cancel-in-progress: false
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 env:
   DEFAULT_BRANCH: remotes/origin/main
@@ -20,7 +20,7 @@ jobs:
     # Require reviewers for this environment
     # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
     environment: integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -55,7 +55,7 @@ jobs:
 
   test-module-utils:
     environment: integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 120
     needs: [changes]
     if: ${{ needs.changes.outputs.module-utils-matrix != '[""]' }}
@@ -125,7 +125,7 @@ jobs:
 
   test-modules:
     environment: integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 40
     needs: [changes]
     if: ${{ needs.changes.outputs.module-utils-matrix == '[""]' && needs.changes.outputs.module-matrix != '[""]' }}

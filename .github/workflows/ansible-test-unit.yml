@@ -1,39 +1,14 @@
 name: unit
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
   push:
-    branches: [ main ]
-  schedule:
-    - cron: '10 6 * * *'
+    branches: [main, mamercad/fix-tests]
+  workflow_dispatch:
 
 jobs:
-
-  units_29:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    name: Units (Ⓐ${{ matrix.ansible }})
-    strategy:
-      fail-fast: true
-      matrix:
-        ansible:
-          - stable-2.9
-    steps:
-      - name: Perform testing
-        uses: ansible-community/ansible-test-gh-action@release/v1
-        with:
-          ansible-core-version: ${{ matrix.ansible }}
-          # pre-test-cmd:
-          python-version: 3.8
-          target-python-version: 3.8
-          testing-type: units
-          test-deps: >-
-            ansible.netcommon
-            ansible.utils
-            community.general
-
   units:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
@@ -50,8 +25,7 @@ jobs:
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           ansible-core-version: ${{ matrix.ansible }}
-          # pre-test-cmd:
-          python-version: 3.9
+          origin-python-version: 3.9
           target-python-version: 3.9
           testing-type: units
           test-deps: >-
