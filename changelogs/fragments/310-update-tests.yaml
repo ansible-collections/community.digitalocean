@@ -1,0 +1,8 @@
+minor_changes:
+  - tests - run C(psf/black) across all files (https://github.com/ansible-collections/community.digitalocean/pull/310).
+  - tests - remove the daily runs (https://github.com/ansible-collections/community.digitalocean/pull/310).
+  - tests - drop Ansible 2.9 and Ansible Core 2.10 and 2.11 (https://github.com/ansible-collections/community.digitalocean/pull/310).
+  - tests - test against Ansible Core 2.12, 2.13, and 2.14 (https://github.com/ansible-collections/community.digitalocean/pull/310).
+trivial:
+  - documentation - add C(CODEOWNERS) (https://github.com/ansible-collections/community.digitalocean/pull/310).
+  - python - add C(pyproject.toml) and C(poetry.lock) (https://github.com/ansible-collections/community.digitalocean/pull/310).
