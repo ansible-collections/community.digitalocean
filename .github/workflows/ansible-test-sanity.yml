@@ -3,8 +3,6 @@ name: sanity
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  push:
-    branches: [main, mamercad/fix-tests]
   workflow_dispatch:
 
 jobs:
