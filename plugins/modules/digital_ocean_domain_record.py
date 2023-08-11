@@ -116,7 +116,7 @@ EXAMPLES = """
     type: A
     name: www
     data: 127.0.0.2
-    force_update: yes
+    force_update: true
 
 - name: Update A record for www based on record_id
   community.digitalocean.digital_ocean_domain_record:
@@ -127,7 +127,7 @@ EXAMPLES = """
     type: A
     name: www
     data: 127.0.0.2
-    force_update: yes
+    force_update: true
 
 - name: Remove www record based on name/type/data
   community.digitalocean.digital_ocean_domain_record:

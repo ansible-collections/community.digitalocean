@@ -1,0 +1,2 @@
+minor_changes:
+  - documentation - use C(true) and C(false) for boolean values in documentation and examples (https://github.com/ansible-collections/community.digitalocean/issues/303).
