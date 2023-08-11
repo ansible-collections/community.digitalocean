@@ -247,7 +247,6 @@ class DOMonitoringAlerts(object):
     def delete(self):
         uuid = self.module.params.get("uuid", None)
         if uuid is not None:
-
             # Check mode
             if self.module.check_mode:
                 self.module.exit_json(changed=True)

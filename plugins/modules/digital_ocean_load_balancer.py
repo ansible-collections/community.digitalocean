@@ -416,7 +416,6 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
 
 
 class DOLoadBalancer(object):
-
     # Regions which use 'size' versus 'size_unit'
     size_regions = {"ams2", "nyc2", "sfo1"}
     all_sizes = {"lb-small", "lb-medium", "lb-large"}

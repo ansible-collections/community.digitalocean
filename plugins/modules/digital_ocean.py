@@ -398,7 +398,6 @@ def core(module):
     if command == "droplet":
         Droplet.setup(api_token)
         if state in ("active", "present"):
-
             # First, try to find a droplet by id.
             droplet = Droplet.find(id=module.params["id"])
 

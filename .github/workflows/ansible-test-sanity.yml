@@ -1,52 +1,27 @@
 name: sanity
+
 on:
   pull_request:
-    types: [ opened, synchronize, reopened ]
-  push:
-    branches: [ main ]
-  schedule:
-    - cron: '0 6 * * *'
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
-
-  sanity_29:
-    timeout-minutes: 30
-    name: Sanity (Ⓐ$${{ matrix.ansible }})
-    strategy:
-      matrix:
-        ansible:
-          - stable-2.9
-    runs-on: ubuntu-latest
-    steps:
-      - name: Perform testing
-        uses: ansible-community/ansible-test-gh-action@release/v1
-        with:
-          ansible-core-version: ${{ matrix.ansible }}
-          # pre-test-cmd:
-          python-version: 3.8
-          target-python-version: 3.8
-          testing-type: sanity
-          # test-deps:
-
   sanity:
     timeout-minutes: 30
     name: Sanity (Ⓐ$${{ matrix.ansible }})
     strategy:
+      fail-fast: false
       matrix:
         ansible:
-        - stable-2.10
-        - stable-2.11
-        - stable-2.12
-        - stable-2.13
-        - devel
-    runs-on: ubuntu-latest
+          - stable-2.12
+          - stable-2.13
+          - stable-2.14
+    runs-on: ubuntu-22.04
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
           ansible-core-version: ${{ matrix.ansible }}
-          # pre-test-cmd:
-          python-version: 3.9
+          origin-python-version: 3.9
           target-python-version: 3.9
           testing-type: sanity
-          # test-deps:

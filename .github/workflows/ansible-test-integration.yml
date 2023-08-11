@@ -1,67 +1,23 @@
 name: integration
+
 on:
   push:
-    branches:
-      - main
-  schedule:
-    - cron: "10 6 * * *"
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
-  group: cloud-integration-tests
-  cancel-in-progress: false
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
 
 jobs:
   integration:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     timeout-minutes: 40
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
-        module:
-          - digital_ocean_account_info
-          - digital_ocean_balance_info
-          - digital_ocean_block_storage
-          - digital_ocean_cdn_endpoints
-          - digital_ocean_cdn_endpoints_info
-          - digital_ocean_certificate
-          - digital_ocean_certificate_info
-          - digital_ocean_database
-          - digital_ocean_database_info
-          - digital_ocean_domain
-          - digital_ocean_domain_info
-          - digital_ocean_domain_record
-          - digital_ocean_domain_record_info
-          - digital_ocean_droplet
-          - digital_ocean_droplet_info
-          - digital_ocean_firewall
-          - digital_ocean_firewall_info
-          - digital_ocean_floating_ip
-          - digital_ocean_floating_ip_info
-          - digital_ocean_image_info
-          - digital_ocean_kubernetes
-          - digital_ocean_kubernetes_info
-          - digital_ocean_load_balancer
-          - digital_ocean_load_balancer_info
-          - digital_ocean_monitoring_alerts
-          - digital_ocean_monitoring_alerts_info
-          - digital_ocean_project
-          - digital_ocean_project_info
-          - digital_ocean_region_info
-          - digital_ocean_size_info
-          - digital_ocean_snapshot
-          - digital_ocean_snapshot_info
-          - digital_ocean_spaces
-          - digital_ocean_spaces_info
-          - digital_ocean_sshkey
-          - digital_ocean_sshkey_info
-          - digital_ocean_tag
-          - digital_ocean_tag_info
-          - digital_ocean_volume_info
-          - digital_ocean_vpc
-          - digital_ocean_vpc_info
-
+        ansible:
+          - stable-2.14
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
@@ -73,8 +29,8 @@ jobs:
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
+          ansible-core-version: ${{ matrix.ansible }}
           origin-python-version: 3.9
-          target: ${{ matrix.module }}
           target-python-version: 3.9
           testing-type: integration
           test-deps: community.general
