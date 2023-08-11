@@ -61,7 +61,6 @@ jobs:
     if: ${{ needs.changes.outputs.module-utils-matrix != '[""]' }}
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         ansible:
           - stable-2.14

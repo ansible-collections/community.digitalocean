@@ -15,7 +15,6 @@ jobs:
     timeout-minutes: 40
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         ansible:
           - stable-2.14
