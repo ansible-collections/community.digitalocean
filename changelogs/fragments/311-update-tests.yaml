@@ -1,0 +1,2 @@
+minor_changes:
+  - tests - add C(sanity), C(units), and C(psf/black) back on merge into C(main) (https://github.com/ansible-collections/community.digitalocean/pull/311).

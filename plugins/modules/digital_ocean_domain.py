@@ -119,7 +119,7 @@ class DoManager(DigitalOceanHelper, object):
         return response.status_code, response.json
 
     def all_domains(self):
-        resp = self.get("domains/")
+        resp = self.get_paginated_data(base_url="domains?", data_key_name="domains")
         return resp
 
     def find(self):
@@ -127,8 +127,7 @@ class DoManager(DigitalOceanHelper, object):
             return None
 
         domains = self.all_domains()
-        status, json = self.jsonify(domains)
-        for domain in json["domains"]:
+        for domain in domains:
             if domain["name"] == self.domain_name:
                 return domain
         return None
