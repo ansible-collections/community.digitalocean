@@ -1,0 +1,2 @@
+trivial:
+  - tests - double the integration timeout (https://github.com/ansible-collections/community.digitalocean/pull/312).
