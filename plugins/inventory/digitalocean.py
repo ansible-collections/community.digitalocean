@@ -30,15 +30,6 @@ options:
         this should always be C(community.digitalocean.digitalocean).
     required: true
     choices: ['community.digitalocean.digitalocean']
-  api_token:
-    description:
-     - DigitalOcean OAuth token.
-     - Template expressions can be used in this field.
-    required: true
-    type: str
-    aliases: [ oauth_token ]
-    env:
-      - name: DO_API_TOKEN
   attributes:
     description: >-
       Droplet attributes to add as host vars to each inventory host.
@@ -78,7 +69,7 @@ options:
 EXAMPLES = r"""
 # Using keyed groups and compose for hostvars
 plugin: community.digitalocean.digitalocean
-api_token: '{{ lookup("pipe", "./get-do-token.sh" }}'
+oauth_token: '{{ lookup("pipe", "./get-do-token.sh" }}'
 attributes:
   - id
   - name
@@ -108,7 +99,6 @@ filters:
   - 'do_region.slug == "fra1"'
 """
 
-import re
 import json
 from ansible.errors import AnsibleError, AnsibleParserError
 from ansible.inventory.group import to_safe_group_name
@@ -159,7 +149,7 @@ class InventoryModule(BaseInventoryPlugin, Constructable, Cacheable):
 
     def _get_payload(self):
         # request parameters
-        api_token = self._template_option("api_token")
+        api_token = self._template_option("oauth_token")
         headers = {
             "Content-Type": "application/json",
             "Authorization": "Bearer {0}".format(api_token),

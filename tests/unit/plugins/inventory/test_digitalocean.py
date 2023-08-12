@@ -208,7 +208,7 @@ def test_populate_groups_sanitization(inventory, mocker, transform):
 def get_option_with_templated_api_token(option):
     options = {
         # "random_choice" with just a single input always returns the same result.
-        "api_token": '{{ lookup("random_choice", "my-do-token") }}',
+        "oauth_token": '{{ lookup("random_choice", "my-do-token") }}',
         "pagination": 100,
     }
     return options.get(option)
