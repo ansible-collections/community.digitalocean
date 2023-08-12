@@ -1,2 +1,0 @@
-minor_changes:
-  - inventory plugin - drop C(api_token) in favor of C(oauth_token) for consistency (https://github.com/ansible-collections/community.digitalocean/issues/300).

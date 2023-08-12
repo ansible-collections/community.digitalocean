@@ -5,6 +5,25 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.24.0
+=======
+
+Minor Changes
+-------------
+
+- documentation - use C(true) and C(false) for boolean values in documentation and examples (https://github.com/ansible-collections/community.digitalocean/issues/303).
+- inventory plugin - drop C(api_token) in favor of C(oauth_token) for consistency (https://github.com/ansible-collections/community.digitalocean/issues/300).
+- tests - add C(sanity), C(units), and C(psf/black) back on merge into C(main) (https://github.com/ansible-collections/community.digitalocean/pull/311).
+- tests - drop Ansible 2.9 and Ansible Core 2.10 and 2.11 (https://github.com/ansible-collections/community.digitalocean/pull/310).
+- tests - remove the daily runs (https://github.com/ansible-collections/community.digitalocean/pull/310).
+- tests - run C(psf/black) across all files (https://github.com/ansible-collections/community.digitalocean/pull/310).
+- tests - test against Ansible Core 2.12, 2.13, and 2.14 (https://github.com/ansible-collections/community.digitalocean/pull/310).
+
+Bugfixes
+--------
+
+- digital_ocean_domain - fix ``all_domains`` by using ``get_paginated_data`` to retrieve all of the domains in the account from the paginated domains api endpoint (https://github.com/ansible-collections/community.digitalocean/pull/307).
+
 v1.23.0
 =======
 
@@ -19,8 +38,8 @@ Minor Changes
 Bugfixes
 --------
 
-- inventory plugin - bugfix for baseurl parameter (https://github.com/ansible-collections/community.digitalocean/pull/297).
 - integration tests - add missing `environment` directive on pull request integration testing (https://github.com/ansible-collections/community.digitalocean/issues/293).
+- inventory plugin - bugfix for baseurl parameter (https://github.com/ansible-collections/community.digitalocean/pull/297).
 
 v1.22.0
 =======
