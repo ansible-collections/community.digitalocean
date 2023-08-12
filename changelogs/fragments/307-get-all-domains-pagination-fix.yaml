@@ -1,2 +1,0 @@
-bugfixes:
-  - digital_ocean_domain - fix ``all_domains`` by using ``get_paginated_data`` to retrieve all of the domains in the account from the paginated domains api endpoint (https://github.com/ansible-collections/community.digitalocean/pull/307).
