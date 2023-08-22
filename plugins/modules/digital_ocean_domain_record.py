@@ -145,6 +145,19 @@ EXAMPLES = """
     domain: example.com
     record_id: 1234567
 
+- name: Create CNAME records for www, git and status subdomains
+  community.digitalocean.digital_ocean_domain_record:
+    state: present
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+    domain: example.com
+    type: CNAME
+    name: "{{ item }}"
+    data: example.com
+  with_items:
+    - www
+    - git
+    - status
+
 - name: Create MX record with priority 10 for example.com
   community.digitalocean.digital_ocean_domain_record:
     state: present
