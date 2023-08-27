@@ -1,2 +1,2 @@
 trivial
-  - docs - add cname example to domain_record module.yaml (https://github.com/ansible-collections/community.digitalocean/pull/314)
+  - docs - add cname example to domain_record module.yaml (https://github.com/ansible-collections/community.digitalocean/pull/314).
