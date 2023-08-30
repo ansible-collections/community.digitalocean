@@ -383,6 +383,14 @@ releases:
     - 311-update-tests.yaml
     - 312-double-integration-test-timeout.yaml
     release_date: '2023-08-12'
+  1.24.1:
+    changes:
+      bugfixes:
+      - inventory plugin - restore reading auth token from env variables (https://github.com/ansible-collections/community.digitalocean/pull/315).
+    fragments:
+    - 314-add-cname-example-to-domain_record-module.yaml
+    - 316-inventory-plugin-restore-reading-auth-token-from-env-variables.yaml
+    release_date: '2023-08-30'
   1.3.0:
     modules:
     - description: Create and delete a DigitalOcean database
