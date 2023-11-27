@@ -1,4 +1,5 @@
 do_region: nyc1
+test_project_name: test-kubernetes
 
 cluster_name: gh-ci-k8s
 cluster_version: latest

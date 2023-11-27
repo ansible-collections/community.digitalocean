@@ -4,6 +4,7 @@ __metaclass__ = type
 
 from ansible_collections.community.general.tests.unit.compat import unittest
 from ansible_collections.community.general.tests.unit.compat.mock import MagicMock
+from ansible_collections.community.general.tests.unit.compat.mock import DEFAULT
 from ansible_collections.community.digitalocean.plugins.modules.digital_ocean_kubernetes import (
     DOKubernetes,
 )
@@ -12,6 +13,7 @@ from ansible_collections.community.digitalocean.plugins.modules.digital_ocean_ku
 class TestDOKubernetes(unittest.TestCase):
     def test_get_by_id_when_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -21,6 +23,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_by_id_when_not_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -30,6 +33,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_all_clusters_when_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -39,6 +43,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_all_clusters_when_not_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -48,11 +53,13 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_by_name_none(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         self.assertIsNone(k.get_by_name(None))
 
     def test_get_by_name_found(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.get_all_clusters = MagicMock()
         k.get_all_clusters.return_value = {"kubernetes_clusters": [{"name": "foo"}]}
@@ -60,6 +67,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_by_name_not_found(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.get_all_clusters = MagicMock()
         k.get_all_clusters.return_value = {"kubernetes_clusters": [{"name": "foo"}]}
@@ -67,6 +75,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_kubernetes_kubeconfig_when_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -76,6 +85,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_kubernetes_kubeconfig_when_not_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -85,6 +95,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_kubernetes_when_found(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.get_by_name = MagicMock()
         k.get_by_name.return_value = {"id": 42}
@@ -92,6 +103,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_kubernetes_when_not_found(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.get_by_name = MagicMock()
         k.get_by_name.return_value = None
@@ -99,6 +111,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_kubernetes_options_when_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -108,6 +121,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_get_kubernetes_options_when_not_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         k = DOKubernetes(module)
         k.rest = MagicMock()
         k.rest.get = MagicMock()
@@ -117,6 +131,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_ensure_running_when_running(self):
         module = MagicMock()
+        module.params.get.return_value = False
         module.fail_json = MagicMock()
 
         k = DOKubernetes(module)
@@ -137,6 +152,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_ensure_running_when_not_running(self):
         module = MagicMock()
+        module.params.get.return_value = False
         module.fail_json = MagicMock()
 
         k = DOKubernetes(module)
@@ -158,14 +174,19 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_create_ok(self):
         module = MagicMock()
+
+        def side_effect(*args, **kwargs):
+            if "project_name" == args[0]:
+                return False
+            if "regions" == args[0]:
+                return "nyc1"
+            return DEFAULT
+
+        module.params.get.side_effect = side_effect
         module.exit_json = MagicMock()
         module.fail_json = MagicMock()
 
         k = DOKubernetes(module)
-        k.module = MagicMock()
-        k.module.params = MagicMock()
-
-        k.module.params.return_value = {"region": "nyc1"}
 
         k.get_kubernetes_options = MagicMock()
 
@@ -190,21 +211,25 @@ class TestDOKubernetes(unittest.TestCase):
         k.rest.post.return_value.status_code = 200
         k.ensure_running = MagicMock()
         k.cluster_id = MagicMock()
-        k.module = MagicMock()
 
         k.create()
         k.module.exit_json.assert_called()
 
     def test_create_not_ok(self):
         module = MagicMock()
+
+        def side_effect(*args, **kwargs):
+            if "project_name" == args[0]:
+                return False
+            if "regions" == args[0]:
+                return "nyc1"
+            return DEFAULT
+
+        module.params.get.side_effect = side_effect
         module.exit_json = MagicMock()
         module.fail_json = MagicMock()
 
         k = DOKubernetes(module)
-        k.module = MagicMock()
-        k.module.params = MagicMock()
-
-        k.module.params.return_value = {"region": "nyc1"}
 
         k.get_kubernetes_options = MagicMock()
 
@@ -229,13 +254,13 @@ class TestDOKubernetes(unittest.TestCase):
         k.rest.post.return_value.status_code = 400
         k.ensure_running = MagicMock()
         k.cluster_id = MagicMock()
-        k.module = MagicMock()
 
         k.create()
         k.module.exit_json.assert_called()
 
     def test_delete_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         module.exit_json = MagicMock()
 
         k = DOKubernetes(module)
@@ -252,6 +277,7 @@ class TestDOKubernetes(unittest.TestCase):
 
     def test_delete_not_ok(self):
         module = MagicMock()
+        module.params.get.return_value = False
         module.exit_json = MagicMock()
 
         k = DOKubernetes(module)

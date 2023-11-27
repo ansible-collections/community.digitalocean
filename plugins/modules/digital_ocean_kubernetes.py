@@ -155,6 +155,14 @@ options:
       - Highly available control planes incur less downtime.
     type: bool
     default: false
+  project_name:
+    aliases: ["project"]
+    description:
+    - Project to assign the resource to (project name, not UUID).
+    - Defaults to the default project of the account (empty string).
+    type: str
+    required: false
+    default: ""
 """
 
 
@@ -171,7 +179,7 @@ EXAMPLES = r"""
         count: 3
     return_kubeconfig: true
     wait_timeout: 600
-    register: my_cluster
+  register: my_cluster
 
 - name: Show the kubeconfig for the cluster we just created
   debug:
@@ -182,6 +190,21 @@ EXAMPLES = r"""
     state: absent
     oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
     name: hacktoberfest
+
+- name: Create a new DigitalOcean Kubernetes cluster assigned to Project "test"
+  community.digitalocean.digital_ocean_kubernetes:
+    state: present
+    oauth_token: "{{ lookup('env', 'DO_API_TOKEN') }}"
+    name: hacktoberfest
+    region: nyc1
+    node_pools:
+      - name: hacktoberfest-workers
+        size: s-1vcpu-2gb
+        count: 3
+    return_kubeconfig: true
+    project: test
+    wait_timeout: 600
+  register: my_cluster
 """
 
 
@@ -264,6 +287,7 @@ import time
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
+    DigitalOceanProjects,
 )
 
 
@@ -277,6 +301,8 @@ class DOKubernetes(object):
         self.wait_timeout = self.module.params.pop("wait_timeout", 600)
         self.module.params.pop("oauth_token")
         self.cluster_id = None
+        if self.module.params.get("project_name"):
+            self.projects = DigitalOceanProjects(module, self.rest)
 
     def get_by_id(self):
         """Returns an existing DigitalOcean Kubernetes cluster matching on id"""
@@ -375,16 +401,32 @@ class DOKubernetes(object):
                         node_pool["size"], ", ".join(valid_sizes)
                     )
                 )
-
+        if self.module.check_mode:
+            self.module.exit_json(changed=True)
         # Create the Kubernetes cluster
         json_data = self.get_kubernetes()
         if json_data:
             # Add the kubeconfig to the return
             if self.return_kubeconfig:
                 json_data["kubeconfig"] = self.get_kubernetes_kubeconfig()
+            # Assign kubernetes to project
+            project_name = self.module.params.get("project_name")
+            # empty string is the default project, skip project assignment
+            if project_name:
+                urn = "do:kubernetes:{0}".format(self.cluster_id)
+                (
+                    assign_status,
+                    error_message,
+                    resources,
+                ) = self.projects.assign_to_project(project_name, urn)
+                if assign_status not in {"ok", "assigned", "already_assigned"}:
+                    self.module.fail_json(
+                        changed=False,
+                        msg=error_message,
+                        assign_status=assign_status,
+                        resources=resources,
+                    )
             self.module.exit_json(changed=False, data=json_data)
-        if self.module.check_mode:
-            self.module.exit_json(changed=True)
         request_params = dict(self.module.params)
         response = self.rest.post("kubernetes/clusters", data=request_params)
         json_data = response.json
@@ -397,6 +439,21 @@ class DOKubernetes(object):
         # Add the kubeconfig to the return
         if self.return_kubeconfig:
             json_data["kubeconfig"] = self.get_kubernetes_kubeconfig()
+        # Assign kubernetes to project
+        project_name = self.module.params.get("project_name")
+        # empty string is the default project, skip project assignment
+        if project_name:
+            urn = "do:kubernetes:{0}".format(self.cluster_id)
+            assign_status, error_message, resources = self.projects.assign_to_project(
+                project_name, urn
+            )
+            if assign_status not in {"ok", "assigned", "already_assigned"}:
+                self.module.fail_json(
+                    changed=True,
+                    msg=error_message,
+                    assign_status=assign_status,
+                    resources=resources,
+                )
         self.module.exit_json(changed=True, data=json_data["kubernetes_cluster"])
 
     def delete(self):
@@ -473,6 +530,9 @@ def main():
             wait=dict(type="bool", default=True),
             wait_timeout=dict(type="int", default=600),
             ha=dict(type="bool", default=False),
+            project_name=dict(
+                type="str", aliases=["project"], required=False, default=""
+            ),
         ),
         required_if=(
             [

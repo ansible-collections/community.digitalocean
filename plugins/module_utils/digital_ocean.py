@@ -283,6 +283,7 @@ class DigitalOceanProjects:
         Domain         | do:domain:example.com
         Droplet        | do:droplet:4126873
         Floating IP    | do:floatingip:192.168.99.100
+        Kubernetes     | do:kubernetes:bd5f5959-5e1e-4205-a714-a914373942af
         Load Balancer  | do:loadbalancer:39052d89-8dd4-4d49-8d5a-3c3b6b365b5b
         Space          | do:space:my-website-assets
         Volume         | do:volume:6fc4c277-ea5c-448a-93cd-dd496cfef71f

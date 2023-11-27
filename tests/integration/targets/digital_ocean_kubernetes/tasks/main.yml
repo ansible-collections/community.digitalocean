@@ -57,6 +57,28 @@
           - result.failed
           - result.msg == "Kubernetes cluster not found"
 
+    - name: Ensure the test project is absent
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ test_project_name }}"
+      register: project
+
+    - name: Verify test project is absent
+      ansible.builtin.assert:
+        that:
+          - not project.changed
+
+    - name: Create test project
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ test_project_name }}"
+        purpose: Just trying out DigitalOcean
+        description: This is a test project
+        environment: Development
+      register: project
+
     - name: Create the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes:
         oauth_token: "{{ do_api_key }}"
@@ -65,6 +87,7 @@
         version: "{{ cluster_version }}"
         region: "{{ do_region }}"
         node_pools: "{{ cluster_node_pools }}"
+        project_name: "{{ test_project_name }}"
         return_kubeconfig: false
         wait_timeout: 600
       register: result
@@ -102,6 +125,19 @@
           - result.data.name == cluster_name
           - result.data.kubeconfig is defined
           - result.data.kubeconfig | length > 0
+
+    - name: Get test project resources
+      community.digitalocean.digital_ocean_project_resource_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ test_project_name }}"
+      register: resources
+
+    - name: Verify kubernetes cluster is present
+      ansible.builtin.assert:
+        that:
+          - resources.data is defined
+          - resources.data | length == 1
+          - resources.data[0].urn == 'do:kubernetes:' + result.data.id
 
     - name: Give the cloud a minute to settle
       ansible.builtin.pause:
@@ -226,4 +262,11 @@
         node_pools: "{{ cluster_ha_node_pools }}"
         return_kubeconfig: false
         wait_timeout: 600
+      ignore_errors: true  # Should this fail, we'll clean it up next run
+
+    - name: Delete test project
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ test_project_name }}"
       ignore_errors: true  # Should this fail, we'll clean it up next run
