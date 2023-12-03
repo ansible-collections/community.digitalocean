@@ -12,10 +12,9 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import json
-import os
-from ansible.module_utils.urls import fetch_url
 from ansible.module_utils._text import to_text
 from ansible.module_utils.basic import env_fallback
+from ansible.module_utils.urls import fetch_url
 
 
 class Response(object):
@@ -223,6 +222,42 @@ class DigitalOceanProjects:
         elif len(project) > 1:
             return "Unexpected error; more than one project with the same name", {}
         return "", project[0]
+
+    def get_resources_by_id(self, id):
+        """Fetches the project resources with the given id.
+
+        Returns:
+        error_message -- project fetch error message (or "" if no error)
+        resources -- resources dictionary representation (or {} if error)
+        """
+        resources = self.rest.get_paginated_data(
+            base_url="projects/{0}/resources?".format(id), data_key_name="resources"
+        )
+        return "", dict(resources=resources)
+
+    def get_resources_by_name(self, name):
+        """Fetches the project resources with the given name.
+
+        Returns:
+        error_message -- project fetch error message (or "" if no error)
+        resources -- resources dictionary representation (or {} if error)
+        """
+        err_msg, project = self.get_by_name(name)
+        if err_msg:
+            return err_msg, {}
+        return self.get_resources_by_id(project.get("id"))
+
+    def get_resources_of_default(self):
+        """Fetches default project resources.
+
+        Returns:
+        error_message -- project fetch error message (or "" if no error)
+        resources -- resources dictionary representation (or {} if error)
+        """
+        err_msg, project = self.get_default()
+        if err_msg:
+            return err_msg, {}
+        return self.get_resources_by_id(project.get("id"))
 
     def assign_to_project(self, project_name, urn):
         """Assign resource (urn) to project (name).

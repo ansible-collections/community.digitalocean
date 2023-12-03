@@ -210,7 +210,6 @@ data:
   type: list
 """
 
-from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,

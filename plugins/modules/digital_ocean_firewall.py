@@ -544,7 +544,7 @@ def main():
         outbound_rules=dict(
             type="list", elements="dict", options=outbound_spec, required=False
         ),
-    ),
+    )
     module = AnsibleModule(
         argument_spec=argument_spec,
         required_if=[("state", "present", ["inbound_rules", "outbound_rules"])],

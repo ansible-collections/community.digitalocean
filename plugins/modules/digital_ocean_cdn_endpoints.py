@@ -43,11 +43,13 @@ options:
     description:
       - The ID of a DigitalOcean managed TLS certificate used for SSL when a custom subdomain is provided.
     type: str
+    default: ""
     required: false
   custom_domain:
     description:
       - The fully qualified domain name (FQDN) of the custom subdomain used with the CDN endpoint.
     type: str
+    default: ""
     required: false
 extends_documentation_fragment:
   - community.digitalocean.digital_ocean.documentation
@@ -92,7 +94,7 @@ data:
 """
 
 
-from ansible.module_utils.basic import AnsibleModule, env_fallback
+from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
 )

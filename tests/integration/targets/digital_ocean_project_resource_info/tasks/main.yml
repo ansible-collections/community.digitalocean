@@ -1,0 +1,156 @@
+---
+- block:
+
+    - name: Ensure API key is provided
+      ansible.builtin.fail:
+        msg: do_api_key should be defined in tests/integration/integration_config.yml
+      when:
+        - do_api_key is not defined
+        - do_api_key | length == 0
+
+    - name: Ensure the project is absent
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ test_project_name }}"
+      register: project
+
+    - name: Verify project is absent
+      ansible.builtin.assert:
+        that:
+          - not project.changed
+
+    - name: Create test project
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ test_project_name }}"
+        purpose: Just trying out DigitalOcean
+        description: This is a test project
+        environment: Development
+      register: project
+
+    - name: Create some resource (block storage)
+      community.digitalocean.digital_ocean_block_storage:
+        state: present
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        region: fra1
+        block_size: 1
+        volume_name: fra1-test-project-resources
+        project: "{{ test_project_name }}"
+      register: resource
+
+    - name: Get project resources by name
+      community.digitalocean.digital_ocean_project_resource_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ test_project_name }}"
+      register: resources
+
+    - name: Verify resource is present
+      ansible.builtin.assert:
+        that:
+          - resources.data is defined
+          - resources.data | length == 1
+          - resources.data[0].urn == resource.resources.urn
+
+    - name: Get project resources by id
+      community.digitalocean.digital_ocean_project_resource_info:
+        oauth_token: "{{ do_api_key }}"
+        id: "{{ project.data.project.id }}"
+      register: resources
+
+    - name: Verify resource is present
+      ansible.builtin.assert:
+        that:
+          - resources.data is defined
+          - resources.data | length == 1
+          - resources.data[0].urn == resource.resources.urn
+
+    - name: Get all projects
+      community.digitalocean.digital_ocean_project_info:
+        oauth_token: "{{ do_api_key }}"
+      register: projects
+
+    - name: Extract currently default project
+      ansible.builtin.set_fact:
+        default_project: "{{ projects.data | selectattr('is_default') | first }}"
+
+    - name: Make test project default one
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ project.data.project.name }}"
+        purpose: "{{ project.data.project.purpose }}"
+        description: "{{ project.data.project.description }}"
+        environment: "{{ project.data.project.environment }}"
+        is_default: true
+      register: project
+
+    - name: Get project resources of default
+      community.digitalocean.digital_ocean_project_resource_info:
+        oauth_token: "{{ do_api_key }}"
+      register: resources
+
+    - name: Verify resource is present
+      ansible.builtin.assert:
+        that:
+          - resources.data is defined
+          - resources.data | length == 1
+          - resources.data[0].urn == resource.resources.urn
+
+    - name: Get project resources by name
+      community.digitalocean.digital_ocean_project_resource_info:
+        oauth_token: "{{ do_api_key }}"
+        name: "{{ test_project_name }}"
+      register: resources
+
+    - name: Verify resource is present
+      ansible.builtin.assert:
+        that:
+          - resources.data is defined
+          - resources.data | length == 1
+          - resources.data[0].urn == resource.resources.urn
+
+    - name: Get project resources by id
+      community.digitalocean.digital_ocean_project_resource_info:
+        oauth_token: "{{ do_api_key }}"
+        id: "{{ project.data.project.id }}"
+      register: resources
+
+    - name: Verify resource is present
+      ansible.builtin.assert:
+        that:
+          - resources.data is defined
+          - resources.data | length == 1
+          - resources.data[0].urn == resource.resources.urn
+
+    - name: Change back default project
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: present
+        name: "{{ default_project.name }}"
+        purpose: "{{ default_project.purpose }}"
+        description: "{{ default_project.description }}"
+        environment: "{{ default_project.environment }}"
+        is_default: true
+      register: default_project
+
+  always:
+
+    - name: Delete the resource (block storage)
+      community.digitalocean.digital_ocean_block_storage:
+        state: absent
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        region: fra1
+        volume_name: fra1-test-project-resources
+        project: "{{ test_project_name }}"
+      ignore_errors: true  # Should this fail, we'll clean it up next run
+
+    - name: Delete test project
+      community.digitalocean.digital_ocean_project:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ test_project_name }}"
+      ignore_errors: true  # Should this fail, we'll clean it up next run

@@ -127,11 +127,6 @@ data:
 """
 
 
-import traceback
-import time
-import json
-from traceback import format_exc
-from ansible.module_utils._text import to_native
 from ansible.module_utils.basic import AnsibleModule, env_fallback
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,

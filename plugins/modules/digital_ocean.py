@@ -185,7 +185,6 @@ EXAMPLES = r"""
     image_id: fedora-19-x64
 """
 
-import os
 import time
 import traceback
 
@@ -198,7 +197,7 @@ except ImportError:
 
 try:
     # Imported as a dependency for dopy
-    import ansible.module_utils.six
+    import ansible.module_utils.six  # pylint: disable=unused-import
 
     HAS_SIX = True
 except ImportError:
