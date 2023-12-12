@@ -46,6 +46,7 @@ options:
       - Only applies to volume snapshots (not Droplets).
     type: list
     elements: str
+    default: []
   droplet_id:
     description:
       - Droplet ID to snapshot.

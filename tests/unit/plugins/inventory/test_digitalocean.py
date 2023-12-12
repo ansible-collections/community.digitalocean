@@ -8,7 +8,7 @@ __metaclass__ = type
 
 import pytest
 
-from ansible.errors import AnsibleError, AnsibleParserError
+from ansible.errors import AnsibleError
 from ansible.inventory.data import InventoryData
 from ansible.template import Templar
 from ansible.parsing.dataloader import DataLoader

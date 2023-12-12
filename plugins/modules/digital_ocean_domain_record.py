@@ -45,7 +45,6 @@ options:
   data:
     description:
      - This is the value of the record, depending on the record type.
-    default: ""
     type: str
   name:
     description:

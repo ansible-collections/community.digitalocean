@@ -66,7 +66,6 @@ data:
       updated_at: "2021-03-11T00:00:00Z"
 """
 
-from traceback import format_exc
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.digitalocean.plugins.module_utils.digital_ocean import (
     DigitalOceanHelper,
