@@ -1,2 +1,0 @@
-bugfixes:
-  - inventory plugin - restore reading auth token from env variables (https://github.com/ansible-collections/community.digitalocean/pull/315).

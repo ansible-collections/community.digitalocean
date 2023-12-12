@@ -5,6 +5,24 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.25.0
+=======
+
+Minor Changes
+-------------
+
+- fix sanity tests (https://github.com/ansible-collections/community.digitalocean/issues/323).
+
+Bugfixes
+--------
+
+- inventory plugin - restore reading auth token from env variables (https://github.com/ansible-collections/community.digitalocean/pull/315).
+
+New Modules
+-----------
+
+- digital_ocean_project_resource_info - Gather information about DigitalOcean Project Resources
+
 v1.24.0
 =======
 

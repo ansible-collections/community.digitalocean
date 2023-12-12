@@ -29,6 +29,7 @@ authors:
   - Onur Güzel (https://github.com/onurguzel)
   - Shuaib Munshi (https://github.com/shuaibmunshi)
   - Corey Wright (https://github.com/coreywright)
+  - Raman Babich (https://github.com/raman-babich)
 dependencies: {}
 description: DigitalOcean Ansible Collection.
 documentation: https://docs.ansible.com/ansible/latest/collections/community/digitalocean/
@@ -43,7 +44,7 @@ tags:
   - digitalocean
   - cloud
   - droplet
-version: 1.24.0
+version: 1.25.0
 build_ignore:
   - .DS_Store
   - '*.tar.gz'
