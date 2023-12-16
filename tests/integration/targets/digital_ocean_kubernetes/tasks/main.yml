@@ -65,7 +65,7 @@
         version: "{{ cluster_version }}"
         region: "{{ do_region }}"
         node_pools: "{{ cluster_node_pools }}"
-        return_kubeconfig: false
+        return_kubeconfig: true
         wait_timeout: 600
       register: result
 
@@ -74,6 +74,8 @@
         that:
           - result.changed
           - result.data.name == cluster_name
+          - result.data.kubeconfig is defined
+          - result.data.kubeconfig | length > 0
 
     - name: Gather information about the Kubernetes cluster
       community.digitalocean.digital_ocean_kubernetes_info:
