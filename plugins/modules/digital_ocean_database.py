@@ -208,7 +208,7 @@ class DODatabase(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
-        if self.module.params.get("project"):
+        if self.module.params.get("project_name"):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
         # pop wait and wait_timeout so we don't include it in the POST data
@@ -335,7 +335,7 @@ class DODatabase(object):
         if self.wait:
             json_data = self.ensure_online(database_id)
 
-        project_name = self.module.params.get("project")
+        project_name = self.module.params.get("project_name")
         if project_name:  # empty string is the default project, skip project assignment
             urn = "do:dbaas:{0}".format(database_id)
             assign_status, error_message, resources = self.projects.assign_to_project(

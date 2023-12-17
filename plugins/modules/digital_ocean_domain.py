@@ -192,7 +192,7 @@ def run(module):
     do_manager = DoManager(module)
     state = module.params.get("state")
 
-    if module.params.get("project"):
+    if module.params.get("project_name"):
         # only load for non-default project assignments
         projects = DigitalOceanProjects(module, do_manager)
 
@@ -214,7 +214,7 @@ def run(module):
                 # few times before giving up and returning null.
 
                 domain_name = module.params.get("name")
-                project_name = module.params.get("project")
+                project_name = module.params.get("project_name")
                 urn = "do:domain:{0}".format(domain_name)
 
                 for i in range(ZONE_FILE_ATTEMPTS):

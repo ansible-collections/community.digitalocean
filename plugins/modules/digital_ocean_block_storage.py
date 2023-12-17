@@ -182,7 +182,7 @@ class DOBlockStorage(object):
     def __init__(self, module):
         self.module = module
         self.rest = DigitalOceanHelper(module)
-        if self.module.params.get("project"):
+        if self.module.params.get("project_name"):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
 
@@ -295,7 +295,7 @@ class DOBlockStorage(object):
         status = response.status_code
         json = response.json
         if status == 201:
-            project_name = self.module.params.get("project")
+            project_name = self.module.params.get("project_name")
             if (
                 project_name
             ):  # empty string is the default project, skip project assignment
