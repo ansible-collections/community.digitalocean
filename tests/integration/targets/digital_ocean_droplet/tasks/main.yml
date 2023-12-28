@@ -439,8 +439,8 @@
       ansible.builtin.assert:
         that:
           - firewall_settings is defined
-          - "{{ (firewall_settings.data | map(attribute='droplet_ids'))[0] | length > 0 }}"
-          - "{{ firewall_droplet.data.droplet.id }} in {{ (firewall_settings.data | map(attribute='droplet_ids'))[0] }}"
+          - (firewall_settings.data | map(attribute='droplet_ids'))[0] | length > 0
+          - firewall_droplet.data.droplet.id in (firewall_settings.data | map(attribute='droplet_ids'))[0]
 
     - name: Rerun on above droplet without removing firewall
       community.digitalocean.digital_ocean_droplet:
@@ -490,8 +490,8 @@
       ansible.builtin.assert:
         that:
           - firewall_settings_removal is defined
-          - "{{ (firewall_settings_removal.data | map(attribute='droplet_ids'))[0] | length == 0 }}"
-          - "{{ firewall_droplet.data.droplet.id }} not in {{ firewall_settings_removal.data | map(attribute='droplet_ids') }}"
+          - (firewall_settings_removal.data | map(attribute='droplet_ids'))[0] | length == 0
+          - firewall_droplet.data.droplet.id not in (firewall_settings_removal.data | map(attribute='droplet_ids'))
 
   always:
 
