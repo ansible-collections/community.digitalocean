@@ -16,6 +16,7 @@ jobs:
     name: Integration (Ⓐ${{ matrix.versions.ansible }} on ${{ matrix.versions.python }} / ${{ matrix.module }})
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         versions:
@@ -33,7 +34,7 @@ jobs:
           - digital_ocean_database_info
           - digital_ocean_domain
           - digital_ocean_domain_info
-          - digital_ocean_domain_record
+          # - digital_ocean_domain_record  # No test
           - digital_ocean_domain_record_info
           - digital_ocean_droplet
           - digital_ocean_droplet_info
@@ -47,7 +48,7 @@ jobs:
           - digital_ocean_load_balancer
           - digital_ocean_load_balancer_info
           - digital_ocean_monitoring_alerts
-          - digital_ocean_monitoring_alerts_info
+          # - digital_ocean_monitoring_alerts_info  # No test
           - digital_ocean_project
           - digital_ocean_project_info
           - digital_ocean_project_resource_info

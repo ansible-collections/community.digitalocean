@@ -23,6 +23,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
         versions:
           - ansible: stable-2.14
@@ -39,7 +40,7 @@ jobs:
         - digital_ocean_database_info
         - digital_ocean_domain
         - digital_ocean_domain_info
-        - digital_ocean_domain_record
+        # - digital_ocean_domain_record  # No test
         - digital_ocean_domain_record_info
         - digital_ocean_droplet
         - digital_ocean_droplet_info
@@ -53,7 +54,7 @@ jobs:
         - digital_ocean_load_balancer
         - digital_ocean_load_balancer_info
         - digital_ocean_monitoring_alerts
-        - digital_ocean_monitoring_alerts_info
+        # - digital_ocean_monitoring_alerts_info  # No test
         - digital_ocean_project
         - digital_ocean_project_info
         - digital_ocean_project_resource_info

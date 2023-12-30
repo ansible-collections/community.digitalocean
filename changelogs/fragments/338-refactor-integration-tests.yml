@@ -1,0 +1,2 @@
+trivial:
+  - ci - refactor integration test workflows (https://github.com/ansible-collections/community.digitalocean/pull/338).
