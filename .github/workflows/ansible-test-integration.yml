@@ -8,6 +8,11 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
+env:
+  # NOTE: Yes, the origination is not from a PR :smile: but we do have
+  # integration tests on PR and we want the cloud resources uniquely named
+  PR_NUMBER: 0
+
 jobs:
   integration:
     runs-on: ubuntu-22.04
