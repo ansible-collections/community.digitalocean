@@ -1,30 +1,83 @@
-name: pull-request-integration
+name: Pull request integration tests
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  pull_request_target:
+    branches:
+      - main
     paths:
-      - plugins/module_utils/**
-      - plugins/modules/**
+      - poetry.lock
+      - pyproject.toml
+      - 'plugins/module_utils/**'
+      - 'plugins/modules/**'
+      - 'tests/integration/**'
 
 concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
-  integration:
-    environment: integration
+  test-integration:
     runs-on: ubuntu-22.04
-    timeout-minutes: 40
+    # MUST keep this environment set if using pull_request_target
+    environment: integration
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        ansible:
-          - stable-2.14
+        versions:
+          - ansible: stable-2.14
+            python: "3.9"
+        module:
+        - digital_ocean_account_info
+        - digital_ocean_balance_info
+        - digital_ocean_block_storage
+        - digital_ocean_cdn_endpoints
+        - digital_ocean_cdn_endpoints_info
+        - digital_ocean_certificate
+        - digital_ocean_certificate_info
+        - digital_ocean_database
+        - digital_ocean_database_info
+        - digital_ocean_domain
+        - digital_ocean_domain_info
+        - digital_ocean_domain_record
+        - digital_ocean_domain_record_info
+        - digital_ocean_droplet
+        - digital_ocean_droplet_info
+        - digital_ocean_firewall
+        - digital_ocean_firewall_info
+        - digital_ocean_floating_ip
+        - digital_ocean_floating_ip_info
+        - digital_ocean_image_info
+        - digital_ocean_kubernetes
+        - digital_ocean_kubernetes_info
+        - digital_ocean_load_balancer
+        - digital_ocean_load_balancer_info
+        - digital_ocean_monitoring_alerts
+        - digital_ocean_monitoring_alerts_info
+        - digital_ocean_project
+        - digital_ocean_project_info
+        - digital_ocean_project_resource_info
+        - digital_ocean_region_info
+        - digital_ocean_size_info
+        - digital_ocean_snapshot
+        - digital_ocean_snapshot_info
+        - digital_ocean_spaces
+        - digital_ocean_spaces_info
+        - digital_ocean_sshkey
+        - digital_ocean_sshkey_info
+        - digital_ocean_tag
+        - digital_ocean_tag_info
+        - digital_ocean_volume_info
+        - digital_ocean_vpc
+        - digital_ocean_vpc_info
     steps:
-      - name: Perform testing
+      - name: Perform integration testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
+          # MUST set 'git-checkout-ref' if using pull_request_target
+          # MUST use an Environment if using pull_request_target
+          # 'github.event.pull_request.head.sha' checks out the
+          # PR source repo's code, which should be considered untrusted
           git-checkout-ref: ${{ github.event.pull_request.head.sha }}
           pre-test-cmd: >-
             DO_API_KEY=${{ secrets.DO_API_KEY }}
@@ -33,8 +86,8 @@ jobs:
             ./tests/utils/render.sh
             tests/integration/integration_config.yml.template
             > tests/integration/integration_config.yml
-          ansible-core-version: ${{ matrix.ansible }}
-          origin-python-version: 3.9
-          target-python-version: 3.9
+          ansible-core-version: ${{ matrix.versions.ansible }}
+          origin-python-version: ${{ matrix.versions.python }}
+          target: ${{ matrix.module }}
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: integration
-          test-deps: community.general
