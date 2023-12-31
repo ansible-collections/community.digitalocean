@@ -21,6 +21,7 @@ jobs:
     name: Integration (Ⓐ${{ matrix.versions.ansible }} on ${{ matrix.versions.python }} / ${{ matrix.module }})
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         versions:
