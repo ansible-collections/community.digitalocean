@@ -467,7 +467,7 @@ class DOLoadBalancer(object):
         self.module.params.pop("oauth_token")
         self.wait = self.module.params.pop("wait", True)
         self.wait_timeout = self.module.params.pop("wait_timeout", 600)
-        if self.module.params.get("project"):
+        if self.module.params.get("project_name"):
             # only load for non-default project assignments
             self.projects = DigitalOceanProjects(module, self.rest)
 
@@ -716,7 +716,7 @@ class DOLoadBalancer(object):
         if self.wait:
             self.ensure_active()
 
-        project_name = self.module.params.get("project")
+        project_name = self.module.params.get("project_name")
         if project_name:  # empty string is the default project, skip project assignment
             urn = "do:loadbalancer:{0}".format(self.id)
             (

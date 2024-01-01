@@ -235,51 +235,50 @@ data:
       - name: do-nyc1-hacktoberfest-admin
         user:
           token: REDACTED
-    kubernetes_cluster:
-      auto_upgrade: false
-      cluster_subnet: 10.244.0.0/16
-      created_at: '2020-09-27T00:55:37Z'
-      endpoint: https://REDACTED.k8s.ondigitalocean.com
+    auto_upgrade: false
+    cluster_subnet: 10.244.0.0/16
+    created_at: '2020-09-27T00:55:37Z'
+    endpoint: https://REDACTED.k8s.ondigitalocean.com
+    id: REDACTED
+    ipv4: REDACTED
+    maintenance_policy:
+      day: any
+      duration: 4h0m0s
+      start_time: '15:00'
+    name: hacktoberfest
+    node_pools:
+    - auto_scale: false
+      count: 1
       id: REDACTED
-      ipv4: REDACTED
-      maintenance_policy:
-        day: any
-        duration: 4h0m0s
-        start_time: '15:00'
-      name: hacktoberfest
-      node_pools:
-      - auto_scale: false
-        count: 1
+      labels: null
+      max_nodes: 0
+      min_nodes: 0
+      name: hacktoberfest-workers
+      nodes:
+      - created_at: '2020-09-27T00:55:37Z'
+        droplet_id: '209555245'
         id: REDACTED
-        labels: null
-        max_nodes: 0
-        min_nodes: 0
-        name: hacktoberfest-workers
-        nodes:
-        - created_at: '2020-09-27T00:55:37Z'
-          droplet_id: '209555245'
-          id: REDACTED
-          name: hacktoberfest-workers-3tdq1
-          status:
-            state: running
-          updated_at: '2020-09-27T00:58:36Z'
-        size: s-1vcpu-2gb
-        tags:
-        - k8s
-        - k8s:REDACTED
-        - k8s:worker
-        taints: []
-      region: nyc1
-      service_subnet: 10.245.0.0/16
-      status:
-        state: running
-      surge_upgrade: false
+        name: hacktoberfest-workers-3tdq1
+        status:
+          state: running
+        updated_at: '2020-09-27T00:58:36Z'
+      size: s-1vcpu-2gb
       tags:
       - k8s
       - k8s:REDACTED
-      updated_at: '2020-09-27T01:00:37Z'
-      version: 1.18.8-do.1
-      vpc_uuid: REDACTED
+      - k8s:worker
+      taints: []
+    region: nyc1
+    service_subnet: 10.245.0.0/16
+    status:
+      state: running
+    surge_upgrade: false
+    tags:
+    - k8s
+    - k8s:REDACTED
+    updated_at: '2020-09-27T01:00:37Z'
+    version: 1.18.8-do.1
+    vpc_uuid: REDACTED
 """
 
 
@@ -454,6 +453,9 @@ class DOKubernetes(object):
                     assign_status=assign_status,
                     resources=resources,
                 )
+            json_data["kubernetes_cluster"][
+                "kubeconfig"
+            ] = self.get_kubernetes_kubeconfig()
         self.module.exit_json(changed=True, data=json_data["kubernetes_cluster"])
 
     def delete(self):
