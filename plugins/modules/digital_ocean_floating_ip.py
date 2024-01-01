@@ -435,11 +435,11 @@ def create_floating_ips(module, rest):
     json_data = response.json
     if status_code == 202:
         if module.params.get(
-            "project"
+            "project_name"
         ):  # only load for non-default project assignments
             rest = DigitalOceanHelper(module)
             projects = DigitalOceanProjects(module, rest)
-            project_name = module.params.get("project")
+            project_name = module.params.get("project_name")
             if (
                 project_name
             ):  # empty string is the default project, skip project assignment
