@@ -19,13 +19,23 @@ env:
   PR_NUMBER: ${{ github.event.pull_request.number }}
 
 jobs:
-  test-integration:
+  human-review-and-approval:
     runs-on: ubuntu-22.04
     # MUST keep this environment set if using pull_request_target
     environment: integration
-    timeout-minutes: 60
+    steps:
+      - name: Wait for approval
+        run: sleep infinity
+
+  test-integration:
+    needs: human-review-and-approval
+    runs-on: ubuntu-22.04
+    # NOTE using the 'needs' as a gate ... the 'integration' environment has
+    # required reviewers (which is a good idea since we're using pull_request_target)
+    timeout-minutes: 90
     strategy:
       fail-fast: false
+      # NOTE we're hitting 429s (too many requests)
       max-parallel: 1
       matrix:
         versions:
