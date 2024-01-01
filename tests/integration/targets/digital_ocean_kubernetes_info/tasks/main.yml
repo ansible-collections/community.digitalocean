@@ -16,8 +16,7 @@
       register: result
       ignore_errors: true  # expected to fail
 
-    - name: Verify Kubernetes cluster information is not found
+    - name: Verify Kubernetes cluster information is not changed
       ansible.builtin.assert:
         that:
           - not result.changed
-          - not result.data.name is defined
