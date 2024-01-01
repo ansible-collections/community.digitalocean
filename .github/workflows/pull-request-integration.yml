@@ -25,7 +25,7 @@ jobs:
     environment: integration
     steps:
       - name: Wait for approval
-        run: sleep infinity
+        run: sleep 10
 
   test-integration:
     needs: human-review-and-approval
