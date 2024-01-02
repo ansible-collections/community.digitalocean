@@ -1,2 +1,0 @@
-trivial:
-  - ci - switch Droplet CI images to Jammy (https://github.com/ansible-collections/community.digitalocean/issues/334).
