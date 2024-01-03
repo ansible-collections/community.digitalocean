@@ -86,5 +86,7 @@ jobs:
           target: ${{ matrix.module }}
           target-python-version: ${{ matrix.versions.python }}
           testing-type: integration
-          test-deps: |
+          test-deps: >-
+            ansible.netcommon
+            ansible.utils
             community.general
