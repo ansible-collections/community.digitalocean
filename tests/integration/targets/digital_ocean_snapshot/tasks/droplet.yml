@@ -1,0 +1,101 @@
+- name: Droplet snapshot block
+  block:
+    - name: Ensure Droplet is absent (leftover)
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      ignore_errors: true  # In case one was left from previous run
+      register: droplet_cleanup
+
+    - name: Give the cloud a minute to settle
+      when: droplet_cleanup is changed
+      ansible.builtin.pause:
+        minutes: 1
+
+    - name: Create the Droplet
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: active
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify Droplet is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.data is defined
+          - result.data.droplet is defined
+          - result.data.droplet.name is defined
+          - result.data.droplet.name == droplet_name
+          - result.data.droplet.status in ["new", "active", "available"]
+
+    - name: Set a fact for the Droplet id
+      ansible.builtin.set_fact:
+        droplet_id: "{{ result.data.droplet.id }}"
+
+    - name: Snapshot the Droplet
+      community.digitalocean.digital_ocean_snapshot:
+        state: present
+        snapshot_type: droplet
+        snapshot_name: "{{ snapshot_name }}"
+        droplet_id: "{{ droplet_id }}"
+        oauth_token: "{{ do_api_key }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify snapshot is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is search("Created snapshot")
+
+    - name: Gather information about Droplet snapshots
+      community.digitalocean.digital_ocean_snapshot_info:
+        snapshot_type: droplet
+        oauth_token: "{{ do_api_key }}"
+      register: snapshot_info
+
+    - name: Set a fact for the snapshot id
+      delegate_to: localhost
+      ansible.builtin.set_fact:
+        snapshot_id: "{{ item.id }}"
+      loop: "{{ snapshot_info.data | community.general.json_query(name) }}"
+      vars:
+        name: "[?name=='{{ snapshot_name }}']"
+
+    - name: Delete the Droplet snapshot
+      when: snapshot_id is defined
+      community.digitalocean.digital_ocean_snapshot:
+        state: absent
+        snapshot_id: "{{ snapshot_id }}"
+        oauth_token: "{{ do_api_key }}"
+      register: result
+
+    - name: Verify Droplet snapshot is absent
+      when: snapshot_id is defined
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.msg is search("Deleted snapshot")
+
+  always:
+    - name: Delete the Droplet
+      community.digitalocean.digital_ocean_droplet:
+        oauth_token: "{{ do_api_key }}"
+        state: absent
+        name: "{{ droplet_name }}"
+        unique_name: true
+        region: "{{ do_region }}"
+        image: "{{ droplet_image }}"
+        size: "{{ droplet_size }}"
+      ignore_errors: true  # Should this fail, we'll clean it up next run
