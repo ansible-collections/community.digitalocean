@@ -1,0 +1,96 @@
+- name: Volume snapshot block
+  block:
+    - name: Ensure volume is absent (leftover)
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: absent
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_size }}"
+      ignore_errors: true  # In case one was left from previous run
+
+    - name: Create a volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: present
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+        block_size: "{{ volume_size }}"
+      register: result
+
+    - name: Verify volume is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - result.id is defined
+
+    - name: Set a fact for the volume id
+      ansible.builtin.set_fact:
+        volume_id: "{{ result.id }}"
+
+    - name: Snapshot the volume
+      community.digitalocean.digital_ocean_snapshot:
+        state: present
+        snapshot_type: volume
+        snapshot_name: "{{ snapshot_name }}"
+        volume_id: "{{ volume_id }}"
+        oauth_token: "{{ do_api_key }}"
+        wait_timeout: 500
+      register: result
+
+    - name: Verify snapshot is present
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - not result.failed
+          - result.msg is search("Created snapshot")
+
+    - name: Get information about volume snapshots
+      community.digitalocean.digital_ocean_snapshot_info:
+        snapshot_type: volume
+        oauth_token: "{{ do_api_key }}"
+      register: snapshot_info
+
+    - name: Set a fact for the snapshot id
+      ansible.builtin.set_fact:
+        snapshot_id: "{{ item.id }}"
+      loop: "{{ snapshot_info.data | community.general.json_query(name) }}"
+      vars:
+        name: "[?name=='{{ snapshot_name }}']"
+
+    - name: Delete the volume snapshot
+      when: snapshot_id is defined
+      community.digitalocean.digital_ocean_snapshot:
+        state: absent
+        snapshot_id: "{{ snapshot_id }}"
+        oauth_token: "{{ do_api_key }}"
+      register: result
+
+    - name: Verify volume snapshot is absent
+      when: snapshot_id is defined
+      ansible.builtin.assert:
+        that:
+          - result.changed
+          - not result.failed
+          - result.msg is search("Deleted snapshot")
+
+    - name: Remove the volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: absent
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+      register: result
+
+  always:
+    - name: Remove the volume
+      community.digitalocean.digital_ocean_block_storage:
+        oauth_token: "{{ do_api_key }}"
+        command: create
+        state: absent
+        volume_name: "{{ volume_name }}"
+        region: "{{ do_region }}"
+      ignore_errors: true  # Should this fail, we'll clean it up next run
