@@ -10,7 +10,7 @@ jobs:
   units:
     runs-on: ubuntu-22.04
     timeout-minutes: 30
-    name: Units (Ⓐ${{ matrix.ansible }})
+    name: Units (Ⓐ${{ matrix.ansible_python[0] }})
     strategy:
       fail-fast: false
       matrix:

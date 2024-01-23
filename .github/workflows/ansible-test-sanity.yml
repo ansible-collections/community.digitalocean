@@ -10,7 +10,7 @@ on:
 jobs:
   sanity:
     timeout-minutes: 30
-    name: Sanity (Ⓐ$${{ matrix.ansible }})
+    name: Sanity (Ⓐ$${{ matrix.ansible_python[0] }})
     strategy:
       fail-fast: false
       matrix:
