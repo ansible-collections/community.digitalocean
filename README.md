@@ -73,7 +73,7 @@ This collection contains modules and plugins to assist in automating [DigitalOce
 
 The collection is tested and supported with:
 
-- ansible-core >= 2.12 (not including `devel`)
+- ansible-core >= 2.14 (not including `devel`)
 - python >= 3.9
 
 ### Installing the Collection from Ansible Galaxy
