@@ -1,0 +1,2 @@
+trivial:
+  - ci - define `python_requires` for `ansible-test` (https://github.com/ansible-collections/community.digitalocean/issues/347).
