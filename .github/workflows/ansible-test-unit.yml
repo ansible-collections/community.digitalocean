@@ -16,9 +16,9 @@ jobs:
       matrix:
         # https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html
         ansible_python:
-          - [stable-2.14, 3.9]
-          - [stable-2.15, 3.9]
-          - [stable-2.16, 3.10]
+          - ["stable-2.14", "3.9"]
+          - ["stable-2.15", "3.9"]
+          - ["stable-2.16", "3.10"]
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
