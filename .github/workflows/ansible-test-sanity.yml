@@ -10,20 +10,25 @@ on:
 jobs:
   sanity:
     timeout-minutes: 30
-    name: Sanity (Ⓐ$${{ matrix.ansible }})
+    name: Sanity (Ⓐ$${{ matrix.versions.ansible }})
     strategy:
       fail-fast: false
       matrix:
-        ansible:
-          - stable-2.12
-          - stable-2.13
-          - stable-2.14
+        versions:
+          - ansible: stable-2.14
+            python: "3.9"
+          - ansible: stable-2.15
+            python: "3.9"
+          - ansible: stable-2.16
+            python: "3.10"
+          - ansible: devel
+            python: "3.10"
     runs-on: ubuntu-22.04
     steps:
       - name: Perform testing
         uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          ansible-core-version: ${{ matrix.ansible }}
-          origin-python-version: 3.9
-          target-python-version: 3.9
+          ansible-core-version: ${{ matrix.versions.ansible }}
+          origin-python-version: ${{ matrix.versions.python }}
+          target-python-version: ${{ matrix.versions.python }}
           testing-type: sanity

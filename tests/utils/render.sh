@@ -8,7 +8,9 @@ set -u
 
 function main()
 {
+  # shellcheck disable=SC2155
   readonly template="$1"; shift
+  # shellcheck disable=SC2155
   readonly content="$(cat "$template")"
 
   eval "echo \"$content\""
