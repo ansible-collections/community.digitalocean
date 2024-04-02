@@ -14,7 +14,7 @@ jmespath = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 ansible-lint = { version = "^6.16.2", markers = "platform_system != 'Windows'" }
-black = "^23.3.0"
+black = "^24.3.0"
 pre-commit = "^3.3.2"
 pylint = "^2.17.4"
 pytest = "^7.3.1"
