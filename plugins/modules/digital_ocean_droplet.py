@@ -621,6 +621,17 @@ class DODroplet(object):
         json_data = response.json
         status_code = response.status_code
         message = json_data.get("message", "no error message")
+
+        # action and other fields may not be available in case of error, check first
+        # will catch Not Authorized due to restrictive Scopes
+        if status_code >= 400:
+            self.module.fail_json(
+                changed=False,
+                msg=DODroplet.failure_message["failed_to"].format(
+                    "post", "action", status_code, message
+                ),
+            )
+
         action = json_data.get("action", None)
         action_id = action.get("id", None)
         action_status = action.get("status", None)
@@ -630,14 +641,6 @@ class DODroplet(object):
                 changed=False,
                 msg=DODroplet.failure_message["unexpected"].format(
                     "no action, ID, or status"
-                ),
-            )
-
-        if status_code >= 400:
-            self.module.fail_json(
-                changed=False,
-                msg=DODroplet.failure_message["failed_to"].format(
-                    "post", "action", status_code, message
                 ),
             )
 
