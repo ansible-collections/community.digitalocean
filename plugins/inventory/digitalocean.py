@@ -69,7 +69,7 @@ options:
 EXAMPLES = r"""
 # Using keyed groups and compose for hostvars
 plugin: community.digitalocean.digitalocean
-oauth_token: '{{ lookup("pipe", "./get-do-token.sh" }}'
+oauth_token: '{{ lookup("pipe", "./get-do-token.sh") }}'
 attributes:
   - id
   - name
