@@ -1,0 +1,3 @@
+minor_changes:
+  - digital_ocean_kubernetes_info - if kubernetes cluster name not specified get all kubernetes clusters
+    (https://github.com/ansible-collections/community.digitalocean/issues/367).
