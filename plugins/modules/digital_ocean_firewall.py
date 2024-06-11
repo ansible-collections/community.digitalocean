@@ -87,6 +87,12 @@ options:
             description:
               - List of strings containing the IDs of the Load Balancers to which the firewall will allow traffic
             required: false
+          kubernetes_ids:
+            type: list
+            elements: str
+            description:
+              - List of strings containing the IDs of the Kubernetes clusters to which the firewall will allow traffic
+            required: false
           tags:
             type: list
             elements: str
@@ -138,6 +144,12 @@ options:
             description:
               - List of strings containing the IDs of the Load Balancers to which the firewall will allow traffic
             required: false
+          kubernetes_ids:
+            type: list
+            elements: str
+            description:
+              - List of strings containing the IDs of the Kubernetes clusters to which the firewall will allow traffic
+            required: false
           tags:
             type: list
             elements: str
@@ -165,6 +177,7 @@ EXAMPLES = """
           addresses: ["1.2.3.4"]
           droplet_ids: ["my_droplet_id_1", "my_droplet_id_2"]
           load_balancer_uids: ["my_lb_id_1", "my_lb_id_2"]
+          kubernetes_ids: ["my_k8s_id_1", "my_k8s_id_2"]
           tags: ["tag_1", "tag_2"]
       - protocol: "tcp"
         ports: "80"
@@ -215,6 +228,10 @@ data:
                   "load_balancer_uids": [
                       "my_lb_id_1",
                       "my_lb_id_2"
+                  ],
+                  "kubernetes_ids": [
+                      "my_k8s_id_1",
+                      "my_k8s_id_2"
                   ],
                   "tags": [
                       "tag_1",
@@ -293,6 +310,7 @@ address_spec = dict(
     addresses=dict(type="list", elements="str", required=False),
     droplet_ids=dict(type="list", elements="str", required=False),
     load_balancer_uids=dict(type="list", elements="str", required=False),
+    kubernetes_ids=dict(type="list", elements="str", required=False),
     tags=dict(type="list", elements="str", required=False),
 )
 
@@ -384,12 +402,16 @@ class DOFirewall(object):
         load_balancer_uids = obj.get("load_balancer_uids") or []
         load_balancer_uids = [str(uid) for uid in load_balancer_uids]
 
+        kubernetes_ids = obj.get("kubernetes_ids") or []
+        kubernetes_ids = [str(k8s_id) for k8s_id in kubernetes_ids]
+
         tags = obj.get("tags") or []
 
         data = {
             "addresses": addresses,
             "droplet_ids": droplet_ids,
             "load_balancer_uids": load_balancer_uids,
+            "kubernetes_ids": kubernetes_ids,
             "tags": tags,
         }
 
