@@ -50,7 +50,9 @@ options:
     type: bool
     required: false
   entities:
-    description: Alert entities, required for C(state=present)
+    description:
+      - Alert entities, required for C(state=present)
+      - To apply to all entities provide an empty list
     type: list
     elements: str
     required: false
@@ -149,6 +151,10 @@ from ansible_collections.community.digitalocean.plugins.module_utils.digital_oce
     DigitalOceanHelper,
 )
 
+alerts_spec = dict(
+    email=dict(type="list", elements="str", required=False, default=[]),
+    slack=dict(type="list", elements="dict", required=False, default=[]),
+)
 
 alert_types = [
     "v1/insights/droplet/load_1",
@@ -194,9 +200,7 @@ class DOMonitoringAlerts(object):
         return alerts
 
     def get_alert(self):
-        alerts = self.rest.get_paginated_data(
-            base_url="monitoring/alerts?", data_key_name="policies"
-        )
+        alerts = self.get_alerts()
         for alert in alerts:
             for alert_key in alert_keys:
                 if alert.get(alert_key, None) != self.module.params.get(
@@ -295,7 +299,7 @@ def main():
             state=dict(
                 choices=["present", "absent"], default="present", required=False
             ),
-            alerts=dict(type="dict", required=False),
+            alerts=dict(type="dict", required=False, options=alerts_spec),
             compare=dict(
                 type="str", choices=["GreaterThan", "LessThan"], required=False
             ),
