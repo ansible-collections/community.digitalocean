@@ -1,3 +1,2 @@
 minor_changes:
-  - digital_ocean_monitoring_alerts - update list of alert types
-    (https://github.com/ansible-collections/community.digitalocean/issues/370).
+  - digital_ocean_monitoring_alerts - update list of alert types (https://github.com/ansible-collections/community.digitalocean/issues/370).
