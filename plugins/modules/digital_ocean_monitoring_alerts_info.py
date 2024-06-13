@@ -39,12 +39,12 @@ options:
 
 
 EXAMPLES = r"""
-- name: Get Droplet Monitoring alerts polices
+- name: Get all Monitoring alerts polices
   community.digitalocean.digital_ocean_monitoring_alerts_info:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
   register: monitoring_alerts
 
-- name: Get specific Droplet Monitoring alerts policy
+- name: Get specific Monitoring alerts policy
   community.digitalocean.digital_ocean_monitoring_alerts_info:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
     uuid: ec48b0e7-23bb-4a7f-95f2-d83da62fcd60
