@@ -217,10 +217,11 @@ class DOKubernetesInfo(object):
 
 def run(module):
     cluster = DOKubernetesInfo(module)
-    if module.params["name"]:
-        cluster.get()
-    else:
+    name = module.params.get("name", None)
+    if name is None:
         cluster.get_all()
+    else:
+        cluster.get()
 
 
 def main():
