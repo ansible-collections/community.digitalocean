@@ -27,7 +27,7 @@ options:
     description:
       - A human-readable name for a Kubernetes cluster.
     type: str
-    required: true
+    required: false
   return_kubeconfig:
     description:
       - Controls whether or not to return the C(kubeconfig).
@@ -38,6 +38,10 @@ options:
 
 
 EXAMPLES = r"""
+- name: Gather information about all DigitalOcean Kubernetes clusters
+  community.digitalocean.digital_ocean_kubernetes_info:
+    oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+
 - name: Get information about an existing DigitalOcean Kubernetes cluster
   community.digitalocean.digital_ocean_kubernetes_info:
     oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
@@ -152,18 +156,17 @@ class DOKubernetesInfo(object):
 
     def get_all_clusters(self):
         """Returns all DigitalOcean Kubernetes clusters"""
-        response = self.rest.get("kubernetes/clusters")
-        json_data = response.json
-        if response.status_code == 200:
-            return json_data
-        return None
+        response = self.rest.get_paginated_data(
+            base_url="kubernetes/clusters?", data_key_name="kubernetes_clusters"
+        )
+        return response
 
     def get_by_name(self, cluster_name):
         """Returns an existing DigitalOcean Kubernetes cluster matching on name"""
         if not cluster_name:
             return None
         clusters = self.get_all_clusters()
-        for cluster in clusters["kubernetes_clusters"]:
+        for cluster in clusters:
             if cluster["name"] == cluster_name:
                 return cluster
         return None
@@ -198,10 +201,27 @@ class DOKubernetesInfo(object):
             self.module.exit_json(changed=False, data=json_data)
         self.module.fail_json(changed=False, msg="Kubernetes cluster not found")
 
+    def get_all(self):
+        """Fetches all existing DigitalOcean Kubernetes clusters
+        API reference: https://docs.digitalocean.com/reference/api/api-reference/#operation/list_all_kubernetes_clusters
+        """
+        response = self.get_all_clusters()
+        if response:
+            if self.return_kubeconfig:
+                for cluster in response:
+                    self.cluster_id = cluster["id"]
+                    cluster["kubeconfig"] = self.get_kubernetes_kubeconfig()
+            self.module.exit_json(changed=False, data=response)
+        self.module.fail_json(changed=False, msg="Kubernetes clusters not found")
+
 
 def run(module):
     cluster = DOKubernetesInfo(module)
-    cluster.get()
+    name = module.params.get("name", None)
+    if name is None:
+        cluster.get_all()
+    else:
+        cluster.get()
 
 
 def main():
@@ -216,7 +236,7 @@ def main():
                 ),
                 required=True,
             ),
-            name=dict(type="str", required=True),
+            name=dict(type="str", required=False),
             return_kubeconfig=dict(type="bool", default=False),
         ),
         supports_check_mode=True,
