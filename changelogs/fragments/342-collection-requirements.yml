@@ -1,2 +1,0 @@
-trivial:
-  - ci - add test-deps to integration test workflows (https://github.com/ansible-collections/community.digitalocean/issues/342).

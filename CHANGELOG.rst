@@ -5,6 +5,15 @@ Community DigitalOcean Release Notes
 .. contents:: Topics
 
 
+v1.27.0
+=======
+
+Release Summary
+---------------
+
+CI, documentation, and Python updates.
+
+
 v1.26.0
 =======
 
