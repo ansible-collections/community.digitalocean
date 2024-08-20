@@ -1,2 +1,0 @@
-trivial:
-  - ci - add new and drop deprecated versions of ``ansible-core`` (https://github.com/ansible-collections/community.digitalocean/issues/351).
