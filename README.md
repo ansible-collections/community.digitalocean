@@ -6,6 +6,11 @@
 [![sanity](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-sanity.yml)
 [![unit](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-unit.yml/badge.svg)](https://github.com/ansible-collections/community.digitalocean/actions/workflows/ansible-test-unit.yml)
 
+> **⚠️ IMPORTANT NOTICE**  
+> This repository is no longer actively maintained. We recommend switching to the `digitalocean.cloud` collection.  
+> **New users should use:** [`digitalocean.cloud`](https://github.com/digitalocean/ansible-collection)  
+> Install with: `ansible-galaxy collection install digitalocean.cloud`
+
 This collection contains modules and plugins to assist in automating [DigitalOcean](https://www.digitalocean.com) infrastructure and API interactions with Ansible.
 
 ## Communication
